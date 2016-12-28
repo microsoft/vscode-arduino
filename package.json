@@ -1,0 +1,58 @@
+{
+  "name": "vscode-arduino",
+  "displayName": "vscode-arduino",
+  "description": "Visual Studio Code Extension for Arduino",
+  "version": "0.0.1",
+  "publisher": "Microsoft",
+  "engines": {
+    "vscode": "^1.5.0"
+  },
+  "categories": [
+    "Languages",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onCommand:extension.verifyArduino",
+    "onCommand:extension.uploadArduino"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.verifyArduino",
+        "title": "Arduino: verfiy"
+      },
+      {
+        "command": "extension.uploadArduino",
+        "title": "Arduino: upload"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Arduino configuration",
+      "properties": {
+        "arduino.path": {
+          "type": "string",
+          "default": "arduino",
+          "description": "Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.40",
+    "gulp": "^3.9.1",
+    "gulp-tslint": "^7.0.1",
+    "mocha": "^2.3.3",
+    "tslint": "^4.2.0",
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0"
+  }
+}
