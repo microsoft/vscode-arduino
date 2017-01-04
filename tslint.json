@@ -1,5 +1,10 @@
 {
+    "extends": "tslint:recommended",
     "rules": {
+        "variable-name": [
+            true,
+            "allow-leading-underscore"
+        ],
         "no-unused-expression": true,
         "no-duplicate-variable": true,
         "curly": true,
@@ -7,6 +12,9 @@
         "semicolon": [
             "always"
         ],
-        "triple-equals": true
+        "triple-equals": true,
+        "max-line-length": [
+            150
+        ]
     }
 }

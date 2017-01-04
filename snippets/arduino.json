@@ -1,0 +1,16 @@
+{
+    "loop": {
+        "prefix": "loop",
+        "body": [
+            "void loop()",
+            "{\n}"
+        ]
+    },
+    "setup": {
+        "prefix": "setup",
+        "body": [
+            "void setup()",
+            "{\n}"
+        ]
+    }
+}
