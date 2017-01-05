@@ -13,10 +13,17 @@
   ],
   "activationEvents": [
     "onCommand:extension.verifyArduino",
-    "onCommand:extension.uploadArduino"
+    "onCommand:extension.uploadArduino",
+    "workspaceContains:device.json"
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "snippets": [
+      {
+        "language": "cpp",
+        "path": "./snippets/arduino.json"
+      }
+    ],
     "commands": [
       {
         "command": "extension.verifyArduino",

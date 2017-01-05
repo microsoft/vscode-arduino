@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fsHelper from '../helper/fsHelper';
+import * as path from "path";
+import * as vscode from "vscode";
+import * as util from "../common/util";
 
 export const IS_WINDOWS = /^win/.test(process.platform);
 
@@ -11,21 +11,22 @@ export interface IArduinoSettings {
 }
 
 export class ArduinoSettings implements IArduinoSettings {
-    private static arduinoSettings: ArduinoSettings = new ArduinoSettings();
-    constructor() {
-        this.initializeSettings();
-    }
-
     public static getIntance(): ArduinoSettings {
         return ArduinoSettings.arduinoSettings;
     }
 
-    private initializeSettings() {
-        let arduinoConfig = vscode.workspace.getConfiguration('arduino');
-        this.arduinoPath = arduinoConfig.get<string>('arduinoPath');
-    }
+    private static arduinoSettings: ArduinoSettings = new ArduinoSettings();
 
     private _arduinoPath: string;
+
+    constructor() {
+        this.initializeSettings();
+    }
+
+    private initializeSettings() {
+        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+        this.arduinoPath = arduinoConfig.get<string>("arduinoPath");
+    }
 
     public get arduinoPath(): string {
         return this._arduinoPath;
@@ -37,25 +38,24 @@ export class ArduinoSettings implements IArduinoSettings {
         }
         try {
             this._arduinoPath = getArduinoExecutable(value);
-        }
-        catch (ex) {
+        } catch (ex) {
             this._arduinoPath = value;
         }
     }
 }
 
 function getArduinoExecutable(arduinoPath: string): string {
-    if (arduinoPath === 'arduino' || fsHelper.fileExists(arduinoPath)) {
+    if (arduinoPath === "arduino" || util.fileExists(arduinoPath)) {
         return arduinoPath;
     }
 
     if (IS_WINDOWS) {
-        if (fsHelper.fileExists(path.join(arduinoPath, 'arduino.exe'))) {
-            return path.join(arduinoPath, 'arduino.exe');
+        if (util.fileExists(path.join(arduinoPath, "arduino.exe"))) {
+            return path.join(arduinoPath, "arduino.exe");
         }
     } else {
-        if (fsHelper.fileExists(path.join(arduinoPath, 'arduino'))) {
-            return path.join(arduinoPath, 'arduino');
+        if (util.fileExists(path.join(arduinoPath, "arduino"))) {
+            return path.join(arduinoPath, "arduino");
         }
     }
     return arduinoPath;
