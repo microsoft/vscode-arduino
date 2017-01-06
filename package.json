@@ -44,7 +44,22 @@
           "description": "Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path."
         }
       }
-    }
+    },
+    "languages": [
+      {
+        "id": "arduino",
+        "extensions": [".ino"],
+        "aliases": ["Arduino", "arduino", "ino"],
+        "configuration": "./syntaxes/arduino.configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "arduino",
+        "path": "./syntaxes/arduino.tmLanguage",
+        "scopeName": "source.cpp.arduino"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
