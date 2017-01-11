@@ -13,7 +13,7 @@ export function fileExists(filePath: string): boolean {
     }
 }
 
-export function spawn(command: string, outputChannel: vscode.OutputChannel, args: T[] = [], options: any = {}): Thenable<Object> {
+export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<Object> {
     return new Promise((resolve, reject) => {
         let stdout = "";
         let stderr = "";

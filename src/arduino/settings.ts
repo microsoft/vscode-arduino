@@ -1,13 +1,15 @@
 "use strict";
 
-import * as path from "path";
-import * as vscode from "vscode";
-import * as util from "../common/util";
-
-export const IS_WINDOWS = /^win/.test(process.platform);
+import os = require("os");
+import path = require("path");
+import vscode = require("vscode");
+import util = require("../common/util");
 
 export interface IArduinoSettings {
     arduinoPath: string;
+    packagePath: string;
+    libPath: string;
+    exePath: string;
 }
 
 export class ArduinoSettings implements IArduinoSettings {
@@ -19,44 +21,42 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _arduinoPath: string;
 
+    private _packagePath: string;
+
+    private _libPath: string;
+
     constructor() {
         this.initializeSettings();
     }
 
     private initializeSettings() {
         let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        this.arduinoPath = arduinoConfig.get<string>("arduinoPath");
+        this.arduinoPath = arduinoConfig.get<string>("path");
+
+        const platform = os.platform();
+        if (platform === "win32") {
+            this._packagePath = path.join(process.env.USERPROFILE, "AppData/Local/Arduino15");
+            this._libPath = path.join(process.env.USERPROFILE, "Documents/Arduino15/libraries");
+        }
     }
 
     public get arduinoPath(): string {
         return this._arduinoPath;
     }
 
+    public get packagePath(): string {
+        return this._packagePath;
+    }
+
+    public get libPath(): string {
+        return this._libPath;
+    }
+
+    public get exePath(): string {
+        return path.join(this._arduinoPath, "arduino_debug");
+    }
+
     public set arduinoPath(value: string) {
-        if (this._arduinoPath === value) {
-            return;
-        }
-        try {
-            this._arduinoPath = getArduinoExecutable(value);
-        } catch (ex) {
-            this._arduinoPath = value;
-        }
+        this._arduinoPath = value;
     }
-}
-
-function getArduinoExecutable(arduinoPath: string): string {
-    if (arduinoPath === "arduino" || util.fileExists(arduinoPath)) {
-        return arduinoPath;
-    }
-
-    if (IS_WINDOWS) {
-        if (util.fileExists(path.join(arduinoPath, "arduino.exe"))) {
-            return path.join(arduinoPath, "arduino.exe");
-        }
-    } else {
-        if (util.fileExists(path.join(arduinoPath, "arduino"))) {
-            return path.join(arduinoPath, "arduino");
-        }
-    }
-    return arduinoPath;
 }
