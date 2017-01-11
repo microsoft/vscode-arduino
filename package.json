@@ -27,11 +27,15 @@
     "commands": [
       {
         "command": "extension.verifyArduino",
-        "title": "Arduino: verfiy"
+        "title": "Arduino: Verfiy"
       },
       {
         "command": "extension.uploadArduino",
-        "title": "Arduino: upload"
+        "title": "Arduino: Upload"
+      },
+      {
+        "command": "extension.addArduinoLibPath",
+        "title": "Arduino: Add libraries paths"
       }
     ],
     "configuration": {
@@ -45,17 +49,9 @@
         }
       }
     },
-    "languages": [
-      {
-        "id": "arduino",
-        "extensions": [".ino"],
-        "aliases": ["Arduino", "arduino", "ino"],
-        "configuration": "./syntaxes/arduino.configuration.json"
-      }
-    ],
     "grammars": [
       {
-        "language": "arduino",
+        "language": "cpp",
         "path": "./syntaxes/arduino.tmLanguage",
         "scopeName": "source.cpp.arduino"
       }
@@ -76,5 +72,8 @@
     "tslint": "^4.2.0",
     "typescript": "^2.0.3",
     "vscode": "^1.0.0"
-  }
+  }, 
+  "extensionDependencies": [
+    "ms-vscode.cpptools"
+  ]
 }
