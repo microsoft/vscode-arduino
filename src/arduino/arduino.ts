@@ -1,11 +1,14 @@
-"use strict";
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------*/
 
 import os = require("os");
 import fs = require("fs");
 import path = require("path");
 import vscode = require("vscode");
 import settings = require("./settings");
-import * as util from "../common/util";
+import util = require("../common/util");
 
 export const outputChannel = vscode.window.createOutputChannel("Arduino");
 
@@ -13,9 +16,9 @@ export function upload(arduinoSettings: settings.IArduinoSettings) {
     return loadProjectConfig(arduinoSettings)
         .then((projectConfig: any) => {
             const boardDescriptor = getBoardDescriptor(projectConfig);
-            const appPath = path.join(vscode.workspace.rootPath, projectConfig.appPath || "src/main.ino");
+            const appPath = path.join(vscode.workspace.rootPath, projectConfig.appPath || "app/app.ino");
             outputChannel.show(true);
-            return util.spawn(arduinoSettings.arduinoPath,
+            return util.spawn(arduinoSettings.commandPath,
                 outputChannel,
                 ["--upload", "--board", boardDescriptor, "--port", projectConfig.port, appPath]);
         });
@@ -25,9 +28,9 @@ export function verify(arduinoConfig: settings.IArduinoSettings) {
     return loadProjectConfig(arduinoConfig)
         .then((projectConfig: any) => {
             const boardDescriptor = getBoardDescriptor(projectConfig);
-            const appPath = path.join(vscode.workspace.rootPath, projectConfig.appPath || "src/main.ino");
+            const appPath = path.join(vscode.workspace.rootPath, projectConfig.appPath || "app/app.ino");
             outputChannel.show(true);
-            return util.spawn(arduinoConfig.exePath,
+            return util.spawn(arduinoConfig.commandPath,
                 outputChannel,
                 ["--verify", "--board", boardDescriptor, "--port", projectConfig.port, appPath]);
         });
@@ -37,6 +40,7 @@ export function addLibPath(arduinoConfig: settings.IArduinoSettings) {
     return loadProjectConfig(arduinoConfig)
         .then((projectConfig: any) => {
             const paths = getPackageLibPaths(arduinoConfig.packagePath, projectConfig);
+            paths.push(arduinoConfig.libPath);
             return vscode.workspace.findFiles("**/c_cpp_properties.json", null, 1)
                 .then((files) => {
                     if (!files || !files.length || files.length < 1) {
@@ -45,7 +49,7 @@ export function addLibPath(arduinoConfig: settings.IArduinoSettings) {
                     const propertyFile = files[0];
                     const context = JSON.parse(fs.readFileSync(propertyFile.fsPath, "utf8"));
                     context.configurations.forEach((configSection) => {
-                        if (configSection.name !== getCppConfigPlatform()) {
+                        if (configSection.name !== util.getCppConfigPlatform()) {
                             return;
                         }
                         paths.forEach((libPath) => {
@@ -120,16 +124,4 @@ function getPackageLibPaths(packageRootPath: string, boardConfig: any): string[]
     result.push(path.join(versionRoot, toolsPath, "libraries"));
 
     return result;
-}
-
-/** c_cpp_properties.json has its own platform name literanls. */
-function getCppConfigPlatform() {
-    const plat = os.platform();
-    if (plat === "linux") {
-        return "Linux";
-    } else if (plat === "darwin") {
-        return "Mac";
-    } else if (plat === "win32") {
-        return "Win32";
-    }
 }
