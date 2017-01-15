@@ -35,7 +35,7 @@
       },
       {
         "command": "extension.addArduinoLibPath",
-        "title": "Arduino: Add libraries paths"
+        "title": "Arduino: Add library paths"
       }
     ],
     "configuration": {
@@ -72,7 +72,7 @@
     "tslint": "^4.2.0",
     "typescript": "^2.0.3",
     "vscode": "^1.0.0"
-  }, 
+  },
   "extensionDependencies": [
     "ms-vscode.cpptools"
   ]

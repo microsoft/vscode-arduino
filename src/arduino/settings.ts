@@ -1,4 +1,7 @@
-"use strict";
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------*/
 
 import os = require("os");
 import path = require("path");
@@ -7,17 +10,17 @@ import util = require("../common/util");
 
 export interface IArduinoSettings {
     arduinoPath: string;
+    commandPath: string;
     packagePath: string;
     libPath: string;
-    exePath: string;
 }
 
 export class ArduinoSettings implements IArduinoSettings {
     public static getIntance(): ArduinoSettings {
-        return ArduinoSettings.arduinoSettings;
+        return ArduinoSettings._arduinoSettings;
     }
 
-    private static arduinoSettings: ArduinoSettings = new ArduinoSettings();
+    private static _arduinoSettings: ArduinoSettings = new ArduinoSettings();
 
     private _arduinoPath: string;
 
@@ -36,7 +39,13 @@ export class ArduinoSettings implements IArduinoSettings {
         const platform = os.platform();
         if (platform === "win32") {
             this._packagePath = path.join(process.env.USERPROFILE, "AppData/Local/Arduino15");
-            this._libPath = path.join(process.env.USERPROFILE, "Documents/Arduino15/libraries");
+            this._libPath = path.join(process.env.USERPROFILE, "Documents/Arduino/libraries");
+        } else if (platform === "linux") {
+            this._packagePath = path.join(process.env.HOME, ".arduino15");
+            this._libPath = path.join(process.env.HOME, "Arduino/libraries");
+        } else if (platform === "darwin") {
+            this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
+            this._libPath = path.join(process.env.HOME, "Documents/Arduino/libraries");
         }
     }
 
@@ -52,7 +61,7 @@ export class ArduinoSettings implements IArduinoSettings {
         return this._libPath;
     }
 
-    public get exePath(): string {
+    public get commandPath(): string {
         return path.join(this._arduinoPath, "arduino_debug");
     }
 

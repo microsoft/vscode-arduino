@@ -1,9 +1,25 @@
-"use strict";
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------*/
 
 import fs = require("fs");
+import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
 import childProcess = require("child_process");
+
+/** c_cpp_properties.json has its own platform name literanls. */
+export function getCppConfigPlatform(): string {
+    const plat = os.platform();
+    if (plat === "linux") {
+        return "Linux";
+    } else if (plat === "darwin") {
+        return "Mac";
+    } else if (plat === "win32") {
+        return "Win32";
+    }
+}
 
 export function fileExists(filePath: string): boolean {
     try {
