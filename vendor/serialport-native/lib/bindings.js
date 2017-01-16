@@ -1,6 +1,6 @@
 'use strict';
 
-const bindings = require('./native_loader').load(__dirname +'/native', 'serialport')
+const bindings = require('./native_loader').load(__dirname +'/native', 'serialport-native')
 let listUnix = require('./list-unix');
 
 let linux = process.platform !== 'win32' && process.platform !== 'darwin';

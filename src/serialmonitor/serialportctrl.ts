@@ -27,7 +27,7 @@ class SerialPortCtrl {
     public static listBaudRates(): number[] {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
     }
-    private static serialport = require("../../../vendor/serialport");
+    private static serialport = require("../../../vendor/serialport-native");
     private _portStatusBar: StatusBarItem;
     private _baudRateStatusBar: StatusBarItem;
     private _outputChannel: OutputChannel;
