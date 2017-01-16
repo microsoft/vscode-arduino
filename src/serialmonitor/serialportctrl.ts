@@ -11,9 +11,8 @@ interface ISerialPortDetail {
 class SerialPortCtrl {
     public static SERIAL_MONITOR: string = "Serial Monitor";
     public static DEFAULT_BAUD_RATE: number = 9600;
-    static serialport = require("../../../vendor/serialport");
-    public static list(): Promise<ISerialPortDetail[]> {
 
+    public static list(): Promise<ISerialPortDetail[]> {
         return new Promise((resolve, reject) => {
             SerialPortCtrl.serialport.list((e: any, ports: ISerialPortDetail[]) => {
                 if (e) {
@@ -24,9 +23,11 @@ class SerialPortCtrl {
             });
         });
     }
+
     public static listBaudRates(): number[] {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
     }
+    private static serialport = require("../../../vendor/serialport");
     private _portStatusBar: StatusBarItem;
     private _baudRateStatusBar: StatusBarItem;
     private _outputChannel: OutputChannel;
@@ -72,7 +73,6 @@ class SerialPortCtrl {
                 });
             } else {
                 this._portStatusBar.text = this._currentPort;
-                const serialport = require("../../../vendor/serialport");
                 this._baudRateStatusBar.text = this._currentBaudRate.toString();
                 this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, {baudRate: this._currentBaudRate});
                 this._outputChannel.show();
@@ -80,8 +80,8 @@ class SerialPortCtrl {
                     this._outputChannel.append(_event.toString());
                 });
 
-                this._currentSerialPort.on("error", (_event) => {
-                    this._outputChannel.appendLine("[Error]" + _event.toString());
+                this._currentSerialPort.on("error", (_error) => {
+                    this._outputChannel.appendLine("[Error]" + _error.toString());
                 });
             }
         });
@@ -226,5 +226,9 @@ export async function changBaudRate() {
 }
 
 export function closeSerialPort() {
-    return ctrl.stop();
+    if (ctrl) {
+        return ctrl.stop();
+    } else {
+        window.showWarningMessage("Serial Monitor has not been started!");
+    }
 }

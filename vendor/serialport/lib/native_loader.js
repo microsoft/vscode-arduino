@@ -1,9 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const loadLibrary = function(parentFolder, libraryName) {
-    const files = glob(`${parentFolder}/${libraryName}*${process.platform}*.node`, {sync: true});
-    // const files = glob(path.dirname(__dirname)+ `/build/**/*.node`, {sync: true});
-    console.log(files);
+    const files = glob(`${parentFolder}/${libraryName}*${process.platform}*.node`, {sync: true});    
     var binding = null;
     files.forEach(file => {
         try {

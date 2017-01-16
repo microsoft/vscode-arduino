@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("extension.openSerialPort", () => openSerialPort()));
     context.subscriptions.push(vscode.commands.registerCommand("extension.changBaudRate", () => changBaudRate()));
     context.subscriptions.push(vscode.commands.registerCommand("extension.sendMessageToSerialPort", () => sendMessageToSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("extension.stopSerialMonitor", () => closeSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("extension.closeSerialPort", () => closeSerialPort()));
 
     // Add arduino specific library file completion.
     const provider = new IncludeCompletionProvider();
