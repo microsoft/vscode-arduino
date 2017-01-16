@@ -1,0 +1,104 @@
+{
+  "name": "serialport",
+  "version": "4.0.7",
+  "description": "Node.js package to access serial ports. Welcome your robotic javascript overlords. Better yet, program them!",
+  "author": {
+    "name": "Chris Williams",
+    "email": "voodootikigod@gmail.com",
+    "url": "http://www.voodootikigod.com"
+  },
+  "binary": {
+    "module_name": "serialport",
+    "module_path": "build/{configuration}/",
+    "host": "https://github.com/EmergingTechnologyAdvisors/node-serialport/releases/download/4.0.7"
+  },
+  "main": "./lib/serialport",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/EmergingTechnologyAdvisors/node-serialport.git"
+  },
+  "keywords": [
+    "serialport",
+    "johnny-five",
+    "serial port",
+    "hardware",
+    "iot",
+    "nodebots"
+  ],
+  "maintainers": [
+    {
+      "name": "Jacob Rosenthal",
+      "email": "jakerosenthal@gmail.com"
+    },
+    {
+      "name": "Chris Williams",
+      "email": "voodootikigod@gmail.com"
+    },
+    {
+      "name": "Joe Ferner",
+      "email": "joe.ferner@nearinfinity.com"
+    },
+    {
+      "name": "Jay Beavers",
+      "email": "jay@hikinghomeschoolers.org"
+    },
+    {
+      "name": "Rob Giseburt",
+      "email": "giseburt@gmail.com"
+    },
+    {
+      "name": "Francis Gulotta",
+      "email": "wizard@roborooter.com"
+    }
+  ],
+  "dependencies": {
+    "bindings": "1.2.1",
+    "commander": "^2.9.0",
+    "debug": "^2.3.2",
+    "lie": "^3.1.0",
+    "nan": "^2.4.0",
+    "node-pre-gyp": "^0.6.32",
+    "object.assign": "^4.0.3"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-subset": "^1.2.2",
+    "coveralls": "^2.11.9",
+    "eslint-config-standard": "^5.1.0",
+    "eslint-plugin-promise": "^1.1.0",
+    "eslint-plugin-standard": "^1.3.2",
+    "grunt": "^1.0.0",
+    "grunt-mocha-test": "^0.12.7",
+    "gruntify-eslint": "^2.0.0",
+    "mocha": "^2.4.5",
+    "node-pre-gyp-github": "^1.1.2",
+    "nyc": "^6.4.4",
+    "sandboxed-module": "^2.0.3",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0"
+  },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "bin": {
+    "serialport-list": "./bin/serialport-list.js",
+    "serialport-term": "./bin/serialport-terminal.js"
+  },
+  "license": "MIT",
+  "scripts": {
+    "install": "node-pre-gyp install --fallback-to-build",
+    "rebuild-all": "npm rebuild && node-gyp rebuild",
+    "gyp-rebuild": "node-gyp rebuild",
+    "stress": "mocha --no-timeouts test/arduinoTest/stress.js",
+    "integration": "mocha test/arduinoTest/integration.js test/integration-lite.js",
+    "grunt": "grunt",
+    "lint": "grunt --verbose lint",
+    "test": "nyc grunt --verbose test",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "valgrind": "valgrind --leak-check=full --show-possibly-lost=no node --expose-gc --trace-gc node_modules/.bin/grunt test"
+  },
+  "gypfile": true
+}
