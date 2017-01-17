@@ -14,6 +14,10 @@
   "activationEvents": [
     "onCommand:extension.verifyArduino",
     "onCommand:extension.uploadArduino",
+    "onCommand:extension.openSerialPort",
+    "onCommand:extension.changBaudRate",
+    "onCommand:extension.closeSerialPort",
+    "onCommand:extension.sendMessageToSerialPort",
     "workspaceContains:device.json"
   ],
   "main": "./out/src/extension",
@@ -36,6 +40,22 @@
       {
         "command": "extension.addArduinoLibPath",
         "title": "Arduino: Add library paths"
+      },
+      {
+        "command": "extension.openSerialPort",
+        "title": "Open Serial Port"
+      },
+      {
+        "command": "extension.changBaudRate",
+        "title": "Change Baud Rate"
+      },
+      {
+        "command": "extension.closeSerialPort",
+        "title": "Stop Serial Monitor"
+      },
+      {
+        "command": "extension.sendMessageToSerialPort",
+        "title": "Send Text to Serial Port"
       }
     ],
     "configuration": {
@@ -75,5 +95,8 @@
   },
   "extensionDependencies": [
     "ms-vscode.cpptools"
-  ]
+  ],
+  "dependencies": {
+    "glob": "^7.1.1"
+  }
 }

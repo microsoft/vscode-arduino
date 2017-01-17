@@ -1,0 +1,21 @@
+{
+  "name": "serialport-native",
+  "description": "Node js operation for seraial port!",
+  "main": "./lib/serialport",
+  "dependencies": {
+    "glob": "^7.1.1"
+  },
+  "devDependencies": {
+    "nan": "^2.4.0"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "license": "MIT",
+  "scripts": {
+    "install": "node-gyp rebuild --target=1.4.6 --arch=x64 --dist-url=https://atom.io/download/electron",
+    "install32": "node-gyp rebuild --target=1.4.6 --arch=ia32 --dist-url=https://atom.io/download/electron",
+    "rebuild-all": "npm rebuild && node-gyp rebuild --target=1.4.6 --arch=ia32 --dist-url=https://atom.io/download/electron"
+  },
+  "gypfile": true
+}
