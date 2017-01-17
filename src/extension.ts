@@ -8,12 +8,19 @@ import settings = require("./arduino/settings");
 import { addLibPath, upload, verify } from "./arduino/arduino";
 import { CompletionProvider } from "./arduino/completionProvider";
 import { DefinitionProvider } from "./arduino/definitionProvider";
+import { changBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort} from "./serialmonitor/serialportctrl";
 
 export function activate(context: vscode.ExtensionContext) {
     let arduinoSettings = settings.ArduinoSettings.getIntance();
     vscode.commands.registerCommand("extension.verifyArduino", () => verify(arduinoSettings));
     vscode.commands.registerCommand("extension.uploadArduino", () => upload(arduinoSettings));
     vscode.commands.registerCommand("extension.addArduinoLibPath", () => addLibPath(arduinoSettings));
+
+    // serial monitor commands
+    context.subscriptions.push(vscode.commands.registerCommand("extension.openSerialPort", () => openSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("extension.changBaudRate", () => changBaudRate()));
+    context.subscriptions.push(vscode.commands.registerCommand("extension.sendMessageToSerialPort", () => sendMessageToSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("extension.closeSerialPort", () => closeSerialPort()));
 
     // Add arduino specific library file completion.
     const completionProvider = new CompletionProvider();
