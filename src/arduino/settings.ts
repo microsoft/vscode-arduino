@@ -4,15 +4,18 @@
  *--------------------------------------------------------*/
 
 import os = require("os");
+import fs = require("fs");
 import path = require("path");
 import vscode = require("vscode");
 import util = require("../common/util");
+import constants = require("../common/constants");
 
 export interface IArduinoSettings {
     arduinoPath: string;
     commandPath: string;
     packagePath: string;
     libPath: string;
+    includePath: string[];
 }
 
 export class ArduinoSettings implements IArduinoSettings {
@@ -27,6 +30,8 @@ export class ArduinoSettings implements IArduinoSettings {
     private _packagePath: string;
 
     private _libPath: string;
+
+    private _includePath: string[];
 
     constructor() {
         this.initializeSettings();
@@ -47,6 +52,25 @@ export class ArduinoSettings implements IArduinoSettings {
             this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
             this._libPath = path.join(process.env.HOME, "Documents/Arduino/libraries");
         }
+
+        this.loadIncludePath();
+    }
+
+    private loadIncludePath() {
+        this._includePath = [];
+        const cppProperties = JSON.parse(fs.readFileSync(path.join(vscode.workspace.rootPath, constants.C_CPP_PROPERTIES), "utf8"));
+        if (!cppProperties || !cppProperties.configurations) {
+            return;
+        }
+        const plat = util.getCppConfigPlatform();
+        cppProperties.configurations.forEach((configSection) => {
+            if (configSection.name === plat && Array.isArray(configSection.includePath)) {
+                configSection.includePath.forEach((includePath) => {
+                    this._includePath.push(includePath);
+                });
+            }
+        });
+
     }
 
     public get arduinoPath(): string {
@@ -67,5 +91,13 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public set arduinoPath(value: string) {
         this._arduinoPath = value;
+    }
+
+    public set includePath(value: string[]) {
+        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+    }
+
+    public get includePath(): string[] {
+        return this._includePath;
     }
 }

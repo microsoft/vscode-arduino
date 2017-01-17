@@ -7,6 +7,7 @@
         ],
         "no-unused-expression": true,
         "no-duplicate-variable": true,
+        "no-empty": false,
         "curly": true,
         "class-name": true,
         "semicolon": [

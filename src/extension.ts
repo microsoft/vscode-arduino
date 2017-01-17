@@ -5,8 +5,9 @@
 
 import vscode = require("vscode");
 import settings = require("./arduino/settings");
-import { addLibPath, outputChannel, upload, verify } from "./arduino/arduino";
-import { IncludeCompletionProvider } from "./arduino/include";
+import { addLibPath, upload, verify } from "./arduino/arduino";
+import { CompletionProvider } from "./arduino/completionProvider";
+import { DefinitionProvider } from "./arduino/definitionProvider";
 
 export function activate(context: vscode.ExtensionContext) {
     let arduinoSettings = settings.ArduinoSettings.getIntance();
@@ -15,7 +16,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("extension.addArduinoLibPath", () => addLibPath(arduinoSettings));
 
     // Add arduino specific library file completion.
-    const provider = new IncludeCompletionProvider();
-    context.subscriptions.push(provider);
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider("cpp", provider, "<", '"'));
+    const completionProvider = new CompletionProvider();
+    context.subscriptions.push(completionProvider);
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider("cpp", completionProvider, "<", '"', "."));
+
+    const definitionProvider = new DefinitionProvider();
+    context.subscriptions.push(vscode.languages.registerDefinitionProvider("cpp", definitionProvider));
 }

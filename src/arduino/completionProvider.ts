@@ -7,13 +7,42 @@ import fs = require("fs");
 import path = require("path");
 import vscode = require("vscode");
 import constants = require("../common/constants");
-import util = require("../common/util")
+import util = require("../common/util");
+import { provideCompletionItems } from "./clang";
 
-export class IncludeCompletionProvider implements vscode.CompletionItemProvider, vscode.Disposable {
-
+export class CompletionProvider implements vscode.CompletionItemProvider, vscode.Disposable {
     private _headerFiles = new Set<string>();
     private _watcher: vscode.FileSystemWatcher;
     private _cppPropertyFilePath: string = path.join(vscode.workspace.rootPath, constants.C_CPP_PROPERTIES);
+
+    public constructor() {
+        this.updateHeaderFileList();
+        this._watcher = vscode.workspace.createFileSystemWatcher(this._cppPropertyFilePath);
+        this._watcher.onDidCreate(() => this.updateHeaderFileList());
+        this._watcher.onDidChange(() => this.updateHeaderFileList());
+        this._watcher.onDidDelete(() => this.updateHeaderFileList());
+    }
+
+    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
+        vscode.CompletionItem[] | Thenable<vscode.CompletionItem[]> {
+        // Check if we are currently inside an include statement.
+        const text = document.lineAt(position.line).text.substr(0, position.character);
+        const match = text.match(/^\s*#\s*include\s*(<[^>]*|"[^"]*)$/);
+
+        if (match) {
+            let result = [];
+            this._headerFiles.forEach((headerFile) => {
+                result.push(new vscode.CompletionItem(headerFile, vscode.CompletionItemKind.File));
+            });
+            return result;
+        } else {
+            return provideCompletionItems(document, position, token);
+        }
+    }
+
+    public dispose() {
+        this._watcher.dispose();
+    }
 
     private addLibFiles(libPath: string): void {
         const subItems = fs.readdirSync(libPath);
@@ -27,7 +56,7 @@ export class IncludeCompletionProvider implements vscode.CompletionItemProvider,
                 }
             } catch (ex) {
             }
-        })
+        });
     }
 
     private updateHeaderFileList(): void {
@@ -44,37 +73,8 @@ export class IncludeCompletionProvider implements vscode.CompletionItemProvider,
             if (configSection.name === plat && Array.isArray(configSection.includePath)) {
                 configSection.includePath.forEach((includePath) => {
                     this.addLibFiles(includePath);
-                })
+                });
             }
         });
-    }
-
-    public constructor() {
-        this.updateHeaderFileList();
-
-        this._watcher = vscode.workspace.createFileSystemWatcher(this._cppPropertyFilePath);
-        this._watcher.onDidCreate(() => this.updateHeaderFileList());
-        this._watcher.onDidChange(() => this.updateHeaderFileList());
-        this._watcher.onDidDelete(() => this.updateHeaderFileList());
-    }
-
-    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.CompletionItem[] {
-        // Check if we are currently inside an include statement.
-        const text = document.lineAt(position.line).text.substr(0, position.character);
-        const match = text.match(/^\s*#\s*include\s*(<[^>]*|"[^"]*)$/);
-
-        if (!match) {
-            return [];
-        }
-
-        let result = [];
-        this._headerFiles.forEach((headerFile) => {
-            result.push(new vscode.CompletionItem(headerFile, vscode.CompletionItemKind.File));
-        });
-        return result;
-    }
-
-    public dispose() {
-        this._watcher.dispose();
     }
 }
