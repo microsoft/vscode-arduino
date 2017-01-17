@@ -92,10 +92,11 @@ class SerialPortCtrl {
 
     public sendMessage(text: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            if (!text) {
+            if (!text || !this._currentSerialPort || !this.isActive()) {
                 resolve();
                 return;
             }
+
             this._currentSerialPort.write(text, (error) => {
                 if (!error) {
                     resolve();
@@ -107,14 +108,12 @@ class SerialPortCtrl {
     }
 
      public changePort(newPort: string): Promise<any> {
-        if (this._currentPort === newPort) {
-            return;
-        }
-        this._currentPort = newPort;
-        if (!this._currentSerialPort) {
-            return;
-        }
         return new Promise((resolve, reject) => {
+            this._currentPort = newPort;
+            if (!this._currentSerialPort || !this.isActive()) {
+                resolve();
+                return;
+            }
             this._currentSerialPort.close((err) => {
                 if (err) {
                     reject(err);
@@ -128,13 +127,11 @@ class SerialPortCtrl {
 
     public stop(): Promise<any> {
        return new Promise((resolve, reject) => {
-           if (!this._currentSerialPort) {
-               return resolve();
-           }
-           if (!this._currentSerialPort.isOpen()) {
-               return resolve();
-           }
-           this._currentSerialPort.close((err) => {
+            if (!this._currentSerialPort || !this.isActive()) {
+                resolve();
+                return;
+            }
+            this._currentSerialPort.close((err) => {
                 if (this._outputChannel) {
                     this._outputChannel.appendLine("User stopped!");
                 }
@@ -148,12 +145,12 @@ class SerialPortCtrl {
         });
     }
     public changeBaudRate(newRate: number): Promise<any> {
-        this._currentBaudRate = newRate;
-        if (!this._currentSerialPort) {
-            return;
-        }
-
         return new Promise((resolve, reject) => {
+            this._currentBaudRate = newRate;
+            if (!this._currentSerialPort || !this.isActive()) {
+                resolve();
+                return;
+            }
             this._baudRateStatusBar.text = this._currentBaudRate.toString();
             this._currentSerialPort.update({baudRate: this._currentBaudRate}, (err) => {
                if (err) {
@@ -179,7 +176,7 @@ export async function openSerialPort() {
                 label: l.comName,
             };
     }).sort((a, b): number => {
-        return a.label == b.label ? 0 : (a.label > b.label ? 1 : -1);
+        return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
     }));
     if (chosen && chosen.label) {
        if (ctrl) {
