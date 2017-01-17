@@ -9,8 +9,6 @@ const debug = function(message) {
 
 
 // shims
-var assign = require('object.assign').getPolyfill();
-
 // Internal Dependencies
 var SerialPortBinding = require('./bindings');
 var parsers = require('./parsers');
@@ -98,7 +96,7 @@ function SerialPort(path, options, callback) {
     this.path = path;
 
     var correctedOptions = correctOptions(options);
-    var settings = assign({}, defaultSettings, correctedOptions);
+    var settings = Object.assign({}, defaultSettings, correctedOptions);
 
     if (typeof settings.baudRate !== 'number') {
         throw new TypeError('Invalid "baudRate" must be a number got: ' + settings.baudRate);
@@ -200,7 +198,7 @@ SerialPort.prototype.update = function(options, callback) {
     }
 
     var correctedOptions = correctOptions(options);
-    var settings = assign({}, defaultSettings, correctedOptions);
+    var settings = Object.assign({}, defaultSettings, correctedOptions);
     this.options.baudRate = settings.baudRate;
 
     SerialPortBinding.update(this.fd, this.options, function(err) {

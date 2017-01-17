@@ -2,7 +2,6 @@
 
 var childProcess = require('child_process');
 var fs = require('fs');
-var Promise = require('es6-promise').Promise;
 var path = require('path');
 
 function promisify(func) {

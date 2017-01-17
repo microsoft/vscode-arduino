@@ -3,9 +3,7 @@
   "description": "Node js operation for seraial port!",
   "main": "./lib/serialport",
   "dependencies": {
-    "es6-promise": "^4.0.5",
-    "lodash": "^4.17.4",
-    "object.assign": "^4.0.3"
+    "glob": "^7.1.1"
   },
   "devDependencies": {
     "nan": "^2.4.0"
@@ -15,7 +13,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "install": "node-gyp rebuild --target=1.4.6 --arch=ia32 --dist-url=https://atom.io/download/electron",
+    "install": "node-gyp rebuild --target=1.4.6 --arch=x64 --dist-url=https://atom.io/download/electron",
+    "install32": "node-gyp rebuild --target=1.4.6 --arch=ia32 --dist-url=https://atom.io/download/electron",
     "rebuild-all": "npm rebuild && node-gyp rebuild --target=1.4.6 --arch=ia32 --dist-url=https://atom.io/download/electron"
   },
   "gypfile": true

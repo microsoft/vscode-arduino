@@ -1,12 +1,11 @@
 import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
-import _ = require("lodash");
 
 interface ISerialPortDetail {
      comName: string;
      manufacturer: string;
      vendorId: string;
      productId: string;
-};
+}
 
 class SerialPortCtrl {
     public static SERIAL_MONITOR: string = "Serial Monitor";
@@ -165,7 +164,7 @@ class SerialPortCtrl {
             } );
         });
     }
-};
+}
 let ctrl: SerialPortCtrl = null;
 export async function openSerialPort() {
     let lists = await SerialPortCtrl.list();
@@ -174,12 +173,14 @@ export async function openSerialPort() {
         return;
     }
 
-    let chosen = await window.showQuickPick(<QuickPickItem[]> _.sortBy(_.map(lists, (l: ISerialPortDetail): QuickPickItem => {
+    let chosen = await window.showQuickPick(<QuickPickItem[]> lists.map((l: ISerialPortDetail): QuickPickItem => {
             return {
                 description: l.manufacturer,
                 label: l.comName,
             };
-    }), "label"));
+    }).sort((a, b): number => {
+        return a.label == b.label ? 0 : (a.label > b.label ? 1 : -1);
+    }));
     if (chosen && chosen.label) {
        if (ctrl) {
            await ctrl.changePort(chosen.label);

@@ -97,7 +97,6 @@
     "ms-vscode.cpptools"
   ],
   "dependencies": {
-    "es6-promise": "^4.0.5",
-    "object.assign": "^4.0.4"
+    "glob": "^7.1.1"
   }
 }
