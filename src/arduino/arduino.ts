@@ -138,7 +138,12 @@ function getPackageLibPaths(packageRootPath: string, boardConfig: any): string[]
     }
     const allVersionsPath = fs.readdirSync(versionRoot);
     const toolsPath = allVersionsPath[0];
-    result.push(path.join(versionRoot, toolsPath, "cores/esp8266"));
+    const coreLibs = fs.readdirSync(path.join(versionRoot, toolsPath, "cores"));
+    if (coreLibs && coreLibs.length > 0) {
+        coreLibs.forEach((coreLib) => {
+            result.push(path.join(versionRoot, toolsPath, "cores", coreLib));
+        });
+    }
 
     return result;
 }
