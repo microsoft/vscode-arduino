@@ -8,6 +8,7 @@ import fs = require("fs");
 import path = require("path");
 import vscode = require("vscode");
 import settings = require("./settings");
+import constants = require("../common/constants");
 import util = require("../common/util");
 
 export const outputChannel = vscode.window.createOutputChannel("Arduino");
@@ -41,43 +42,60 @@ export function addLibPath(arduinoConfig: settings.IArduinoSettings) {
         .then((projectConfig: any) => {
             const paths = getPackageLibPaths(arduinoConfig.packagePath, projectConfig);
             paths.push(arduinoConfig.libPath);
-            return vscode.workspace.findFiles("**/c_cpp_properties.json", null, 1)
+            return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
                 .then((files) => {
+                    let deviceContext = null;
                     if (!files || !files.length || files.length < 1) {
-                        return;
+                        deviceContext = {};
+                    } else {
+                        const propertyFile = files[0];
+                        deviceContext = JSON.parse(fs.readFileSync(propertyFile.fsPath, "utf8"));
                     }
-                    const propertyFile = files[0];
-                    const context = JSON.parse(fs.readFileSync(propertyFile.fsPath, "utf8"));
-                    context.configurations.forEach((configSection) => {
-                        if (configSection.name !== util.getCppConfigPlatform()) {
-                            return;
+                    deviceContext.configurations = deviceContext.configurations || [];
+                    let configSection = null;
+                    deviceContext.configurations.forEach((section) => {
+                        if (section.name === util.getCppConfigPlatform()) {
+                            configSection = section;
                         }
-                        paths.forEach((libPath) => {
-                            libPath = path.resolve(path.normalize(libPath));
-                            if (configSection.includePath && configSection.includePath.length) {
-                                for (let existingPath of configSection.includePath) {
-                                    if (libPath === path.resolve(path.normalize(existingPath))) {
-                                        return;
-                                    }
-                                }
-                            } else {
-                                configSection.includePath = [];
-                            }
-                            configSection.includePath.push(libPath);
-                        });
                     });
-                    fs.writeFileSync(propertyFile.fsPath, JSON.stringify(context, null, 4));
+
+                    if (!configSection) {
+                        configSection = {
+                            name: util.getCppConfigPlatform(),
+                            includePath: [],
+                        };
+                        deviceContext.configurations.push(configSection);
+                    }
+
+                    paths.forEach((libPath) => {
+                        libPath = path.resolve(path.normalize(libPath));
+                        if (configSection.includePath && configSection.includePath.length) {
+                            for (let existingPath of configSection.includePath) {
+                                if (libPath === path.resolve(path.normalize(existingPath))) {
+                                    return;
+                                }
+                            }
+                        } else {
+                            configSection.includePath = [];
+                        }
+                        configSection.includePath.push(libPath);
+                    });
+
+                    fs.writeFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), JSON.stringify(deviceContext, null, 4));
                 });
         });
 }
 
 function loadProjectConfig(arduinoConfig: settings.IArduinoSettings): Thenable<Object> {
-    return vscode.workspace.findFiles("device.json", null, 1)
+    return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
         .then((files) => {
-            const configFile = files[0];
-            const projectConfig = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
-            const arduinoPreferenes = loadPreferences(arduinoConfig.packagePath);
+            let projectConfig: any = {};
+            if (files && files.length > 0) {
+                const configFile = files[0];
+                projectConfig = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
+            }
 
+            const arduinoPreferenes = loadPreferences(arduinoConfig.packagePath);
             projectConfig.board = projectConfig.board || arduinoPreferenes.get("board");
             projectConfig.package = projectConfig.package || arduinoPreferenes.get("target_package");
             projectConfig.arch = projectConfig.arch || arduinoPreferenes.get("target_platform");
@@ -120,8 +138,12 @@ function getPackageLibPaths(packageRootPath: string, boardConfig: any): string[]
     }
     const allVersionsPath = fs.readdirSync(versionRoot);
     const toolsPath = allVersionsPath[0];
-    result.push(path.join(versionRoot, toolsPath, "cores"));
-    result.push(path.join(versionRoot, toolsPath, "libraries"));
+    const coreLibs = fs.readdirSync(path.join(versionRoot, toolsPath, "cores"));
+    if (coreLibs && coreLibs.length > 0) {
+        coreLibs.forEach((coreLib) => {
+            result.push(path.join(versionRoot, toolsPath, "cores", coreLib));
+        });
+    }
 
     return result;
 }

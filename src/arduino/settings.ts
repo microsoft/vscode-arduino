@@ -4,23 +4,28 @@
  *--------------------------------------------------------*/
 
 import os = require("os");
+import fs = require("fs");
 import path = require("path");
 import vscode = require("vscode");
 import util = require("../common/util");
+import constants = require("../common/constants");
 
 export interface IArduinoSettings {
     arduinoPath: string;
     commandPath: string;
     packagePath: string;
     libPath: string;
+    includePath: string[];
 }
 
-export class ArduinoSettings implements IArduinoSettings {
+export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     public static getIntance(): ArduinoSettings {
         return ArduinoSettings._arduinoSettings;
     }
 
     private static _arduinoSettings: ArduinoSettings = new ArduinoSettings();
+
+    private _watcher: vscode.FileSystemWatcher;
 
     private _arduinoPath: string;
 
@@ -28,8 +33,18 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _libPath: string;
 
+    private _includePath: string[];
+
     constructor() {
         this.initializeSettings();
+        this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE));
+        this._watcher.onDidCreate(() => this.loadIncludePath());
+        this._watcher.onDidChange(() => this.loadIncludePath());
+        this._watcher.onDidDelete(() => this.loadIncludePath());
+    }
+
+    public dispose() {
+        this._watcher.dispose();
     }
 
     private initializeSettings() {
@@ -47,6 +62,27 @@ export class ArduinoSettings implements IArduinoSettings {
             this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
             this._libPath = path.join(process.env.HOME, "Documents/Arduino/libraries");
         }
+
+        this.loadIncludePath();
+    }
+
+    private loadIncludePath() {
+        this._includePath = [];
+        if (!fs.existsSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE))) {
+            return;
+        }
+        const cppProperties = JSON.parse(fs.readFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), "utf8"));
+        if (!cppProperties || !cppProperties.configurations) {
+            return;
+        }
+        const plat = util.getCppConfigPlatform();
+        cppProperties.configurations.forEach((configSection) => {
+            if (configSection.name === plat && Array.isArray(configSection.includePath)) {
+                configSection.includePath.forEach((includePath) => {
+                    this._includePath.push(includePath);
+                });
+            }
+        });
     }
 
     public get arduinoPath(): string {
@@ -67,5 +103,13 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public set arduinoPath(value: string) {
         this._arduinoPath = value;
+    }
+
+    public set includePath(value: string[]) {
+        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+    }
+
+    public get includePath(): string[] {
+        return this._includePath;
     }
 }

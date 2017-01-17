@@ -7,6 +7,8 @@
         ],
         "no-unused-expression": true,
         "no-duplicate-variable": true,
+        "no-empty": false,
+        "object-literal-sort-keys": false,
         "curly": true,
         "class-name": true,
         "semicolon": [
