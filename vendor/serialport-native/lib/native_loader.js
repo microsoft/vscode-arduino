@@ -1,6 +1,7 @@
 const glob = require('glob');
+const path = require('path');
 const loadLibrary = function(parentFolder, libraryName) {
-    const nodegypFiles = glob(`../build/(Release/Debug)/${libraryName}.node`, {sync: true});
+    const nodegypFiles = glob(path.join(__dirname, `../build/+(Release|Debug)/${libraryName}.node`), {sync: true});
     const nodepregypFiles = glob(`${parentFolder}/${libraryName}*${process.platform}*.node`, {sync: true});
     var binding = null;
     nodegypFiles.concat(nodepregypFiles).forEach(file => {
