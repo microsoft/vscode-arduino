@@ -9,7 +9,6 @@ import path = require("path");
 import vscode = require("vscode");
 import childProcess = require("child_process");
 
-/** c_cpp_properties.json has its own platform name literanls. */
 export function getCppConfigPlatform(): string {
     const plat = os.platform();
     if (plat === "linux") {

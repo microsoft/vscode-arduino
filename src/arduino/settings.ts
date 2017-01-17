@@ -18,12 +18,14 @@ export interface IArduinoSettings {
     includePath: string[];
 }
 
-export class ArduinoSettings implements IArduinoSettings {
+export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     public static getIntance(): ArduinoSettings {
         return ArduinoSettings._arduinoSettings;
     }
 
     private static _arduinoSettings: ArduinoSettings = new ArduinoSettings();
+
+    private _watcher: vscode.FileSystemWatcher;
 
     private _arduinoPath: string;
 
@@ -35,6 +37,14 @@ export class ArduinoSettings implements IArduinoSettings {
 
     constructor() {
         this.initializeSettings();
+        this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE));
+        this._watcher.onDidCreate(() => this.loadIncludePath());
+        this._watcher.onDidChange(() => this.loadIncludePath());
+        this._watcher.onDidDelete(() => this.loadIncludePath());
+    }
+
+    public dispose() {
+        this._watcher.dispose();
     }
 
     private initializeSettings() {
@@ -58,7 +68,10 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private loadIncludePath() {
         this._includePath = [];
-        const cppProperties = JSON.parse(fs.readFileSync(path.join(vscode.workspace.rootPath, constants.C_CPP_PROPERTIES), "utf8"));
+        if (!fs.existsSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE))) {
+            return;
+        }
+        const cppProperties = JSON.parse(fs.readFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), "utf8"));
         if (!cppProperties || !cppProperties.configurations) {
             return;
         }
@@ -70,7 +83,6 @@ export class ArduinoSettings implements IArduinoSettings {
                 });
             }
         });
-
     }
 
     public get arduinoPath(): string {

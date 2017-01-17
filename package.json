@@ -93,9 +93,6 @@
     "typescript": "^2.0.3",
     "vscode": "^1.0.0"
   },
-  "extensionDependencies": [
-    "ms-vscode.cpptools"
-  ],
   "dependencies": {
     "glob": "^7.1.1"
   }

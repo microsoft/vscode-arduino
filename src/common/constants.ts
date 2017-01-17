@@ -3,4 +3,4 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------*/
 
-export const C_CPP_PROPERTIES = ".vscode/c_cpp_properties.json";
+export const DEVICE_CONFIG_FILE = "device.json";

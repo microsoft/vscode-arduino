@@ -13,11 +13,11 @@ import { provideCompletionItems } from "./clang";
 export class CompletionProvider implements vscode.CompletionItemProvider, vscode.Disposable {
     private _headerFiles = new Set<string>();
     private _watcher: vscode.FileSystemWatcher;
-    private _cppPropertyFilePath: string = path.join(vscode.workspace.rootPath, constants.C_CPP_PROPERTIES);
+    private _deviceConfigFile: string = path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE);
 
     public constructor() {
         this.updateHeaderFileList();
-        this._watcher = vscode.workspace.createFileSystemWatcher(this._cppPropertyFilePath);
+        this._watcher = vscode.workspace.createFileSystemWatcher(this._deviceConfigFile);
         this._watcher.onDidCreate(() => this.updateHeaderFileList());
         this._watcher.onDidChange(() => this.updateHeaderFileList());
         this._watcher.onDidDelete(() => this.updateHeaderFileList());
@@ -61,15 +61,15 @@ export class CompletionProvider implements vscode.CompletionItemProvider, vscode
 
     private updateHeaderFileList(): void {
         this._headerFiles.clear();
-        if (!fs.existsSync(this._cppPropertyFilePath)) {
+        if (!fs.existsSync(this._deviceConfigFile)) {
             return;
         }
-        const cppProperties = JSON.parse(fs.readFileSync(this._cppPropertyFilePath, "utf8"));
-        if (!cppProperties || !cppProperties.configurations) {
+        const deviceConfig = JSON.parse(fs.readFileSync(this._deviceConfigFile, "utf8"));
+        if (!deviceConfig || !deviceConfig.configurations) {
             return;
         }
         const plat = util.getCppConfigPlatform();
-        cppProperties.configurations.forEach((configSection) => {
+        deviceConfig.configurations.forEach((configSection) => {
             if (configSection.name === plat && Array.isArray(configSection.includePath)) {
                 configSection.includePath.forEach((includePath) => {
                     this.addLibFiles(includePath);
