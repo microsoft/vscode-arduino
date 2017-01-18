@@ -6,3 +6,6 @@ src/**
 **/*.map
 .gitignore
 tsconfig.json
+tslint.json
+.travis.yml
+gulpfile.js
