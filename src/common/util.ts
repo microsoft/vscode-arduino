@@ -28,6 +28,14 @@ export function fileExists(filePath: string): boolean {
     }
 }
 
+export function directoryExists(path: string): boolean {
+    try {
+        return fs.statSync(path).isDirectory();
+    } catch (e) {
+        return false;
+    }
+}
+
 export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<Object> {
     return new Promise((resolve, reject) => {
         let stdout = "";
