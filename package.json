@@ -7,6 +7,7 @@
   "engines": {
     "vscode": "^1.5.0"
   },
+  "enableProposedApi": true,
   "categories": [
     "Languages",
     "Snippets"
@@ -69,13 +70,25 @@
         }
       }
     },
+    "languages": [
+      {
+        "id": "arduino",
+        "extensions": [".ino"],
+        "aliases": ["Arduino", "arduino", "ino"],
+        "configuration": "./syntaxes/arduino.configuration.json"
+      }
+    ],
     "grammars": [
       {
-        "language": "cpp",
+        "language": "arduino",
         "path": "./syntaxes/arduino.tmLanguage",
         "scopeName": "source.cpp.arduino"
       }
-    ]
+    ],
+    "explorer": {
+      "treeLabel": "Arduino Examples",
+      "treeExplorerNodeProviderId": "arduinoExampleTree"
+    }
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",

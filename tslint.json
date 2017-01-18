@@ -7,6 +7,7 @@
         ],
         "no-unused-expression": true,
         "no-duplicate-variable": true,
+        "max-classes-per-file": [false],
         "no-empty": false,
         "object-literal-sort-keys": false,
         "curly": true,
