@@ -22,10 +22,12 @@ before_install:
 install:
 - npm install -g vsce
 - npm install -g typescript
+- npm install -g gulp
 - npm install
 - npm run vscode:prepublish
 
 script:
+- gulp tslint
 - npm test --silent
 - vsce package
 
