@@ -3,11 +3,12 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------*/
 
-import fs = require("fs");
-import path = require("path");
-import vscode = require("vscode");
-import constants = require("../common/constants");
-import util = require("../common/util");
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
+
+import * as constants from "../common/constants";
+import * as util from "../common/util";
 import { provideCompletionItems } from "./clang";
 
 export class CompletionProvider implements vscode.CompletionItemProvider, vscode.Disposable {

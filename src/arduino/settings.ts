@@ -2,13 +2,13 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------*/
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as vscode from "vscode";
 
-import os = require("os");
-import fs = require("fs");
-import path = require("path");
-import vscode = require("vscode");
-import util = require("../common/util");
-import constants = require("../common/constants");
+import * as constants from "../common/constants";
+import * as util from "../common/util";
 
 export interface IArduinoSettings {
     arduinoPath: string;

@@ -3,11 +3,11 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------*/
 
-import fs = require("fs");
-import os = require("os");
-import path = require("path");
-import vscode = require("vscode");
-import childProcess = require("child_process");
+import * as childProcess from "child_process";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as vscode from "vscode";
 
 export function getCppConfigPlatform(): string {
     const plat = os.platform();
