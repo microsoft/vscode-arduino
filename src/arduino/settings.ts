@@ -85,6 +85,10 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
         });
     }
 
+    public set arduinoPath(value: string) {
+        this._arduinoPath = value;
+    }
+
     public get arduinoPath(): string {
         return this._arduinoPath;
     }
@@ -99,10 +103,6 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
 
     public get commandPath(): string {
         return path.join(this._arduinoPath, "arduino_debug");
-    }
-
-    public set arduinoPath(value: string) {
-        this._arduinoPath = value;
     }
 
     public set includePath(value: string[]) {
