@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------*/
 
-import vscode = require("vscode");
+import * as vscode from "vscode";
 import { provideDefinitionItems } from "./clang";
 
 export class DefinitionProvider implements vscode.DefinitionProvider {

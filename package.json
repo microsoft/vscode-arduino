@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "publisher": "Microsoft",
   "engines": {
-    "vscode": "^1.5.0"
+    "vscode": "^1.7.0"
   },
   "enableProposedApi": true,
   "categories": [
@@ -13,6 +13,7 @@
     "Snippets"
   ],
   "activationEvents": [
+    "onLanguage:arduino",
     "onCommand:extension.verifyArduino",
     "onCommand:extension.uploadArduino",
     "onCommand:extension.openSerialPort",
@@ -73,8 +74,14 @@
     "languages": [
       {
         "id": "arduino",
-        "extensions": [".ino"],
-        "aliases": ["Arduino", "arduino", "ino"],
+        "extensions": [
+          ".ino"
+        ],
+        "aliases": [
+          "Arduino",
+          "arduino",
+          "ino"
+        ],
         "configuration": "./syntaxes/arduino.configuration.json"
       }
     ],

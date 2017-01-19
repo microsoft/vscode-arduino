@@ -3,12 +3,12 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------*/
 
-import vscode = require("vscode");
-import settings = require("./arduino/settings");
+import * as vscode from "vscode";
 
 import { addLibPath, upload, verify } from "./arduino/arduino";
 import { CompletionProvider } from "./arduino/completionProvider";
 import { DefinitionProvider } from "./arduino/definitionProvider";
+import * as settings from "./arduino/settings";
 import { ARDUINO_MODE } from "./common/constants";
 import { changBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
 

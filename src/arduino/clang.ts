@@ -1,16 +1,13 @@
-import vscode = require("vscode");
-import childProcess = require("child_process");
-import util = require("../common/util");
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------*/
+
+import * as childProcess from "child_process";
+import * as vscode from "vscode";
+
+import * as util from "../common/util";
 import { ArduinoSettings } from "./settings";
-
-export const completionRe = /^COMPLETION: (.*?)(?: : (.*))?$/;
-export const descriptionRe = /^(.*?)(?: : (.*))?$/;
-export const returnTypeRe = /\[#([^#]+)#\]/ig;
-export const argumentTypeRe = /\<#([^#]+)#\>/ig;
-export const optionalArgumentLeftRe = /\{#(,? ?.+?)(?=#\}|\{#)/ig;
-export const optionalArgumentRightRe = /#\}/ig;
-
-const DELIMITERS = '~`!@#$%^&*()-+={}[]|\\\'";:/?<>,. \t\n';
 
 export function provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
     Thenable<vscode.CompletionItem[]> {
@@ -53,6 +50,8 @@ export function provideDefinitionItems(document: vscode.TextDocument, position: 
         return parseAstDump(result.stdout, word);
     });
 }
+
+const DELIMITERS = '~`!@#$%^&*()-+={}[]|\\\'";:/?<>,. \t\n';
 
 function isDelimiter(c: string) {
     return DELIMITERS.indexOf(c) !== -1;
@@ -106,6 +105,13 @@ function buildDefinitionArgs(word: string) {
     return args;
 }
 
+const completionRe = /^COMPLETION: (.*?)(?: : (.*))?$/;
+const descriptionRe = /^(.*?)(?: : (.*))?$/;
+const returnTypeRe = /\[#([^#]+)#\]/ig;
+const argumentTypeRe = /\<#([^#]+)#\>/ig;
+const optionalArgumentLeftRe = /\{#(,? ?.+?)(?=#\}|\{#)/ig;
+const optionalArgumentRightRe = /#\}/ig;
+
 function parseCompletionItem(line: string): vscode.CompletionItem | void {
     let matched = line.match(completionRe);
     if (matched === null) {
@@ -158,6 +164,10 @@ function parseCompletionItems(data: string): vscode.CompletionItem[] {
     return result;
 }
 
+const positionRe = /<(.+)>/;
+const startPositionRe = /(\S+):(\d+):(\d+)/;
+const endPositionRe = /(line|col):(\d+)(?::(\d+))?/;
+
 function parseAstDump(aststring, target) {
     const candidates = aststring.split("\n\n");
     const places = [];
@@ -168,13 +178,13 @@ function parseAstDump(aststring, target) {
             if (lines.length < 2) {
                 return;
             }
-            const positionMath = lines[1].match(/<(.+)>/);
+            const positionMath = lines[1].match(positionRe);
             if (positionMath === null) {
                 return;
             }
             const declTerms = positionMath[1].split(",");
-            const startMatch = declTerms[0].match(/(\S+):(\d+):(\d+)/);
-            const endMatch = declTerms[1].match(/(line|col):(\d+)(?::(\d+))?/);
+            const startMatch = declTerms[0].match(startPositionRe);
+            const endMatch = declTerms[1].match(endPositionRe);
             let startPosition = null;
             let endPosition = null;
             if (endMatch[1] === "line") {
