@@ -1,4 +1,4 @@
-# Visual Studio Code Extension for Arduino
+# Arduino for Visual Studio Code
 
 ## Requirement 
 
