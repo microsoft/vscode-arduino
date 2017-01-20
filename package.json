@@ -1,7 +1,7 @@
 {
   "name": "vscode-arduino",
-  "displayName": "vscode-arduino",
-  "description": "Visual Studio Code Extension for Arduino",
+  "displayName": "Arduino",
+  "description": "Arduino for Visual Studio Code",
   "version": "0.0.1",
   "publisher": "Microsoft",
   "engines": {
@@ -14,50 +14,50 @@
   ],
   "activationEvents": [
     "onLanguage:arduino",
-    "onCommand:extension.verifyArduino",
-    "onCommand:extension.uploadArduino",
-    "onCommand:extension.openSerialPort",
-    "onCommand:extension.changBaudRate",
-    "onCommand:extension.closeSerialPort",
-    "onCommand:extension.sendMessageToSerialPort",
+    "onCommand:arduino.verify",
+    "onCommand:arduino.upload",
+    "onCommand:arduino.openSerialPort",
+    "onCommand:arduino.changeBaudRate",
+    "onCommand:arduino.closeSerialPort",
+    "onCommand:arduino.sendMessageToSerialPort",
     "workspaceContains:device.json"
   ],
   "main": "./out/src/extension",
   "contributes": {
     "snippets": [
       {
-        "language": "cpp",
+        "language": "arduino",
         "path": "./snippets/arduino.json"
       }
     ],
     "commands": [
       {
-        "command": "extension.verifyArduino",
+        "command": "arduino.verify",
         "title": "Arduino: Verfiy"
       },
       {
-        "command": "extension.uploadArduino",
+        "command": "arduino.upload",
         "title": "Arduino: Upload"
       },
       {
-        "command": "extension.addArduinoLibPath",
+        "command": "arduino.addLibPath",
         "title": "Arduino: Add library paths"
       },
       {
-        "command": "extension.openSerialPort",
-        "title": "Open Serial Port"
+        "command": "arduino.openSerialPort",
+        "title": "Arduino: Open Serial Port"
       },
       {
-        "command": "extension.changBaudRate",
-        "title": "Change Baud Rate"
+        "command": "arduino.changeBaudRate",
+        "title": "Arduino: Change Baud Rate"
       },
       {
-        "command": "extension.closeSerialPort",
-        "title": "Stop Serial Monitor"
+        "command": "arduino.closeSerialPort",
+        "title": "Arduino: Stop Serial Monitor"
       },
       {
-        "command": "extension.sendMessageToSerialPort",
-        "title": "Send Text to Serial Port"
+        "command": "arduino.sendMessageToSerialPort",
+        "title": "Arduino: Send Text to Serial Port"
       }
     ],
     "configuration": {
