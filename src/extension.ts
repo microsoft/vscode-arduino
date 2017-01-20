@@ -10,20 +10,20 @@ import { CompletionProvider } from "./arduino/completionProvider";
 import { DefinitionProvider } from "./arduino/definitionProvider";
 import * as settings from "./arduino/settings";
 import { ARDUINO_MODE } from "./common/constants";
-import { changBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
+import { changeBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
 
 export function activate(context: vscode.ExtensionContext) {
     let arduinoSettings = settings.ArduinoSettings.getIntance();
     context.subscriptions.push(arduinoSettings);
-    context.subscriptions.push(vscode.commands.registerCommand("extension.verifyArduino", () => verify(arduinoSettings)));
-    context.subscriptions.push(vscode.commands.registerCommand("extension.uploadArduino", () => upload(arduinoSettings)));
-    context.subscriptions.push(vscode.commands.registerCommand("extension.addArduinoLibPath", () => addLibPath(arduinoSettings)));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => verify(arduinoSettings)));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => upload(arduinoSettings)));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", () => addLibPath(arduinoSettings)));
 
     // serial monitor commands
-    context.subscriptions.push(vscode.commands.registerCommand("extension.openSerialPort", () => openSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("extension.changBaudRate", () => changBaudRate()));
-    context.subscriptions.push(vscode.commands.registerCommand("extension.sendMessageToSerialPort", () => sendMessageToSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("extension.closeSerialPort", () => closeSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialPort", () => openSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", () => changeBaudRate()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", () => sendMessageToSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialPort", () => closeSerialPort()));
 
     // Add arduino specific language suport.
     const completionProvider = new CompletionProvider();
@@ -38,7 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
         const exampleProvider = require("./arduino/exampleProvider");
         vscode.window.registerTreeExplorerNodeProvider("arduinoExampleTree", new exampleProvider.ExampleProvider(arduinoSettings));
         // This command will be invoked using exactly the node you provided in `resolveChildren`.
-        vscode.commands.registerCommand("extension.openArduinoExample", (node) => {
+        vscode.commands.registerCommand("arduino.openExample", (node) => {
             if (node.kind === "leaf") {
                 vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(node.fullPath), true);
             }

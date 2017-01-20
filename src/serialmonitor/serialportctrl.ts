@@ -46,13 +46,13 @@ class SerialPortCtrl {
         } else {
             this._outputChannel = window.createOutputChannel(SerialPortCtrl.SERIAL_MONITOR);
             this._portStatusBar = window.createStatusBarItem(StatusBarAlignment.Right, 2);
-            this._portStatusBar.command = "extension.openSerialPort";
+            this._portStatusBar.command = "arduino.openSerialPort";
             this._portStatusBar.text = this._currentPort;
             this._portStatusBar.tooltip = "Change Port";
             this._portStatusBar.show();
 
             this._baudRateStatusBar = window.createStatusBarItem(StatusBarAlignment.Right, 1);
-            this._baudRateStatusBar.command = "extension.changBaudRate";
+            this._baudRateStatusBar.command = "arduino.changeBaudRate";
             this._baudRateStatusBar.text = this._currentBaudRate.toString();
             this._baudRateStatusBar.tooltip = "Baud Rate";
             this._baudRateStatusBar.show();
@@ -205,7 +205,7 @@ export async function sendMessageToSerialPort() {
     }
 }
 
-export async function changBaudRate() {
+export async function changeBaudRate() {
     let rates = SerialPortCtrl.listBaudRates();
     let choose = await window.showQuickPick(rates.map((rate) => rate.toString()));
     if (!choose) {
