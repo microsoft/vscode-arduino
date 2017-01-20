@@ -28,6 +28,9 @@
       {
         "language": "arduino",
         "path": "./snippets/arduino.json"
+      }, {
+        "language": "cpp",
+        "path": "./snippets/arduino.json"
       }
     ],
     "commands": [
