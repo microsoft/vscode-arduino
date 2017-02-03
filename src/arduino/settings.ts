@@ -1,7 +1,8 @@
-/*---------------------------------------------------------
+/*--------------------------------------------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------*/
+ *-------------------------------------------------------------------------------------------*/
+
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -9,6 +10,8 @@ import * as vscode from "vscode";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
+
+import { resolveArduinoPath } from "./platform";
 
 export interface IArduinoSettings {
     arduinoPath: string;
@@ -86,7 +89,12 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     }
 
     public set arduinoPath(value: string) {
-        this._arduinoPath = value;
+        // By default, the extension will use where/which to resolve the Arduino installation path.
+        if (value === "arduino") {
+            this._arduinoPath = resolveArduinoPath();
+        } else {
+            this._arduinoPath = value;
+        }
     }
 
     public get arduinoPath(): string {

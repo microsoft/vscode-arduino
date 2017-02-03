@@ -1,6 +1,18 @@
 # Arduino for Visual Studio Code
 
-## Requirement 
+## Requirement
 
+### Arduino
 - [Arduino](https://www.arduino.cc/)
-- [C/C++ for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+
+Currently, the extension relies on the Arduino IDE. You should properly install the Arduino IDE and configurate the installation path.
+
+- If the arduino command is already available from shell, the extension will try to probe the installation folder.
+- And you can specify the Arduino installation path in the VSCode user setting files:
+
+    ``` json
+    {
+        "arduino.path": "D:\\Develop\\arduino",
+    }
+    ```
+
