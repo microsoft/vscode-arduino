@@ -91,7 +91,7 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     public set arduinoPath(value: string) {
         // By default, the extension will use where/which to resolve the Arduino installation path.
         if (value === "arduino") {
-            this._arduinoPath = resolveArduinoPath(value);
+            this._arduinoPath = resolveArduinoPath();
         } else {
             this._arduinoPath = value;
         }

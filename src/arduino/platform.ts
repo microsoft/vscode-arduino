@@ -10,17 +10,22 @@ import * as vscode from "vscode";
 
 import { fileExists } from "../common/util";
 
-export function resolveArduinoPath(arduino: string): string {
-    let result = arduino;
+export function resolveArduinoPath(): string {
+    let result;
     const plat = os.platform();
-    if (plat === "win32") {
-        let pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
-        pathString = path.resolve(pathString).trim();
-        if (!fileExists(pathString)) {
-            vscode.window.showErrorMessage("Cannot find the Arduino installation folder.");
-        } else {
-            result = path.dirname(path.resolve(pathString));
+    try {
+        if (plat === "win32") {
+            let pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
+            pathString = path.resolve(pathString).trim();
+            if (fileExists(pathString)) {
+                result = path.dirname(path.resolve(pathString));
+            }
         }
+    } catch (ex) {
+        // Ignore the errors.
+    }
+    if (!result) {
+        vscode.window.showErrorMessage("Cannot find the Arduino installation path. You can specify the path in the user settings.");
     }
     // TODO: Add path resolve on Ubuntu and Mac OS platforms.
     return result;
