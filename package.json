@@ -7,7 +7,7 @@
   "engines": {
     "vscode": "^1.7.0"
   },
-  "enableProposedApi": true,
+  "enableProposedApi": false,
   "categories": [
     "Languages",
     "Snippets"
