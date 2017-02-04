@@ -33,7 +33,8 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(ARDUINO_MODE, definitionProvider));
 
     // Example explorer, only work under VSCode insider version.
-    if (typeof vscode.window.registerTreeExplorerNodeProvider === "function") {
+    if (typeof vscode.window.registerTreeExplorerNodeProvider === "function"
+        && vscode.version.indexOf("insider") > -1) {
         const rootPath = vscode.workspace.rootPath;
         const exampleProvider = require("./arduino/exampleProvider");
         vscode.window.registerTreeExplorerNodeProvider("arduinoExampleTree", new exampleProvider.ExampleProvider(arduinoSettings));
