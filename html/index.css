@@ -1,0 +1,14 @@
+.board {
+    padding: 5px 10px;
+    margin: 10px;
+    border: 1px double black;
+}
+
+.board-header {
+    font-weight: bold;
+}
+
+.installed-header {
+    font-weight: bold;
+    color: lightseagreen;
+}

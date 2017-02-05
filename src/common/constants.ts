@@ -11,3 +11,6 @@ export const ARDUINO_MODE: vscode.DocumentSelector = [
     { language: "cpp", scheme: "file" },
     { language: "arduino", scheme: "file" },
 ];
+
+export const BOARD_MANAGER_URI = vscode.Uri.parse("board-manager://arduino/packages");
+export const BOARD_MANAGER_PROTOCOL = "board-manager";

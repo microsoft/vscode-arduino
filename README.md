@@ -16,3 +16,15 @@ Currently, the extension relies on the Arduino IDE. You should properly install 
     }
     ```
 
+## Commands
+
+## Settings
+
+## Device Options
+
+```json
+{
+    "board": ""
+}
+```
+
