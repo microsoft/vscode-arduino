@@ -12,6 +12,9 @@ import * as constants from "../common/constants";
 import * as util from "../common/util";
 import * as settings from "./settings";
 
+import { DeviceContext, IDeviceContext } from "../deviceContext";
+import { BoardManager } from "./boardManager";
+
 export const outputChannel = vscode.window.createOutputChannel("Arduino");
 
 /**
@@ -20,6 +23,8 @@ export const outputChannel = vscode.window.createOutputChannel("Arduino");
 export class ArduinoApp {
 
     private _preferences: Map<string, string>;
+
+    private _boardManager: BoardManager;
     /**
      * @constructor
      */
@@ -27,75 +32,72 @@ export class ArduinoApp {
     }
 
     public upload() {
-        return this.loadProjectConfig()
-            .then((projectConfig: any) => {
-                const boardDescriptor = getBoardDescriptor(projectConfig);
-                const appPath = path.join(vscode.workspace.rootPath, projectConfig.appPath || "app/app.ino");
-                outputChannel.show(true);
-                return util.spawn(this._settings.commandPath,
-                    outputChannel,
-                    ["--upload", "--board", boardDescriptor, "--port", projectConfig.port, appPath]);
-            });
+
+        let dc = DeviceContext.getIntance();
+
+        const boardDescriptor = this.getBoardDescriptorString(dc);
+        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        outputChannel.show(true);
+        return util.spawn(this._settings.commandPath,
+            outputChannel,
+            ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath]);
     }
 
     public verify() {
-        return this.loadProjectConfig()
-            .then((projectConfig: any) => {
-                const boardDescriptor = getBoardDescriptor(projectConfig);
-                const appPath = path.join(vscode.workspace.rootPath, projectConfig.appPath || "app/app.ino");
-                outputChannel.show(true);
-                return util.spawn(this._settings.commandPath,
-                    outputChannel,
-                    ["--verify", "--board", boardDescriptor, "--port", projectConfig.port, appPath]);
-            });
+        let dc = DeviceContext.getIntance();
+        const boardDescriptor = this.getBoardDescriptorString(dc);
+        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        outputChannel.show(true);
+        return util.spawn(this._settings.commandPath,
+            outputChannel,
+            ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath]);
     }
 
     public addLibPath() {
-        return this.loadProjectConfig()
-            .then((projectConfig: any) => {
-                const paths = getPackageLibPaths(this._settings.packagePath, projectConfig);
-                paths.push(this._settings.libPath);
-                return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
-                    .then((files) => {
-                        let deviceContext = null;
-                        if (!files || !files.length || files.length < 1) {
-                            deviceContext = {};
-                        } else {
-                            const propertyFile = files[0];
-                            deviceContext = JSON.parse(fs.readFileSync(propertyFile.fsPath, "utf8"));
-                        }
-                        deviceContext.configurations = deviceContext.configurations || [];
-                        let configSection = null;
-                        deviceContext.configurations.forEach((section) => {
-                            if (section.name === util.getCppConfigPlatform()) {
-                                configSection = section;
+        let dc = DeviceContext.getIntance();
+
+        let paths = this.getPackageLibPaths(dc);
+        paths.push(this._settings.libPath);
+        return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
+            .then((files) => {
+                let deviceContext = null;
+                if (!files || !files.length || files.length < 1) {
+                    deviceContext = {};
+                } else {
+                    const propertyFile = files[0];
+                    deviceContext = JSON.parse(fs.readFileSync(propertyFile.fsPath, "utf8"));
+                }
+                deviceContext.configurations = deviceContext.configurations || [];
+                let configSection = null;
+                deviceContext.configurations.forEach((section) => {
+                    if (section.name === util.getCppConfigPlatform()) {
+                        configSection = section;
+                    }
+                });
+
+                if (!configSection) {
+                    configSection = {
+                        name: util.getCppConfigPlatform(),
+                        includePath: [],
+                    };
+                    deviceContext.configurations.push(configSection);
+                }
+
+                paths.forEach((libPath) => {
+                    libPath = path.resolve(path.normalize(libPath));
+                    if (configSection.includePath && configSection.includePath.length) {
+                        for (let existingPath of configSection.includePath) {
+                            if (libPath === path.resolve(path.normalize(existingPath))) {
+                                return;
                             }
-                        });
-
-                        if (!configSection) {
-                            configSection = {
-                                name: util.getCppConfigPlatform(),
-                                includePath: [],
-                            };
-                            deviceContext.configurations.push(configSection);
                         }
+                    } else {
+                        configSection.includePath = [];
+                    }
+                    configSection.includePath.push(libPath);
+                });
 
-                        paths.forEach((libPath) => {
-                            libPath = path.resolve(path.normalize(libPath));
-                            if (configSection.includePath && configSection.includePath.length) {
-                                for (let existingPath of configSection.includePath) {
-                                    if (libPath === path.resolve(path.normalize(existingPath))) {
-                                        return;
-                                    }
-                                }
-                            } else {
-                                configSection.includePath = [];
-                            }
-                            configSection.includePath.push(libPath);
-                        });
-
-                        fs.writeFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), JSON.stringify(deviceContext, null, 4));
-                    });
+                fs.writeFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), JSON.stringify(deviceContext, null, 4));
             });
     }
 
@@ -104,6 +106,14 @@ export class ArduinoApp {
             this.loadPreferences();
         }
         return this._preferences;
+    }
+
+    public get boardManager() {
+        return this._boardManager;
+    }
+
+    public set boardManager(value: BoardManager) {
+        this._boardManager = value;
     }
 
     /**
@@ -137,47 +147,23 @@ export class ArduinoApp {
         });
     }
 
-    private loadProjectConfig(): Thenable<Object> {
-        return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
-            .then((files) => {
-                let projectConfig: any = {};
-                if (files && files.length > 0) {
-                    const configFile = files[0];
-                    projectConfig = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
-                }
+    private getBoardDescriptorString(deviceContext: IDeviceContext): string {
+        let boardDescriptor = this.boardManager.installedBoards.get(deviceContext.board);
+        let boardString = `${boardDescriptor.platform.package.name}:${boardDescriptor.platform.architecture}:${boardDescriptor.board}`;
+        return boardString;
+    }
 
-                const arduinoPreferenes = this.preferences;
-                projectConfig.board = projectConfig.board || arduinoPreferenes.get("board");
-                projectConfig.package = projectConfig.package || arduinoPreferenes.get("target_package");
-                projectConfig.arch = projectConfig.arch || arduinoPreferenes.get("target_platform");
-
-                return projectConfig;
+    private getPackageLibPaths(dc: IDeviceContext): string[] {
+        let boardDescriptor = this._boardManager.installedBoards.get(dc.board);
+        let result = [];
+        let toolsPath = boardDescriptor.platform.rootBoardPath;
+        let coreLibs = fs.readdirSync(path.join(toolsPath, toolsPath, "cores"));
+        if (coreLibs && coreLibs.length > 0) {
+            coreLibs.forEach((coreLib) => {
+                result.push(path.join(toolsPath, toolsPath, "cores", coreLib));
             });
-    }
-}
+        }
 
-function getBoardDescriptor(projectConfig: any): string {
-    let boardDescriptor = `${projectConfig.package}:${projectConfig.arch}:${projectConfig.board}`;
-    if (projectConfig.parameters) {
-        boardDescriptor = `${boardDescriptor}:${projectConfig.parameters}`;
-    }
-    return boardDescriptor;
-}
-
-function getPackageLibPaths(packageRootPath: string, boardConfig: any): string[] {
-    const result = [];
-    const versionRoot = path.join(packageRootPath, "packages", boardConfig.package, "hardware", boardConfig.arch);
-    if (!fs.existsSync(versionRoot)) {
         return result;
     }
-    const allVersionsPath = fs.readdirSync(versionRoot);
-    const toolsPath = allVersionsPath[0];
-    const coreLibs = fs.readdirSync(path.join(versionRoot, toolsPath, "cores"));
-    if (coreLibs && coreLibs.length > 0) {
-        coreLibs.forEach((coreLib) => {
-            result.push(path.join(versionRoot, toolsPath, "cores", coreLib));
-        });
-    }
-
-    return result;
 }

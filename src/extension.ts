@@ -12,11 +12,27 @@ import { CompletionProvider } from "./arduino/completionProvider";
 import { DefinitionProvider } from "./arduino/definitionProvider";
 import { ArduinoSettings } from "./arduino/settings";
 import { ARDUINO_MODE, BOARD_MANAGER_PROTOCOL, BOARD_MANAGER_URI } from "./common/constants";
+import { DeviceContext } from "./deviceContext";
 import { changeBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
 
 export function activate(context: vscode.ExtensionContext) {
     const arduinoSettings = ArduinoSettings.getIntance();
     const arduinoApp = new ArduinoApp(arduinoSettings);
+
+    // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
+    let deviceContext = DeviceContext.getIntance();
+    deviceContext.loadContext(arduinoApp);
+
+    // Arduino board manager:
+    const boardManger = new BoardManager(arduinoSettings, arduinoApp);
+    arduinoApp.boardManager = boardManger;
+    const packageProvider = new BoardContentProvider(boardManger, context.extensionPath);
+    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(BOARD_MANAGER_PROTOCOL, packageProvider));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", () => boardManger.changeBoardType()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.showBoardManager", () => {
+        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
+    }));
+
     context.subscriptions.push(arduinoSettings);
     context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => arduinoApp.verify()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => arduinoApp.upload()));
@@ -37,15 +53,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
     const definitionProvider = new DefinitionProvider();
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(ARDUINO_MODE, definitionProvider));
-
-    // Arduino board manager:
-    const boardManger = new BoardManager(arduinoSettings, arduinoApp);
-    const packageProvider = new BoardContentProvider(boardManger, context.extensionPath);
-    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(BOARD_MANAGER_PROTOCOL, packageProvider));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", () => boardManger.changeBoardType()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.showBoardManager", () => {
-        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
-    }));
 
     // Example explorer, only work under VSCode insider version.
     if (typeof vscode.window.registerTreeExplorerNodeProvider === "function"

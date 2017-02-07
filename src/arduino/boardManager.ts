@@ -176,15 +176,14 @@ export class BoardManager {
 
     private _installedPlatforms: IPlatform[];
 
+    private _boards: Map<string, IBoard>;
+
     private _boardStatusBar: vscode.StatusBarItem;
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._boardStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 5);
         this._boardStatusBar.command = "arduino.changeBoardType";
         this._boardStatusBar.tooltip = "Change Board Type";
-        this._boardStatusBar.show();
-
-        this.updateStatusBar();
     }
 
     public loadPackages(): void {
@@ -203,6 +202,9 @@ export class BoardManager {
         });
 
         this.loadInstalledPlatforms();
+        this.loadInstalledBoards();
+        this.updateStatusBar();
+        this._boardStatusBar.show();
     }
 
     public async changeBoardType() {
@@ -227,8 +229,8 @@ export class BoardManager {
         }));
         if (chosen && chosen.label) {
             const dc = DeviceContext.getIntance();
-            dc.board = (<any>chosen).entry;
-            this.updateStatusBar();
+            dc.board = (<any>chosen).entry.board;
+            this._boardStatusBar.text = chosen.label;
         }
     }
 
@@ -244,9 +246,16 @@ export class BoardManager {
         return this._installedPlatforms;
     }
 
+    public get installedBoards(): Map<string, IBoard> {
+        return this._boards;
+    }
+
     private updateStatusBar(): void {
         const dc = DeviceContext.getIntance();
-        this._boardStatusBar.text = dc.board ? dc.board.name : "<Please select the board type>";
+        let selectedBoard = this._boards.get(dc.board);
+        if (selectedBoard) {
+            this._boardStatusBar.text = selectedBoard.name;
+        }
     }
 
     private parsePackageIndex(rawModel: any): void {
@@ -287,17 +296,20 @@ export class BoardManager {
         });
     }
 
-    private listBoards(): IBoard[] {
+    private loadInstalledBoards(): void {
         let boards: Map<string, IBoard> = new Map<string, IBoard>();
         this.installedPlatforms.forEach((plat) => {
             let dir = plat.rootBoardPath;
             let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
             boards = new Map([...boards, ...this.parseBoardDescriptorFile(boardContent, plat)]);
-            return boards;
         });
 
+        this._boards = boards;
+    }
+
+    private listBoards(): IBoard[] {
         let result = [];
-        boards.forEach((b) => {
+        this._boards.forEach((b) => {
             result.push(b);
         });
         return result;
