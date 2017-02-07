@@ -5,19 +5,41 @@
 
 import * as vscode from "vscode";
 
-import { addLibPath, upload, verify } from "./arduino/arduino";
+import { ArduinoApp } from "./arduino/arduino";
+import { BoardContentProvider } from "./arduino/boardContentProvider";
+import { BoardManager } from "./arduino/boardManager";
 import { CompletionProvider } from "./arduino/completionProvider";
 import { DefinitionProvider } from "./arduino/definitionProvider";
-import * as settings from "./arduino/settings";
-import { ARDUINO_MODE } from "./common/constants";
+import { ArduinoSettings } from "./arduino/settings";
+import { ARDUINO_MODE, BOARD_MANAGER_PROTOCOL, BOARD_MANAGER_URI } from "./common/constants";
+import { DeviceContext } from "./deviceContext";
 import { changeBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
 
 export function activate(context: vscode.ExtensionContext) {
-    let arduinoSettings = settings.ArduinoSettings.getIntance();
+    const arduinoSettings = ArduinoSettings.getIntance();
+    const arduinoApp = new ArduinoApp(arduinoSettings);
+
+    // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
+    let deviceContext = DeviceContext.getIntance();
+    deviceContext.loadContext(arduinoApp);
+
+    // Arduino board manager:
+    const boardManger = new BoardManager(arduinoSettings, arduinoApp);
+    arduinoApp.boardManager = boardManger;
+    const packageProvider = new BoardContentProvider(boardManger, context.extensionPath);
+    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(BOARD_MANAGER_PROTOCOL, packageProvider));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", () => boardManger.changeBoardType()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.showBoardManager", () => {
+        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
+    }));
+
     context.subscriptions.push(arduinoSettings);
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => verify(arduinoSettings)));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => upload(arduinoSettings)));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", () => addLibPath(arduinoSettings)));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => arduinoApp.verify()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => arduinoApp.upload()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", () => arduinoApp.addLibPath()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.installBoard", (packageName, arch) => {
+        arduinoApp.installBoard(packageName, arch);
+    }));
 
     // serial monitor commands
     context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialPort", () => openSerialPort()));

@@ -28,7 +28,8 @@
       {
         "language": "arduino",
         "path": "./snippets/arduino.json"
-      }, {
+      },
+      {
         "language": "cpp",
         "path": "./snippets/arduino.json"
       }
@@ -61,8 +62,24 @@
       {
         "command": "arduino.sendMessageToSerialPort",
         "title": "Arduino: Send Text to Serial Port"
+      },
+      {
+        "command": "arduino.changeBoardType",
+        "title": "Arduino: Change Board Type"
+      },
+      {
+        "command": "arduino.showBoardManager",
+        "title": "Arduino: Boards Manager"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "arduino.showBoardManager",
+          "when": "resourceLangId == arduino"
+        }
+      ]
+    },
     "configuration": {
       "type": "object",
       "title": "Arduino configuration",

@@ -7,11 +7,22 @@
         ],
         "no-unused-expression": true,
         "no-duplicate-variable": true,
-        "max-classes-per-file": [false],
+        "max-classes-per-file": [
+            false
+        ],
         "no-empty": false,
         "object-literal-sort-keys": false,
         "curly": true,
         "class-name": true,
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-module",
+            "check-separator",
+            "check-type"
+        ],
         "semicolon": [
             "always"
         ],

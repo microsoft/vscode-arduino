@@ -6,10 +6,10 @@
 import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
 
 interface ISerialPortDetail {
-     comName: string;
-     manufacturer: string;
-     vendorId: string;
-     productId: string;
+    comName: string;
+    manufacturer: string;
+    vendorId: string;
+    productId: string;
 }
 
 class SerialPortCtrl {
@@ -78,7 +78,7 @@ class SerialPortCtrl {
             } else {
                 this._portStatusBar.text = this._currentPort;
                 this._baudRateStatusBar.text = this._currentBaudRate.toString();
-                this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, {baudRate: this._currentBaudRate});
+                this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
                 this._outputChannel.show();
                 this._currentSerialPort.on("data", (_event) => {
                     this._outputChannel.append(_event.toString());
@@ -112,7 +112,7 @@ class SerialPortCtrl {
         });
     }
 
-     public changePort(newPort: string): Promise<any> {
+    public changePort(newPort: string): Promise<any> {
         return new Promise((resolve, reject) => {
             this._currentPort = newPort;
             if (!this._currentSerialPort || !this.isActive()) {
@@ -126,12 +126,12 @@ class SerialPortCtrl {
                     this._currentSerialPort = null;
                     resolve();
                 }
-            } );
+            });
         });
     }
 
     public stop(): Promise<any> {
-       return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             if (!this._currentSerialPort || !this.isActive()) {
                 resolve();
                 return;
@@ -157,13 +157,13 @@ class SerialPortCtrl {
                 return;
             }
             this._baudRateStatusBar.text = this._currentBaudRate.toString();
-            this._currentSerialPort.update({baudRate: this._currentBaudRate}, (err) => {
-               if (err) {
+            this._currentSerialPort.update({ baudRate: this._currentBaudRate }, (err) => {
+                if (err) {
                     reject(err);
                 } else {
                     resolve();
                 }
-            } );
+            });
         });
     }
 }
@@ -175,30 +175,30 @@ export async function openSerialPort() {
         return;
     }
 
-    let chosen = await window.showQuickPick(<QuickPickItem[]> lists.map((l: ISerialPortDetail): QuickPickItem => {
-            return {
-                description: l.manufacturer,
-                label: l.comName,
-            };
+    let chosen = await window.showQuickPick(<QuickPickItem[]>lists.map((l: ISerialPortDetail): QuickPickItem => {
+        return {
+            description: l.manufacturer,
+            label: l.comName,
+        };
     }).sort((a, b): number => {
         return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
     }));
     if (chosen && chosen.label) {
-       if (ctrl) {
-           await ctrl.changePort(chosen.label);
-       } else {
-           ctrl = new SerialPortCtrl(chosen.label);
-       }
-       try {
-           return await ctrl.open();
-       } catch (error) {
-           window.showWarningMessage(`Failed to open serial port ${chosen.label} due to error:  + ${error.toString()}`);
-       }
+        if (ctrl) {
+            await ctrl.changePort(chosen.label);
+        } else {
+            ctrl = new SerialPortCtrl(chosen.label);
+        }
+        try {
+            return await ctrl.open();
+        } catch (error) {
+            window.showWarningMessage(`Failed to open serial port ${chosen.label} due to error:  + ${error.toString()}`);
+        }
     }
 }
 
 export async function sendMessageToSerialPort() {
-     if (ctrl && ctrl.isActive()) {
+    if (ctrl && ctrl.isActive()) {
         let text = await window.showInputBox();
         try {
             await ctrl.sendMessage(text);
@@ -214,8 +214,8 @@ export async function changeBaudRate() {
     let rates = SerialPortCtrl.listBaudRates();
     let choose = await window.showQuickPick(rates.map((rate) => rate.toString()));
     if (!choose) {
-            // console.log('No rate is selected, keep baud rate no changed.');
-            return;
+        // console.log('No rate is selected, keep baud rate no changed.');
+        return;
     }
     if (!parseInt(choose, 10)) {
         // console.log('Invalid baud rate, keep baud rate no changed.', choose);
