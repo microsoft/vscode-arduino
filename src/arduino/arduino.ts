@@ -32,9 +32,7 @@ export class ArduinoApp {
     }
 
     public upload() {
-
         let dc = DeviceContext.getIntance();
-
         const boardDescriptor = this.getBoardDescriptorString(dc);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         outputChannel.show(true);
@@ -127,8 +125,8 @@ export class ArduinoApp {
             ["--install-boards", `${packageName}:${arch}`]);
     }
 
-    public uninstallBoard() {
-
+    public uninstallBoard(packagePath: string) {
+        util.rmdirRecursivelySync(packagePath);
     }
 
     private loadPreferences() {

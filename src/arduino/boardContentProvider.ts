@@ -11,6 +11,8 @@ import { BoardManager, IPackage, IPlatform } from "./boardManager";
 
 export class BoardContentProvider implements vscode.TextDocumentContentProvider {
 
+    private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
+
     constructor(private _boardManager: BoardManager, private _extensionPath: string) {
         this._boardManager.loadPackages();
     }
@@ -31,6 +33,15 @@ export class BoardContentProvider implements vscode.TextDocumentContentProvider 
             </body>
         </html>
         `;
+    }
+
+    get onDidChange(): vscode.Event<vscode.Uri> {
+        return this._onDidChange.event;
+    }
+
+    public update(uri: vscode.Uri) {
+        this._boardManager.loadPackages();
+        this._onDidChange.fire(uri);
     }
 
     private buildBoardView(): string {
@@ -66,10 +77,14 @@ export class BoardContentProvider implements vscode.TextDocumentContentProvider 
     }
 
     private buildBoardSecionButtons(p: IPlatform): string {
-        return `<a href="${encodeURI("command:arduino.installBoard?" + JSON.stringify([p.package.name, p.architecture]))}">Install</a>`;
+        if (p.installedVersion) {
+            return `<div class="board-footer"><a href="${encodeURI("command:arduino.uninstallBoard?" + JSON.stringify([p.rootBoardPath]))}" class="operation">Remove</a></div>`;
+        } else {
+            return `<div class="board-footer"><a href="${encodeURI("command:arduino.installBoard?" + JSON.stringify([p.package.name, p.architecture]))}" class="operation">Install</a></div>`;
+        }
     }
 
     private getCssContent(): string {
-        return fs.readFileSync(path.join(this._extensionPath, "html", "index.css"), "utf8");
+        return fs.readFileSync(path.join(this._extensionPath, "html", "board.css"), "utf8");
     }
 }

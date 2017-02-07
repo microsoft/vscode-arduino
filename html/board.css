@@ -12,3 +12,11 @@
     font-weight: bold;
     color: lightseagreen;
 }
+
+.board-footer {
+    overflow: hidden;
+}
+
+.operation {
+    float: right;
+}

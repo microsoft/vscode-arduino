@@ -36,6 +36,24 @@ export function directoryExists(path: string): boolean {
     }
 }
 
+/**
+ * Recursively delete files. Equals to "rm -rf"
+ * @argument rootPath {string}
+ */
+export function rmdirRecursivelySync(rootPath: string): void {
+    if (fs.existsSync(rootPath)) {
+        fs.readdirSync(rootPath).forEach((file, index) => {
+            let curPath = path.join(rootPath, file);
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                rmdirRecursivelySync(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(rootPath);
+    }
+}
+
 export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<Object> {
     return new Promise((resolve, reject) => {
         let stdout = "";
