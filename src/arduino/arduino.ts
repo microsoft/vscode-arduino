@@ -118,7 +118,7 @@ export class ArduinoApp {
      * Install arduino board package based on package name and platform hardware architecture.
      * TODO: Add version
      */
-    public async installBoard(packageName: string, arch: string) {
+    public installBoard(packageName: string, arch: string) {
         outputChannel.show(true);
         return util.spawn(this._settings.commandPath,
             outputChannel,
