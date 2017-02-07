@@ -32,9 +32,7 @@ export class ArduinoApp {
     }
 
     public upload() {
-
         let dc = DeviceContext.getIntance();
-
         const boardDescriptor = this.getBoardDescriptorString(dc);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         outputChannel.show(true);
@@ -120,15 +118,15 @@ export class ArduinoApp {
      * Install arduino board package based on package name and platform hardware architecture.
      * TODO: Add version
      */
-    public installBoard(packageName: string, arch: string) {
+    public async installBoard(packageName: string, arch: string) {
         outputChannel.show(true);
         return util.spawn(this._settings.commandPath,
             outputChannel,
             ["--install-boards", `${packageName}:${arch}`]);
     }
 
-    public uninstallBoard() {
-
+    public uninstallBoard(packagePath: string) {
+        util.rmdirRecursivelySync(packagePath);
     }
 
     private loadPreferences() {

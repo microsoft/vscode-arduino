@@ -36,7 +36,7 @@ export interface IDeviceContext {
     sketch: string;
 }
 
-export class DeviceContext implements IDeviceContext {
+export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public static getIntance(): DeviceContext {
         return DeviceContext._deviceContext;
     }
@@ -49,10 +49,30 @@ export class DeviceContext implements IDeviceContext {
 
     private _sketch: string;
 
+    private _arduinoApp: ArduinoApp;
+
+    private _watcher: vscode.FileSystemWatcher;
+
     /**
      * @constructor
      */
     private constructor() {
+        this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE));
+        this._watcher.onDidCreate(() => this.loadContext());
+        this._watcher.onDidChange(() => this.loadContext());
+        this._watcher.onDidDelete(() => this.loadContext());
+    }
+
+    public dispose() {
+        this._watcher.dispose();
+    }
+
+    public get arduinoApp(): ArduinoApp {
+        return this._arduinoApp;
+    }
+
+    public set arduinoApp(value: ArduinoApp) {
+        this._arduinoApp = value;
     }
 
     /**
@@ -60,12 +80,12 @@ export class DeviceContext implements IDeviceContext {
      * and the setting only depends on device.json.
      * @method
      */
-    public loadContext(app: ArduinoApp): Thenable<Object> {
-        let preferences = app.preferences;
+    public loadContext(): Thenable<Object> {
+        let preferences = this.arduinoApp.preferences;
         this.sketch = "app/app.ino";
         if (preferences) {
-            this.board = preferences.get("board");
-            this.port = preferences.get("serial.port");
+            this._board = preferences.get("board");
+            this._port = preferences.get("serial.port");
         }
 
         return vscode.workspace.findFiles(DEVICE_CONFIG_FILE, null, 1)
@@ -74,9 +94,9 @@ export class DeviceContext implements IDeviceContext {
                 if (files && files.length > 0) {
                     const configFile = files[0];
                     deviceConfig = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
-                    this.port = deviceConfig.port;
-                    this.board = deviceConfig.board;
-                    this.sketch = deviceConfig.sketch;
+                    this._port = deviceConfig.port;
+                    this._board = deviceConfig.board;
+                    this._sketch = deviceConfig.sketch;
                 }
                 return this;
             });
@@ -97,6 +117,7 @@ export class DeviceContext implements IDeviceContext {
     }
     public set port(value: string) {
         this._port = value;
+        this.saveContext();
     }
 
     public get board() {

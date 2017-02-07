@@ -15,13 +15,14 @@ import { ARDUINO_MODE, BOARD_MANAGER_PROTOCOL, BOARD_MANAGER_URI } from "./commo
 import { DeviceContext } from "./deviceContext";
 import { changeBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     const arduinoSettings = ArduinoSettings.getIntance();
     const arduinoApp = new ArduinoApp(arduinoSettings);
 
     // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
     let deviceContext = DeviceContext.getIntance();
-    deviceContext.loadContext(arduinoApp);
+    deviceContext.arduinoApp = arduinoApp;
+    await deviceContext.loadContext();
 
     // Arduino board manager:
     const boardManger = new BoardManager(arduinoSettings, arduinoApp);
@@ -37,8 +38,13 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => arduinoApp.verify()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => arduinoApp.upload()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", () => arduinoApp.addLibPath()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.installBoard", (packageName, arch) => {
-        arduinoApp.installBoard(packageName, arch);
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.installBoard", async (packageName, arch) => {
+        await arduinoApp.installBoard(packageName, arch);
+        packageProvider.update(BOARD_MANAGER_URI);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.uninstallBoard", (packagePath) => {
+        arduinoApp.uninstallBoard(packagePath);
+        packageProvider.update(BOARD_MANAGER_URI);
     }));
 
     // serial monitor commands
