@@ -1,13 +1,13 @@
 a {
     color: lightseagreen;
 }
-.board {
+.library {
     padding: 5px 10px;
     margin: 10px;
     border: 1px double black;
 }
 
-.board-header {
+.library-header {
     font-weight: bold;
 }
 
@@ -16,10 +16,11 @@ a {
     color: lightseagreen;
 }
 
-.board-footer {
+.library-footer {
     overflow: hidden;
 }
 
 .operation {
     float: right;
+    padding: 2px 5px;
 }

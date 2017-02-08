@@ -51,11 +51,15 @@ export class ArduinoApp {
             ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath]);
     }
 
-    public addLibPath() {
+    public addLibPath(libraryPath: string) {
         let dc = DeviceContext.getIntance();
+        let libPaths;
+        if (libraryPath) {
+            libPaths = [libraryPath];
+        } else {
+            libPaths = this.getPackageLibPaths(dc);
+        }
 
-        let paths = this.getPackageLibPaths(dc);
-        paths.push(this._settings.libPath);
         return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
             .then((files) => {
                 let deviceContext = null;
@@ -81,18 +85,18 @@ export class ArduinoApp {
                     deviceContext.configurations.push(configSection);
                 }
 
-                paths.forEach((libPath) => {
-                    libPath = path.resolve(path.normalize(libPath));
+                libPaths.forEach((childLibPath) => {
+                    childLibPath = path.resolve(path.normalize(childLibPath));
                     if (configSection.includePath && configSection.includePath.length) {
                         for (let existingPath of configSection.includePath) {
-                            if (libPath === path.resolve(path.normalize(existingPath))) {
+                            if (childLibPath === path.resolve(path.normalize(existingPath))) {
                                 return;
                             }
                         }
                     } else {
                         configSection.includePath = [];
                     }
-                    configSection.includePath.push(libPath);
+                    configSection.includePath.push(childLibPath);
                 });
 
                 fs.writeFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), JSON.stringify(deviceContext, null, 4));
@@ -152,13 +156,13 @@ export class ArduinoApp {
     }
 
     private getPackageLibPaths(dc: IDeviceContext): string[] {
-        let boardDescriptor = this._boardManager.installedBoards.get(dc.board);
+        let boardDescriptor = this._boardManager.currentBoard;
         let result = [];
         let toolsPath = boardDescriptor.platform.rootBoardPath;
-        let coreLibs = fs.readdirSync(path.join(toolsPath, toolsPath, "cores"));
+        let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
         if (coreLibs && coreLibs.length > 0) {
             coreLibs.forEach((coreLib) => {
-                result.push(path.join(toolsPath, toolsPath, "cores", coreLib));
+                result.push(path.join(toolsPath, "cores", coreLib));
             });
         }
 

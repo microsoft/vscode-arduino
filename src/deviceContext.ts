@@ -37,6 +37,7 @@ export interface IDeviceContext {
 }
 
 export class DeviceContext implements IDeviceContext, vscode.Disposable {
+
     public static getIntance(): DeviceContext {
         return DeviceContext._deviceContext;
     }
@@ -90,13 +91,13 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
         return vscode.workspace.findFiles(DEVICE_CONFIG_FILE, null, 1)
             .then((files) => {
-                let deviceConfig: any = {};
+                let deviceConfigJson: any = {};
                 if (files && files.length > 0) {
                     const configFile = files[0];
-                    deviceConfig = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
-                    this._port = deviceConfig.port;
-                    this._board = deviceConfig.board;
-                    this._sketch = deviceConfig.sketch;
+                    deviceConfigJson = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
+                    this._port = deviceConfigJson.port;
+                    this._board = deviceConfigJson.board;
+                    this._sketch = deviceConfigJson.sketch;
                 }
                 return this;
             });
@@ -104,17 +105,21 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public saveContext() {
         const deviceConfigFile = path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE);
-        let deviceContext = JSON.parse(fs.readFileSync(deviceConfigFile, "utf8"));
-        deviceContext.sketch = this.sketch;
-        deviceContext.port = this.port;
-        deviceContext.board = this.board;
+        let deviceConfigJson: any = {};
+        if (util.fileExists(deviceConfigFile)) {
+            deviceConfigJson = JSON.parse(fs.readFileSync(deviceConfigFile, "utf8"));
+        }
+        deviceConfigJson.sketch = this.sketch;
+        deviceConfigJson.port = this.port;
+        deviceConfigJson.board = this.board;
 
-        fs.writeFileSync(path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE), JSON.stringify(deviceContext, null, 4));
+        fs.writeFileSync(path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE), JSON.stringify(deviceConfigJson, null, 4));
     }
 
     public get port() {
         return this._port;
     }
+
     public set port(value: string) {
         this._port = value;
         this.saveContext();
