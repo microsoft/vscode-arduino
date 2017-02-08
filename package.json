@@ -70,6 +70,10 @@
       {
         "command": "arduino.showBoardManager",
         "title": "Arduino: Boards Manager"
+      },
+      {
+        "command": "arduino.showLibraryManager",
+        "title": "Arduino: Manage Libraries"
       }
     ],
     "menus": {

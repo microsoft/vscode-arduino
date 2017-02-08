@@ -180,6 +180,8 @@ export class BoardManager {
 
     private _boardStatusBar: vscode.StatusBarItem;
 
+    private _currentBoard: IBoard;
+
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._boardStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 5);
         this._boardStatusBar.command = "arduino.changeBoardType";
@@ -230,6 +232,7 @@ export class BoardManager {
         if (chosen && chosen.label) {
             const dc = DeviceContext.getIntance();
             dc.board = (<any>chosen).entry.board;
+            this._currentBoard = (<any>chosen).entry;
             this._boardStatusBar.text = chosen.label;
         }
     }
@@ -250,10 +253,15 @@ export class BoardManager {
         return this._boards;
     }
 
+    public get currentBoard(): IBoard {
+        return this._currentBoard;
+    }
+
     private updateStatusBar(): void {
         const dc = DeviceContext.getIntance();
         let selectedBoard = this._boards.get(dc.board);
         if (selectedBoard) {
+            this._currentBoard = selectedBoard;
             this._boardStatusBar.text = selectedBoard.name;
         }
     }
