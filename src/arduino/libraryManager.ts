@@ -42,8 +42,14 @@ export class LibraryManager {
     }
 
     public loadLibraries(): void {
-        let rootPackgeFolder = this._settings.packagePath;
-        let packageContent = fs.readFileSync(path.join(rootPackgeFolder, "library_index.json"), "utf8");
+        this._libraries = new Map<string, ILibrary>();
+        this._sortedLibrary = [];
+
+        let libraryIndexFilePath = path.join(this._settings.packagePath, "library_index.json");
+        if (!util.fileExists(libraryIndexFilePath)) {
+            return;
+        }
+        let packageContent = fs.readFileSync(libraryIndexFilePath, "utf8");
         this.parseLibraryIndex(JSON.parse(packageContent));
 
         this.loadInstalledLibraries();
@@ -51,7 +57,6 @@ export class LibraryManager {
     }
 
     private parseLibraryIndex(rawModel: any) {
-        this._libraries = new Map<string, ILibrary>();
         rawModel.libraries.forEach((library: ILibrary) => {
             let existingLib = this._libraries.get(library.name);
             if (existingLib) {
@@ -79,8 +84,8 @@ export class LibraryManager {
     }
 
     private sortLibraries() {
-        this._sortedLibrary = [];
-        if (this._boardManager.currentBoard) {
+
+        if (!this._boardManager.currentBoard) {
             return;
         }
         this._libraries.forEach((_lib) => {

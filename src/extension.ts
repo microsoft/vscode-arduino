@@ -27,19 +27,22 @@ export async function activate(context: vscode.ExtensionContext) {
     await deviceContext.loadContext();
     context.subscriptions.push(deviceContext);
 
-    // Arduino board manager:
+    // Arduino board & library managers:
     const boardManger = new BoardManager(arduinoSettings, arduinoApp);
     arduinoApp.boardManager = boardManger;
     const packageProvider = new BoardContentProvider(boardManger, context.extensionPath);
+    const libraryManager = new LibraryManager(arduinoSettings, boardManger);
+    const libraryProvider = new LibraryContentProvider(libraryManager, context.extensionPath);
+
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(BOARD_MANAGER_PROTOCOL, packageProvider));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", () => boardManger.changeBoardType()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", () => {
+        boardManger.changeBoardType();
+        libraryProvider.update(LIBRARY_MANAGER_URI);
+    }));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.showBoardManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
     }));
 
-    // Arduino library manager:
-    const libraryManager = new LibraryManager(arduinoSettings, boardManger);
-    const libraryProvider = new LibraryContentProvider(libraryManager, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(LIBRARY_MANAGER_PROTOCOL, libraryProvider));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.showLibraryManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Library Manager");

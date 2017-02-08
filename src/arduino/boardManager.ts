@@ -264,6 +264,8 @@ export class BoardManager {
         if (selectedBoard) {
             this._currentBoard = selectedBoard;
             this._boardStatusBar.text = selectedBoard.name;
+        } else {
+            this._boardStatusBar.text = "<Select Board Type>";
         }
     }
 
