@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as url from "url";
 import * as vscode from "vscode";
+import * as util from "../common/util";
 
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
@@ -288,10 +289,20 @@ export class BoardManager {
 
     private loadInstalledPlatforms(): void {
         this._installedPlatforms = [];
-        const dirs = fs.readdirSync(path.join(this._settings.packagePath, "packages"));
+        let rootPacakgesPath = path.join(path.join(this._settings.packagePath, "packages"));
+        if (!util.directoryExists(rootPacakgesPath)) {
+            return;
+        }
+        const dirs = fs.readdirSync(rootPacakgesPath);
         dirs.forEach((packageName) => {
             let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
+            if (!util.directoryExists(archPath)) {
+                return;
+            }
             let architectures = fs.readdirSync(archPath);
+            if (!architectures || !architectures.length) {
+                return;
+            }
             architectures.forEach((architecture) => {
                 let allVersion = fs.readdirSync(path.join(archPath, architecture));
                 let existingPlatform = this._platforms.find((_plat) => _plat.package.name === packageName && _plat.architecture === architecture);

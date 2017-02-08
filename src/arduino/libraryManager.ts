@@ -80,6 +80,9 @@ export class LibraryManager {
 
     private sortLibraries() {
         this._sortedLibrary = [];
+        if (this._boardManager.currentBoard) {
+            return;
+        }
         this._libraries.forEach((_lib) => {
             this._sortedLibrary.push(_lib);
         });
