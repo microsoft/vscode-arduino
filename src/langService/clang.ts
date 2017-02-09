@@ -5,9 +5,9 @@
 
 import * as childProcess from "child_process";
 import * as vscode from "vscode";
-
 import * as util from "../common/util";
-import { ArduinoSettings } from "./settings";
+
+import { ArduinoSettings } from "../arduino/settings";
 
 export function provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
     Thenable<vscode.CompletionItem[]> {

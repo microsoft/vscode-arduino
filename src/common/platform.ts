@@ -8,7 +8,7 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { fileExists } from "../common/util";
+import { fileExists } from "./util";
 
 export function resolveArduinoPath(): string {
     let result;

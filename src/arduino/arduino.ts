@@ -31,6 +31,19 @@ export class ArduinoApp {
     constructor(private _settings: settings.IArduinoSettings) {
     }
 
+    public async initialize() {
+        if (!util.fileExists(path.join(this._settings.packagePath, "package_index.json"))) {
+            try {
+
+                // Use the dummy package to initialize the Arduino IDE
+                await util.spawn(this._settings.commandPath,
+                    null,
+                    ["--install-boards", "dummy"]);
+            } catch (ex) {
+            }
+        }
+    }
+
     public upload() {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
