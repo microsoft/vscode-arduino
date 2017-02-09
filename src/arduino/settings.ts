@@ -11,7 +11,7 @@ import * as vscode from "vscode";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 
-import { resolveArduinoPath } from "./platform";
+import { resolveArduinoPath } from "../common/platform";
 
 export interface IArduinoSettings {
     arduinoPath: string;

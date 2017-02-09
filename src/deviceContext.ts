@@ -83,7 +83,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      */
     public loadContext(): Thenable<Object> {
         let preferences = this.arduinoApp.preferences;
-        this.sketch = "app/app.ino";
+        this._sketch = "app/app.ino";
         if (preferences) {
             this._board = preferences.get("board");
             this._port = preferences.get("serial.port");
@@ -95,9 +95,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 if (files && files.length > 0) {
                     const configFile = files[0];
                     deviceConfigJson = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
-                    this._port = deviceConfigJson.port;
-                    this._board = deviceConfigJson.board;
-                    this._sketch = deviceConfigJson.sketch;
+                    this._port = deviceConfigJson.port || this._port;
+                    this._board = deviceConfigJson.board || this._board;
+                    this._sketch = deviceConfigJson.sketch || this._sketch;
                 }
                 return this;
             });
@@ -140,5 +140,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set sketch(value: string) {
         this._sketch = value;
+        this.saveContext();
     }
 }

@@ -8,18 +8,19 @@ import * as vscode from "vscode";
 import { ArduinoApp } from "./arduino/arduino";
 import { BoardContentProvider } from "./arduino/boardContentProvider";
 import { BoardManager } from "./arduino/boardManager";
-import { CompletionProvider } from "./arduino/completionProvider";
-import { DefinitionProvider } from "./arduino/definitionProvider";
 import { LibraryContentProvider } from "./arduino/libraryContentProvider";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ArduinoSettings } from "./arduino/settings";
 import { ARDUINO_MODE, BOARD_MANAGER_PROTOCOL, BOARD_MANAGER_URI, LIBRARY_MANAGER_PROTOCOL, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
+import { CompletionProvider } from "./langService/completionProvider";
+import { DefinitionProvider } from "./langService/definitionProvider";
 import { changeBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
 
 export async function activate(context: vscode.ExtensionContext) {
     const arduinoSettings = ArduinoSettings.getIntance();
     const arduinoApp = new ArduinoApp(arduinoSettings);
+    await arduinoApp.initialize();
 
     // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
     let deviceContext = DeviceContext.getIntance();
