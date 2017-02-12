@@ -1,5 +1,17 @@
 # Arduino for Visual Studio Code
 
+Welcome to **Arduino** for Visual Studio Code! The Arduino extension makes it easy to code, build and deploy your Arduino sketches in Visual Studio Code.
+
+* Verify and upload your Arduino sketches in Visual Studio Code.
+* Built-in Arduino board and library manager.
+* IntelliSense support and syntax highlighting.
+* Built-in serial port monitoring tool.
+* Arduino example list.
+* Snippets for ino files.
+* F5 integration with debugging support (Arduino Zero).
+* Commond Palette(F1) integration for most common Arduino commands (e.g. Verify, Upload).
+* Customizable extension options including command shortcuts and more.
+
 ## Requirement
 
 ### Arduino
