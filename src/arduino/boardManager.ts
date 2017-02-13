@@ -167,8 +167,6 @@ export interface IBoard {
     platform: IPlatform;
 }
 
-const BOARD_LINE_RE = /([^\.]+)\.(\S+)=(.+)/;
-
 export class BoardManager {
 
     private _packages: IPackage[];
@@ -200,6 +198,9 @@ export class BoardManager {
         this._packages = [];
         this._platforms = [];
         indexFiles.forEach((indexFile) => {
+            if (!util.fileExistsSync(path.join(rootPackgeFolder, indexFile))) {
+                return;
+            }
             let packageContent = fs.readFileSync(path.join(rootPackgeFolder, indexFile), "utf8");
             this.parsePackageIndex(JSON.parse(packageContent));
         });
@@ -292,13 +293,13 @@ export class BoardManager {
     private loadInstalledPlatforms(): void {
         this._installedPlatforms = [];
         let rootPacakgesPath = path.join(path.join(this._settings.packagePath, "packages"));
-        if (!util.directoryExists(rootPacakgesPath)) {
+        if (!util.directoryExistsSync(rootPacakgesPath)) {
             return;
         }
         const dirs = fs.readdirSync(rootPacakgesPath);
         dirs.forEach((packageName) => {
             let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
-            if (!util.directoryExists(archPath)) {
+            if (!util.directoryExistsSync(archPath)) {
                 return;
             }
             let architectures = fs.readdirSync(archPath);
@@ -337,14 +338,17 @@ export class BoardManager {
     }
 
     private parseBoardDescriptorFile(boardDescriptor: string, plat: IPlatform): Map<string, IBoard> {
+        const boardLineRegex = /([^\.]+)\.(\S+)=(.+)/;
+
         let result = new Map<string, IBoard>();
         let lines = boardDescriptor.split(/[\r|\r\n|\n]/);
+
         lines.forEach((line) => {
+            // Ignore comments and menu discription lines.
             if (line.startsWith("#") || line.startsWith("menu.")) {
                 return;
             }
-
-            let match = BOARD_LINE_RE.exec(line);
+            let match = boardLineRegex.exec(line);
             if (match && match.length > 3) {
                 let boardObject = result.get(match[1]);
                 if (!boardObject) {

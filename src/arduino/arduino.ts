@@ -15,10 +15,10 @@ import * as settings from "./settings";
 import { DeviceContext, IDeviceContext } from "../deviceContext";
 import { BoardManager } from "./boardManager";
 
-export const outputChannel = vscode.window.createOutputChannel("Arduino");
+export const arduinoChannel = vscode.window.createOutputChannel("Arduino");
 
 /**
- * Represent an Arduino application based on Arduino IDE.
+ * Represent an Arduino application based on the official Arduino IDE.
  */
 export class ArduinoApp {
 
@@ -32,7 +32,7 @@ export class ArduinoApp {
     }
 
     public async initialize() {
-        if (!util.fileExists(path.join(this._settings.packagePath, "package_index.json"))) {
+        if (!util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
 
                 // Use the dummy package to initialize the Arduino IDE
@@ -44,13 +44,25 @@ export class ArduinoApp {
         }
     }
 
+    public async initializeLibrary() {
+        if (!util.fileExistsSync(path.join(this._settings.packagePath, "library_index.json"))) {
+            try {
+                // Use the dummy library to initialize the Arduino IDE
+                await util.spawn(this._settings.commandPath,
+                    null,
+                    ["--install-library", "dummy"]);
+            } catch (ex) {
+            }
+        }
+    }
+
     public upload() {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        outputChannel.show(true);
+        arduinoChannel.show(true);
         return util.spawn(this._settings.commandPath,
-            outputChannel,
+            arduinoChannel,
             ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath]);
     }
 
@@ -58,9 +70,9 @@ export class ArduinoApp {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        outputChannel.show(true);
+        arduinoChannel.show(true);
         return util.spawn(this._settings.commandPath,
-            outputChannel,
+            arduinoChannel,
             ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath]);
     }
 
@@ -70,7 +82,7 @@ export class ArduinoApp {
         if (libraryPath) {
             libPaths = [libraryPath];
         } else {
-            libPaths = this.getPackageLibPaths(dc);
+            libPaths = this.getPackageDefaultLibPaths(dc);
         }
 
         return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
@@ -136,9 +148,9 @@ export class ArduinoApp {
      * TODO: Add version
      */
     public installBoard(packageName: string, arch: string) {
-        outputChannel.show(true);
+        arduinoChannel.show(true);
         return util.spawn(this._settings.commandPath,
-            outputChannel,
+            arduinoChannel,
             ["--install-boards", `${packageName}:${arch}`]);
     }
 
@@ -163,20 +175,25 @@ export class ArduinoApp {
     }
 
     private getBoardDescriptorString(deviceContext: IDeviceContext): string {
-        let boardDescriptor = this.boardManager.installedBoards.get(deviceContext.board);
+        let boardDescriptor = this.boardManager.currentBoard;
+        if (!boardDescriptor) {
+            throw new Error("Please select the board type first.");
+        }
         let boardString = `${boardDescriptor.platform.package.name}:${boardDescriptor.platform.architecture}:${boardDescriptor.board}`;
         return boardString;
     }
 
-    private getPackageLibPaths(dc: IDeviceContext): string[] {
+    private getPackageDefaultLibPaths(dc: IDeviceContext): string[] {
         let boardDescriptor = this._boardManager.currentBoard;
         let result = [];
         let toolsPath = boardDescriptor.platform.rootBoardPath;
-        let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
-        if (coreLibs && coreLibs.length > 0) {
-            coreLibs.forEach((coreLib) => {
-                result.push(path.join(toolsPath, "cores", coreLib));
-            });
+        if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
+            let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
+            if (coreLibs && coreLibs.length > 0) {
+                coreLibs.forEach((coreLib) => {
+                    result.push(path.join(toolsPath, "cores", coreLib));
+                });
+            }
         }
 
         return result;

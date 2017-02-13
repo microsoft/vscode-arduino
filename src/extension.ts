@@ -32,7 +32,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const boardManger = new BoardManager(arduinoSettings, arduinoApp);
     arduinoApp.boardManager = boardManger;
     const packageProvider = new BoardContentProvider(boardManger, context.extensionPath);
-    const libraryManager = new LibraryManager(arduinoSettings, boardManger);
+    const libraryManager = new LibraryManager(arduinoSettings, arduinoApp, boardManger);
     const libraryProvider = new LibraryContentProvider(libraryManager, context.extensionPath);
 
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(BOARD_MANAGER_PROTOCOL, packageProvider));

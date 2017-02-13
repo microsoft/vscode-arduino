@@ -9,6 +9,10 @@ import * as vscode from "vscode";
 
 import { BoardManager, IPackage, IPlatform } from "./boardManager";
 
+/**
+ * Class represent Arduino Board Manager view.
+ * @class
+ */
 export class BoardContentProvider implements vscode.TextDocumentContentProvider {
 
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
@@ -44,6 +48,9 @@ export class BoardContentProvider implements vscode.TextDocumentContentProvider 
         this._onDidChange.fire(uri);
     }
 
+    /**
+     * TODO: Add version selection for board manager.
+     */
     private buildBoardView(): string {
         let result = "";
         this._boardManager.platforms.forEach((p: IPlatform) => {

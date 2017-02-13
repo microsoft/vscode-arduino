@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as util from "../common/util";
+import { ArduinoApp } from "./arduino";
 import { BoardManager } from "./boardManager";
 import { IArduinoSettings } from "./settings";
 
@@ -29,25 +30,25 @@ export interface ILibrary {
 }
 
 export class LibraryManager {
-
     private _libraries: Map<string, ILibrary>;
 
+    // Sorted library group by board type, then alphabetically.
     private _sortedLibrary: ILibrary[];
 
-    constructor(private _settings: IArduinoSettings, private _boardManager: BoardManager) {
+    constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp, private _boardManager: BoardManager) {
     }
 
     public get libraries(): ILibrary[] {
         return this._sortedLibrary;
     }
 
-    public loadLibraries(): void {
+    public async loadLibraries() {
         this._libraries = new Map<string, ILibrary>();
         this._sortedLibrary = [];
 
         let libraryIndexFilePath = path.join(this._settings.packagePath, "library_index.json");
-        if (!util.fileExists(libraryIndexFilePath)) {
-            return;
+        if (!util.fileExistsSync(libraryIndexFilePath)) {
+            await this._arduinoApp.initializeLibrary();
         }
         let packageContent = fs.readFileSync(libraryIndexFilePath, "utf8");
         this.parseLibraryIndex(JSON.parse(packageContent));
@@ -73,6 +74,10 @@ export class LibraryManager {
     private loadInstalledLibraries() {
         let libRoot = this._settings.libPath;
 
+        if (util.directoryExistsSync(this._settings.libPath)) {
+            return;
+        }
+
         let installedLibDirs = fs.readdirSync(libRoot);
         installedLibDirs.forEach((libDir) => {
             let sourceLib = this._libraries.get(libDir);
@@ -84,13 +89,14 @@ export class LibraryManager {
     }
 
     private sortLibraries() {
-
         if (!this._boardManager.currentBoard) {
             return;
         }
         this._libraries.forEach((_lib) => {
             this._sortedLibrary.push(_lib);
         });
+
+        // Filter out not supported library according to the selected board type.
         let targetArch = this._boardManager.currentBoard.platform.architecture;
         this._sortedLibrary = this._sortedLibrary.filter((_lib) => {
             let supportedArch = (<string[]>_lib.architectures).find((arch) => {
@@ -117,7 +123,7 @@ export class LibraryManager {
         let rootBoardPath = currentBoard.platform.rootBoardPath;
         let builtInLib = [];
         let builtInLibPath = path.join(rootBoardPath, "libraries");
-        if (util.directoryExists(builtInLibPath)) {
+        if (util.directoryExistsSync(builtInLibPath)) {
             let libDirs = fs.readdirSync(builtInLibPath);
             if (!libDirs || !libDirs.length) {
                 return;

@@ -8,7 +8,7 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { fileExists } from "./util";
+import { fileExistsSync } from "./util";
 
 export function resolveArduinoPath(): string {
     let result;
@@ -17,7 +17,7 @@ export function resolveArduinoPath(): string {
         if (plat === "win32") {
             let pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
             pathString = path.resolve(pathString).trim();
-            if (fileExists(pathString)) {
+            if (fileExistsSync(pathString)) {
                 result = path.dirname(path.resolve(pathString));
             }
         }
