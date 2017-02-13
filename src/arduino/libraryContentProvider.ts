@@ -14,10 +14,13 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
     constructor(private _libraryManager: LibraryManager, private _extensionPath: string) {
-        this._libraryManager.loadLibraries();
     }
 
-    public provideTextDocumentContent(uri: vscode.Uri): string {
+    public async provideTextDocumentContent(uri: vscode.Uri) {
+
+        if (!this._libraryManager.libraries) {
+            await this._libraryManager.loadLibraries();
+        }
         const packageView = this.buildBoardView();
         const cssContent = this.getCssContent();
 
@@ -39,8 +42,8 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
         return this._onDidChange.event;
     }
 
-    public update(uri: vscode.Uri) {
-        this._libraryManager.loadLibraries();
+    public async update(uri: vscode.Uri) {
+        await this._libraryManager.loadLibraries();
         this._onDidChange.fire(uri);
     }
 
