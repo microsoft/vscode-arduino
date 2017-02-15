@@ -35,13 +35,14 @@ export class SerialMonitor {
     private _serialPortCtrl: SerialPortCtrl = null;
 
     constructor() {
+        this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
-        this._portsStatusBar.command = "arduino.changeSerialPort";
-        this._portsStatusBar.tooltip = "Select Port";
+        this._portsStatusBar.command = "arduino.selectSerialPort";
+        this._portsStatusBar.tooltip = "Select Serial Port";
         this._portsStatusBar.show();
 
         this._openPortStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 3);
-        this._openPortStatusBar.command = "arduino.openSerialPort";
+        this._openPortStatusBar.command = "arduino.openSerialMonitor";
         this._openPortStatusBar.text = `$(key)`;
         this._openPortStatusBar.tooltip = "Open Port";
         this._openPortStatusBar.show();
@@ -53,7 +54,7 @@ export class SerialMonitor {
         this.updatePortListStatus(null);
     }
 
-    public async changeSerialPort() {
+    public async selectSerialPort() {
         let lists = await SerialPortCtrl.list();
         if (!lists.length) {
             vscode.window.showInformationMessage("No serial port is available.");
@@ -73,7 +74,7 @@ export class SerialMonitor {
         }
     }
 
-    public async  openSerialPort() {
+    public async  openSerialMonitor() {
         if (this._serialPortCtrl) {
             await this._serialPortCtrl.changePort(this._currentPort);
         } else {
@@ -118,7 +119,7 @@ export class SerialMonitor {
         return await this._serialPortCtrl.changeBaudRate(parseInt(choose, 10));
     }
 
-    public async closeSerialPort() {
+    public async closeSerialMonitor() {
         if (this._serialPortCtrl) {
             await this._serialPortCtrl.stop();
             this.updatePortStatus(false);
@@ -143,14 +144,14 @@ export class SerialMonitor {
 
     private updatePortStatus(isOpened: boolean) {
         if (isOpened) {
-            this._openPortStatusBar.command = "arduino.closeSerialPort";
+            this._openPortStatusBar.command = "arduino.closeSerialMonitor";
             this._openPortStatusBar.text = `$(x)`;
-            this._openPortStatusBar.tooltip = "close Port";
+            this._openPortStatusBar.tooltip = "Close Serial Monitor";
             this._baudRateStatusBar.show();
         } else {
-            this._openPortStatusBar.command = "arduino.openSerialPort";
+            this._openPortStatusBar.command = "arduino.openSerialMonitor";
             this._openPortStatusBar.text = `$(key)`;
-            this._openPortStatusBar.tooltip = "Open Port";
+            this._openPortStatusBar.tooltip = "Open Serial Monitor";
             this._baudRateStatusBar.hide();
         }
 

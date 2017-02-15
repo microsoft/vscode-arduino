@@ -72,11 +72,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // serial monitor commands
     const monitor = new SerialMonitor();
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeSerialPort", async () => monitor.changeSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialPort", async () => monitor.openSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", async () => monitor.changeBaudRate()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", async () => monitor.sendMessageToSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialPort", async () => monitor.closeSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.selectSerialPort", async () => await monitor.selectSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialMonitor", async () => await monitor.openSerialMonitor()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", async () => await monitor.changeBaudRate()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", async () => await monitor.sendMessageToSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialMonitor", async () => await monitor.closeSerialMonitor()));
 
     // Add arduino specific language suport.
     const completionProvider = new CompletionProvider();

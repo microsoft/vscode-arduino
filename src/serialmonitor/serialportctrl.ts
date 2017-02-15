@@ -62,7 +62,7 @@ export class SerialPortCtrl {
                 this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
                 this._outputChannel.show();
                 this._currentSerialPort.on("open", () => {
-                    this._currentSerialPort.write("TestOPen", (err) => {
+                    this._currentSerialPort.write("TestingOpen", (err) => {
                         if (err) {
                             reject(err);
                         } else {
