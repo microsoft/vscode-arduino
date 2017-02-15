@@ -15,7 +15,7 @@ import { ARDUINO_MODE, BOARD_MANAGER_PROTOCOL, BOARD_MANAGER_URI, LIBRARY_MANAGE
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import { DefinitionProvider } from "./langService/definitionProvider";
-import { changeBaudRate, closeSerialPort, openSerialPort, sendMessageToSerialPort } from "./serialmonitor/serialportctrl";
+import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
 export async function activate(context: vscode.ExtensionContext) {
     const arduinoSettings = ArduinoSettings.getIntance();
@@ -61,12 +61,22 @@ export async function activate(context: vscode.ExtensionContext) {
         arduinoApp.uninstallBoard(packagePath);
         packageProvider.update(BOARD_MANAGER_URI);
     }));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.installLibrary", async (libName) => {
+        await arduinoApp.installLibrary(libName);
+        libraryProvider.update(LIBRARY_MANAGER_URI);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.uninstallLibrary", (libPath) => {
+        arduinoApp.uninstallLibrary(libPath);
+        libraryProvider.update(LIBRARY_MANAGER_URI);
+    }));
 
     // serial monitor commands
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialPort", () => openSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", () => changeBaudRate()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", () => sendMessageToSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialPort", () => closeSerialPort()));
+    const monitor = new SerialMonitor();
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeSerialPort", async () => monitor.changeSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialPort", async () => monitor.openSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", async () => monitor.changeBaudRate()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", async () => monitor.sendMessageToSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialPort", async () => monitor.closeSerialPort()));
 
     // Add arduino specific language suport.
     const completionProvider = new CompletionProvider();

@@ -80,12 +80,12 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
                 </div>`;
             } else {
                 return `<div class="library-footer">
-                <a href="${encodeURI("command:arduino.uninstallBoard?" + JSON.stringify([lib.name]))}" class="operation">Remove</a>
+                <a href="${encodeURI("command:arduino.uninstallLibrary?" + JSON.stringify([lib.name]))}" class="operation">Remove</a>
                 <a href="${encodeURI("command:arduino.addLibPath?" + JSON.stringify([lib.installedPath]))}" class="operation">Add to Include Path</a>
                 </div>`;
             }
         } else {
-            return `<div class="library-footer"><a href="${encodeURI("command:arduino.installBoard?" + JSON.stringify([lib.name]))}" class="operation">Install</a></div>`;
+            return `<div class="library-footer"><a href="${encodeURI("command:arduino.installLibrary?" + JSON.stringify([lib.name]))}" class="operation">Install</a></div>`;
         }
     }
 
