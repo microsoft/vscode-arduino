@@ -374,7 +374,13 @@ export class BoardManager {
         if (addtionalUrls) {
             let urls = addtionalUrls.split(",");
             urls.forEach((urlString) => {
+                if (!urlString) {
+                    return;
+                }
                 let normalizedUrl = url.parse(urlString);
+                if (!normalizedUrl) {
+                    return;
+                }
                 let indexFileName = normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
                 result.push(indexFileName);
             });

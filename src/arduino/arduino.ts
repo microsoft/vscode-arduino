@@ -34,11 +34,8 @@ export class ArduinoApp {
     public async initialize() {
         if (!util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
-
                 // Use the dummy package to initialize the Arduino IDE
-                await util.spawn(this._settings.commandPath,
-                    null,
-                    ["--install-boards", "dummy"]);
+                await this.installBoard("dummy", "dummy", false);
             } catch (ex) {
             }
         }
@@ -48,9 +45,7 @@ export class ArduinoApp {
         if (!util.fileExistsSync(path.join(this._settings.packagePath, "library_index.json"))) {
             try {
                 // Use the dummy library to initialize the Arduino IDE
-                await util.spawn(this._settings.commandPath,
-                    null,
-                    ["--install-library", "dummy"]);
+                await this.installLibrary("dummy", false);
             } catch (ex) {
             }
         }
@@ -147,15 +142,26 @@ export class ArduinoApp {
      * Install arduino board package based on package name and platform hardware architecture.
      * TODO: Add version
      */
-    public installBoard(packageName: string, arch: string) {
+    public installBoard(packageName: string, arch: string, showOutput: boolean = true) {
         arduinoChannel.show(true);
         return util.spawn(this._settings.commandPath,
-            arduinoChannel,
+            showOutput ? arduinoChannel : null,
             ["--install-boards", `${packageName}:${arch}`]);
     }
 
     public uninstallBoard(packagePath: string) {
         util.rmdirRecursivelySync(packagePath);
+    }
+
+    public installLibrary(libName: string, showOutput: boolean = true) {
+        arduinoChannel.show(true);
+        return util.spawn(this._settings.commandPath,
+            showOutput ? arduinoChannel : null,
+            ["--install-library", `${libName}`]);
+    }
+
+    public uninstallLibrary(libPath: string) {
+        util.rmdirRecursivelySync(libPath);
     }
 
     private loadPreferences() {
