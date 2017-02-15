@@ -112,7 +112,7 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     public get commandPath(): string {
         const platform = os.platform();
         if (platform === "darwin") {
-            return path.join(this._arduinoPath, path.normalize('Arduino.app/Contents/MacOS/Arduino'));
+            return path.join(this._arduinoPath, path.normalize("Arduino.app/Contents/MacOS/Arduino"));
         }
         return path.join(this._arduinoPath, "arduino_debug");
     }
