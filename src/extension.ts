@@ -32,6 +32,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const boardManger = new BoardManager(arduinoSettings, arduinoApp);
     arduinoApp.boardManager = boardManger;
     const packageProvider = new BoardContentProvider(boardManger, context.extensionPath);
+    await packageProvider.initialize();
     const libraryManager = new LibraryManager(arduinoSettings, arduinoApp, boardManger);
     const libraryProvider = new LibraryContentProvider(libraryManager, context.extensionPath);
 
