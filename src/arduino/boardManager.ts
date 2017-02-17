@@ -93,6 +93,12 @@ export interface IPlatform {
     url: string;
 
     /**
+     * Whether is the default platform come with the installation.
+     * @property {boolean}
+     */
+    defaultPlatform?: boolean;
+
+    /**
      * The raw version when load the object from json object. This value should not be used after the
      * platforms information has been parsed.
      * @property {string}
@@ -187,25 +193,26 @@ export class BoardManager {
         this._boardStatusBar.tooltip = "Change Board Type";
     }
 
-    public loadPackages(): void {
+    public async loadPackages() {
+        this._packages = [];
+        this._platforms = [];
+
         let rootPackgeFolder = this._settings.packagePath;
         let indexFiles = ["package_index.json"];
         let preferences = this._arduinoApp.preferences;
-        if (preferences && preferences.has("boardsmanager.additional.urls")) {
-            indexFiles = indexFiles.concat(this.getAddtionalIndexFiles(preferences.get("boardsmanager.additional.urls")));
-        }
-
-        this._packages = [];
-        this._platforms = [];
-        indexFiles.forEach((indexFile) => {
+        indexFiles = indexFiles.concat(this.getAddtionalIndexFiles());
+        await indexFiles.forEach(async (indexFile) => {
             if (!util.fileExistsSync(path.join(rootPackgeFolder, indexFile))) {
-                return;
+                await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
+                await this._arduinoApp.initialize(true);
             }
             let packageContent = fs.readFileSync(path.join(rootPackgeFolder, indexFile), "utf8");
             this.parsePackageIndex(JSON.parse(packageContent));
         });
 
         this.loadInstalledPlatforms();
+        this.loadDefaultPlatforms();
+
         this.loadInstalledBoards();
         this.updateStatusBar();
         this._boardStatusBar.show();
@@ -267,6 +274,46 @@ export class BoardManager {
             this._boardStatusBar.text = selectedBoard.name;
         } else {
             this._boardStatusBar.text = "<Select Board Type>";
+        }
+    }
+
+    private loadDefaultPlatforms() {
+        // Default arduino package information:
+        const arduinoPath = this._settings.arduinoPath;
+        const packageName = "arduino";
+        const archName = "avr";
+        try {
+            let packageBundled = fs.readFileSync(path.join(arduinoPath, "hardware", "package_index_bundled.json"), "utf8");
+            if (!packageBundled) {
+                return;
+            }
+            let bundledObject = JSON.parse(packageBundled);
+            if (bundledObject && bundledObject.packages && bundledObject.packages.length && bundledObject.packages[0].platforms) {
+                let platforms = bundledObject.packages[0].platforms;
+                if (platforms && platforms.length && platforms.length > 0) {
+                    const v = platforms[0].version;
+                    if (v) {
+                        let filteredPlat = this._platforms.find((_plat) => _plat.package.name === packageName && _plat.architecture === archName);
+                        if (!filteredPlat) {
+                            return;
+                        }
+                        filteredPlat.defaultPlatform = true;
+                        if (filteredPlat.installedVersion) {
+                            let installedPlat = this.installedPlatforms
+                                .find((_plat) => _plat.package.name === packageName && _plat.architecture === archName);
+                            if (installedPlat) {
+                                installedPlat.defaultPlatform = true;
+                            }
+                            return;
+                        } else {
+                            filteredPlat.installedVersion = v;
+                            filteredPlat.rootBoardPath = path.join(arduinoPath, "hardware/arduino/avr");
+                            this.installedPlatforms.push(filteredPlat);
+                        }
+                    }
+                }
+            }
+        } catch (ex) {
         }
     }
 
@@ -369,23 +416,37 @@ export class BoardManager {
         return result;
     }
 
-    private getAddtionalIndexFiles(addtionalUrls: string): string[] {
+    private getAddtionalIndexFiles(): string[] {
         let result = [];
-        if (addtionalUrls) {
-            let urls = addtionalUrls.split(",");
-            urls.forEach((urlString) => {
-                if (!urlString) {
-                    return;
-                }
-                let normalizedUrl = url.parse(urlString);
-                if (!normalizedUrl) {
-                    return;
-                }
-                let indexFileName = normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
-                result.push(indexFileName);
-            });
-        }
+        let urls = this.getAdditionalUrls();
+
+        urls.forEach((urlString) => {
+            if (!urlString) {
+                return;
+            }
+            let normalizedUrl = url.parse(urlString);
+            if (!normalizedUrl) {
+                return;
+            }
+            let indexFileName = normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
+            result.push(indexFileName);
+        });
 
         return result;
+    }
+
+    private getAdditionalUrls(): string[] {
+        let additionalUrls = this._settings.additionalUrls;
+        let preferences = this._arduinoApp.preferences;
+        if (!additionalUrls && preferences && preferences.has("boardsmanager.additional.urls")) {
+            additionalUrls = preferences.get("boardsmanager.additional.urls");
+        }
+        let urls = additionalUrls;
+        if (additionalUrls) {
+            if (!Array.isArray(urls) && typeof urls === "string") {
+                urls = (<string>additionalUrls).split(",");
+            }
+        }
+        return <string[]>urls;
     }
 }

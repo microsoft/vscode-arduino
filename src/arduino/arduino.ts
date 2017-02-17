@@ -31,13 +31,23 @@ export class ArduinoApp {
     constructor(private _settings: settings.IArduinoSettings) {
     }
 
-    public async initialize() {
-        if (!util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
+    public async initialize(force: boolean = false) {
+        if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
                 // Use the dummy package to initialize the Arduino IDE
                 await this.installBoard("dummy", "dummy", false);
             } catch (ex) {
             }
+        }
+    }
+
+    public async setPref(key, value) {
+        try {
+            await util.spawn(this._settings.commandPath,
+                null,
+                ["--pref", `${key}=${value}`]);
+
+        } catch (ex) {
         }
     }
 
