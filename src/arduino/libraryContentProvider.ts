@@ -14,10 +14,13 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
     constructor(private _libraryManager: LibraryManager, private _extensionPath: string) {
-        this._libraryManager.loadLibraries();
     }
 
-    public provideTextDocumentContent(uri: vscode.Uri): string {
+    public async provideTextDocumentContent(uri: vscode.Uri) {
+
+        if (!this._libraryManager.libraries) {
+            await this._libraryManager.loadLibraries();
+        }
         const packageView = this.buildBoardView();
         const cssContent = this.getCssContent();
 
@@ -39,8 +42,8 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
         return this._onDidChange.event;
     }
 
-    public update(uri: vscode.Uri) {
-        this._libraryManager.loadLibraries();
+    public async update(uri: vscode.Uri) {
+        await this._libraryManager.loadLibraries();
         this._onDidChange.fire(uri);
     }
 
@@ -77,12 +80,12 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
                 </div>`;
             } else {
                 return `<div class="library-footer">
-                <a href="${encodeURI("command:arduino.uninstallBoard?" + JSON.stringify([lib.name]))}" class="operation">Remove</a>
+                <a href="${encodeURI("command:arduino.uninstallLibrary?" + JSON.stringify([lib.name]))}" class="operation">Remove</a>
                 <a href="${encodeURI("command:arduino.addLibPath?" + JSON.stringify([lib.installedPath]))}" class="operation">Add to Include Path</a>
                 </div>`;
             }
         } else {
-            return `<div class="library-footer"><a href="${encodeURI("command:arduino.installBoard?" + JSON.stringify([lib.name]))}" class="operation">Install</a></div>`;
+            return `<div class="library-footer"><a href="${encodeURI("command:arduino.installLibrary?" + JSON.stringify([lib.name]))}" class="operation">Install</a></div>`;
         }
     }
 

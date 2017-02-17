@@ -9,15 +9,23 @@ import * as vscode from "vscode";
 
 import { BoardManager, IPackage, IPlatform } from "./boardManager";
 
+/**
+ * Class represent Arduino Board Manager view.
+ * @class
+ */
 export class BoardContentProvider implements vscode.TextDocumentContentProvider {
 
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
     constructor(private _boardManager: BoardManager, private _extensionPath: string) {
-        this._boardManager.loadPackages();
     }
 
-    public provideTextDocumentContent(uri: vscode.Uri): string {
+    public async initialize() {
+        await this._boardManager.loadPackages();
+    }
+
+    public async provideTextDocumentContent(uri: vscode.Uri) {
+        await this._boardManager.loadPackages();
         const packageView = this.buildBoardView();
         const cssContent = this.getCssContent();
 
@@ -40,10 +48,12 @@ export class BoardContentProvider implements vscode.TextDocumentContentProvider 
     }
 
     public update(uri: vscode.Uri) {
-        this._boardManager.loadPackages();
         this._onDidChange.fire(uri);
     }
 
+    /**
+     * TODO: Add version selection for board manager.
+     */
     private buildBoardView(): string {
         let result = "";
         this._boardManager.platforms.forEach((p: IPlatform) => {
@@ -79,7 +89,7 @@ export class BoardContentProvider implements vscode.TextDocumentContentProvider 
     private buildBoardSecionButtons(p: IPlatform): string {
         if (p.installedVersion) {
             return `<div class="board-footer"><a href="${encodeURI("command:arduino.uninstallBoard?" + JSON.stringify([p.rootBoardPath]))}" class="operation">Remove</a></div>`;
-        } else {
+        } else if (!p.defaultPlatform) {
             return `<div class="board-footer"><a href="${encodeURI("command:arduino.installBoard?" + JSON.stringify([p.package.name, p.architecture]))}" class="operation">Install</a></div>`;
         }
     }

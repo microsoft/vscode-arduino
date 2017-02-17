@@ -46,7 +46,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider, vscode
     }
 
     private addLibFiles(libPath: string): void {
-        if (!util.directoryExists(libPath)) {
+        if (!util.directoryExistsSync(libPath)) {
             return;
         }
         const subItems = fs.readdirSync(libPath);

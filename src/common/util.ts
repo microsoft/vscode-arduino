@@ -9,6 +9,10 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
+/**
+ * This function will return the VSCode C/C++ extesnion compatible platform literals.
+ * @function getCppConfigPlatform
+ */
 export function getCppConfigPlatform(): string {
     const plat = os.platform();
     if (plat === "linux") {
@@ -20,7 +24,12 @@ export function getCppConfigPlatform(): string {
     }
 }
 
-export function fileExists(filePath: string): boolean {
+/**
+ * This function will detect the file existing in the sync mode.
+ * @function fileExistsSync
+ * @argument {string} filePath
+ */
+export function fileExistsSync(filePath: string): boolean {
     try {
         return fs.statSync(filePath).isFile();
     } catch (e) {
@@ -28,9 +37,14 @@ export function fileExists(filePath: string): boolean {
     }
 }
 
-export function directoryExists(path: string): boolean {
+/**
+ * This function will detect the directoy existing in the sync mode.
+ * @function directoryExistsSync
+ * @argument {string} dirPath
+ */
+export function directoryExistsSync(dirPath: string): boolean {
     try {
-        return fs.statSync(path).isDirectory();
+        return fs.statSync(dirPath).isDirectory();
     } catch (e) {
         return false;
     }
@@ -38,7 +52,8 @@ export function directoryExists(path: string): boolean {
 
 /**
  * Recursively delete files. Equals to "rm -rf"
- * @argument rootPath {string}
+ * @function rmdirRecursivelySync
+ * @argument {string} rootPath
  */
 export function rmdirRecursivelySync(rootPath: string): void {
     if (fs.existsSync(rootPath)) {

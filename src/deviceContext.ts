@@ -106,7 +106,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public saveContext() {
         const deviceConfigFile = path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE);
         let deviceConfigJson: any = {};
-        if (util.fileExists(deviceConfigFile)) {
+        if (util.fileExistsSync(deviceConfigFile)) {
             deviceConfigJson = JSON.parse(fs.readFileSync(deviceConfigFile, "utf8"));
         }
         deviceConfigJson.sketch = this.sketch;

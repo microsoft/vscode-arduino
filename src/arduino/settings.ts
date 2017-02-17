@@ -15,6 +15,7 @@ import { resolveArduinoPath } from "../common/platform";
 
 export interface IArduinoSettings {
     arduinoPath: string;
+    additionalUrls: string | string[];
     commandPath: string;
     packagePath: string;
     libPath: string;
@@ -31,6 +32,11 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     private _watcher: vscode.FileSystemWatcher;
 
     private _arduinoPath: string;
+
+    /**
+     * Save the raw arduino path value from the configuration to avoid path resolution.
+     */
+    private _rawArduinoPathValue: string;
 
     private _packagePath: string;
 
@@ -51,9 +57,6 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     }
 
     private initializeSettings() {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        this.arduinoPath = arduinoConfig.get<string>("path");
-
         const platform = os.platform();
         if (platform === "win32") {
             this._packagePath = path.join(process.env.USERPROFILE, "AppData/Local/Arduino15");
@@ -88,17 +91,24 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
         });
     }
 
-    public set arduinoPath(value: string) {
-        // By default, the extension will use where/which to resolve the Arduino installation path.
-        if (value === "arduino") {
-            this._arduinoPath = resolveArduinoPath();
-        } else {
-            this._arduinoPath = value;
+    public get arduinoPath(): string {
+        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+        const configValue = arduinoConfig.get<string>("path");
+        // The configuration is updated
+        if (configValue !== this._rawArduinoPathValue) {
+            if (configValue === "arduino") {
+                this._arduinoPath = resolveArduinoPath();
+            } else {
+                this._arduinoPath = configValue;
+            }
+            this._rawArduinoPathValue = configValue;
         }
+        return this._arduinoPath;
     }
 
-    public get arduinoPath(): string {
-        return this._arduinoPath;
+    public get additionalUrls(): string {
+        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+        return arduinoConfig.get<string>("additionalUrls");
     }
 
     public get packagePath(): string {
@@ -110,7 +120,11 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
     }
 
     public get commandPath(): string {
-        return path.join(this._arduinoPath, "arduino_debug");
+        const platform = os.platform();
+        if (platform === "darwin") {
+            return path.join(this.arduinoPath, path.normalize("Arduino.app/Contents/MacOS/Arduino"));
+        }
+        return path.join(this.arduinoPath, "arduino_debug");
     }
 
     public set includePath(value: string[]) {

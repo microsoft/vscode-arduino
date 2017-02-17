@@ -106,17 +106,17 @@ export class ExampleProvider implements TreeExplorerNodeProvider<ExampleNode> {
             return subfolders;
         }
         // Bypass the exmaples hierarchy for display purpose to make it consistent with the Arduino IDE:
-        if (items.filter((item) => item === "examples" && util.directoryExists(path.join(rootNodePath, item))).length > 0) {
+        if (items.filter((item) => item === "examples" && util.directoryExistsSync(path.join(rootNodePath, item))).length > 0) {
             rootNodePath = path.join(rootNodePath, "examples");
             items = fs.readdirSync(rootNodePath);
         }
         items.forEach((item) => {
             const fullItemPath = path.join(rootNodePath, item);
-            if (!util.directoryExists(fullItemPath)) {
+            if (!util.directoryExistsSync(fullItemPath)) {
                 return;
             }
             const subItems = fs.readdirSync(fullItemPath);
-            if (subItems.filter((subItem) => util.fileExists(path.join(fullItemPath, subItem)) && subItem.endsWith(".ino")).length > 0) {
+            if (subItems.filter((subItem) => util.fileExistsSync(path.join(fullItemPath, subItem)) && subItem.endsWith(".ino")).length > 0) {
                 subfolders.push(new Leaf(fullItemPath, item));
             } else {
                 subfolders.push(new Node(fullItemPath, item));
