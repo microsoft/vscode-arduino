@@ -20,6 +20,12 @@ export function resolveArduinoPath(): string {
             if (fileExistsSync(pathString)) {
                 result = path.dirname(path.resolve(pathString));
             }
+        } else if (plat === "linux") {
+            let pathString = childProcess.execSync("readlink -f $(which arduino)", { encoding: "utf8" });
+            pathString = path.resolve(pathString).trim();
+            if (fileExistsSync(pathString)) {
+                result = path.dirname(path.resolve(pathString));
+            }
         }
     } catch (ex) {
         // Ignore the errors.

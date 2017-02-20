@@ -68,7 +68,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider, vscode
         if (!fs.existsSync(this._deviceConfigFile)) {
             return;
         }
-        const deviceConfig = JSON.parse(fs.readFileSync(this._deviceConfigFile, "utf8"));
+        const deviceConfig = util.tryParseJSON(fs.readFileSync(this._deviceConfigFile, "utf8"));
         if (!deviceConfig || !deviceConfig.configurations) {
             return;
         }

@@ -92,3 +92,14 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
         });
     });
 }
+
+export function tryParseJSON(jsonString: string) {
+    try {
+        const jsonObj = JSON.parse(jsonString);
+        if (jsonObj && typeof jsonObj === "object") {
+            return jsonObj;
+        }
+    } catch (ex) { }
+
+    return false;
+}

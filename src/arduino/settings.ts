@@ -77,7 +77,7 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
         if (!fs.existsSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE))) {
             return;
         }
-        const cppProperties = JSON.parse(fs.readFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), "utf8"));
+        const cppProperties = util.tryParseJSON(fs.readFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), "utf8"));
         if (!cppProperties || !cppProperties.configurations) {
             return;
         }

@@ -446,6 +446,8 @@ export class BoardManager {
             if (!Array.isArray(urls) && typeof urls === "string") {
                 urls = (<string>additionalUrls).split(",");
             }
+        } else {
+            return [];
         }
         return <string[]>urls;
     }
