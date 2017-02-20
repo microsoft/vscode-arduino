@@ -94,10 +94,12 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 let deviceConfigJson: any = {};
                 if (files && files.length > 0) {
                     const configFile = files[0];
-                    deviceConfigJson = JSON.parse(fs.readFileSync(configFile.fsPath, "utf8"));
-                    this._port = deviceConfigJson.port || this._port;
-                    this._board = deviceConfigJson.board || this._board;
-                    this._sketch = deviceConfigJson.sketch || this._sketch;
+                    deviceConfigJson = util.tryParseJSON(fs.readFileSync(configFile.fsPath, "utf8"));
+                    if (deviceConfigJson) {
+                        this._port = deviceConfigJson.port || this._port;
+                        this._board = deviceConfigJson.board || this._board;
+                        this._sketch = deviceConfigJson.sketch || this._sketch;
+                    }
                 }
                 return this;
             });

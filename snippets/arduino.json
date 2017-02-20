@@ -1,4 +1,14 @@
 {
+    "ls": {
+        "prefix": "ls",
+        "body": [
+            "void loop()",
+            "{\n}",
+            "\n",
+            "void setup()",
+            "{\n}"
+        ]
+    },
     "loop": {
         "prefix": "loop",
         "body": [
