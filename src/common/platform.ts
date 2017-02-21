@@ -33,6 +33,20 @@ export function resolveArduinoPath(): string {
     if (!result) {
         vscode.window.showErrorMessage("Cannot find the Arduino installation path. You can specify the path in the user settings.");
     }
-    // TODO: Add path resolve on Ubuntu and Mac OS platforms.
+    return result;
+}
+
+export function detectApp(appName: string): boolean {
+    let result;
+    const plat = os.platform();
+    try {
+        if (plat === "win32") {
+            result = childProcess.execSync(`where ${appName}`, { encoding: "utf8" });
+        } else if (plat === "linux" || plat === "darwin") {
+            result = childProcess.execSync(`which ${appName}`, { encoding: "utf8" });
+        }
+    } catch (ex) {
+        // Ignore the errors.
+    }
     return result;
 }

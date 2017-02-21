@@ -4,51 +4,188 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as childProcess from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
+import * as constants from "../common/constants";
+import * as platform from "../common/platform";
 import * as util from "../common/util";
 
+import { ArduinoApp } from "../arduino/arduino";
 import { ArduinoSettings } from "../arduino/settings";
 
-export function provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
-    Thenable<vscode.CompletionItem[]> {
-    let delPos = findPreviousDelimiter(document, position);
-    const args = buildCompletionArgs(delPos);
-    const options = {
-        cwd: vscode.workspace.rootPath,
-    };
+export class ClangProvider implements vscode.Disposable {
+    private _headerFiles = new Set<string>();
 
-    return new Promise((resolve, reject) => {
-        let proc = childProcess.execFile("clang", args, options,
-            (error, stdout, stderr) => {
-                // TODO: Fix error cases.
-                resolve({ error, stdout, stderr });
-            });
-        proc.stdin.end(document.getText());
-    }).then((result: any) => {
-        return parseCompletionItems(result.stdout);
-    });
-}
+    private _libPaths = new Set<string>();
 
-export function provideDefinitionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
-    Thenable<vscode.Definition> {
-    const range = document.getWordRangeAtPosition(position);
-    const word = document.getText(range);
-    const args = buildDefinitionArgs(word);
+    private _watcher: vscode.FileSystemWatcher;
 
-    const options = {
-        cwd: vscode.workspace.rootPath,
-    };
+    private _deviceConfigFile: string = path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE);
 
-    return new Promise((resolve, reject) => {
-        let proc = childProcess.execFile("clang", args, options,
-            (error, stdout, stderr) => {
-                // TODO: Fix error cases
-                resolve({ error, stdout, stderr });
-            });
-        proc.stdin.end(document.getText());
-    }).then((result: any) => {
-        return parseAstDump(result.stdout, word);
-    });
+    constructor(private _arduinoApp: ArduinoApp) {
+        this.updateLibList();
+        this._watcher = vscode.workspace.createFileSystemWatcher(this._deviceConfigFile);
+        this._watcher.onDidCreate(() => this.updateLibList());
+        this._watcher.onDidChange(() => this.updateLibList());
+        this._watcher.onDidDelete(() => this.updateLibList());
+    }
+
+    public dispose() {
+        this._watcher.dispose();
+    }
+
+    public initialize() {
+        // Use async operation to unblock the main process.
+        return new Promise((resolve, reject) => {
+            const res = platform.detectApp("clang");
+            if (!res) {
+                vscode.window.showInformationMessage("Please install LLVM for language services.");
+            }
+            resolve(res);
+        });
+    }
+
+    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
+        Thenable<vscode.CompletionItem[]> {
+        let delPos = findPreviousDelimiter(document, position);
+        const args = this.buildCompletionArgs(delPos);
+        const options = {
+            cwd: vscode.workspace.rootPath,
+        };
+
+        return new Promise((resolve, reject) => {
+            let proc = childProcess.execFile("clang", args, options,
+                (error, stdout, stderr) => {
+                    // TODO: Fix error cases.
+                    resolve({ error, stdout, stderr });
+                });
+            proc.stdin.end(document.getText());
+        }).then((result: any) => {
+            return parseCompletionItems(result.stdout);
+        });
+    }
+
+    public provideDefinitionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
+        Thenable<vscode.Definition> {
+        const range = document.getWordRangeAtPosition(position);
+        const word = document.getText(range);
+        const args = this.buildDefinitionArgs(word);
+
+        const options = {
+            cwd: vscode.workspace.rootPath,
+        };
+
+        return new Promise((resolve, reject) => {
+            let proc = childProcess.execFile("clang", args, options,
+                (error, stdout, stderr) => {
+                    // TODO: Fix error cases
+                    resolve({ error, stdout, stderr });
+                });
+            proc.stdin.end(document.getText());
+        }).then((result: any) => {
+            return parseAstDump(result.stdout, word);
+        });
+    }
+
+    public get libPaths(): Set<string> {
+        return this._libPaths;
+    }
+
+    public get headerFiles(): Set<string> {
+        return this._headerFiles;
+    }
+
+    private updateLibList(): void {
+        this._libPaths.clear();
+        this._headerFiles.clear();
+        this._arduinoApp.getDefaultPackageLibPaths().forEach((defaultPath) => {
+            this._libPaths.add(defaultPath);
+        });
+
+        if (fs.existsSync(this._deviceConfigFile)) {
+
+            const deviceConfig = util.tryParseJSON(fs.readFileSync(this._deviceConfigFile, "utf8"));
+            if (deviceConfig) {
+                if (deviceConfig.sketch) {
+                    const appFolder = path.dirname(deviceConfig.sketch);
+                    if (util.directoryExistsSync(appFolder)) {
+                        this._libPaths.add(path.normalize(appFolder));
+                    }
+                }
+                if (deviceConfig.configurations) {
+                    const plat = util.getCppConfigPlatform();
+                    deviceConfig.configurations.forEach((configSection) => {
+                        if (configSection.name === plat && Array.isArray(configSection.includePath)) {
+                            configSection.includePath.forEach((includePath) => {
+                                this._libPaths.add(path.normalize(includePath));
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        this._libPaths.forEach((includePath) => {
+            this.addLibFiles(includePath);
+        });
+    }
+
+    private addLibFiles(libPath: string): void {
+        if (!util.directoryExistsSync(libPath)) {
+            return;
+        }
+        const subItems = fs.readdirSync(libPath);
+        subItems.forEach((item) => {
+            try {
+                let state = fs.statSync(path.join(libPath, item));
+                if (state.isFile() && item.endsWith(".h")) {
+                    this._headerFiles.add(item);
+                } else if (state.isDirectory()) {
+                    this.addLibFiles(path.join(libPath, item));
+                }
+            } catch (ex) {
+            }
+        });
+    }
+
+    private buildCompletionArgs(position: vscode.Position): string[] {
+        const args = [];
+        args.push("-x", "c++");
+        args.push("-std=c++11");
+        args.push("-include", "Arduino.h");
+        this.libPaths.forEach((path) => {
+            args.push(`-I${path}`);
+        });
+        args.push("-fsyntax-only");
+        args.push("-fparse-all-comments");
+        args.push("-Xclang", "-code-completion-macros");
+        args.push("-Xclang", "-code-completion-brief-comments");
+        args.push("-Xclang", `-code-completion-at=<stdin>:${position.line + 1}:${position.character + 1}`);
+
+        args.push("-");
+        return args;
+    }
+
+    private buildDefinitionArgs(word: string) {
+        const args = [];
+        args.push("-x", "c++");
+        args.push("-std=c++11");
+        args.push("-include", "Arduino.h");
+        this.libPaths.forEach((path) => {
+            args.push(`-I${path}`);
+        });
+        args.push("-fsyntax-only");
+        args.push("-fparse-all-comments");
+        args.push("-Xclang", "-code-completion-macros");
+        args.push("-Xclang", "-code-completion-brief-comments");
+        args.push("-Xclang", "-ast-dump");
+        args.push("-Xclang", "-ast-dump-filter");
+        args.push("-Xclang", word);
+
+        args.push("-");
+        return args;
+    }
 }
 
 const DELIMITERS = '~`!@#$%^&*()-+={}[]|\\\'";:/?<>,. \t\n';
@@ -65,44 +202,6 @@ function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.P
         char--;
     }
     return new vscode.Position(line, char);
-}
-
-function buildCompletionArgs(position: vscode.Position): string[] {
-    const args = [];
-    args.push("-x", "c++");
-    args.push("-std=c++11");
-    const includePath = ArduinoSettings.getIntance().includePath;
-    includePath.forEach((path) => {
-        args.push(`-I${path}`);
-    });
-    args.push("-fsyntax-only");
-    args.push("-fparse-all-comments");
-    args.push("-Xclang", "-code-completion-macros");
-    args.push("-Xclang", "-code-completion-brief-comments");
-    args.push("-Xclang", `-code-completion-at=<stdin>:${position.line + 1}:${position.character + 1}`);
-
-    args.push("-");
-    return args;
-}
-
-function buildDefinitionArgs(word: string) {
-    const args = [];
-    args.push("-x", "c++");
-    args.push("-std=c++11");
-    const includePath = ArduinoSettings.getIntance().includePath;
-    includePath.forEach((path) => {
-        args.push(`-I${path}`);
-    });
-    args.push("-fsyntax-only");
-    args.push("-fparse-all-comments");
-    args.push("-Xclang", "-code-completion-macros");
-    args.push("-Xclang", "-code-completion-brief-comments");
-    args.push("-Xclang", "-ast-dump");
-    args.push("-Xclang", "-ast-dump-filter");
-    args.push("-Xclang", word);
-
-    args.push("-");
-    return args;
 }
 
 const completionRe = /^COMPLETION: (.*?)(?: : (.*))?$/;

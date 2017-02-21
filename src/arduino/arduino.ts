@@ -82,12 +82,11 @@ export class ArduinoApp {
     }
 
     public addLibPath(libraryPath: string) {
-        let dc = DeviceContext.getIntance();
         let libPaths;
         if (libraryPath) {
             libPaths = [libraryPath];
         } else {
-            libPaths = this.getPackageDefaultLibPaths(dc);
+            libPaths = this.getDefaultPackageLibPaths();
         }
 
         return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
@@ -131,6 +130,25 @@ export class ArduinoApp {
 
                 fs.writeFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), JSON.stringify(deviceContext, null, 4));
             });
+    }
+
+    public getDefaultPackageLibPaths(): string[] {
+        let result = [];
+        let boardDescriptor = this._boardManager.currentBoard;
+        if (!boardDescriptor) {
+            return result;
+        }
+        let toolsPath = boardDescriptor.platform.rootBoardPath;
+        if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
+            let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
+            if (coreLibs && coreLibs.length > 0) {
+                coreLibs.forEach((coreLib) => {
+                    result.push(path.normalize(path.join(toolsPath, "cores", coreLib)));
+                });
+            }
+        }
+
+        return result;
     }
 
     public get preferences() {
@@ -197,21 +215,5 @@ export class ArduinoApp {
         }
         let boardString = `${boardDescriptor.platform.package.name}:${boardDescriptor.platform.architecture}:${boardDescriptor.board}`;
         return boardString;
-    }
-
-    private getPackageDefaultLibPaths(dc: IDeviceContext): string[] {
-        let boardDescriptor = this._boardManager.currentBoard;
-        let result = [];
-        let toolsPath = boardDescriptor.platform.rootBoardPath;
-        if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
-            let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
-            if (coreLibs && coreLibs.length > 0) {
-                coreLibs.forEach((coreLib) => {
-                    result.push(path.join(toolsPath, "cores", coreLib));
-                });
-            }
-        }
-
-        return result;
     }
 }

@@ -4,11 +4,13 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { provideDefinitionItems } from "./clang";
+import { ClangProvider } from "./clang";
 
 export class DefinitionProvider implements vscode.DefinitionProvider {
+    constructor(private _clangProvider: ClangProvider) {
+    }
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
         Thenable<vscode.Definition> {
-        return provideDefinitionItems(document, position, token);
+        return this._clangProvider.provideDefinitionItems(document, position, token);
     }
 }
