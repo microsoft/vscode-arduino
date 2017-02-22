@@ -3,25 +3,11 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-import * as fs from "fs";
-import * as path from "path";
 import * as vscode from "vscode";
+import { ClangProvider } from "./clang";
 
-import * as constants from "../common/constants";
-import * as util from "../common/util";
-import { provideCompletionItems } from "./clang";
-
-export class CompletionProvider implements vscode.CompletionItemProvider, vscode.Disposable {
-    private _headerFiles = new Set<string>();
-    private _watcher: vscode.FileSystemWatcher;
-    private _deviceConfigFile: string = path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE);
-
-    public constructor() {
-        this.updateHeaderFileList();
-        this._watcher = vscode.workspace.createFileSystemWatcher(this._deviceConfigFile);
-        this._watcher.onDidCreate(() => this.updateHeaderFileList());
-        this._watcher.onDidChange(() => this.updateHeaderFileList());
-        this._watcher.onDidDelete(() => this.updateHeaderFileList());
+export class CompletionProvider implements vscode.CompletionItemProvider {
+    public constructor(private _clangProvider: ClangProvider) {
     }
 
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
@@ -32,53 +18,13 @@ export class CompletionProvider implements vscode.CompletionItemProvider, vscode
 
         if (match) {
             let result = [];
-            this._headerFiles.forEach((headerFile) => {
+            this._clangProvider.headerFiles.forEach((headerFile) => {
                 result.push(new vscode.CompletionItem(headerFile, vscode.CompletionItemKind.File));
             });
             return result;
         } else {
-            return provideCompletionItems(document, position, token);
+            return this._clangProvider.provideCompletionItems(document, position, token);
         }
     }
 
-    public dispose() {
-        this._watcher.dispose();
-    }
-
-    private addLibFiles(libPath: string): void {
-        if (!util.directoryExistsSync(libPath)) {
-            return;
-        }
-        const subItems = fs.readdirSync(libPath);
-        subItems.forEach((item) => {
-            try {
-                let state = fs.statSync(path.join(libPath, item));
-                if (state.isFile() && item.endsWith(".h")) {
-                    this._headerFiles.add(item);
-                } else if (state.isDirectory()) {
-                    this.addLibFiles(path.join(libPath, item));
-                }
-            } catch (ex) {
-            }
-        });
-    }
-
-    private updateHeaderFileList(): void {
-        this._headerFiles.clear();
-        if (!fs.existsSync(this._deviceConfigFile)) {
-            return;
-        }
-        const deviceConfig = util.tryParseJSON(fs.readFileSync(this._deviceConfigFile, "utf8"));
-        if (!deviceConfig || !deviceConfig.configurations) {
-            return;
-        }
-        const plat = util.getCppConfigPlatform();
-        deviceConfig.configurations.forEach((configSection) => {
-            if (configSection.name === plat && Array.isArray(configSection.includePath)) {
-                configSection.includePath.forEach((includePath) => {
-                    this.addLibFiles(includePath);
-                });
-            }
-        });
-    }
 }

@@ -13,6 +13,7 @@ import { LibraryManager } from "./arduino/libraryManager";
 import { ArduinoSettings } from "./arduino/settings";
 import { ARDUINO_MODE, BOARD_MANAGER_PROTOCOL, BOARD_MANAGER_URI, LIBRARY_MANAGER_PROTOCOL, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
+import { ClangProvider } from "./langService/clang";
 import { CompletionProvider } from "./langService/completionProvider";
 import { DefinitionProvider } from "./langService/definitionProvider";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
@@ -80,10 +81,12 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialMonitor", async () => await monitor.closeSerialMonitor()));
 
     // Add arduino specific language suport.
-    const completionProvider = new CompletionProvider();
-    context.subscriptions.push(completionProvider);
+    const clangProvider = new ClangProvider(arduinoApp);
+    clangProvider.initialize();
+    const completionProvider = new CompletionProvider(clangProvider);
+    context.subscriptions.push(clangProvider);
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
-    const definitionProvider = new DefinitionProvider();
+    const definitionProvider = new DefinitionProvider(clangProvider);
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(ARDUINO_MODE, definitionProvider));
 
     // Example explorer, only work under VSCode insider version.
