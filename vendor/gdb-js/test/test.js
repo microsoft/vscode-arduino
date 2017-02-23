@@ -1,5 +1,5 @@
 import NodeGDB from '../out/node-gdb'
-const file = '../test/test.ino.elf';
+const file = '../test/app.ino.elf';
 const breakPoint = 'app.ino:17';
 const COUNT  = 500;
 const gdbLocation = 'C:\\Program Files (x86)\\Atmel\\Studio\\7.0\\toolchain\\arm\\arm-gnu-toolchain\\bin\\arm-none-eabi-gdb.exe';

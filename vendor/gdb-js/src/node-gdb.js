@@ -51,6 +51,7 @@ export default class NodeGDB {
         let response = await this.send_mi('-gdb-set target-async on');
         if (response && response.state === 'done') {
             this.emitter.emit('connected');
+            return response;
         } else {
             throw new Error("cannot set async mode!");
         }
@@ -91,6 +92,9 @@ export default class NodeGDB {
     }
     next() {
         return this.send_mi('-exec-next');
+    }
+    stop() {
+        return this.send_mi('-gdb-exit');
     }
     async pause() {
         let t = setTimeout(() => {
@@ -161,6 +165,10 @@ export default class NodeGDB {
         this.emitter.emit('disconnected');
         this._flush_queue();
         delete this.child;
+    }
+
+    getState() {
+        return this.state;
     }
 }
 
