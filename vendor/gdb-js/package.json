@@ -1,7 +1,7 @@
 {
   "name": "gdb-js",
   "version": "1.0.0",
-  "description": "",
+  "description": "node js wrapper for gdb",
   "main": "out/node-gdb.js",
   "directories": {
     "test": "test"
@@ -9,7 +9,7 @@
   "scripts": {
     "babel": "gulp"
   },
-  "author": "",
+  "author": "Andy xu",
   "license": "ISC",
   "dependencies": {
     "babel-core": "^6.22.1",
