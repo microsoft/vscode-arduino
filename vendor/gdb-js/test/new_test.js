@@ -2,10 +2,8 @@ import mocha from 'mocha';
 import { expect } from 'chai';
 import os from 'os';
 
-import NodeGDB from '../src/node-gdb'
+import NodeGDB from '../src/node-gdb';
 const file = './app.ino.elf';
-const breakPoint = 'app.ino:17';
-const COUNT = 500;
 let gdbLocation = null;
 
 os.platform() === 'win32' ? gdbLocation = 'C:\\Program Files (x86)\\Atmel\\Studio\\7.0\\toolchain\\arm\\arm-gnu-toolchain\\bin\\arm-none-eabi-gdb.exe' : 'gdb';
