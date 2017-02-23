@@ -105,6 +105,27 @@ export default class NodeGDB {
         return res;
     }
 
+    async targetRemote(port) {
+        const res = await this.send_mi(`-target-select remote :${port}`);
+        return res;
+    }
+
+    async setFile(file) {
+        const res = await this.send_mi(`-file-exec-file ${file}`);
+        return res;
+    }
+
+    async init() {
+        try {
+            await this.send_cli('monitor speed 500');
+            await this.send_cli('load');
+            await this.send_cli('monitor reset');
+        } catch (error) {
+            console.log('error', error);
+        }
+        return true;
+    }
+
     _drain_queue() {
         if (this.cmdq.length) {
             return this.child.stdin(this.cmdq[0].cmd);
