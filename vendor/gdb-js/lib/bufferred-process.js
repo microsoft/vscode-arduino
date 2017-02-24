@@ -41,7 +41,6 @@
         };
 
         BufferedProcess.prototype.stdin = function(line) {
-            require('fs').appendFileSync('c:/_/send.log', line + '\n');
             return this.process.stdin.write(line + '\n');
         };
 
