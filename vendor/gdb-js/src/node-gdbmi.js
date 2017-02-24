@@ -36,6 +36,7 @@ export default class NodeGDB {
         this.next_token = 0;
         this.cmdq = [];
         this.state = '';
+        this.remote = false;
     }
 
     async start() {
@@ -106,6 +107,7 @@ export default class NodeGDB {
     }
 
     async targetRemote(port) {
+        this.remote = true;
         return this.send_mi(`-target-select remote :${port}`);
     }
 
@@ -113,11 +115,15 @@ export default class NodeGDB {
         return this.send_mi(`-file-exec-file ${file}`);
     }
 
-    async init(speed = 'auto') {
+    async remoteModeInit(speed = 'auto') {
+        if (!this.remote) {
+            console.log('monitor & load command should not be called if gdbserver is not used.');
+            return false;
+        }
         try {
             await this.send_cli(`monitor speed ${speed}`);
-            await this.send_cli('load');
             await this.send_cli('monitor reset');
+            await this.send_cli('load');
         } catch (error) {
             console.log('error', error);
         }
