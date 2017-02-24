@@ -1,3 +1,4 @@
 out
 node_modules
 .vscode-test
+/vendor/gdb-js/test/JLinkGDBServer.ini

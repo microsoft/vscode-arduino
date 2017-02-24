@@ -1,74 +1,112 @@
-import NodeGDB from '../out/node-gdb'
-const file = '../test/app.ino.elf';
-const breakPoint = 'app.ino:17';
-const COUNT  = 500;
-const gdbLocation = 'C:\\Program Files (x86)\\Atmel\\Studio\\7.0\\toolchain\\arm\\arm-gnu-toolchain\\bin\\arm-none-eabi-gdb.exe';
+import mocha from 'mocha';
+import { expect } from 'chai';
+import os from 'os';
+import ChildProcess from 'child_process';
 
-(async()=>{
-    let gdb = new NodeGDB({
-        command: gdbLocation
+import NodeGDB from '../src/node-gdb';
+
+const TEST_BIN_FILE = 'test/app.ino.elf';
+const BREAKPOINT = {file: 'app.ino', line: 17};
+const DEVICE = 'ATSAMD21G18';
+const INTERFACE = 'SWD';
+let GDB_LOCATION = 'gdb';
+let JLINK_GDB_SERVER = 'JLinkGDBServer';
+
+
+if (os.platform() === 'win32') {
+    GDB_LOCATION = 'test/arm-none-eabi-gdb.exe';
+    JLINK_GDB_SERVER = 'test/JLinkGDBServer.exe';
+} 
+
+describe('GDB base', () => {
+
+    let GDB = null;
+
+    before((done) => {
+        GDB = new NodeGDB({
+            command: GDB_LOCATION
+        });
+        done();
+    })
+
+    it('should be able to connect', async() => {
+        const ret = await GDB.start();
+        expect(ret.state).to.equal('done');
     });
-    let timeout = (ms) => {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    };
 
-    let getState = () => {
-        return gdb.state;
-    };
-    let waitToStop = async (seconds) => {
-        while (getState() != 'stopped') {
-            await timeout(1000);
-            seconds --;
-            if (seconds < 0 ) {
-                console.log('wait timeout ');
-                return;
-            } else {
-                if (seconds<5) {
-                    gdb.pause();
-                }
-                console.log('wait util ', seconds);
-            }
-        }
-    };
-
-
-    let execute = async (cmd, descr) => {
-        let r;
-        if (cmd === 'cont') {
-            r = await gdb.cont();
-            console.log('cont', r);
-        } else if (cmd === 'next') {
-            r = await gdb.next();
-            console.log('next', r);
-        } else if (cmd === 'interrupt') {
-            r = await gdb.pause();
-            console.log('interrupt', r);
-        } else {
-            console.log(`${descr || cmd}...`);
-            r = await gdb.send_cli(cmd);
-            console.log(cmd, r);
-            console.log(`${descr || cmd} completed`);
-        }
-    };
-
-    gdb.emitter.on('connected', async () => {
-        try {
-            await execute('target remote :2331', 'connect');
-            await execute(`file ${file}`, 'set file');
-
-            await execute('monitor speed 500');
-            await execute('load');
-            await execute('monitor reset');
-            await execute(`break ${breakPoint}`);
-            await execute('cont');
-
-            for (let i = 0; i < COUNT; i++){
-                await waitToStop(10);
-                await execute('cont');
-            }
-        } catch(err) {
-            console.log(err);
-        }
+    it('should be able to stop', async() => {
+        const ret = await GDB.stop();
+        expect(ret.state).to.equal('exit');
     });
-    await gdb.start();
-})().catch(err => console.log(err));
+
+    after((done) => {
+        GDB = null;
+        done();
+    });
+});
+
+
+describe('GDB remote', () => {
+
+    let GDB = null;
+    let GDBServer = null;
+    const port = 2331;
+
+    before(async () => {
+        GDBServer = ChildProcess.spawn(JLINK_GDB_SERVER, ["-device", DEVICE, "-if", INTERFACE, "-port", port]);
+        GDBServer.stdout.on('data', (data) => {
+            console.log(`GDBServer stdout: ${data}`);
+        });
+        GDBServer.stderr.on('data', (data) => {
+            console.log(`GDBServer stderr: ${data}`);
+        });
+        GDBServer.on("close", (code) => {
+            console.log(`GDBServer child process exited with code ${code}`);
+        });
+        GDB = new NodeGDB({
+            command: GDB_LOCATION
+        });
+        await GDB.start();
+    });
+
+    it('should be able to connect to JLink GDB server', async () => {
+        const ret = await GDB.targetRemote(port);
+        expect(ret.state).to.equal('connected');
+    });
+
+    after(async () => {
+        await GDB.stop();
+        GDB = null;
+        GDBServer.kill();
+        GDBServer = null;
+    });
+});
+
+
+describe('GDB initialize', () => {
+
+    let GDB = null;
+
+    before(async () => {
+        GDB = new NodeGDB({
+            command: GDB_LOCATION
+        });
+        await GDB.start();
+    });
+
+    it('should be able to set file', async () => {
+        const ret = await GDB.setFile(TEST_BIN_FILE);
+        expect(ret.state).to.equal('done');
+    });
+
+    it('should be able to init', async () => {
+        const ret = await GDB.init();
+        expect(ret).to.equal(true);
+    });
+
+    after(async () => {
+        await GDB.stop();
+        GDB = null;
+    });
+
+});

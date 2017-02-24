@@ -106,18 +106,16 @@ export default class NodeGDB {
     }
 
     async targetRemote(port) {
-        const res = await this.send_mi(`-target-select remote :${port}`);
-        return res;
+        return this.send_mi(`-target-select remote :${port}`);
     }
 
     async setFile(file) {
-        const res = await this.send_mi(`-file-exec-file ${file}`);
-        return res;
+        return this.send_mi(`-file-exec-file ${file}`);
     }
 
-    async init() {
+    async init(speed = 'auto') {
         try {
-            await this.send_cli('monitor speed 500');
+            await this.send_cli(`monitor speed ${speed}`);
             await this.send_cli('load');
             await this.send_cli('monitor reset');
         } catch (error) {
