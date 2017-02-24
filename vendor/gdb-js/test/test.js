@@ -14,8 +14,8 @@ let JLINK_GDB_SERVER = 'JLinkGDBServer';
 
 
 if (os.platform() === 'win32') {
-    GDB_LOCATION = 'test/arm-none-eabi-gdb.exe';
-    JLINK_GDB_SERVER = 'test/JLinkGDBServer.exe';
+    GDB_LOCATION = 'test/win/arm-none-eabi-gdb.exe';
+    JLINK_GDB_SERVER = 'test/win/JLinkGDBServer.exe';
 } 
 
 describe('GDB base', () => {
@@ -70,12 +70,12 @@ describe('GDB remote', () => {
     });
 
     it('should be able to connect to JLink GDB server', async () => {
-        const ret = await GDB.targetRemote(port);
+        const ret = await GDB.connectToGDBServer(port);
         expect(ret.state).to.equal('connected');
     });
 
     it('should be able to init remote option', async () => {
-        const ret = await GDB.remoteModeInit();
+        const ret = await GDB.configRemoteOption();
         expect(ret).to.equal(true);
     })
 

@@ -106,7 +106,7 @@ export default class NodeGDB {
         return res;
     }
 
-    async targetRemote(port) {
+    async connectToGDBServer(port) {
         const res = await this.send_mi(`-target-select remote :${port}`);
         if (res.state === 'connected') {
             this.remote = true;
@@ -114,11 +114,11 @@ export default class NodeGDB {
         return res;
     }
 
-    async setFile(file) {
+    setFile(file) {
         return this.send_mi(`-file-exec-file ${file}`);
     }
 
-    async remoteModeInit(speed = 'auto') {
+    async configRemoteOption(speed = 'auto') {
         if (!this.remote) {
             console.log('monitor & load command should not be called if gdbserver is not used.');
             return false;
