@@ -107,8 +107,11 @@ export default class NodeGDB {
     }
 
     async targetRemote(port) {
-        this.remote = true;
-        return this.send_mi(`-target-select remote :${port}`);
+        const res = await this.send_mi(`-target-select remote :${port}`);
+        if (res.state === 'connected') {
+            this.remote = true;
+        }
+        return res;
     }
 
     async setFile(file) {
