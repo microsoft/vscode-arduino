@@ -1,7 +1,11 @@
-import {Emitter} from 'event-kit'
+import {
+    Emitter
+} from 'event-kit'
 import bufferedProcess from '../lib/bufferred-process'
-import {parse} from '../lib/parser.js';
-const _clone  = obj => {
+import {
+    parse
+} from '../lib/parser.js';
+const _clone = obj => {
     return Object.assign({}, obj);
 };
 
@@ -43,7 +47,7 @@ export default class NodeGDB {
         if (this.child) {
             await this.child.kill();
         }
-        this.child  = await bufferedProcess({
+        this.child = await bufferedProcess({
             command: this.opt.command,
             args: ['-q', '-n', '--interpreter=mi'],
             stdout: this._line_output_handler.bind(this),
@@ -62,7 +66,7 @@ export default class NodeGDB {
         if (!this.child) {
             throw new Error('Not connected');
         }
-        return new Promise((resolve, reject)=> {
+        return new Promise((resolve, reject) => {
             this.cmdq.push({
                 quiet: quiet,
                 cmd: this.next_token + cmd,
@@ -115,7 +119,7 @@ export default class NodeGDB {
     }
 
     setFile(file) {
-        return this.send_mi(`-file-exec-file ${file}`);
+        return this.send_mi(`-file-exec-and-symbols ${file}`);
     }
 
     async configRemoteOption(speed = 'auto') {
@@ -131,6 +135,59 @@ export default class NodeGDB {
             console.log('error', error);
         }
         return true;
+    }
+
+    addBreakPoint(breakpoint) {
+        //TODO: check breakpoint already exist?
+        if (!breakpoint || !breakpoint.file || !breakpoint.line) {
+            throw new Error('file name and line number must be specified');
+        }
+        return this.send_mi(`-break-insert ${breakpoint.file}:${breakpoint.line}`);
+    }
+
+    removeBreakPoint(id) {
+        if (id === undefined) {
+            throw new Error('index of the breakpoint must be given');
+        }
+        return this.send_mi(`-break-delete ${id}`);
+    }
+
+    clearBreakPoints() {
+        return this.send_mi('-break-delete');
+    }
+
+    async listBreakPoints() {
+        const res = await this.send_mi('-break-list');
+        if (!res || !res.data || !res.data.BreakpointTable || !res.data.BreakpointTable.body) {
+            throw new Error('breakpoint list parse error');
+        }
+        let breakpoints = [];
+        res.data.BreakpointTable.body.forEach(item => {
+            let breakpoint = item.value;
+            if (breakpoint && breakpoint['original-location']) {
+                breakpoints.push({
+                    id: breakpoint.number,
+                    file: breakpoint['original-location'].substr(0, breakpoint['original-location'].indexOf(':')),
+                    line: breakpoint.line,
+                });
+            }
+        });
+        return breakpoints;
+    }
+
+    loadBreakPoints(breakpoints) {
+        const len = breakpoints.length;
+        let promises = [];
+        breakpoints.forEach(bp => {
+            promises.push(this.addBreakPoint(bp));
+        })
+        Promise.all(promises).then(results => {
+            results.forEach(res => {
+                if (res.state !== 'done') {
+                    console.log(`Error add breakpoint: ${res.data.msg}`);
+                }
+            })
+        });
     }
 
     _drain_queue() {
@@ -157,9 +214,10 @@ export default class NodeGDB {
 
         if (r) {
             switch (r.type) {
-                case 'console': console.log('.', r.data);
+                case 'console':
+                    console.log('.', r.data);
                     break;
-                case 'notify' :
+                case 'notify':
                     console.log('notify', r.state, r.data);
                     break;
                 case 'exec':
@@ -172,15 +230,16 @@ export default class NodeGDB {
                     break;
                 case 'prompt':
                     break;
-                case 'result': {
-                    if (Number.isInteger(r.token)) {
-                        let c = this.cmdq.shift();
-                        if (c.token === r.token) {
-                            c.resolve(r);
+                case 'result':
+                    {
+                        if (Number.isInteger(r.token)) {
+                            let c = this.cmdq.shift();
+                            if (c.token === r.token) {
+                                c.resolve(r);
+                            }
+                            this._drain_queue();
                         }
-                        this._drain_queue();
                     }
-                }
                     break;
                 default:
                     console.log(JSON.stringify(r, null, 4), line);
@@ -199,4 +258,3 @@ export default class NodeGDB {
         return this.state;
     }
 }
-
