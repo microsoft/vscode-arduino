@@ -84,7 +84,7 @@ export class ClangProvider implements vscode.Disposable {
                 });
             proc.stdin.end(document.getText());
         }).then((result: any) => {
-            return parseAstDump(result.stdout, word);
+            return parseAstDump(result.stdout, word, document);
         });
     }
 
@@ -267,7 +267,7 @@ const positionRe = /<(.+)>/;
 const startPositionRe = /(\S+):(\d+):(\d+)/;
 const endPositionRe = /(line|col):(\d+)(?::(\d+))?/;
 
-function parseAstDump(aststring, target) {
+function parseAstDump(aststring: string, target: string, doc: vscode.TextDocument): vscode.Location[] {
     const candidates = aststring.split("\n\n");
     const places = [];
     candidates.forEach((candidate) => {
@@ -291,9 +291,15 @@ function parseAstDump(aststring, target) {
             } else {
                 endPosition = new vscode.Position(parseInt(startMatch[2], 10) - 1, parseInt(endMatch[2], 10) - 1);
             }
-            places.push(new vscode.Location(vscode.Uri.file(startMatch[1]), new vscode.Range(
+            let targetUri;
+            if (startMatch[1] === "<stdin>") {
+                targetUri = doc.uri;
+            } else {
+                targetUri = vscode.Uri.file(startMatch[1]);
+            }
+            places.push(targetUri, new vscode.Range(
                 new vscode.Position(parseInt(startMatch[2], 10) - 1, parseInt(startMatch[3], 10) - 1),
-                endPosition)));
+                endPosition));
         }
     });
     return places;

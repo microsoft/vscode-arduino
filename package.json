@@ -10,7 +10,8 @@
   "enableProposedApi": false,
   "categories": [
     "Languages",
-    "Snippets"
+    "Snippets",
+    "Formatters"
   ],
   "activationEvents": [
     "onLanguage:arduino",

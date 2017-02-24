@@ -67,7 +67,8 @@ export class BoardContentProvider implements vscode.TextDocumentContentProvider 
     }
 
     private buildBoardSectionHeader(p: IPlatform): string {
-        let result = `<div><span class="board-header"> ${p.name}</span> by <span class="board-header" href="${p.package.websiteURL}">${p.package.maintainer}</span>`;
+        let result = `<div><span class="board-header"> ${p.name}`
+            + `</span> by <span class="board-header" href="${p.package.websiteURL}">${p.package.maintainer}</span>`;
         result
             += (p.installedVersion ? ` version ${p.installedVersion} <span class="installed-header">INSTALLED</span>` : "")
             + "</div>";
@@ -88,9 +89,12 @@ export class BoardContentProvider implements vscode.TextDocumentContentProvider 
 
     private buildBoardSecionButtons(p: IPlatform): string {
         if (p.installedVersion) {
-            return `<div class="board-footer"><a href="${encodeURI("command:arduino.uninstallBoard?" + JSON.stringify([p.rootBoardPath]))}" class="operation">Remove</a></div>`;
+            return `<div class="board-footer"><a href="${encodeURI("command:arduino.uninstallBoard?" + JSON.stringify([p.rootBoardPath]))}"`
+                + ` class="operation">Remove</a></div>`;
         } else if (!p.defaultPlatform) {
-            return `<div class="board-footer"><a href="${encodeURI("command:arduino.installBoard?" + JSON.stringify([p.package.name, p.architecture]))}" class="operation">Install</a></div>`;
+            return `<div class="board-footer"><a href="` +
+                `${encodeURI("command:arduino.installBoard?" + JSON.stringify([p.package.name, p.architecture]))}`
+                + `" class="operation">Install</a></div>`;
         }
     }
 
