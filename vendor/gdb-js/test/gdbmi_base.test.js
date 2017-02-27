@@ -4,10 +4,7 @@ import os from 'os';
 import NodeGDB from '../src/node-gdbmi';
 import config from './config.json';
 
-let GDB_LOCATION = config.gdbLocation;
-if (os.platform() === 'win32') {
-  GDB_LOCATION = 'test/win/arm-none-eabi-gdb.exe';
-}
+let GDB_LOCATION = config.gdbLocation[os.platform()];
 
 describe('GDB base', () => {
 

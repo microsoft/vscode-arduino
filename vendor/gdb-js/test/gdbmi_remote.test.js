@@ -8,13 +8,8 @@ import config from './config.json';
 const DEVICE = config.device;
 const INTERFACE = config.interface;
 
-let GDB_LOCATION = config.gdbLocation;
-let JLINK_GDB_SERVER = config.gdbServer;
-if (os.platform() === 'win32') {
-  GDB_LOCATION = 'test/win/arm-none-eabi-gdb.exe';
-  JLINK_GDB_SERVER = 'test/win/JLinkGDBServer.exe';
-}
-
+let GDB_LOCATION = config.gdbLocation[os.platform()];
+let JLINK_GDB_SERVER = config.gdbServer[os.platform()];
 
 describe('GDB remote', () => {
 

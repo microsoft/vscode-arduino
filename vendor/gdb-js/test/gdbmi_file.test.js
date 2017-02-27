@@ -6,10 +6,7 @@ import config from './config.json';
 
 const TEST_BIN_FILE = config.testBinFile;
 
-let GDB_LOCATION = 'gdb';
-if (os.platform() === 'win32') {
-  GDB_LOCATION = 'test/win/arm-none-eabi-gdb.exe';
-}
+let GDB_LOCATION = config.gdbLocation[os.platform()];
 
 describe('GDB file', () => {
 

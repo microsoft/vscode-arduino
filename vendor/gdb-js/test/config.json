@@ -13,6 +13,12 @@
   },
   "device": "ATSAMD21G18",
   "interface": "SWD",
-  "gdbLocation": "gdb",
-  "gdbServer": "JLinkGDBServer"
+  "gdbLocation": {
+    "win32": "test/win/arm-none-eabi-gdb.exe",
+    "linux": "gdb"
+  },
+  "gdbServer": {
+    "win32": "test/win/JLinkGDBServer.exe",
+    "linux": "JLinkGDBServer"
+  }
 }

@@ -8,10 +8,7 @@ const TEST_BIN_FILE = config.testBinFile;
 const BREAKPOINTS = config.breakPoints;
 const ILLEGAL_BREAKPOINT = config.illegalBreakPoint;
 
-let GDB_LOCATION = 'gdb';
-if (os.platform() === 'win32') {
-  GDB_LOCATION = 'test/win/arm-none-eabi-gdb.exe';
-}
+let GDB_LOCATION = config.gdbLocation[os.platform()];
 
 describe('GDB breakpoint', async() => {
 
