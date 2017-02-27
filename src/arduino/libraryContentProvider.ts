@@ -85,7 +85,8 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
                 </div>`;
             }
         } else {
-            return `<div class="library-footer"><a href="${encodeURI("command:arduino.installLibrary?" + JSON.stringify([lib.name]))}" class="operation">Install</a></div>`;
+            return `<div class="library-footer"><a href="${encodeURI("command:arduino.installLibrary?" + JSON.stringify([lib.name]))}" `
+                + `class="operation">Install</a></div>`;
         }
     }
 

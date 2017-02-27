@@ -28,6 +28,7 @@
         ],
         "triple-equals": true,
         "max-line-length": [
+            true,
             150
         ]
     }

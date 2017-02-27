@@ -16,6 +16,7 @@ import { DeviceContext } from "./deviceContext";
 import { ClangProvider } from "./langService/clang";
 import { CompletionProvider } from "./langService/completionProvider";
 import { DefinitionProvider } from "./langService/definitionProvider";
+import { FormatterProvider } from "./langService/formatterProvider";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -77,7 +78,8 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("arduino.selectSerialPort", async () => await monitor.selectSerialPort()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialMonitor", async () => await monitor.openSerialMonitor()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", async () => await monitor.changeBaudRate()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", async () => await monitor.sendMessageToSerialPort()));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", async () =>
+        await monitor.sendMessageToSerialPort()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialMonitor", async () => await monitor.closeSerialMonitor()));
 
     // Add arduino specific language suport.
@@ -88,6 +90,8 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
     const definitionProvider = new DefinitionProvider(clangProvider);
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(ARDUINO_MODE, definitionProvider));
+    const formatterProvider = new FormatterProvider();
+    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(ARDUINO_MODE, formatterProvider));
 
     // Example explorer, only work under VSCode insider version.
     if (typeof vscode.window.registerTreeExplorerNodeProvider === "function"
