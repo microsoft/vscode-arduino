@@ -175,18 +175,17 @@ export default class NodeGDB {
         return breakpoints;
     }
 
-    loadBreakPoints(breakpoints) {
-        const len = breakpoints.length;
+    addBreakPoints(breakpoints) {
         let promises = [];
         breakpoints.forEach(bp => {
             promises.push(this.addBreakPoint(bp));
-        })
+        });
         Promise.all(promises).then(results => {
             results.forEach(res => {
                 if (res.state !== 'done') {
                     console.log(`Error add breakpoint: ${res.data.msg}`);
                 }
-            })
+            });
         });
     }
 

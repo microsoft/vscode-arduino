@@ -1,4 +1,3 @@
-import mocha from 'mocha';
 import { expect } from 'chai';
 import os from 'os';
 import ChildProcess from 'child_process';
@@ -157,13 +156,13 @@ describe('GDB breakpoint', async() => {
     });
 
     it('should be able to add mutiple breakpoints & list breakpoint', async() => {
-        let ret = await GDB.loadBreakPoints([BREAKPOINT1, BREAKPOINT2]);
-        ret = await GDB.listBreakPoints();
+        await GDB.addBreakPoints([BREAKPOINT1, BREAKPOINT2]);
+        const ret = await GDB.listBreakPoints();
         expect(ret).to.deep.equal([
             {id: '1', file: 'app.ino', line: '17'},
             {id: '2', file: 'app.ino', line: '18'},
         ]);
-    })
+    });
 
     afterEach(async () => {
         await GDB.stop();
