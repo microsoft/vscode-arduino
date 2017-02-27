@@ -8,7 +8,7 @@
   },
   "scripts": {
     "babel": "gulp",
-    "test": "mocha --compilers js:babel-core/register test/test.js"
+    "test": "mocha --compilers js:babel-core/register test/*.test.js"
   },
   "author": "Andy xu",
   "license": "ISC",

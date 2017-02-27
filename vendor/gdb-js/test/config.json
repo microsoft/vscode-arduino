@@ -1,0 +1,18 @@
+{
+  "testBinFile": "test/app.ino.elf",
+  "breakPoints": [{
+    "file": "app.ino",
+    "line": 17
+  }, {
+    "file": "app.ino",
+    "line": 18
+  }],
+  "illegalBreakPoint": {
+    "file": "app.ino",
+    "line": 200
+  },
+  "device": "ATSAMD21G18",
+  "interface": "SWD",
+  "gdbLocation": "gdb",
+  "gdbServer": "JLinkGDBServer"
+}
