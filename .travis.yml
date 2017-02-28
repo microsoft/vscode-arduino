@@ -24,6 +24,7 @@ install:
 - npm install -g typescript
 - npm install -g gulp
 - npm install
+- gulp install
 - npm run vscode:prepublish
 
 script:

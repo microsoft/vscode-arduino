@@ -35,7 +35,7 @@ export class ArduinoApp {
         if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
                 // Use the dummy package to initialize the Arduino IDE
-                await this.installBoard("dummy", "dummy", false);
+                await this.installBoard("dummy", "dummy", "", false);
             } catch (ex) {
             }
         }
@@ -170,11 +170,11 @@ export class ArduinoApp {
      * Install arduino board package based on package name and platform hardware architecture.
      * TODO: Add version
      */
-    public installBoard(packageName: string, arch: string, showOutput: boolean = true) {
+    public installBoard(packageName: string, arch: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show(true);
         return util.spawn(this._settings.commandPath,
             showOutput ? arduinoChannel : null,
-            ["--install-boards", `${packageName}:${arch}`]);
+            ["--install-boards", `${packageName}:${arch}${version && ":" + version}`]);
     }
 
     public uninstallBoard(packagePath: string) {

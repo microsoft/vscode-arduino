@@ -1,0 +1,18 @@
+.search-input {
+  padding: 10px 10px;
+  position: relative;
+}
+
+.search-input > input {
+  width: 100%;
+  font-size: 18px;
+  border: none;
+  line-height: 22px;
+  padding: 5px 10px 5px 10px;
+  height: 34px;
+  position: relative;
+}
+
+.search-input > input:focus {
+  outline: none;
+}

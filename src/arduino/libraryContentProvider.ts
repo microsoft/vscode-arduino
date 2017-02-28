@@ -91,6 +91,6 @@ export class LibraryContentProvider implements vscode.TextDocumentContentProvide
     }
 
     private getCssContent(): string {
-        return fs.readFileSync(path.join(this._extensionPath, "html", "library.css"), "utf8");
+        return fs.readFileSync(path.join(this._extensionPath, "out/html/styles/app.css"), "utf8");
     }
 }

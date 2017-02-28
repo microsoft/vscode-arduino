@@ -128,22 +128,30 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
+    "vscode:prepublish": "gulp build",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
+    "gulp-install": "^0.6.0",
+    "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^7.0.1",
+    "gulp-typescript": "^3.1.5",
+    "gulp-util": "^3.0.8",
     "mocha": "^2.3.3",
+    "run-sequence": "^1.2.2",
     "tslint": "^4.2.0",
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0"
+    "typescript": "^2.2.1",
+    "vscode": "^1.0.0",
+    "webpack": "^2.2.1"
   },
   "dependencies": {
+    "body-parser": "^1.16.1",
+    "express": "^4.14.1",
     "glob": "^7.1.1"
   }
 }
