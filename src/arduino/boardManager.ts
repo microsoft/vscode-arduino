@@ -346,7 +346,7 @@ export class BoardManager {
         const dirs = fs.readdirSync(rootPacakgesPath);
         dirs.forEach((packageName) => {
             // in Mac, filter .DS_Store file.
-            if (util.junk(packageName)) {
+            if (util.isJunk(packageName)) {
                 return ;
             }
             let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
@@ -358,7 +358,7 @@ export class BoardManager {
                 return;
             }
             architectures.forEach((architecture) => {
-                if (util.junk(architecture)) {
+                if (util.isJunk(architecture)) {
                     return ;
                 }
                 let allVersion = fs.readdirSync(path.join(archPath, architecture));

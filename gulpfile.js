@@ -18,13 +18,13 @@ gulp.task("tslint", () => {
 });
 
 gulp.task("install", () => {
-    gulp.src(['./package.json', './html/package.json']).pipe(install());
+    return gulp.src(['./package.json', './html/package.json']).pipe(install());
 });
 
 gulp.task("html-webpack", (done) => {
     const config = require("./html/webpack.config.js");
     config.context = `${__dirname}/html`;
-    webpack(config, (err, stats) => {
+    return webpack(config, (err, stats) => {
         const statsJson = stats.toJson();
         if (err || (statsJson.errors && statsJson.errors.length)) {
             statsJson.errors.forEach(webpackError => {
@@ -40,12 +40,12 @@ gulp.task("html-webpack", (done) => {
 
 gulp.task("ts-compile", () => {
     const tsProject = ts.createProject("./tsconfig.json");
-    const tsResult = tsProject.src()
+    return tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(tsProject())
         .pipe(sourcemaps.write(".", {
             mapSources: (sourcePath, file) => {
-                // Correct map source path.
+                // Correct source map path.
                 const relativeSourcePath = path.relative(path.dirname(file.path), path.join(file.base, sourcePath));
                 return relativeSourcePath;
             }

@@ -9,23 +9,21 @@ import * as http from "http";
 import * as path from "path";
 
 export default class LocalWebServer {
-    public static _serverPort: string;
-    public static _vscodeExtensionPath: string;
-    public static getServerUrl(): string {
-        return `http://localhost:${this._serverPort}`;
-    }
-    public static getEndpointUri(type: string): string {
-        return `http://localhost:${this._serverPort}/${type}`;
-    }
-
     private app = express();
     private server;
+    private _serverPort: string;
 
-    constructor(extensionPath: string) {
-        LocalWebServer._vscodeExtensionPath = extensionPath;
-        this.app.use("/", express.static(path.join(extensionPath, "./out/html")));
+    constructor(private _extensionPath: string) {
+        this.app.use("/", express.static(path.join(this._extensionPath, "./out/html")));
         this.app.use(bodyParser.json());
         this.server = http.createServer(this.app);
+    }
+
+    public getServerUrl(): string {
+        return `http://localhost:${this._serverPort}`;
+    }
+    public getEndpointUri(type: string): string {
+        return `http://localhost:${this._serverPort}/${type}`;
     }
 
     public addHandler(url: string, handler: (req, res) => void): void {
@@ -40,6 +38,6 @@ export default class LocalWebServer {
         const port = this.server.listen(0).address().port;
         // tslint:disable-next-line
         console.log(`Starting express server on port: ${port}`);
-        LocalWebServer._serverPort = port;
+        this._serverPort = port;
     }
 }

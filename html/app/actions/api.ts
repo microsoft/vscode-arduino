@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-function postFetch(url, postData) {
+function postHTTP(url, postData) {
     const request = new Request(url, {
         method: "POST",
         headers: new Headers({
@@ -19,7 +19,7 @@ export function getBoardPackages() {
 }
 
 export function installBoard(packageName, arch, version) {
-    return postFetch("/api/installboard", {
+    return postHTTP("/api/installboard", {
         packageName,
         arch,
         version,
@@ -27,7 +27,7 @@ export function installBoard(packageName, arch, version) {
 }
 
 export function uninstallBoard(packagePath) {
-    return postFetch("/api/uninstallboard", {
+    return postHTTP("/api/uninstallboard", {
         packagePath,
     }).then((response) => response.json());
 }

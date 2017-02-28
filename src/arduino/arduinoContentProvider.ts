@@ -5,19 +5,16 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
+import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import { BoardManager } from "./boardManager";
 import LocalWebServer from "./localWebServer";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
-    private _boardManager: BoardManager;
-    private _extensionPath: string;
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
-    constructor(boardManager: BoardManager, extensionPath: string) {
-        this._boardManager = boardManager;
-        this._extensionPath = extensionPath;
+    constructor(private _boardManager: BoardManager, private _extensionPath: string) {
         this.initialize();
     }
 
@@ -33,7 +30,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     public provideTextDocumentContent(uri: vscode.Uri) {
         // URI needs to be encoded as a component for proper inclusion in a url
         let type = "home";
-        if (uri.toString() === "arduino-manager://arduino/packages") {
+        if (uri.toString() === Constants.BOARD_MANAGER_URI.toString()) {
             type = "boardmanager";
         }
         let encodedUri = encodeURIComponent(uri.toString());
@@ -53,7 +50,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                     var backgroundcolor = styles.getPropertyValue('--background-color');
                     var color = styles.getPropertyValue('--color');
                     var theme = document.body.className;
-                    var url = "${LocalWebServer.getEndpointUri(type)}?" +
+                    var url = "${this._webserver.getEndpointUri(type)}?" +
                             "uri=${encodedUri}" +
                             "&theme=" + theme +
                             "&backgroundcolor=" + backgroundcolor +
