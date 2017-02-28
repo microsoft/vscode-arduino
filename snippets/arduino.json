@@ -1,11 +1,11 @@
 {
     "ls": {
-        "prefix": "ls",
+        "prefix": "sl",
         "body": [
-            "void loop()",
+            "void setup()",
             "{\n}",
             "\n",
-            "void setup()",
+            "void loop()",
             "{\n}"
         ]
     },

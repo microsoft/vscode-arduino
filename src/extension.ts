@@ -20,7 +20,8 @@ import { FormatterProvider } from "./langService/formatterProvider";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
 export async function activate(context: vscode.ExtensionContext) {
-    const arduinoSettings = ArduinoSettings.getIntance();
+    const arduinoSettings = new ArduinoSettings();
+    await arduinoSettings.initialize();
     const arduinoApp = new ArduinoApp(arduinoSettings);
     await arduinoApp.initialize();
 
@@ -54,7 +55,6 @@ export async function activate(context: vscode.ExtensionContext) {
         libraryProvider.update(LIBRARY_MANAGER_URI);
     }));
 
-    context.subscriptions.push(arduinoSettings);
     context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => arduinoApp.verify()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => arduinoApp.upload()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));

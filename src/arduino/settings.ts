@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
+import * as WinReg from "winreg";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
@@ -21,13 +22,7 @@ export interface IArduinoSettings {
     libPath: string;
 }
 
-export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
-    public static getIntance(): ArduinoSettings {
-        return ArduinoSettings._arduinoSettings;
-    }
-
-    private static _arduinoSettings: ArduinoSettings = new ArduinoSettings();
-
+export class ArduinoSettings implements IArduinoSettings {
     private _arduinoPath: string;
 
     /**
@@ -39,18 +34,13 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
 
     private _libPath: string;
 
-    constructor() {
-        this.initializeSettings();
+    public constructor() {
     }
 
-    public dispose() {
-    }
-
-    private initializeSettings() {
+    public async initialize() {
         const platform = os.platform();
         if (platform === "win32") {
-            this._packagePath = path.join(process.env.USERPROFILE, "AppData/Local/Arduino15");
-            this._libPath = path.join(process.env.USERPROFILE, "Documents/Arduino/libraries");
+            await this.updateWindowsPath(this.arduinoPath);
         } else if (platform === "linux") {
             this._packagePath = path.join(process.env.HOME, ".arduino15");
             this._libPath = path.join(process.env.HOME, "Arduino/libraries");
@@ -97,5 +87,45 @@ export class ArduinoSettings implements IArduinoSettings, vscode.Disposable {
         } else if (platform === "win32") {
             return path.join(this.arduinoPath, "arduino_debug");
         }
+    }
+
+    /**
+     * For Windows platform, there are two situations here:
+     *  - User change the location of the default *Documents* folder.
+     *  - Use the windows store Arduino app.
+     */
+    private updateWindowsPath(arduinoPath: string): Thenable<boolean> {
+        let docFolder = path.join(process.env.USERPROFILE, "Documents");
+        return new Promise((resolve, reject) => {
+            try {
+                const regKey = new WinReg({
+                    hive: WinReg.HKCU,
+                    key: "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
+                });
+
+                regKey.valueExists("Personal", (e, exists) => {
+                    if (!e && exists) {
+                        regKey.get("Personal", (err, result) => {
+                            if (!err && result) {
+                                docFolder = result.value;
+                            }
+                            resolve(docFolder);
+
+                        });
+                    }
+                    resolve(docFolder);
+                });
+            } catch (ex) {
+                resolve(docFolder);
+            }
+        }).then((folder: string) => {
+            this._libPath = path.join(folder, "Arduino/libraries");
+            if (util.fileExistsSync(path.join(arduinoPath, "AppxManifest.xml"))) {
+                this._packagePath = path.join(folder, "ArduinoData");
+            } else {
+                this._packagePath = path.join(process.env.USERPROFILE, "AppData/Local/Arduino15");
+            }
+            return true;
+        });
     }
 }

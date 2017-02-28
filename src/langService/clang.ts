@@ -297,9 +297,9 @@ function parseAstDump(aststring: string, target: string, doc: vscode.TextDocumen
             } else {
                 targetUri = vscode.Uri.file(startMatch[1]);
             }
-            places.push(targetUri, new vscode.Range(
+            places.push(new vscode.Location(targetUri, new vscode.Range(
                 new vscode.Position(parseInt(startMatch[2], 10) - 1, parseInt(startMatch[3], 10) - 1),
-                endPosition));
+                endPosition)));
         }
     });
     return places;
