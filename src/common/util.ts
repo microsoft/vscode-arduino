@@ -103,3 +103,9 @@ export function tryParseJSON(jsonString: string) {
 
     return false;
 }
+
+export function junk(filename: string): boolean {
+    // tslint:disable-next-line
+    const re = /^npm-debug\.log$|^\..*\.swp$|^\.DS_Store$|^\.AppleDouble$|^\.LSOverride$|^Icon\r$|^\._.*|^\.Spotlight-V100(?:$|\/)|\.Trashes|^__MACOSX$|~$|^Thumbs\.db$|^ehthumbs\.db$|^Desktop\.ini$/;
+    return re.test(filename);
+}

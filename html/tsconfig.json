@@ -1,18 +1,15 @@
 {
     "compilerOptions": {
         "module": "commonjs",
+        "moduleResolution": "node",
+        "jsx": "react",
         "target": "es6",
         "outDir": "out",
         "alwaysStrict": true,
-        "lib": [
-            "es6"
-        ],
         "sourceMap": true,
         "rootDir": "."
     },
     "exclude": [
-        "node_modules",
-        ".vscode-test",
-        "html"
+        "node_modules"
     ]
 }

@@ -3,6 +3,7 @@
 out/test/**
 test/**
 src/**
+html/**
 **/*.map
 .gitignore
 tsconfig.json

@@ -1,0 +1,109 @@
+a {
+    color: lightseagreen;
+}
+.board {
+    padding: 5px 10px;
+    margin: 10px;
+    border: 1px double #505050;
+
+    &:hover {
+        background-color: #333;
+    }
+}
+
+.board-header {
+    font-weight: bold;
+}
+
+.installed-header {
+    font-weight: bold;
+    color: lightseagreen;
+}
+
+.board-footer {
+    padding: 5px 0px;
+    height: 40px;
+
+    .operation-btn {
+        padding: 2px 6px;
+        margin-right: 5px;
+    }
+
+    .left-side {
+        float: left;
+
+        .dropdown {
+            margin-right: 5px;
+
+            button {
+                width: 120px;
+                padding: 2px 10px;
+                text-align: left;
+                overflow: hidden;
+            }
+
+            .caret {
+                left: 90%;
+                top: 45%;
+                position: absolute;
+            }
+
+            .dropdown-menu {
+                min-width: inherit;
+                width: 120px;
+            }
+        }
+    }
+
+    .right-side {
+        float: right;
+    }
+}
+
+.operation {
+    float: right;
+}
+
+.boardmanager-toolbar {
+    height: 60px;
+    padding: 15px 10px;
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+    background-color: #1a1a1a;
+
+    .typeselector-header {
+        float: left;
+        padding-top: 8px;
+        margin-right: 5px;
+    }
+
+    .dropdown {
+        float: left;
+        button {
+            text-align: left;
+            width: 170px;
+
+            .caret {
+                left: 90%;
+                top: 45%;
+                position: absolute;
+            }
+        }
+        .dropdown-menu {
+            left: inherit;
+            min-width: inherit;
+            width: 170px;
+        }
+    }
+
+    .search-input {
+        margin-left: 210px;
+        padding-top: 0px;
+        color: #333;
+    }
+}
+
+.boardmanager-container {
+    padding-top: 60px;
+}
