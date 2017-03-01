@@ -2,4 +2,14 @@
 html.theme-night body {
     background-color: #1a1a1a;
     color: #ccc;
+
+    .mask {
+        position: absolute;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #1a1a1a;
+    }
 }

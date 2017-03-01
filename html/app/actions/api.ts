@@ -31,3 +31,9 @@ export function uninstallBoard(packagePath) {
         packagePath,
     }).then((response) => response.json());
 }
+
+export function openLink(link) {
+    return postHTTP("/api/openlink", {
+        link,
+    }).then((response) => response.json());
+}

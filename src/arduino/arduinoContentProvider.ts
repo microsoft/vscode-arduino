@@ -20,16 +20,17 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public initialize() {
         this._webserver = new LocalWebServer(this._extensionPath);
-        this._webserver.addHandler("/boardmanager", async (req, res) => await this.getBoardManagerView(req, res));
+        this._webserver.addHandler("/boardmanager", (req, res) => this.getBoardManagerView(req, res));
         this._webserver.addHandler("/api/boardpackages", async (req, res) => await this.getBoardPackages(req, res));
         this._webserver.addPostHandler("/api/installboard", async (req, res) => await this.installpackage(req, res));
         this._webserver.addPostHandler("/api/uninstallboard", async (req, res) => await this.uninstallpackage(req, res));
+        this._webserver.addPostHandler("/api/openlink", async(req, res) => await this.openLink(req, res));
         this._webserver.start();
     }
 
     public provideTextDocumentContent(uri: vscode.Uri) {
         // URI needs to be encoded as a component for proper inclusion in a url
-        let type = "home";
+        let type = "";
         if (uri.toString() === Constants.BOARD_MANAGER_URI.toString()) {
             type = "boardmanager";
         }
@@ -73,43 +74,58 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this._onDidChange.fire(uri);
     }
 
-    public async getBoardManagerView(req, res) {
-        res.sendFile(path.join(this._extensionPath, "./out/html/index.html"));
+    public getBoardManagerView(req, res) {
+        return res.sendFile(path.join(this._extensionPath, "./out/html/index.html"));
     }
 
     public async getBoardPackages(req, res) {
         await this._boardManager.loadPackages();
-        res.json({
+        return res.json({
             platforms: JSONHelper.decycle(this._boardManager.platforms, undefined),
         });
     }
 
     public async installpackage(req, res) {
         if (!req.body.packageName || !req.body.arch) {
-            res.status(400).send("BAD Request! Missing packageName or arch parameters!");
+            return res.status(400).send("BAD Request! Missing { packageName, arch } parameters!");
         } else {
             try {
                 await vscode.commands.executeCommand("arduino.installBoard", req.body.packageName, req.body.arch, req.body.version);
-                res.json({
+                return res.json({
                     status: "OK",
                 });
             } catch (error) {
-                res.status(500).send(`Install board failed with message "code:${error.code}, err:${error.stderr}"`);
+                return res.status(500).send(`Install board failed with message "code:${error.code}, err:${error.stderr}"`);
             }
         }
     }
 
     public async uninstallpackage(req, res) {
         if (!req.body.packagePath) {
-            res.status(400).send("BAD Request! Missing packagePath parameter!");
+            return res.status(400).send("BAD Request! Missing { packagePath } parameter!");
         } else {
             try {
                 await vscode.commands.executeCommand("arduino.uninstallBoard", req.body.packagePath);
-                res.json({
+                return res.json({
                     status: "OK",
                 });
             } catch (error) {
-                res.status(500).send(`Uninstall board failed with message "${error}"`);
+                return res.status(500).send(`Uninstall board failed with message "${error}"`);
+            }
+        }
+    }
+
+    public async openLink(req, res) {
+        if (!req.body.link) {
+            return res.status(400).send("BAD Request! Missing { link } parameter!");
+        } else {
+            try {
+                await vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(req.body.link));
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Cannot open the link with error message "${error}"`);
             }
         }
     }
