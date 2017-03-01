@@ -51,6 +51,8 @@ a {
             .dropdown-menu {
                 min-width: inherit;
                 width: 120px;
+                max-height: 200px;
+                overflow: auto;
             }
         }
     }
@@ -106,4 +108,10 @@ a {
 
 .boardmanager-container {
     padding-top: 60px;
+}
+
+.help-link {
+    &:hover {
+        cursor: pointer;
+    }
 }
