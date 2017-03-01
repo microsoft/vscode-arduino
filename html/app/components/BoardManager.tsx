@@ -3,6 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
+import * as API from "../actions/api";
 import * as React from "react";
 import { connect } from "react-redux";
 import SearchInput, { createFilter } from "react-search-input";
@@ -59,6 +60,10 @@ class BoardView extends React.Component<IBoardProps, IBoardState> {
         });
     }
 
+    openLink(url) {
+        API.openLink(url);
+    }
+
     buildBoardSectionHeader(p) {
         return (<div>
                 <span className="board-header">{p.name}</span> by <span className="board-header" href={p.package.websiteURL}>{p.package.maintainer}</span>
@@ -69,21 +74,36 @@ class BoardView extends React.Component<IBoardProps, IBoardState> {
     }
 
     buildBoardSectionBody(p) {
+        const helpLinks = [];
+        if (p.help && p.help.online) {
+            helpLinks.push({
+                url: p.help.online,
+                label: "Online help",
+            });
+        }
+        if (p.package.help && p.package.help.online) {
+            if (p.help && p.help.online === p.package.help.online) {
+                // do nothing.
+            } else {
+                helpLinks.push({
+                    url: p.package.help.online,
+                    label: "Online help",
+                });
+            }
+        }
+        helpLinks.push({
+            url: p.package.websiteURL,
+            label: "More info",
+        });
         return (<div>
                 <div>
                     Boards included in this package:<br/> {p.boards.map((board: any) => board.name).join(", ")}  
                 </div>
                 {
-                    p.help && p.help.online && (
-                        <div><a href={`javascript:top.window.location.href='${p.help.online}'`} target="_blank">Online help</a></div>
-                    )
+                    helpLinks.map((helpLink, index) => {
+                        return (<div key={index}><a className="help-link" onClick={() => this.openLink(helpLink.url)}>{helpLink.label}</a></div>)
+                    })
                 }
-                {
-                    p.package.help && p.package.help.online && (
-                        <div><a href={`javascript:top.window.location.href='${p.package.help.online}'`} target="_blank">Online help</a></div>
-                    )
-                }
-                <div><a href={p.package.websiteURL} target="_top">More info</a></div>
             </div>);
     }
 
@@ -171,15 +191,10 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
         };
         this.searchUpdate = this.searchUpdate.bind(this);
         this.typeUpdate = this.typeUpdate.bind(this);
-        this.dropdownToggle = this.dropdownToggle.bind(this);
     }
 
     componentWillMount() {
         this.props.loadBoardPackages();
-    }
-
-    dropdownToggle(isOpen) {
-        console.log(isOpen);
     }
 
     typeUpdate(eventKey:any, event?: React.SyntheticEvent<{}>): void {
@@ -218,31 +233,26 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
         <div>
             {
                 this.props.requesting && (
-                    <div>Loading...</div>
+                    <div className="mask">Loading...</div>
                 )
             }
-            <div>
-                {
-                    !this.props.requesting && (
-                        <div className="boardmanager-toolbar">
-                            <div className="typeselector-header">Type</div>
-                            <DropdownButton id="typeselector" title={this.state.category} onSelect={this.typeUpdate}>
-                                { this.props.categories.map((c, index) => {
-                                    return (<MenuItem key={index} eventKey={c} active={c === this.state.category}>{c}</MenuItem>)
-                                })}
-                            </DropdownButton>
-                            <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
-                        </div>
-                    )
-                }
-                <div className="boardmanager-container">
-                    {
-                        filteredPlatforms.map((p, index) => {
-                            return (<BoardView key={index} platform={p} {...boardProps} />);
-                        })
-                    }
-                </div>
+            <div className="boardmanager-toolbar">
+                <div className="typeselector-header">Type</div>
+                <DropdownButton id="typeselector" title={this.state.category} onSelect={this.typeUpdate}>
+                    { this.props.categories.map((c, index) => {
+                        return (<MenuItem key={index} eventKey={c} active={c === this.state.category}>{c}</MenuItem>)
+                    })}
+                </DropdownButton>
+                <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
             </div>
+            <div className="boardmanager-container">
+                {
+                    filteredPlatforms.map((p, index) => {
+                        return (<BoardView key={index} platform={p} {...boardProps} />);
+                    })
+                }
+            </div>
+            <div className="boardmanager-footer"></div>
         </div>)
     }
 }
