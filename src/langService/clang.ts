@@ -21,7 +21,7 @@ export class ClangProvider implements vscode.Disposable {
 
     private _watcher: vscode.FileSystemWatcher;
 
-    private _deviceConfigFile: string = path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE);
+    private _deviceConfigFile: string = path.join(vscode.workspace.rootPath, constants.ARDUINO_CONFIG_FILE);
 
     constructor(private _arduinoApp: ArduinoApp) {
         this.updateLibList();

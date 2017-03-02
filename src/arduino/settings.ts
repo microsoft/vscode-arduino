@@ -17,6 +17,7 @@ import { resolveArduinoPath } from "../common/platform";
 export interface IArduinoSettings {
     arduinoPath: string;
     additionalUrls: string | string[];
+    logLevel: string;
     commandPath: string;
     packagePath: string;
     libPath: string;
@@ -33,6 +34,8 @@ export class ArduinoSettings implements IArduinoSettings {
     private _packagePath: string;
 
     private _libPath: string;
+
+    private _logLevel: string;
 
     public constructor() {
     }
@@ -76,6 +79,11 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get libPath(): string {
         return this._libPath;
+    }
+
+    public get logLevel(): string {
+        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+        return arduinoConfig.get<string>("logLevel") || "info";
     }
 
     public get commandPath(): string {

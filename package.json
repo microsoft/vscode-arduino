@@ -98,6 +98,14 @@
             "array"
           ],
           "description": "Additional URLs for 3-rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array."
+        },
+        "arduino.logLevel": {
+          "type": "string",
+          "default": "info",
+          "enum": [
+            "info",
+            "verbose"
+          ]
         }
       }
     },

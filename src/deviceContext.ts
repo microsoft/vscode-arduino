@@ -10,7 +10,7 @@ import * as util from "./common/util";
 
 import { ArduinoApp } from "./arduino/arduino";
 import { IBoard } from "./arduino/boardManager";
-import { DEVICE_CONFIG_FILE } from "./common/constants";
+import { ARDUINO_CONFIG_FILE } from "./common/constants";
 
 /**
  * Interface that represents the arduino context information.
@@ -58,7 +58,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * @constructor
      */
     private constructor() {
-        this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE));
+        this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE));
         this._watcher.onDidCreate(() => this.loadContext());
         this._watcher.onDidChange(() => this.loadContext());
         this._watcher.onDidDelete(() => this.loadContext());
@@ -89,7 +89,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             this._port = preferences.get("serial.port");
         }
 
-        return vscode.workspace.findFiles(DEVICE_CONFIG_FILE, null, 1)
+        return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
                 let deviceConfigJson: any = {};
                 if (files && files.length > 0) {
@@ -106,7 +106,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public saveContext() {
-        const deviceConfigFile = path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE);
+        const deviceConfigFile = path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE);
         let deviceConfigJson: any = {};
         if (util.fileExistsSync(deviceConfigFile)) {
             deviceConfigJson = JSON.parse(fs.readFileSync(deviceConfigFile, "utf8"));
@@ -115,7 +115,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.port = this.port;
         deviceConfigJson.board = this.board;
 
-        fs.writeFileSync(path.join(vscode.workspace.rootPath, DEVICE_CONFIG_FILE), JSON.stringify(deviceConfigJson, null, 4));
+        fs.writeFileSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE), JSON.stringify(deviceConfigJson, null, 4));
     }
 
     public get port() {

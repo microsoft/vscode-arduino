@@ -3,9 +3,10 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
+import * as path from "path";
 import * as vscode from "vscode";
 
-export const DEVICE_CONFIG_FILE = "device.json";
+export const ARDUINO_CONFIG_FILE = path.join(".vscode", "arduino.json");
 
 export const ARDUINO_MODE: vscode.DocumentSelector = [
     { language: "cpp", scheme: "file" },
