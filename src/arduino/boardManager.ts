@@ -240,7 +240,7 @@ export class BoardManager {
         }));
         if (chosen && chosen.label) {
             const dc = DeviceContext.getIntance();
-            dc.board = (<any>chosen).entry.board;
+            dc.board = this.getBoardKey((<any>chosen).entry);
             this._currentBoard = (<any>chosen).entry;
             this._boardStatusBar.text = chosen.label;
         }
@@ -347,7 +347,7 @@ export class BoardManager {
         dirs.forEach((packageName) => {
             // in Mac, filter .DS_Store file.
             if (util.isJunk(packageName)) {
-                return ;
+                return;
             }
             let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
             if (!util.directoryExistsSync(archPath)) {
@@ -359,7 +359,7 @@ export class BoardManager {
             }
             architectures.forEach((architecture) => {
                 if (util.isJunk(architecture)) {
-                    return ;
+                    return;
                 }
                 let allVersion = fs.readdirSync(path.join(archPath, architecture));
                 let existingPlatform = this._platforms.find((_plat) => _plat.package.name === packageName && _plat.architecture === architecture);
@@ -373,14 +373,19 @@ export class BoardManager {
     }
 
     private loadInstalledBoards(): void {
-        let boards: Map<string, IBoard> = new Map<string, IBoard>();
+        // let boards: Map<string, IBoard> = new Map<string, IBoard>();
+        this._boards = new Map<string, IBoard>();
         this.installedPlatforms.forEach((plat) => {
             let dir = plat.rootBoardPath;
-            let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
-            boards = new Map([...boards, ...this.parseBoardDescriptorFile(boardContent, plat)]);
+            if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
+                let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
+                let res = this.parseBoardDescriptorFile(boardContent, plat);
+                res.forEach((bd) => {
+                    let fullKey = this.getBoardKey(bd);
+                    this._boards.set(fullKey, bd);
+                });
+            }
         });
-
-        this._boards = boards;
     }
 
     private listBoards(): IBoard[] {
@@ -457,5 +462,11 @@ export class BoardManager {
             return [];
         }
         return <string[]>urls;
+    }
+    /**
+     * @returns {string} Return board key in format packageName:arch:boardName
+     */
+    private getBoardKey(board: IBoard) {
+        return `${board.platform.package.name}:${board.platform.architecture}:${board.board}`;
     }
 }

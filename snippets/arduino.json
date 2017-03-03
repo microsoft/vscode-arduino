@@ -22,5 +22,29 @@
             "void setup()",
             "{\n}"
         ]
+    },
+    "spr": {
+        "prefix": "spr",
+        "body": [
+            "Serial.print("
+        ]
+    },
+    "sprl": {
+        "prefix": "sprl", 
+        "body": [
+            "Serial.println("
+        ]
+    }, 
+    "dw": {
+        "prefix": "dw", 
+        "body": [
+            "digitalWrite("
+        ]
+    }, 
+    "dr": {
+        "prefix": "dr", 
+        "body": [
+            "digitalRead("
+        ]
     }
 }

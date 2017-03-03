@@ -66,19 +66,23 @@ export class ArduinoApp {
         const boardDescriptor = this.getBoardDescriptorString(dc);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         arduinoChannel.show(true);
-        return util.spawn(this._settings.commandPath,
-            arduinoChannel,
-            ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath]);
+        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+        if (this._settings.logLevel === "verbose") {
+            args.push("--verbose");
+        }
+        return util.spawn(this._settings.commandPath, arduinoChannel, args);
     }
 
     public verify() {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const args = ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath];
+        if (this._settings.logLevel === "verbose") {
+            args.push("--verbose");
+        }
         arduinoChannel.show(true);
-        return util.spawn(this._settings.commandPath,
-            arduinoChannel,
-            ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath]);
+        return util.spawn(this._settings.commandPath, arduinoChannel, args);
     }
 
     public addLibPath(libraryPath: string) {
@@ -89,47 +93,44 @@ export class ArduinoApp {
             libPaths = this.getDefaultPackageLibPaths();
         }
 
-        return vscode.workspace.findFiles(constants.DEVICE_CONFIG_FILE, null, 1)
-            .then((files) => {
-                let deviceContext = null;
-                if (!files || !files.length || files.length < 1) {
-                    deviceContext = {};
-                } else {
-                    const propertyFile = files[0];
-                    deviceContext = JSON.parse(fs.readFileSync(propertyFile.fsPath, "utf8"));
-                }
-                deviceContext.configurations = deviceContext.configurations || [];
-                let configSection = null;
-                deviceContext.configurations.forEach((section) => {
-                    if (section.name === util.getCppConfigPlatform()) {
-                        configSection = section;
+        const configFilePath = path.join(vscode.workspace.rootPath, constants.ARDUINO_CONFIG_FILE);
+        let deviceContext = null;
+        if (!util.fileExistsSync(configFilePath)) {
+            deviceContext = {};
+        } else {
+            deviceContext = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+        }
+        deviceContext.configurations = deviceContext.configurations || [];
+        let configSection = null;
+        deviceContext.configurations.forEach((section) => {
+            if (section.name === util.getCppConfigPlatform()) {
+                configSection = section;
+            }
+        });
+
+        if (!configSection) {
+            configSection = {
+                name: util.getCppConfigPlatform(),
+                includePath: [],
+            };
+            deviceContext.configurations.push(configSection);
+        }
+
+        libPaths.forEach((childLibPath) => {
+            childLibPath = path.resolve(path.normalize(childLibPath));
+            if (configSection.includePath && configSection.includePath.length) {
+                for (let existingPath of configSection.includePath) {
+                    if (childLibPath === path.resolve(path.normalize(existingPath))) {
+                        return;
                     }
-                });
-
-                if (!configSection) {
-                    configSection = {
-                        name: util.getCppConfigPlatform(),
-                        includePath: [],
-                    };
-                    deviceContext.configurations.push(configSection);
                 }
+            } else {
+                configSection.includePath = [];
+            }
+            configSection.includePath.push(childLibPath);
+        });
 
-                libPaths.forEach((childLibPath) => {
-                    childLibPath = path.resolve(path.normalize(childLibPath));
-                    if (configSection.includePath && configSection.includePath.length) {
-                        for (let existingPath of configSection.includePath) {
-                            if (childLibPath === path.resolve(path.normalize(existingPath))) {
-                                return;
-                            }
-                        }
-                    } else {
-                        configSection.includePath = [];
-                    }
-                    configSection.includePath.push(childLibPath);
-                });
-
-                fs.writeFileSync(path.join(vscode.workspace.rootPath, constants.DEVICE_CONFIG_FILE), JSON.stringify(deviceContext, null, 4));
-            });
+        fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
     }
 
     public getDefaultPackageLibPaths(): string[] {
