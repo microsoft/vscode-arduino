@@ -6,20 +6,21 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { createStore, applyMiddleware } from "redux";
-import { Router, Route, IndexRoute, browserHistory, Link } from 'react-router';
-import reducer from "./reducers";
+import { browserHistory, IndexRoute, Link, Route, Router } from "react-router";
+import { applyMiddleware, createStore } from "redux";
 import BoardManager from "./components/BoardManager";
+import LibraryManager from "./components/LibraryManager";
+import reducer from "./reducers";
 
 import "./styles";
 
 class App extends React.Component<{}, {}> {
-  render() {
+  public render() {
     return (<div>
         <div>
           { this.props.children }
         </div>
-      </div>)
+      </div>);
   }
 }
 
@@ -31,6 +32,7 @@ ReactDOM.render(
     <Router history={ browserHistory }>
       <Route path="/" component={App}>
         <Route path="boardmanager" component={BoardManager} />
+        <Route path="librarymanager" component={LibraryManager} />
       </Route>
     </Router>
   </Provider>,

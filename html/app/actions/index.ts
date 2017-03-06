@@ -15,6 +15,15 @@ export const INSTALL_BOARD_FAILURE = "INSTALL_BOARD_FAILURE";
 export const UNINSTALL_BOARD_REQUEST = "UNINSTALL_BOARD_REQUEST";
 export const UNINSTALL_BOARD_SUCCESS = "UNINSTALL_BOARD_SUCCESS";
 export const UNINSTALL_BOARD_FAILURE = "UNINSTALL_BOARD_FAILURE";
+export const LIBRARIES_REQUEST = "LIBRARIES_REQUEST";
+export const LIBRARIES_SUCCESS = "LIBRARIES_SUCCESS";
+export const LIBRARIES_FAILURE = "LIBRARIES_FAILURE";
+export const INSTALL_LIBRARY_REQUEST = "INSTALL_LIBRARY_REQUEST";
+export const INSTALL_LIBRARY_SUCCESS = "INSTALL_LIBRARY_SUCCESS";
+export const INSTALL_LIBRARY_FAILURE = "INSTALL_LIBRARY_FAILURE";
+export const UNINSTALL_LIBRARY_REQUEST = "UNINSTALL_LIBRARY_REQUEST";
+export const UNINSTALL_LIBRARY_SUCCESS = "UNINSTALL_LIBRARY_SUCCESS";
+export const UNINSTALL_LIBRARY_FAILURE = "UNINSTALL_LIBRARY_FAILURE";
 
 export function boardPackagesRequest() {
     return {
@@ -76,6 +85,70 @@ export function uninstallBoardFailure(errorMessage) {
     };
 }
 
+export function librariesRequest() {
+    return {
+        type: LIBRARIES_REQUEST,
+    };
+}
+
+export function librariesSuccess(libraries) {
+    return {
+        type: LIBRARIES_SUCCESS,
+        libraries,
+    };
+}
+
+export function librariesFailure(errorMessage) {
+    return {
+        type: LIBRARIES_FAILURE,
+        errorMessage,
+    };
+}
+
+export function installLibraryRequest(libraryName) {
+    return {
+        type: INSTALL_LIBRARY_REQUEST,
+        libraryName,
+    };
+}
+
+export function installLibrarySuccess(libraryName) {
+    return {
+        type: INSTALL_LIBRARY_SUCCESS,
+        libraryName,
+    };
+}
+
+export function installLibraryFailure(libraryName, errorMessage) {
+    return {
+        type: INSTALL_LIBRARY_FAILURE,
+        libraryName,
+        errorMessage,
+    };
+}
+
+export function uninstallLibraryRequest(libraryName) {
+    return {
+        type: UNINSTALL_LIBRARY_REQUEST,
+        libraryName,
+    };
+}
+
+export function uninstallLibrarySuccess(libraryName) {
+    return {
+        type: UNINSTALL_LIBRARY_SUCCESS,
+        libraryName,
+    };
+}
+
+export function uninstallLibraryFailure(libraryName, errorMessage) {
+    return {
+        type: UNINSTALL_LIBRARY_FAILURE,
+        libraryName,
+        errorMessage,
+    };
+}
+
 export function getBoardPackages(dispatch) {
     dispatch(boardPackagesRequest());
     API.getBoardPackages().then((response) => {
@@ -107,5 +180,51 @@ export function uninstallBoard(dispatch, boardName, packagePath, callback?: Func
         }
     }).catch((error) => {
         dispatch(uninstallBoardFailure(error));
+    });
+}
+
+export function getLibraries(dispatch, callback?: Function) {
+    dispatch(librariesRequest());
+    API.getLibraries().then((response) => {
+        const { libraries } = <any> response;
+        dispatch(librariesSuccess(libraries));
+        if (callback) {
+            callback();
+        }
+    }).catch((error) => {
+        dispatch(librariesFailure(error));
+        if (callback) {
+            callback();
+        }
+    });
+}
+
+export function installLibrary(dispatch, libraryName, version, callback?: Function) {
+    dispatch(installLibraryRequest(libraryName));
+    API.installLibrary(libraryName, version).then((response) => {
+        dispatch(installLibrarySuccess(libraryName));
+        if (callback) {
+            callback();
+        }
+    }).catch((error) => {
+        dispatch(installLibraryFailure(libraryName, error));
+        if (callback) {
+            callback(error);
+        }
+    });
+}
+
+export function uninstallLibrary(dispatch, libraryName, libraryPath, callback?: Function) {
+    dispatch(uninstallLibraryRequest(libraryName));
+    API.uninstallLibrary(libraryPath).then((response) => {
+        dispatch(uninstallLibrarySuccess(libraryName));
+        if (callback) {
+            callback();
+        }
+    }).catch((error) => {
+        dispatch(uninstallLibraryFailure(libraryName, error));
+        if (callback) {
+            callback(error);
+        }
     });
 }

@@ -15,6 +15,4 @@ export const ARDUINO_MODE: vscode.DocumentSelector = [
 
 export const ARDUINO_MANAGER_PROTOCOL = "arduino-manager";
 export const BOARD_MANAGER_URI = vscode.Uri.parse("arduino-manager://arduino/packages");
-
-export const LIBRARY_MANAGER_URI = vscode.Uri.parse("library-manager://arduino/libraries");
-export const LIBRARY_MANAGER_PROTOCOL = "library-manager";
+export const LIBRARY_MANAGER_URI = vscode.Uri.parse("arduino-manager://arduino/libraries");

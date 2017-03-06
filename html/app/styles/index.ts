@@ -5,6 +5,5 @@
 
 import "./board.scss";
 import "./bootstrap.min.css";
-import "./library.scss";
 import "./react-search-input.css";
 import "./theme.scss";

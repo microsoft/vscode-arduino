@@ -7,14 +7,17 @@ import * as path from "path";
 import * as vscode from "vscode";
 import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
+import { ArduinoApp } from "./arduino";
 import { BoardManager } from "./boardManager";
+import { LibraryManager } from  "./libraryManager";
 import LocalWebServer from "./localWebServer";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
-    constructor(private _boardManager: BoardManager, private _extensionPath: string) {
+    constructor(private _arduinoApp: ArduinoApp, private _boardManager: BoardManager, private _libraryManager: LibraryManager,
+                private _extensionPath: string) {
         this.initialize();
     }
 
@@ -22,9 +25,14 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this._webserver = new LocalWebServer(this._extensionPath);
         this._webserver.addHandler("/boardmanager", (req, res) => this.getBoardManagerView(req, res));
         this._webserver.addHandler("/api/boardpackages", async (req, res) => await this.getBoardPackages(req, res));
-        this._webserver.addPostHandler("/api/installboard", async (req, res) => await this.installpackage(req, res));
-        this._webserver.addPostHandler("/api/uninstallboard", async (req, res) => await this.uninstallpackage(req, res));
+        this._webserver.addPostHandler("/api/installboard", async (req, res) => await this.installPackage(req, res));
+        this._webserver.addPostHandler("/api/uninstallboard", async (req, res) => await this.uninstallPackage(req, res));
         this._webserver.addPostHandler("/api/openlink", async(req, res) => await this.openLink(req, res));
+        this._webserver.addHandler("/librarymanager", (req, res) => this.getLibraryManagerView(req, res));
+        this._webserver.addHandler("/api/libraries", async (req, res) => await this.getLibraries(req, res));
+        this._webserver.addPostHandler("/api/installlibrary", async (req, res) => await this.installLibrary(req, res));
+        this._webserver.addPostHandler("/api/uninstalllibrary", async (req, res) => await this.uninstallLibrary(req, res));
+        this._webserver.addPostHandler("/api/addlibpath", async (req, res) => await this.addLibPath(req, res));
         this._webserver.start();
     }
 
@@ -33,6 +41,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         let type = "";
         if (uri.toString() === Constants.BOARD_MANAGER_URI.toString()) {
             type = "boardmanager";
+        } else if (uri.toString() === Constants.LIBRARY_MANAGER_URI.toString()) {
+            type = "librarymanager";
         }
         let encodedUri = encodeURIComponent(uri.toString());
 
@@ -85,12 +95,12 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         });
     }
 
-    public async installpackage(req, res) {
+    public async installPackage(req, res) {
         if (!req.body.packageName || !req.body.arch) {
             return res.status(400).send("BAD Request! Missing { packageName, arch } parameters!");
         } else {
             try {
-                await vscode.commands.executeCommand("arduino.installBoard", req.body.packageName, req.body.arch, req.body.version);
+                await this._arduinoApp.installBoard(req.body.packageName, req.body.arch, req.body.version);
                 return res.json({
                     status: "OK",
                 });
@@ -100,12 +110,12 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         }
     }
 
-    public async uninstallpackage(req, res) {
+    public async uninstallPackage(req, res) {
         if (!req.body.packagePath) {
             return res.status(400).send("BAD Request! Missing { packagePath } parameter!");
         } else {
             try {
-                await vscode.commands.executeCommand("arduino.uninstallBoard", req.body.packagePath);
+                await this._arduinoApp.uninstallBoard(req.body.packagePath);
                 return res.json({
                     status: "OK",
                 });
@@ -126,6 +136,62 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                 });
             } catch (error) {
                 return res.status(500).send(`Cannot open the link with error message "${error}"`);
+            }
+        }
+    }
+
+    public getLibraryManagerView(req, res) {
+        return res.sendFile(path.join(this._extensionPath, "./out/html/index.html"));
+    }
+
+    public async getLibraries(req, res) {
+        await this._libraryManager.loadLibraries();
+        return res.json({
+            libraries: this._libraryManager.libraries,
+        });
+    }
+
+    public async installLibrary(req, res) {
+        if (!req.body.libraryName) {
+            return res.status(400).send("BAD Request! Missing { libraryName } parameters!");
+        } else {
+            try {
+                await this._arduinoApp.installLibrary(req.body.libraryName, req.body.version);
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Install library failed with message "code:${error.code}, err:${error.stderr}"`);
+            }
+        }
+    }
+
+    public async uninstallLibrary(req, res) {
+        if (!req.body.libraryPath) {
+            return res.status(400).send("BAD Request! Missing { libraryPath } parameters!");
+        } else {
+            try {
+                await this._arduinoApp.uninstallLibrary(req.body.libraryPath);
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Uninstall library failed with message "code:${error.code}, err:${error.stderr}"`);
+            }
+        }
+    }
+
+    public async addLibPath(req, res) {
+        if (!req.body.path) {
+            return res.status(400).send("BAD Request! Missing { path } parameters!");
+        } else {
+            try {
+                await this._arduinoApp.addLibPath(req.body.path);
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Add library path failed with message "code:${error.code}, err:${error.stderr}"`);
             }
         }
     }

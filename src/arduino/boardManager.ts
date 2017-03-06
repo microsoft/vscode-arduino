@@ -343,25 +343,18 @@ export class BoardManager {
         if (!util.directoryExistsSync(rootPacakgesPath)) {
             return;
         }
-        const dirs = fs.readdirSync(rootPacakgesPath);
+        const dirs = util.filterJunk(fs.readdirSync(rootPacakgesPath)); // in Mac, filter .DS_Store file.
         dirs.forEach((packageName) => {
-            // in Mac, filter .DS_Store file.
-            if (util.isJunk(packageName)) {
-                return;
-            }
             let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
             if (!util.directoryExistsSync(archPath)) {
                 return;
             }
-            let architectures = fs.readdirSync(archPath);
+            let architectures = util.filterJunk(fs.readdirSync(archPath));
             if (!architectures || !architectures.length) {
                 return;
             }
             architectures.forEach((architecture) => {
-                if (util.isJunk(architecture)) {
-                    return;
-                }
-                let allVersion = fs.readdirSync(path.join(archPath, architecture));
+                let allVersion = util.filterJunk(fs.readdirSync(path.join(archPath, architecture)));
                 let existingPlatform = this._platforms.find((_plat) => _plat.package.name === packageName && _plat.architecture === architecture);
                 if (existingPlatform && allVersion && allVersion.length) {
                     existingPlatform.installedVersion = allVersion[0];

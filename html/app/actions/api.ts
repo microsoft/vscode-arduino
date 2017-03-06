@@ -37,3 +37,26 @@ export function openLink(link) {
         link,
     }).then((response) => response.json());
 }
+
+export function getLibraries() {
+    return window.fetch("/api/libraries").then((response) => response.json());
+}
+
+export function installLibrary(libraryName, version) {
+    return postHTTP("/api/installlibrary", {
+        libraryName,
+        version,
+    }).then((response) => response.json());
+}
+
+export function uninstallLibrary(libraryPath) {
+    return postHTTP("/api/uninstalllibrary", {
+        libraryPath,
+    }).then((response) => response.json());
+}
+
+export function addLibPath(path) {
+    return postHTTP("/api/addlibpath", {
+        path,
+    }).then((response) => response.json());
+}

@@ -1,90 +1,43 @@
-a {
-    color: lightseagreen;
-}
-.board {
-    padding: 5px 10px;
-    margin: 10px;
-    border: 1px double #505050;
+@import "theme";
 
-    &:hover {
-        background-color: #333;
-    }
+.disabled {
+    pointer-events: none;
+    opacity: 0.6;
 }
 
-.board-header {
-    font-weight: bold;
+.hidden {
+    display: none;
 }
 
-.installed-header {
-    font-weight: bold;
-    color: lightseagreen;
+.mask {
+    @extend .theme-bgcolor;
+    position: absolute;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
-.board-footer {
-    padding: 5px 0px;
-    height: 40px;
-
-    .operation-btn {
-        padding: 2px 6px;
-        margin-right: 5px;
-    }
-
-    .left-side {
-        float: left;
-
-        .dropdown {
-            margin-right: 5px;
-
-            button {
-                width: 120px;
-                padding: 2px 10px;
-                text-align: left;
-                overflow: hidden;
-            }
-
-            .caret {
-                left: 90%;
-                top: 45%;
-                position: absolute;
-            }
-
-            .dropdown-menu {
-                min-width: inherit;
-                width: 120px;
-                max-height: 200px;
-                overflow: auto;
-            }
-        }
-    }
-
-    .right-side {
-        float: right;
-    }
-}
-
-.operation {
-    float: right;
-}
-
-.boardmanager-toolbar {
+.arduinomanager-toolbar {
+    @extend .theme-bgcolor;
     height: 60px;
     padding: 15px 10px;
     position: fixed;
     width: 100%;
     z-index: 100;
-    background-color: #1a1a1a;
 
-    .typeselector-header {
+    .dropdown-label {
         float: left;
         padding-top: 8px;
-        margin-right: 5px;
+        margin: 0px 5px;
     }
 
     .dropdown {
         float: left;
         button {
             text-align: left;
-            width: 170px;
+            width: 150px;
 
             .caret {
                 left: 90%;
@@ -95,23 +48,125 @@ a {
         .dropdown-menu {
             left: inherit;
             min-width: inherit;
-            width: 170px;
+            width: 150px;
+            max-width: 150px;
+            max-height: 250px;
+            overflow: auto;
+        }
+    }
+}
+
+.arduinomanager-container {
+    padding-top: 60px;
+}
+
+a {
+    color: lightseagreen;
+}
+
+.help-link {
+    @extend a;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.left-side {
+    float: left;
+}
+
+.right-side {
+    float: right;
+}
+
+.listitem {
+    @extend .theme-border;
+    padding: 5px 10px;
+    margin: 10px;
+
+    &:hover {
+        @extend .theme-bgcolor-hover;
+    }
+}
+
+.listitem-header {
+    font-weight: bold;
+}
+
+.listitem-author {
+    color: gray;
+}
+
+.listitem-installed-header {
+    font-weight: bold;
+    color: lightseagreen;
+}
+
+.listitem-container {
+    padding-top: 2px;
+}
+
+.listitem-footer {
+    padding: 5px 0px;
+    height: 40px;
+
+    .operation-btn {
+        padding: 2px 6px;
+        margin-right: 5px;
+    }
+
+    .dropdown {
+        margin-right: 5px;
+
+        button {
+            width: 120px;
+            padding: 2px 10px;
+            text-align: left;
+            overflow: hidden;
+        }
+
+        .caret {
+            left: 90%;
+            top: 45%;
+            position: absolute;
+        }
+
+        .dropdown-menu {
+            min-width: inherit;
+            width: 120px;
+            max-height: 200px;
+            overflow: auto;
         }
     }
 
+    .toolbar-mask {
+        @extend .theme-bgcolor;
+        position: absolute;
+        z-index: 9999;
+        left: 20px;
+        right: 20px;
+        text-align: end;
+        margin-top: -5px;
+        height: 45px;
+
+        &:hover {
+            @extend .theme-bgcolor-hover;
+        }
+    }
+}
+
+.boardmanager {
     .search-input {
-        margin-left: 210px;
+        margin-left: 190px;
         padding-top: 0px;
         color: #333;
     }
 }
 
-.boardmanager-container {
-    padding-top: 60px;
-}
-
-.help-link {
-    &:hover {
-        cursor: pointer;
+.librarymanager {
+    .search-input {
+        margin-left: 380px;
+        padding-top: 0px;
+        color: #333;
     }
 }

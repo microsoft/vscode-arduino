@@ -5,9 +5,11 @@
 
 import { combineReducers } from "redux";
 import boardManagerReducer from "./boardManagerReducer";
+import { libraryManagerReducer } from "./libraryManagerReducer";
 
 const rootReducer = combineReducers({
     boardManagerStore: boardManagerReducer,
+    libraryManagerStore: libraryManagerReducer,
 });
 
 export default rootReducer;
