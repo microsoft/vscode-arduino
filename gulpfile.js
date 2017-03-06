@@ -1,7 +1,6 @@
 const gulp = require("gulp");
 const tslint = require("gulp-tslint");
 const gutil = require("gulp-util");
-const install = require("gulp-install");
 const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
 const webpack = require("webpack");
@@ -12,13 +11,9 @@ const path = require("path");
 
 //...
 gulp.task("tslint", () => {
-    return gulp.src(["**/*.ts", "!**/*.d.ts", "!node_modules/**"])
+    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./html/node_modules/**"])
         .pipe(tslint())
         .pipe(tslint.report());
-});
-
-gulp.task("install", () => {
-    return gulp.src(['./package.json', './html/package.json']).pipe(install());
 });
 
 gulp.task("html-webpack", (done) => {

@@ -55,7 +55,7 @@ export class ArduinoApp {
         if (!util.fileExistsSync(path.join(this._settings.packagePath, "library_index.json"))) {
             try {
                 // Use the dummy library to initialize the Arduino IDE
-                await this.installLibrary("dummy", false);
+                await this.installLibrary("dummy", "", false);
             } catch (ex) {
             }
         }
@@ -182,11 +182,11 @@ export class ArduinoApp {
         util.rmdirRecursivelySync(packagePath);
     }
 
-    public installLibrary(libName: string, showOutput: boolean = true) {
+    public installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show(true);
         return util.spawn(this._settings.commandPath,
             showOutput ? arduinoChannel : null,
-            ["--install-library", `${libName}`]);
+            ["--install-library", `${libName}${version && ":" + version}`]);
     }
 
     public uninstallLibrary(libPath: string) {

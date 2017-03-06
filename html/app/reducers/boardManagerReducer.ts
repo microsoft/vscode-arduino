@@ -4,7 +4,7 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as actions from "../actions";
-import * as helper from "../utils/util";
+import * as util from "../utils/util";
 
 const initalState = {
     platforms: [],
@@ -27,18 +27,17 @@ export default function boardManagerReducer(state = initalState, action) {
                 categories: ["All", "Updatable"],
             };
         case actions.BOARD_PACKAGES_SUCCESS:
-            const group = helper.groupBy(action.platforms, "category");
-            const categories = ["All", "Updatable"];
+            const categories = util.parseGroups(action.platforms, "category");
             // Sorting versions in descending order.
             action.platforms.forEach((element) => {
-                element.versions = element.versions.sort(helper.versionCompare).reverse();
+                element.versions = element.versions.sort(util.versionCompare).reverse();
             });
             return {
                 ...state,
                 errorMessage: "",
                 requesting: false,
                 platforms: action.platforms,
-                categories: categories.concat(Object.keys(group).sort()),
+                categories: ["All", "Updatable"].concat(categories.sort()),
             };
         case actions.BOARD_PACKAGES_FAILURE:
             return {

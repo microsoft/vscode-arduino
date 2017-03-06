@@ -7,6 +7,7 @@ import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
+import * as properties from "properties";
 import * as vscode from "vscode";
 
 /**
@@ -108,4 +109,34 @@ export function isJunk(filename: string): boolean {
     // tslint:disable-next-line
     const re = /^npm-debug\.log$|^\..*\.swp$|^\.DS_Store$|^\.AppleDouble$|^\.LSOverride$|^Icon\r$|^\._.*|^\.Spotlight-V100(?:$|\/)|\.Trashes|^__MACOSX$|~$|^Thumbs\.db$|^ehthumbs\.db$|^Desktop\.ini$/;
     return re.test(filename);
+}
+
+export function filterJunk(files: any[]): any[] {
+    return files.filter((file) => !isJunk(file));
+}
+
+export function parseProperties(propertiesFile: string): Thenable<Object> {
+    return new Promise((resolve, reject) => {
+        properties.parse(propertiesFile, { path: true}, (error, obj) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(obj);
+            }
+        });
+    });
+}
+
+export function formatVersion(version: string): string {
+    if (!version) {
+        return version;
+    }
+    const versions = String(version).split(".");
+    if (versions.length < 2) {
+        versions.push("0");
+    }
+    if (versions.length < 3) {
+        versions.push("0");
+    }
+    return versions.join(".");
 }

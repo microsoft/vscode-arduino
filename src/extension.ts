@@ -8,10 +8,9 @@ import * as vscode from "vscode";
 import { ArduinoApp } from "./arduino/arduino";
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
 import { BoardManager } from "./arduino/boardManager";
-import { LibraryContentProvider } from "./arduino/libraryContentProvider";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ArduinoSettings } from "./arduino/settings";
-import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_MANAGER_URI, LIBRARY_MANAGER_PROTOCOL, LIBRARY_MANAGER_URI } from "./common/constants";
+import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_MANAGER_URI, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
 import { ClangProvider } from "./langService/clang";
 import { CompletionProvider } from "./langService/completionProvider";
@@ -31,20 +30,18 @@ export async function activate(context: vscode.ExtensionContext) {
     await deviceContext.loadContext();
     context.subscriptions.push(deviceContext);
 
-    // Arduino board manager
+    // Arduino board manager & library manager
     const boardManager = new BoardManager(arduinoSettings, arduinoApp);
     arduinoApp.boardManager = boardManager;
-    await boardManager.loadPackages();
-    const arduinoManagerProvider = new ArduinoContentProvider(boardManager, context.extensionPath);
+    // await boardManager.loadPackages();
+    const libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
+
+    const arduinoManagerProvider = new ArduinoContentProvider(arduinoApp, boardManager, libraryManager, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.showBoardManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
     }));
 
-    // Arduino library manager
-    const libraryManager = new LibraryManager(arduinoSettings, arduinoApp, boardManager);
-    const libraryProvider = new LibraryContentProvider(libraryManager, context.extensionPath);
-    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(LIBRARY_MANAGER_PROTOCOL, libraryProvider));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.showLibraryManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Library Manager");
     }));
@@ -52,12 +49,12 @@ export async function activate(context: vscode.ExtensionContext) {
     // change board type
     context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", () => {
         boardManager.changeBoardType();
-        libraryProvider.update(LIBRARY_MANAGER_URI);
+        arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => arduinoApp.verify()));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => arduinoApp.upload()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", async (path) => await arduinoApp.addLibPath(path)));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.installBoard", async (packageName, arch, version?: string) => {
         await arduinoApp.installBoard(packageName, arch, version);
         arduinoManagerProvider.update(BOARD_MANAGER_URI);
@@ -66,13 +63,13 @@ export async function activate(context: vscode.ExtensionContext) {
         arduinoApp.uninstallBoard(packagePath);
         arduinoManagerProvider.update(BOARD_MANAGER_URI);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.installLibrary", async (libName) => {
-        await arduinoApp.installLibrary(libName);
-        libraryProvider.update(LIBRARY_MANAGER_URI);
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.installLibrary", async (libName, version?: string) => {
+        await arduinoApp.installLibrary(libName, version);
+        arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
     }));
     context.subscriptions.push(vscode.commands.registerCommand("arduino.uninstallLibrary", (libPath) => {
         arduinoApp.uninstallLibrary(libPath);
-        libraryProvider.update(LIBRARY_MANAGER_URI);
+        arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
     }));
 
     // serial monitor commands

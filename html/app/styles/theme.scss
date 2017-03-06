@@ -1,15 +1,25 @@
+$theme-night-bgcolor: #1a1a1a;
+$theme-night-bgcolor-hover: #333;
+$theme-night-color: #ccc;
+$theme-night-border-color: #505050;
 
 html.theme-night body {
-    background-color: #1a1a1a;
-    color: #ccc;
+    background-color: $theme-night-bgcolor;
+    color: $theme-night-color;
 
-    .mask {
-        position: absolute;
-        z-index: 9999;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #1a1a1a;
+    .theme-bgcolor {
+        background-color: $theme-night-bgcolor;
+    }
+
+    .theme-bgcolor-hover {
+        background-color: $theme-night-bgcolor-hover
+    }
+
+    .theme-color {
+        color: $theme-night-color;
+    }
+
+    .theme-border {
+        border: 1px double $theme-night-border-color;
     }
 }
