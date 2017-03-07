@@ -6,6 +6,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import * as constants from "./common/constants";
 import * as util from "./common/util";
 
 import { ArduinoApp } from "./arduino/arduino";
@@ -99,6 +100,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._port = deviceConfigJson.port || this._port;
                         this._board = deviceConfigJson.board || this._board;
                         this._sketch = deviceConfigJson.sketch || this._sketch;
+                    } else {
+                        vscode.window.showErrorMessage(constants.messages.ARDUINO_FILE_ERROR);
                     }
                 }
                 return this;
@@ -109,7 +112,11 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         const deviceConfigFile = path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE);
         let deviceConfigJson: any = {};
         if (util.fileExistsSync(deviceConfigFile)) {
-            deviceConfigJson = JSON.parse(fs.readFileSync(deviceConfigFile, "utf8"));
+            deviceConfigJson = util.tryParseJSON(fs.readFileSync(deviceConfigFile, "utf8"));
+        }
+        if (!deviceConfigJson) {
+            vscode.window.showErrorMessage(constants.messages.ARDUINO_FILE_ERROR);
+            return;
         }
         deviceConfigJson.sketch = this.sketch;
         deviceConfigJson.port = this.port;

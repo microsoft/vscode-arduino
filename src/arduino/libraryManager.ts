@@ -86,8 +86,8 @@ export class LibraryManager {
         let installedLibDirs = util.filterJunk(fs.readdirSync(libRoot));
         for (let libDir of installedLibDirs) {
             let sourceLib = this._libraries.get(libDir);
-            if (sourceLib) {
-                const properties = <any> await util.parseProperties(path.join(libRoot, libDir, "library.properties"));
+            if (sourceLib && util.fileExistsSync(path.join(libRoot, libDir, "library.properties"))) {
+                const properties = <any>await util.parseProperties(path.join(libRoot, libDir, "library.properties"));
                 sourceLib.version = util.formatVersion(properties.version);
                 sourceLib.installed = true;
                 sourceLib.installedPath = path.join(libRoot, libDir);
@@ -135,7 +135,10 @@ export class LibraryManager {
                 return;
             }
             for (let libDir of libDirs) {
-                const properties = <any> await util.parseProperties(path.join(builtInLibPath, libDir, "library.properties"));
+                if (!util.fileExistsSync(path.join(builtInLibPath, libDir, "library.properties"))) {
+                    continue;
+                }
+                let properties = <any>await util.parseProperties(path.join(builtInLibPath, libDir, "library.properties"));
                 properties.version = util.formatVersion(properties.version);
                 properties.builtIn = true;
                 properties.installedPath = path.join(builtInLibPath, libDir);

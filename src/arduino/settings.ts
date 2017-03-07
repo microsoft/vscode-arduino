@@ -21,6 +21,11 @@ export interface IArduinoSettings {
     commandPath: string;
     packagePath: string;
     libPath: string;
+    formatterSettings: IClangFormatterSettings;
+}
+
+export interface IClangFormatterSettings {
+    style: string;
 }
 
 export class ArduinoSettings implements IArduinoSettings {
@@ -37,6 +42,8 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _logLevel: string;
 
+    private _clangFormatterSettings: IClangFormatterSettings;
+
     public constructor() {
     }
 
@@ -51,6 +58,7 @@ export class ArduinoSettings implements IArduinoSettings {
             this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
             this._libPath = path.join(process.env.HOME, "Documents/Arduino/libraries");
         }
+        this.loadClangFormatterSettings();
     }
 
     public get arduinoPath(): string {
@@ -97,6 +105,10 @@ export class ArduinoSettings implements IArduinoSettings {
         }
     }
 
+    public get formatterSettings(): IClangFormatterSettings {
+        return this._clangFormatterSettings;
+    }
+
     /**
      * For Windows platform, there are two situations here:
      *  - User change the location of the default *Documents* folder.
@@ -135,5 +147,12 @@ export class ArduinoSettings implements IArduinoSettings {
             }
             return true;
         });
+    }
+
+    private loadClangFormatterSettings() {
+        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+        this._clangFormatterSettings = {
+            style: arduinoConfig.get<string>("clangFormatStyle"),
+        };
     }
 }
