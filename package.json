@@ -15,7 +15,7 @@
   ],
   "activationEvents": [
     "onLanguage:arduino",
-    "workspaceContains:device.json"
+    "workspaceContains:.vscode/arduino.json"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -110,6 +110,10 @@
             "info",
             "verbose"
           ]
+        },
+        "arduino.clangFormatStyle": {
+          "type": "string",
+          "desription": "The clang-format style value. Set this value to file if want to use the .clang-format file"
         }
       }
     },

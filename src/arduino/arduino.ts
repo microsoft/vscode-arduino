@@ -25,12 +25,17 @@ export class ArduinoApp {
     private _preferences: Map<string, string>;
 
     private _boardManager: BoardManager;
+
     /**
-     * @constructor
+     * @param {IArduinoSettings} ArduinoSetting object.
      */
     constructor(private _settings: settings.IArduinoSettings) {
     }
 
+    /**
+     * Need refresh Arduino IDE's setting when starting up.
+     * @param {boolean} force - Whether force initialzie the arduino
+     */
     public async initialize(force: boolean = false) {
         if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
@@ -41,16 +46,9 @@ export class ArduinoApp {
         }
     }
 
-    public async setPref(key, value) {
-        try {
-            await util.spawn(this._settings.commandPath,
-                null,
-                ["--pref", `${key}=${value}`]);
-
-        } catch (ex) {
-        }
-    }
-
+    /**
+     * Initialize the arduino library.
+     */
     public async initializeLibrary() {
         if (!util.fileExistsSync(path.join(this._settings.packagePath, "library_index.json"))) {
             try {
@@ -61,9 +59,26 @@ export class ArduinoApp {
         }
     }
 
+    /**
+     * Set the Arduino preferences value.
+     * @param {string} key - The preference key
+     * @param {string} value - The preference value
+     */
+    public async setPref(key, value) {
+        try {
+            await util.spawn(this._settings.commandPath,
+                null,
+                ["--pref", `${key}=${value}`]);
+        } catch (ex) {
+        }
+    }
+
     public upload() {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
+        if (!boardDescriptor) {
+            return;
+        }
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         arduinoChannel.show(true);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
@@ -76,6 +91,9 @@ export class ArduinoApp {
     public verify() {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
+        if (!boardDescriptor) {
+            return;
+        }
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath];
         if (this._settings.logLevel === "verbose") {
@@ -98,8 +116,13 @@ export class ArduinoApp {
         if (!util.fileExistsSync(configFilePath)) {
             deviceContext = {};
         } else {
-            deviceContext = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+            deviceContext = util.tryParseJSON(fs.readFileSync(configFilePath, "utf8"));
         }
+        if (!deviceContext) {
+            vscode.window.showErrorMessage(constants.messages.ARDUINO_FILE_ERROR);
+            throw new Error(constants.messages.ARDUINO_FILE_ERROR);
+        }
+
         deviceContext.configurations = deviceContext.configurations || [];
         let configSection = null;
         deviceContext.configurations.forEach((section) => {
@@ -133,43 +156,8 @@ export class ArduinoApp {
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
     }
 
-    public getDefaultPackageLibPaths(): string[] {
-        let result = [];
-        let boardDescriptor = this._boardManager.currentBoard;
-        if (!boardDescriptor) {
-            return result;
-        }
-        let toolsPath = boardDescriptor.platform.rootBoardPath;
-        if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
-            let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
-            if (coreLibs && coreLibs.length > 0) {
-                coreLibs.forEach((coreLib) => {
-                    result.push(path.normalize(path.join(toolsPath, "cores", coreLib)));
-                });
-            }
-        }
-
-        return result;
-    }
-
-    public get preferences() {
-        if (!this._preferences) {
-            this.loadPreferences();
-        }
-        return this._preferences;
-    }
-
-    public get boardManager() {
-        return this._boardManager;
-    }
-
-    public set boardManager(value: BoardManager) {
-        this._boardManager = value;
-    }
-
     /**
      * Install arduino board package based on package name and platform hardware architecture.
-     * TODO: Add version
      */
     public installBoard(packageName: string, arch: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show(true);
@@ -193,6 +181,39 @@ export class ArduinoApp {
         util.rmdirRecursivelySync(libPath);
     }
 
+    public getDefaultPackageLibPaths(): string[] {
+        let result = [];
+        let boardDescriptor = this._boardManager.currentBoard;
+        if (!boardDescriptor) {
+            return result;
+        }
+        let toolsPath = boardDescriptor.platform.rootBoardPath;
+        if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
+            let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
+            if (coreLibs && coreLibs.length > 0) {
+                coreLibs.forEach((coreLib) => {
+                    result.push(path.normalize(path.join(toolsPath, "cores", coreLib)));
+                });
+            }
+        }
+        return result;
+    }
+
+    public get preferences() {
+        if (!this._preferences) {
+            this.loadPreferences();
+        }
+        return this._preferences;
+    }
+
+    public get boardManager() {
+        return this._boardManager;
+    }
+
+    public set boardManager(value: BoardManager) {
+        this._boardManager = value;
+    }
+
     private loadPreferences() {
         this._preferences = new Map<string, string>();
         const lineRegex = /(\S+)=(\S+)/;
@@ -212,7 +233,8 @@ export class ArduinoApp {
     private getBoardDescriptorString(deviceContext: IDeviceContext): string {
         let boardDescriptor = this.boardManager.currentBoard;
         if (!boardDescriptor) {
-            throw new Error("Please select the board type first.");
+            vscode.window.showErrorMessage(constants.messages.NO_BOARD_SELECTED);
+            return;
         }
         let boardString = `${boardDescriptor.platform.package.name}:${boardDescriptor.platform.architecture}:${boardDescriptor.board}`;
         return boardString;

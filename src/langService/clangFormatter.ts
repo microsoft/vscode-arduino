@@ -3,9 +3,18 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 import * as childProcess from "child_process";
+import * as path from "path";
 import * as vscode from "vscode";
+import * as util from "../common/util";
+
+import { IArduinoSettings } from "../arduino/settings";
 
 export class ClangFormatter {
+
+    constructor(private _settings: IArduinoSettings) {
+
+    }
+
     public formatDocument(document: vscode.TextDocument): Thenable<vscode.TextEdit[]> {
         const args = this.buildFormatterArgs(document);
         const options = {
@@ -26,8 +35,13 @@ export class ClangFormatter {
 
     private buildFormatterArgs(document: vscode.TextDocument): string[] {
         let args = [];
-        args.push("-style=file");
-        args.push("-fallback-style=Visual Studio");
+        if (this._settings.formatterSettings.style === "file"
+            || util.fileExistsSync(path.join(vscode.workspace.rootPath, ".clang-format"))) {
+            args.push("-style=file");
+        } else {
+            args.push(`-style=${this.getDefaultStyle()}`);
+        }
+        args.push("-fallback-style=LLVM");
         args.push(`-assume-filename=${document.fileName}`);
         return args;
     }
@@ -39,5 +53,10 @@ export class ClangFormatter {
         // Replace the whole document.
         res.push(vscode.TextEdit.replace(new vscode.Range(startPos, endPos), output));
         return res;
+    }
+
+    private getDefaultStyle() {
+        const editor = vscode.workspace.getConfiguration("editor");
+        return `{ BasedOnStyle: LLVM, IndentWidth: ${editor.get("tabSize")} , BreakBeforeBraces: Allman}`;
     }
 }
