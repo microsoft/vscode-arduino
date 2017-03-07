@@ -48,8 +48,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     // change board type
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", () => {
-        boardManager.changeBoardType();
+    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", async () => {
+        await boardManager.changeBoardType();
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
     }));
 
