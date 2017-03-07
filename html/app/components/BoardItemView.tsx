@@ -114,29 +114,29 @@ export default class BoardView extends React.Component<IBoardProps, IBoardState>
                                 </Button>
                             )
                         }
-                        <Button className="operation-btn" onClick={() => this.props.uninstallBoard(p.name, p.rootBoardPath)}>Remove</Button>
+                        {
+                            !p.defaultPlatform && (
+                                <Button className="operation-btn" onClick={() => this.props.uninstallBoard(p.name, p.rootBoardPath)}>Remove</Button>
+                            )
+                        }
                     </div>
                 )
             }
-            {
-                !p.defaultPlatform && (
-                    <div className="left-side">
-                        <DropdownButton id="versionselector" title={this.state.version || "Select version"}
-                        placeholder="Select version" onSelect={this.versionUpdate}>
-                            { p.versions.map((v, index) => {
-                                if (v === p.installedVersion) {
-                                    return "";
-                                }
-                                return (<MenuItem key={index} eventKey={v} active={v === this.state.version}>{v}</MenuItem>);
-                            })}
-                        </DropdownButton>
-                        <Button className="operation-btn" disabled={!this.state.version}
-                        onClick={() => this.props.installBoard(p.name, p.package.name, p.architecture, this.state.version)}>
-                        Install
-                        </Button>
-                    </div>
-                )
-            }
+            <div className="left-side">
+                <DropdownButton id="versionselector" title={this.state.version || "Select version"}
+                placeholder="Select version" onSelect={this.versionUpdate}>
+                    { p.versions.map((v, index) => {
+                        if (v === p.installedVersion) {
+                            return "";
+                        }
+                        return (<MenuItem key={index} eventKey={v} active={v === this.state.version}>{v}</MenuItem>);
+                    })}
+                </DropdownButton>
+                <Button className="operation-btn" disabled={!this.state.version}
+                onClick={() => this.props.installBoard(p.name, p.package.name, p.architecture, this.state.version)}>
+                Install
+                </Button>
+            </div>
         </div>);
     }
 }

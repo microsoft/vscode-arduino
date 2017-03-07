@@ -4,6 +4,7 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as url from "url";
 import * as vscode from "vscode";
@@ -282,8 +283,15 @@ export class BoardManager {
         const arduinoPath = this._settings.arduinoPath;
         const packageName = "arduino";
         const archName = "avr";
+        let defaultPlatformPath = path.join(arduinoPath, "hardware");
+        const platform = os.platform();
+        if (platform === "darwin") {
+            defaultPlatformPath = path.join(arduinoPath, "Arduino.app/Contents/Java/hardware");
+        } else if (platform === "linux") {
+            // TODO Check default platform path at linux.
+        }
         try {
-            let packageBundled = fs.readFileSync(path.join(arduinoPath, "hardware", "package_index_bundled.json"), "utf8");
+            let packageBundled = fs.readFileSync(path.join(defaultPlatformPath, "package_index_bundled.json"), "utf8");
             if (!packageBundled) {
                 return;
             }
@@ -307,7 +315,7 @@ export class BoardManager {
                             return;
                         } else {
                             filteredPlat.installedVersion = v;
-                            filteredPlat.rootBoardPath = path.join(arduinoPath, "hardware/arduino/avr");
+                            filteredPlat.rootBoardPath = path.join(defaultPlatformPath, "arduino/avr");
                             this.installedPlatforms.push(filteredPlat);
                         }
                     }
