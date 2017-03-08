@@ -78,11 +78,11 @@ export function validateArduinoPath(arduinoPath: string): boolean {
     const platform = os.platform();
     let arduinoExe = "";
     if (platform === "darwin") {
-        arduinoExe = path.join(arduinoPath, path.normalize("Arduino.app/Contents/MacOS/Arduino"));
+        arduinoExe = path.join(arduinoPath, "Arduino.app/Contents/MacOS/Arduino");
     } else if (platform === "linux") {
-        arduinoExe = path.join(this.arduinoPath, "arduino");
+        arduinoExe = path.join(arduinoPath, "arduino");
     } else if (platform === "win32") {
-        arduinoExe = path.join(this.arduinoPath, "arduino_debug.exe");
+        arduinoExe = path.join(arduinoPath, "arduino_debug.exe");
     }
     return fileExistsSync(arduinoExe);
 }
