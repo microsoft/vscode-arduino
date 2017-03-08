@@ -82,7 +82,7 @@ export function validateArduinoPath(arduinoPath: string): boolean {
     } else if (platform === "linux") {
         arduinoExe = path.join(this.arduinoPath, "arduino");
     } else if (platform === "win32") {
-        arduinoExe = path.join(this.arduinoPath, "arduino_debug");
+        arduinoExe = path.join(this.arduinoPath, "arduino_debug.exe");
     }
     return fileExistsSync(arduinoExe);
 }
