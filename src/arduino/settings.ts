@@ -77,8 +77,8 @@ export class ArduinoSettings implements IArduinoSettings {
                                                " Requires a restart after change.");
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             } else if (!validateArduinoPath(this._arduinoPath)) { // Validate if arduino path is the correct path.
-                vscode.window.showErrorMessage(`Cannot find arduino executable program under directory "${this._arduinoPath}". Please set the correct ` +
-                `"arduino.path" in the User Settings. Requires a restart after change.`);
+                vscode.window.showErrorMessage(`Cannot find arduino executable program under directory "${this._arduinoPath}". ` +
+                `Please set the correct "arduino.path" in the User Settings. Requires a restart after change.`);
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             }
             return this._arduinoPath;
