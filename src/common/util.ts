@@ -81,7 +81,7 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
 
         if (outputChannel) {
             child.stdout.on("data", (data) => { outputChannel.append(data.toString()); });
-            child.stderr.on("data", (data) => { outputChannel.append(data.toString()); });
+            child.stderr.on("data", (data) => { outputChannel.append(data.toString()); stderr += data.toString(); });
         }
 
         child.on("error", (error) => reject({ error, stderr, stdout }));
