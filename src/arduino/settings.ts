@@ -72,9 +72,9 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._arduinoPath = configValue;
             }
 
-            if (!this._arduinoPath) { // Pop up vscode User Settings page when cannot resolve Arduino path.
-                vscode.window.showErrorMessage("Cannot find the Arduino installation path. Please specify the arduino.path in the User Settings." +
-                                               " And then restart vscode to apply new settings.");
+            if (!this._arduinoPath) { // Pop up vscode User Settings page when cannot resolve arduino path.
+                vscode.window.showErrorMessage("Cannot find the arduino installation path. Please specify the arduino.path in the User Settings." +
+                                               " And restart vscode to apply new settings.");
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             } else if (!validateArduinoPath(this._arduinoPath)) { // Validate if arduino path is the correct path.
                 vscode.window.showErrorMessage(`Cannot find arduino executable program under "${this._arduinoPath}". Please set the correct ` +
@@ -110,7 +110,7 @@ export class ArduinoSettings implements IArduinoSettings {
         } else if (platform === "linux") {
             return path.join(this.arduinoPath, "arduino");
         } else if (platform === "win32") {
-            return path.join(this.arduinoPath, "arduino_debug");
+            return path.join(this.arduinoPath, "arduino_debug.exe");
         }
     }
 
@@ -152,7 +152,7 @@ export class ArduinoSettings implements IArduinoSettings {
             if (util.fileExistsSync(path.join(arduinoPath, "AppxManifest.xml"))) {
                 this._packagePath = path.join(folder, "ArduinoData");
             } else {
-                this._packagePath = path.join(process.env.USERPROFILE, "AppData/Local/Arduino15");
+                this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
             }
             return true;
         });

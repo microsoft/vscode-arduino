@@ -46,9 +46,9 @@ export function resolveArduinoPath(): string {
         } else if (plat === "linux") {
             // TODO
         } else if (plat === "win32") {
-            const defaultCommonPaths = ["C:\\Program Files", "C:\\Program Files (x86)"];
+            const defaultCommonPaths = [process.env.ProgramFiles, process.env["ProgramFiles(x86)"]];
             for (let scanPath of defaultCommonPaths) {
-                if (directoryExistsSync(path.join(scanPath, "Arduino"))) {
+                if (scanPath && directoryExistsSync(path.join(scanPath, "Arduino"))) {
                     result = path.join(scanPath, "Arduino");
                     break;
                 }
