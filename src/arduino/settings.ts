@@ -12,7 +12,7 @@ import * as WinReg from "winreg";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 
-import { resolveArduinoPath } from "../common/platform";
+import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
 
 export interface IArduinoSettings {
     arduinoPath: string;
@@ -30,11 +30,6 @@ export interface IClangFormatterSettings {
 
 export class ArduinoSettings implements IArduinoSettings {
     private _arduinoPath: string;
-
-    /**
-     * Save the raw arduino path value from the configuration to avoid path resolution.
-     */
-    private _rawArduinoPathValue: string;
 
     private _packagePath: string;
 
@@ -62,18 +57,32 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public get arduinoPath(): string {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        const configValue = arduinoConfig.get<string>("path");
-        // The configuration is updated
-        if (configValue !== this._rawArduinoPathValue) {
-            if (configValue === "arduino") {
+        if (this._arduinoPath) {
+            return this._arduinoPath;
+        } else {
+            // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
+            // "usual software installation directory for each os".
+            // 1. Search vscode user settings first.
+            let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+            const configValue = arduinoConfig.get<string>("path");
+            if (!configValue || !configValue.trim()) {
+                // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
                 this._arduinoPath = resolveArduinoPath();
             } else {
                 this._arduinoPath = configValue;
             }
-            this._rawArduinoPathValue = configValue;
+
+            if (!this._arduinoPath) { // Pop up vscode User Settings page when cannot resolve Arduino path.
+                vscode.window.showErrorMessage("Cannot find the Arduino installation path. Please specify the arduino.path in the User Settings." +
+                                               " And then restart vscode to apply new settings.");
+                vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+            } else if (!validateArduinoPath(this._arduinoPath)) { // Validate if arduino path is the correct path.
+                vscode.window.showErrorMessage(`Cannot find arduino executable program under "${this._arduinoPath}". Please set the correct ` +
+                `arduino.path in the User Settings. And restart vscode to apply new settings.`);
+                vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+            }
+            return this._arduinoPath;
         }
-        return this._arduinoPath;
     }
 
     public get additionalUrls(): string {
