@@ -122,7 +122,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.port = this.port;
         deviceConfigJson.board = this.board;
 
-        fs.writeFileSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE), JSON.stringify(deviceConfigJson, null, 4));
+        util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
+        fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, null, 4));
     }
 
     public get port() {
