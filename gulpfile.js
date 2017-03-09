@@ -7,6 +7,7 @@ const webpack = require("webpack");
 const runSequence = require('run-sequence');
 const del = require('del');
 
+const fs = require("fs");
 const path = require("path");
 
 //...
@@ -50,6 +51,17 @@ gulp.task("ts-compile", () => {
 
 gulp.task("clean", (done) => {
     return del('out', done);
+});
+
+gulp.task("genAikey", (done) => {
+    const packageJson = JSON.parse(fs.readFileSync("package.json"));
+    if (process.env.ISPROD) {
+        packageJson.aiKey = process.env["PROD_AIKEY"];
+    } else {
+        packageJson.aiKey = process.env["INT_AIKEY"] || packageJson.aiKey;
+    }
+    fs.writeFileSync("package.json", JSON.stringify(packageJson));
+    done();
 });
 
 gulp.task("build", (done) => {
