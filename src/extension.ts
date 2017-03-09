@@ -18,12 +18,11 @@ import { CompletionProvider } from "./langService/completionProvider";
 import { DefinitionProvider } from "./langService/definitionProvider";
 import { FormatterProvider } from "./langService/formatterProvider";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
-import Telemetry from './applicationInsight/Telemetry'
+import Logger from './logger/logger-wrapper'
 
 export async function activate(context: vscode.ExtensionContext) {
-    let activationTimer: Telemetry.TelemetryTimer = new Telemetry.TelemetryTimer();
-    Telemetry.initialize(context);
-
+    Logger.configure(context);
+    Logger.traceUserData("start-activate-extension");
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
     const arduinoApp = new ArduinoApp(arduinoSettings);
@@ -43,86 +42,82 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const arduinoManagerProvider = new ArduinoContentProvider(arduinoApp, boardManager, libraryManager, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.showBoardManager", () => {
-        Telemetry.sendTelemetryEvent("command.arduinoShowBoardManager");
+
+    let myregisterCommand = (command: string, callback: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
+        return vscode.commands.registerCommand(command, async () => {
+            Logger.traceUserData(`start-command-` + command);
+            let timer1 = new Logger.Timer();
+            let result = callback();
+            if (result) {
+                await Promise.resolve(result);
+            }
+
+            Logger.traceUserData(`end-command-` + command, { duration: timer1.end() });
+        });
+    };
+    context.subscriptions.push(myregisterCommand("arduino.showBoardManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.showLibraryManager", () => {
-        Telemetry.sendTelemetryEvent("command.arduinoShowLibraryManager");
+    context.subscriptions.push(myregisterCommand("arduino.showLibraryManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Library Manager");
     }));
 
     // change board type
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", async () => {
-        let timer = new Telemetry.TelemetryTimer();
+    context.subscriptions.push(myregisterCommand("arduino.changeBoardType", async () => {
         await boardManager.changeBoardType();
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
-        Telemetry.sendTelemetryEvent("command.arduinoChangeBoardType", { board: boardManager.currentBoard.name }, { duration: timer.end() });
+    }, () => {
+        return { board: boardManager.currentBoard.name };
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", async () => {
-        let timer = new Telemetry.TelemetryTimer();
-        await arduinoApp.verify();
-        Telemetry.sendTelemetryEvent("command.arduinoVerify", { board: boardManager.currentBoard.name }, { duration: timer.end() });
+    context.subscriptions.push(myregisterCommand("arduino.verify", () => arduinoApp.verify(), () => {
+        return { board: boardManager.currentBoard.name };
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", async () => {
-        let timer = new Telemetry.TelemetryTimer();
-        await arduinoApp.upload();
-        Telemetry.sendTelemetryEvent("command.arduinoUpload", { board: boardManager.currentBoard.name }, { duration: timer.end() });
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", async (path) => {
-        let timer = new Telemetry.TelemetryTimer();
-        await arduinoApp.addLibPath(path);
-        Telemetry.sendTelemetryEvent("command.arduinoAddLibPath", undefined, { duration: timer.end() });
-    }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.installBoard", async (packageName, arch, version?: string) => {
-        let timer = new Telemetry.TelemetryTimer();
+
+    context.subscriptions.push(myregisterCommand("arduino.upload", () => arduinoApp.upload(),
+        () => {
+            return { board: boardManager.currentBoard.name };
+        }));
+
+    context.subscriptions.push(myregisterCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));
+    context.subscriptions.push(myregisterCommand("arduino.installBoard", async (packageName, arch, version?: string) => {
         await arduinoApp.installBoard(packageName, arch, version);
         arduinoManagerProvider.update(BOARD_MANAGER_URI);
-        Telemetry.sendTelemetryEvent("command.arduinoInstallBoard", { packageName, arch, version }, { duration: timer.end() });
+        return { telemetry: true, packageName, arch, version };
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.uninstallBoard", (packagePath) => {
-        let timer = new Telemetry.TelemetryTimer();
+    context.subscriptions.push(myregisterCommand("arduino.uninstallBoard", (packagePath) => {
         arduinoApp.uninstallBoard(packagePath);
         arduinoManagerProvider.update(BOARD_MANAGER_URI);
-        Telemetry.sendTelemetryEvent("command.arduinoUninstallBoard", { packagePath }, { duration: timer.end() });
+        return { telemetry: true, packagePath };
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.installLibrary", async (libName, version?: string) => {
-        let timer = new Telemetry.TelemetryTimer();
+    context.subscriptions.push(myregisterCommand("arduino.installLibrary", async (libName, version?: string) => {
         await arduinoApp.installLibrary(libName, version);
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
-        Telemetry.sendTelemetryEvent("command.arduinoInstallLibrary", { libName, version }, { duration: timer.end() });
+        return { telemetry: true, libName, version };
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.uninstallLibrary", (libPath) => {
-        let timer = new Telemetry.TelemetryTimer();
+    context.subscriptions.push(myregisterCommand("arduino.uninstallLibrary", (libPath) => {
         arduinoApp.uninstallLibrary(libPath);
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
-        Telemetry.sendTelemetryEvent("command.arduinoUninstallLibrary", { libPath }, { duration: timer.end() });
+        return { telemetry: true, libPath };
     }));
 
     // serial monitor commands
     const monitor = new SerialMonitor();
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.selectSerialPort", async () => {
+    context.subscriptions.push(myregisterCommand("arduino.selectSerialPort", async () => {
         await monitor.selectSerialPort();
-        Telemetry.sendTelemetryEvent("command.arduinoSelectSerialPort");
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialMonitor", async () => {
-        let timer = new Telemetry.TelemetryTimer();
+    context.subscriptions.push(myregisterCommand("arduino.openSerialMonitor", async () => {
         await monitor.openSerialMonitor();
-        Telemetry.sendTelemetryEvent("command.arduinoOpenSerialMonitor", undefined, { duration: timer.end() });
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", async () => {
+    context.subscriptions.push(myregisterCommand("arduino.changeBaudRate", async () => {
         await monitor.changeBaudRate();
-        Telemetry.sendTelemetryEvent("command.arduinoChangeBaudRate");
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", async () => {
+    context.subscriptions.push(myregisterCommand("arduino.sendMessageToSerialPort", async () => {
         await monitor.sendMessageToSerialPort();
-        Telemetry.sendTelemetryEvent("command.arduinoSendMessageToSerialPort");
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialMonitor", async () => {
+    context.subscriptions.push(myregisterCommand("arduino.closeSerialMonitor", async () => {
         await monitor.closeSerialMonitor();
-        Telemetry.sendTelemetryEvent("command.arduinoCloseSerialMonitor");
     }));
 
     // Add arduino specific language suport.
@@ -143,17 +138,16 @@ export async function activate(context: vscode.ExtensionContext) {
         const exampleProvider = require("./arduino/exampleProvider");
         vscode.window.registerTreeExplorerNodeProvider("arduinoExampleTree", new exampleProvider.ExampleProvider(arduinoSettings));
         // This command will be invoked using exactly the node you provided in `resolveChildren`.
-        vscode.commands.registerCommand("arduino.openExample", (node) => {
+        myregisterCommand("arduino.openExample", (node) => {
             if (node.kind === "leaf") {
                 vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(node.fullPath), true);
             }
         });
     }
-
-    Telemetry.sendTelemetryEvent('activateExtension', {}, { duration: activationTimer.end() });
+    Logger.traceUserData("end-activate-extension");
 }
 
 
 export function deactivate() {
-    Telemetry.sendTelemetryEvent('deactivateExtension');
+    Logger.traceUserData('deactivate-extension');
 }

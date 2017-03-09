@@ -9,7 +9,6 @@ import * as os from "os";
 import * as path from "path";
 import * as properties from "properties";
 import * as vscode from "vscode";
-import Telemetry from '../applicationInsight/Telemetry'
 
 /**
  * This function will return the VSCode C/C++ extesnion compatible platform literals.
@@ -73,7 +72,6 @@ export function rmdirRecursivelySync(rootPath: string): void {
 
 export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<Object> {
     return new Promise((resolve, reject) => {
-        let timer: Telemetry.TelemetryTimer = new Telemetry.TelemetryTimer();
         let stdout = "";
         let stderr = "";
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
@@ -81,37 +79,15 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
 
         if (outputChannel) {
             child.stdout.on("data", (data) => { outputChannel.append(data.toString()); });
-            child.stderr.on("data", (data) => { outputChannel.append(data.toString()); stderr += data.toString(); });
+            child.stderr.on("data", (data) => { outputChannel.append(data.toString()); });
         }
 
         child.on("error", (error) => reject({ error, stderr, stdout }));
 
         child.on("exit", (code) => {
             if (code === 0) {
-                // begin of telemetry trace
-                Telemetry.sendTelemetryEvent("spawnSuccess", {
-                    command: command,
-                    args1: (args && args.length) ? args[0] : null,
-                    args2: (args && args.length > 1) ? args[1] : null
-                }, {                    
-                    duration: timer.end()
-                });
-                // end of telemetry trace
-                
                 resolve({ code, stdout, stderr });
             } else {
-                // begin of telemetry trace
-                Telemetry.sendTelemetryEvent("spawnError", {
-                    command: command,
-                    args1: (args && args.length) ? args[0] : null,
-                    args2: (args && args.length > 1) ? args[1] : null,
-                    error: stderr
-                }, {
-                    duration: timer.end(),
-                    code: code
-                });
-                // end of telemetry trace
-
                 reject({ code, stdout, stderr });
             }
         });

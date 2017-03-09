@@ -172,6 +172,7 @@
     "glob": "^7.1.1",
     "properties": "^1.2.1",
     "vscode-extension-telemetry": "0.0.6",
-    "winreg": "^1.2.3"    
+    "winreg": "^1.2.3",
+    "winston": "^2.3.1"
   }
 }
