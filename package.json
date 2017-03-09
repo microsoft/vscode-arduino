@@ -93,8 +93,8 @@
       "properties": {
         "arduino.path": {
           "type": "string",
-          "default": "arduino",
-          "description": "Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path."
+          "default": "",
+          "description": "Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: 'C:\\Program Files\\Arduino' for Windows, '/Applications' for Mac, '/home/$user/Downloads/arduino-1.8.1' for Linux. (Requires a restart after change)"
         },
         "arduino.additionalUrls": {
           "type": [

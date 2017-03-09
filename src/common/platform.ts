@@ -8,12 +8,13 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { fileExistsSync } from "./util";
+import { directoryExistsSync, fileExistsSync } from "./util";
 
 export function resolveArduinoPath(): string {
     let result;
     const plat = os.platform();
     try {
+        // Resolve arduino path from system environment variables.
         if (plat === "win32") {
             let pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
             pathString = path.resolve(pathString).trim();
@@ -30,10 +31,32 @@ export function resolveArduinoPath(): string {
     } catch (ex) {
         // Ignore the errors.
     }
+
+    // Resolve arduino path from the usual software installation directory for each os.
+    // For example, "C:\Program Files" for Windows, "/Applications" for Mac.
     if (!result) {
-        vscode.window.showErrorMessage("Cannot find the Arduino installation path. You can specify the path in the user settings.");
+        if (plat === "darwin") {
+            const defaultCommonPaths = [path.join(process.env.HOME, "Applications"), "/Applications"];
+            for (let scanPath of defaultCommonPaths) {
+                if (directoryExistsSync(path.join(scanPath, "Arduino.app"))) {
+                    result = scanPath;
+                    break;
+                }
+            }
+        } else if (plat === "linux") {
+            // TODO
+        } else if (plat === "win32") {
+            const defaultCommonPaths = [process.env.ProgramFiles, process.env["ProgramFiles(x86)"]];
+            for (let scanPath of defaultCommonPaths) {
+                if (scanPath && directoryExistsSync(path.join(scanPath, "Arduino"))) {
+                    result = path.join(scanPath, "Arduino");
+                    break;
+                }
+            }
+        }
     }
-    return result;
+
+    return result || "";
 }
 
 export function detectApp(appName: string): boolean {
@@ -49,4 +72,17 @@ export function detectApp(appName: string): boolean {
         // Ignore the errors.
     }
     return result;
+}
+
+export function validateArduinoPath(arduinoPath: string): boolean {
+    const platform = os.platform();
+    let arduinoExe = "";
+    if (platform === "darwin") {
+        arduinoExe = path.join(arduinoPath, "Arduino.app/Contents/MacOS/Arduino");
+    } else if (platform === "linux") {
+        arduinoExe = path.join(arduinoPath, "arduino");
+    } else if (platform === "win32") {
+        arduinoExe = path.join(arduinoPath, "arduino_debug.exe");
+    }
+    return fileExistsSync(arduinoExe);
 }
