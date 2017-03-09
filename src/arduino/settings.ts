@@ -63,8 +63,8 @@ export class ArduinoSettings implements IArduinoSettings {
             // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
             // "usual software installation directory for each os".
             // 1. Search vscode user settings first.
-            let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-            const configValue = arduinoConfig.get<string>("path");
+            const workspaceConfig = vscode.workspace.getConfiguration();
+            const configValue = workspaceConfig.get<string>("arduino.path");
             if (!configValue || !configValue.trim()) {
                 // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
                 this._arduinoPath = resolveArduinoPath();
@@ -86,8 +86,8 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public get additionalUrls(): string {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        return arduinoConfig.get<string>("additionalUrls");
+        const workspaceConfig = vscode.workspace.getConfiguration();
+        return workspaceConfig.get<string>("arduino.additionalUrls");
     }
 
     public get packagePath(): string {
@@ -99,8 +99,8 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public get logLevel(): string {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        return arduinoConfig.get<string>("logLevel") || "info";
+        const workspaceConfig = vscode.workspace.getConfiguration();
+        return workspaceConfig.get<string>("arduino.logLevel") || "info";
     }
 
     public get commandPath(): string {
@@ -159,9 +159,9 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     private loadClangFormatterSettings() {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+        const workspaceConfig = vscode.workspace.getConfiguration();
         this._clangFormatterSettings = {
-            style: arduinoConfig.get<string>("clangFormatStyle"),
+            style: workspaceConfig.get<string>("arduino.clangFormatStyle"),
         };
     }
 }
