@@ -15,9 +15,6 @@ branches:
 env:
   global:
     - ISPRODTAG=^v?[0-9]+\.[0-9]+\.[0-9]+$
-  matrix:
-    - ISPROD=true
-    - ISPROD=false
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
@@ -31,32 +28,29 @@ install:
 - npm install -g typescript
 - npm install -g gulp
 - npm install
-- npm run vscode:prepublish
 
 script:
 - gulp tslint
-- npm test --silent
 - gulp genAikey
+- npm run vscode:prepublish
+- npm test --silent
 - vsce package
 
 deploy:
   # deploy to github release
   - provider: releases
-    api_key:
-      secure: YB+wf8pralHqjas4cdP2Ljy6fzs/ysufEhRsSoSU8mV8C/vdzeVm0sxazlRI1JOh9FQl1byVZRrSOoshCOp51EgbCnxMB2RLM+qB4Bq26lOOS8SKXEypRClHJa79kd26QuZtH9A4WoRl/awHz1VWikdawNNK3PPmCJ5G8S3iysRwtUxeCEUA1ZIyhC4mXSBhFKe+fenRfJBctP4Q6HcKxS30xhf5+Bo+8FSH3c1ogOlRD8c70n7DHFcbLW37R+hPsC6XgAFb010teisrVQY8rP+RjzZyRSqL5xjUM8tqJybLAGvFTFSDvI8ql5eyLyTefQHvIIrjpESklNNhj4lCWOlGYw3r8fD7R6/ioPJA4uiAmNJ4ALy8E8K2emHDvxBqaJcPj82HtxKPbZ+Y77n9Twa7Yob38eNoPTEGSoECQvJCLb7BYMC8h6I+suMTm3EcfPn/upgN2zzf+Sb4l3kmsC2LMWoH4OhBquiVxcRXgIo4YRiXOgKKezJUzSMqyltiHfGkodX3s2QYNmEKqrDP6+xwtGDzobyjdJO+Y+3DtKMfYI5AzD8Ll0c6sx+uVcBmSFoWKdZaKfFASUg6JWiItWuwBPtEfXqQv4AS6i64/K9ETJ37OeOl/DnZXWAkAUNG/9MPfCoKjHjMolqs6AcQVr6/KETpqvQLsJRl5gZK5yg=
+    api_key: $GIT_TOKEN
     file_glob: true
     file: "*.vsix"
     on:
       tags: true
       all_branches: true
-      # In PROD build job, when git tag is like 1.0.0, then deploy it to git release.
-      # In DEVINT build job, when git tag is like 1.0.0-rc.0, then deploy it to git release.
-      condition: "$TRAVIS_OS_NAME == linux && (($ISPROD == true && $TRAVIS_TAG =~ $ISPRODTAG) || ($ISPROD == false && ! $TRAVIS_TAG =~ $ISPRODTAG))"
+      condition: "$TRAVIS_OS_NAME == linux"
   # deploy to vscode extension market
   - provider: script  
     script: vsce publish -p $VSCE_TOKEN
     on:
       tags: true
       all_branches: true
-      # In PROD build job, when git tag is like 1.0.0, then publish extension to market.
-      condition: "$TRAVIS_OS_NAME == linux && (($ISPROD == true && $TRAVIS_TAG =~ $ISPRODTAG) || ($ISPROD == false && ! $TRAVIS_TAG =~ $ISPRODTAG))"
+      # if it's a PROD tag (something like 1.0.0), then publish extension to market.
+      condition: "$TRAVIS_OS_NAME == linux && $TRAVIS_TAG =~ $ISPRODTAG"
