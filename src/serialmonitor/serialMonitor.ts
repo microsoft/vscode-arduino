@@ -103,7 +103,7 @@ export class SerialMonitor {
         }
     }
 
-    public async  changeBaudRate() {
+    public async changeBaudRate() {
         let rates = SerialMonitor.listBaudRates();
         let choose = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
         if (!choose) {
@@ -115,7 +115,7 @@ export class SerialMonitor {
             return;
         }
         if (!this._serialPortCtrl) {
-            Logger.warn("Serial Monitor have not been started!");
+            Logger.warn("Serial Monitor have not been started.");
             return;
         }
         return await this._serialPortCtrl.changeBaudRate(parseInt(choose, 10));

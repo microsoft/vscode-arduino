@@ -61,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     telemetryResult = getUserData();
                 }
             } catch (error) {
-                Logger.traceError("executeCommandError", error, { command });
+                Logger.traceError("executeCommandError", error, { correlationId: guid, command });
             }
 
             Logger.traceUserData(`end-command-` + command, { ...telemetryResult, correlationId: guid, duration: timer1.end() });

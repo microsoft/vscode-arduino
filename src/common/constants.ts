@@ -22,6 +22,6 @@ export const messages = {
     NO_BOARD_SELECTED: "Please select the board type first.",
     INVALID_ARDUINO_PATH: "Cannot find the Arduino installation path. You can specify the path in the user settings.",
     FAILED_SEND_SERIALPORT: "Failed to send message to serial port.",
-    SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started!",
-    SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first!",
+    SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
+    SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",
 };
