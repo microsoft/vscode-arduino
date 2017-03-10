@@ -51,6 +51,21 @@ export function directoryExistsSync(dirPath: string): boolean {
     }
 }
 
+export function mkdirRecursivelySync(dirPath: string): void {
+    if (directoryExistsSync(dirPath)) {
+        return ;
+    }
+    const dirname = path.dirname(dirPath);
+    if (path.normalize(dirname) === path.normalize(dirPath)) {
+        fs.mkdirSync(dirPath);
+    } else if (directoryExistsSync(dirname)) {
+        fs.mkdirSync(dirPath);
+    } else {
+        mkdirRecursivelySync(dirname);
+        fs.mkdirSync(dirPath);
+    }
+}
+
 /**
  * Recursively delete files. Equals to "rm -rf"
  * @function rmdirRecursivelySync

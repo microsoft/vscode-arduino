@@ -12,7 +12,7 @@ import * as WinReg from "winreg";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 
-import { resolveArduinoPath } from "../common/platform";
+import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
 
 export interface IArduinoSettings {
     arduinoPath: string;
@@ -30,11 +30,6 @@ export interface IClangFormatterSettings {
 
 export class ArduinoSettings implements IArduinoSettings {
     private _arduinoPath: string;
-
-    /**
-     * Save the raw arduino path value from the configuration to avoid path resolution.
-     */
-    private _rawArduinoPathValue: string;
 
     private _packagePath: string;
 
@@ -62,23 +57,37 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public get arduinoPath(): string {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        const configValue = arduinoConfig.get<string>("path");
-        // The configuration is updated
-        if (configValue !== this._rawArduinoPathValue) {
-            if (configValue === "arduino") {
+        if (this._arduinoPath) {
+            return this._arduinoPath;
+        } else {
+            // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
+            // "usual software installation directory for each os".
+            // 1. Search vscode user settings first.
+            const workspaceConfig = vscode.workspace.getConfiguration();
+            const configValue = workspaceConfig.get<string>("arduino.path");
+            if (!configValue || !configValue.trim()) {
+                // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
                 this._arduinoPath = resolveArduinoPath();
             } else {
                 this._arduinoPath = configValue;
             }
-            this._rawArduinoPathValue = configValue;
+
+            if (!this._arduinoPath) { // Pop up vscode User Settings page when cannot resolve arduino path.
+                vscode.window.showErrorMessage(`Cannot find the arduino installation path. Please specify the "arduino.path" in the User Settings.` +
+                                               " Requires a restart after change.");
+                vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+            } else if (!validateArduinoPath(this._arduinoPath)) { // Validate if arduino path is the correct path.
+                vscode.window.showErrorMessage(`Cannot find arduino executable program under directory "${this._arduinoPath}". ` +
+                `Please set the correct "arduino.path" in the User Settings. Requires a restart after change.`);
+                vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+            }
+            return this._arduinoPath;
         }
-        return this._arduinoPath;
     }
 
     public get additionalUrls(): string {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        return arduinoConfig.get<string>("additionalUrls");
+        const workspaceConfig = vscode.workspace.getConfiguration();
+        return workspaceConfig.get<string>("arduino.additionalUrls");
     }
 
     public get packagePath(): string {
@@ -90,8 +99,8 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public get logLevel(): string {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
-        return arduinoConfig.get<string>("logLevel") || "info";
+        const workspaceConfig = vscode.workspace.getConfiguration();
+        return workspaceConfig.get<string>("arduino.logLevel") || "info";
     }
 
     public get commandPath(): string {
@@ -101,7 +110,7 @@ export class ArduinoSettings implements IArduinoSettings {
         } else if (platform === "linux") {
             return path.join(this.arduinoPath, "arduino");
         } else if (platform === "win32") {
-            return path.join(this.arduinoPath, "arduino_debug");
+            return path.join(this.arduinoPath, "arduino_debug.exe");
         }
     }
 
@@ -143,16 +152,16 @@ export class ArduinoSettings implements IArduinoSettings {
             if (util.fileExistsSync(path.join(arduinoPath, "AppxManifest.xml"))) {
                 this._packagePath = path.join(folder, "ArduinoData");
             } else {
-                this._packagePath = path.join(process.env.USERPROFILE, "AppData/Local/Arduino15");
+                this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
             }
             return true;
         });
     }
 
     private loadClangFormatterSettings() {
-        let arduinoConfig = vscode.workspace.getConfiguration("arduino");
+        const workspaceConfig = vscode.workspace.getConfiguration();
         this._clangFormatterSettings = {
-            style: arduinoConfig.get<string>("clangFormatStyle"),
+            style: workspaceConfig.get<string>("arduino.clangFormatStyle"),
         };
     }
 }
