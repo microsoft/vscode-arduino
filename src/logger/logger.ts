@@ -59,31 +59,39 @@ export function traceUserData(message: string, metadata?: any) {
     winston.log("info", message, { ...metadata, telemetry: true });
 }
 
-export function traceErrorOrWarning(level: string, message: string, err: Error, metadata?: any) {
+function traceErrorOrWarning(level: string, message: string, error: Error, metadata?: any) {
     // use `info` as the log level and add a special flag in metadata
     let stackArray: string[];
     let firstLine: string = "";
-    if (err !== undefined && err.stack !== undefined) {
-        stackArray = err.stack.split("\n");
+    if (error !== undefined && error.stack !== undefined) {
+        stackArray = error.stack.split("\n");
         if (stackArray !== undefined && stackArray.length >= 2) {
             firstLine = stackArray[1]; // The fist line is the error message and we don't want to send that telemetry event
             firstLine = FilterErrorPath(firstLine ? firstLine.replace(/\\/g, "/") : "");
         }
     }
-    winston.log(level, err.message || "unknown error", { ...metadata, firstLine, telemetry: true });
+    winston.log(level, "error", { ...metadata, message: error.message, errorLine: firstLine, telemetry: true });
 }
 
-export function notifyAndThrowUserError(message: string, err: Error) {
-    notifyUserError(message, err);
-    throw err;
+export function traceError(message: string, error: Error, metadata?: any) {
+    traceErrorOrWarning("error", message, error, metadata);
 }
 
-export function notifyUserError(message: string, err: Error) {
-    traceErrorOrWarning("error", message, err, { showUser: true, telemetry: true });
+export function traceWarning(message: string, error: Error, metadata?: any) {
+    traceErrorOrWarning("warn", message, error, metadata);
 }
 
-export function notifyUserWarning(message: string, err: Error) {
-    traceErrorOrWarning("warn", message, err, { showUser: true, telemetry: true });
+export function notifyAndThrowUserError(errorCode: string, error: Error, message?: string) {
+    notifyUserError(errorCode, error, message);
+    throw error;
+}
+
+export function notifyUserError(errorCode: string, error: Error, message?: string) {
+    traceError(errorCode, error, { notification: message || error.message, showUser: true, telemetry: true });
+}
+
+export function notifyUserWarning(errorCode: string, error: Error, message?: string) {
+    traceWarning(errorCode, error, { notification: message || error.message, showUser: true, telemetry: true });
 }
 
 export class Timer {

@@ -75,7 +75,7 @@ export class SerialMonitor {
         }
     }
 
-    public async  openSerialMonitor() {
+    public async openSerialMonitor() {
         if (this._serialPortCtrl) {
             await this._serialPortCtrl.changePort(this._currentPort);
         } else {
@@ -85,7 +85,8 @@ export class SerialMonitor {
             await this._serialPortCtrl.open();
             this.updatePortStatus(true);
         } catch (error) {
-            Logger.notifyUserWarning(`Failed to open serial port ${this._currentPort} due to error:  + ${error.toString()}`, error);
+            Logger.notifyUserWarning("openSerialMonitorError", error,
+                `Failed to open serial port ${this._currentPort} due to error:  + ${error.toString()}`);
         }
     }
 
@@ -95,10 +96,10 @@ export class SerialMonitor {
             try {
                 await this._serialPortCtrl.sendMessage(text);
             } catch (error) {
-                Logger.notifyUserWarning(constants.messages.FAILED_SEND_SERIALPORT, error);
+                Logger.notifyUserWarning("sendMessageToSerialPortError", error, constants.messages.FAILED_SEND_SERIALPORT);
             }
         } else {
-            Logger.notifyUserWarning(constants.messages.SEND_BEFORE_OPEN_SERIALPORT, new Error(constants.messages.SEND_BEFORE_OPEN_SERIALPORT));
+            Logger.notifyUserWarning("sendMessageToSerialPortError", new Error(constants.messages.SEND_BEFORE_OPEN_SERIALPORT));
         }
     }
 
@@ -125,7 +126,7 @@ export class SerialMonitor {
             await this._serialPortCtrl.stop();
             this.updatePortStatus(false);
         } else {
-            Logger.notifyUserWarning(constants.messages.SERIAL_PORT_NOT_STARTED, new Error(constants.messages.SERIAL_PORT_NOT_STARTED));
+            Logger.notifyUserWarning("closeSerialMonitorError", new Error(constants.messages.SERIAL_PORT_NOT_STARTED));
         }
     }
 

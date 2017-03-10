@@ -102,7 +102,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._board = deviceConfigJson.board || this._board;
                         this._sketch = deviceConfigJson.sketch || this._sketch;
                     } else {
-                        Logger.notifyUserError(constants.messages.ARDUINO_FILE_ERROR, new Error(constants.messages.ARDUINO_FILE_ERROR));
+                        Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
                 }
                 return this;
@@ -116,7 +116,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             deviceConfigJson = util.tryParseJSON(fs.readFileSync(deviceConfigFile, "utf8"));
         }
         if (!deviceConfigJson) {
-            Logger.notifyUserError(constants.messages.ARDUINO_FILE_ERROR, new Error(constants.messages.ARDUINO_FILE_ERROR));
+            Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
             return;
         }
         deviceConfigJson.sketch = this.sketch;

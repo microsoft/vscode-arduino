@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
-
+import * as Uuid from "uuid-lib";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "./arduino/arduino";
@@ -22,7 +22,8 @@ import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
-    Logger.traceUserData("start-activate-extension");
+    let activeGuid = Uuid.create().value;
+    Logger.traceUserData("start-activate-extension", {correlationId: activeGuid});
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
     const arduinoApp = new ArduinoApp(arduinoSettings);
@@ -45,7 +46,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
         return vscode.commands.registerCommand(command, async () => {
-            let guid = "";
+            let guid = Uuid.create().value;
             Logger.traceUserData(`start-command-` + command, { correlationId: guid });
             let timer1 = new Logger.Timer();
             let telemetryResult;
@@ -58,10 +59,10 @@ export async function activate(context: vscode.ExtensionContext) {
                     telemetryResult = result;
                 }
             } catch (error) {
-                Logger.traceError(error, { command });
+                Logger.traceError("executeCommandError", error, { command });
             }
 
-            Logger.traceUserData(`end-command-` + command, { ...telemetryResult, duration: timer1.end() });
+            Logger.traceUserData(`end-command-` + command, { ...telemetryResult, correlationId: guid, duration: timer1.end() });
         });
     };
     context.subscriptions.push(registerCommand("arduino.showBoardManager", () => {
@@ -113,11 +114,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // serial monitor commands
     const monitor = new SerialMonitor();
-    context.subscriptions.push(registerCommand("arduino.selectSerialPort", monitor.selectSerialPort));
-    context.subscriptions.push(registerCommand("arduino.openSerialMonitor", monitor.openSerialMonitor));
-    context.subscriptions.push(registerCommand("arduino.changeBaudRate", monitor.changeBaudRate));
-    context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", monitor.sendMessageToSerialPort));
-    context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", monitor.closeSerialMonitor));
+    context.subscriptions.push(registerCommand("arduino.selectSerialPort", monitor.selectSerialPort.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.openSerialMonitor", monitor.openSerialMonitor.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.changeBaudRate", monitor.changeBaudRate.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", monitor.sendMessageToSerialPort.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", monitor.closeSerialMonitor.bind(monitor)));
 
     // Add arduino specific language suport.
     const clangProvider = new ClangProvider(arduinoApp);
@@ -143,7 +144,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
     }
-    Logger.traceUserData("end-activate-extension");
+    Logger.traceUserData("end-activate-extension", {correlationId: activeGuid});
 }
 
 export function deactivate() {
