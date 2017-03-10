@@ -179,6 +179,7 @@
     "express": "^4.14.1",
     "glob": "^7.1.1",
     "properties": "^1.2.1",
+    "uuid-lib": "0.0.6",
     "vscode-extension-telemetry": "0.0.6",
     "winreg": "^1.2.3",
     "winston": "^2.3.1"

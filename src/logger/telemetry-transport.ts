@@ -1,3 +1,8 @@
+/*--------------------------------------------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import * as winston from "winston";
@@ -46,7 +51,7 @@ export class TelemetryTransport extends winston.Transport {
                 delete metadata.telemetry;
                 let properties: { [key: string]: string; } = {};
                 let measures: { [key: string]: number; } = {};
-                for (let key in Object.keys(metadata)) {
+                for (let key of Object.keys(metadata)) {
                     if (typeof key === "string" || key instanceof String) {
                         let value = metadata[key];
                         if (value === null || typeof value === "string" || value instanceof String) {
