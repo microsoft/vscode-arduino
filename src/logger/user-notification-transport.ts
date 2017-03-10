@@ -4,7 +4,6 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
 import * as winston from "winston";
 
 export default class UserNotificationTransport extends winston.Transport {
