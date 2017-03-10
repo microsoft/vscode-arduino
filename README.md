@@ -4,32 +4,37 @@ Welcome to **Arduino** for Visual Studio Code! The Arduino extension makes it ea
 
 * Verify and upload your Arduino sketches in Visual Studio Code.
 * Built-in Arduino board and library manager.
-* IntelliSense support and syntax highlighting.
+* Built-in Arduino example list.
 * Built-in serial port monitoring tool.
+* IntelliSense support and syntax highlighting.
 * Snippets for \*.ino files.
 * Commond Palette(F1) integration for most common Arduino commands (e.g. Verify, Upload...).
-* TBD: Arduino example list.
 * TBD: Customizable extension options including command shortcuts and more.
-* TBD: F5 integration with debugging support (Arduino Zero).
+* TBD: F5 integration with debugging support.
 
-## Requirement
+## Prerequisites
 
-### Arduino
-- [Arduino](https://www.arduino.cc/)
+- [Arduino IDE](https://www.arduino.cc/en/main/software). Please choose stable version for your operating system.
+- [clang](http://releases.llvm.org/download.html). Please install the pre-built binaries for your operating system.
+- [Visual Studio Code](https://code.visualstudio.com/#alt-downloads)
 
-Currently, the extension relies on the Arduino IDE. You should properly install the Arduino IDE and configurate the installation path.
+## Using
+- First, open your Visual Studio Code to install the **vscode-arduino** extension manually from Extensions Activity Bar.
 
-- If the arduino command is already available from shell, the extension will try to probe the installation folder.
-- And you can specify the Arduino installation path in the VSCode user setting files:
+![Install from VSIX](/images/install_from_vsix.png)
 
-    ``` json
-    {
-        "arduino.path": "D:\\Develop\\arduino",
-    }
-    ```
+- Open an exsiting Arduino sketch folder and change the language mode to **Arduino**.
+
+![Change language mode](/images/change_language_mode.png)
+
+- Press **F1** or **Ctrl+Shift+P** to open command palette, select and run **Add library paths**. There will be a `arduino.json` file generated in your `.vscode` folder.
+
+![Add lib paths](/images/add_lib_path.png)
+
+- Start working on your Arduino sketch by using the commands below.
 
 ## Commands
-This extension provides several commands in the Command Palette (F1) for working with `*.ino` files:
+This extension provides several commands in the Command Palette (**F1** or **Ctrl+Shift+P**) for working with `*.ino` files:
 - **Arduino: Add library path**: Init the config file, which contains platform related configurations.
 - **Arduino: Verify**: Build (verify) your sketch (\*.ino) file.
 - **Arduino: Upload**: Build your sketch file and deploy (upload) to your Arduino board via serial port.
@@ -41,13 +46,9 @@ This extension provides several commands in the Command Palette (F1) for working
 - **Arduino: Change Baud Rate**: Change the band rate of current serial port communication.
 - **Arduino: Change Board Type**: Switch your board type or platform.
 
-## Settings
+## Supported Operating Systems
+Currently this extension supports the following operatings systems:
 
-## Device Options
-
-```json
-{
-    "board": ""
-}
-```
-
+- Windows 7 and later (32-bit and 64-bit)
+- macOS 10.10 and later
+- Ubuntu 16.04
