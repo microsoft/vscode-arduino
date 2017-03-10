@@ -48,7 +48,7 @@ deploy:
       condition: "$TRAVIS_OS_NAME == linux"
   # deploy to vscode extension market
   - provider: script  
-    script: vsce publish -p $VSCE_TOKEN
+    script: vsce publish -p $VSCE_TOKEN --packagePath *.vsix
     on:
       tags: true
       all_branches: true
