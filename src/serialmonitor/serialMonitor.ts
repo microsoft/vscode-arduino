@@ -86,7 +86,7 @@ export class SerialMonitor {
             this.updatePortStatus(true);
         } catch (error) {
             Logger.notifyUserWarning("openSerialMonitorError", error,
-                `Failed to open serial port ${this._currentPort} due to error:  + ${error.toString()}`);
+                `Failed to open serial port ${this._currentPort} due to error: + ${error.toString()}`);
         }
     }
 

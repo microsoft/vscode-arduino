@@ -57,6 +57,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 }
                 if (result && result.telemetry) {
                     telemetryResult = result;
+                } else if (getUserData) {
+                    telemetryResult = getUserData();
                 }
             } catch (error) {
                 Logger.traceError("executeCommandError", error, { command });
