@@ -1,0 +1,24 @@
+import * as vscode from "vscode";
+import TelemetryReporter from "vscode-extension-telemetry";
+import * as winston from "winston";
+
+export class UserNotificationTransport extends winston.Transport {
+
+    constructor(options: any) {
+        super(options);
+    }
+
+    protected log(level: string, message: string, metadata?: any, callback?: Function) {
+        if (metadata && metadata.showUser) {
+            if (level === "warn") {
+                vscode.window.showWarningMessage(message);
+            } else if (level === "error") {
+                vscode.window.showErrorMessage(message);
+            } else {
+                winston.error(`Invalid error level '${level}' for user notification.`);
+            }
+        }
+        super.emit("logged");
+        callback(null, true);
+    }
+}

@@ -43,20 +43,25 @@ export async function activate(context: vscode.ExtensionContext) {
     const arduinoManagerProvider = new ArduinoContentProvider(arduinoApp, boardManager, libraryManager, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
 
-    let registerCommand = (command: string, callback: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
+    let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
         return vscode.commands.registerCommand(command, async () => {
-            Logger.traceUserData(`start-command-` + command);
+            let guid = "";
+            Logger.traceUserData(`start-command-` + command, { correlationId: guid });
             let timer1 = new Logger.Timer();
+            let telemetryResult;
             try {
-                let result = callback();
+                let result = commandBody();
                 if (result) {
-                    await Promise.resolve(result);
+                    result = await Promise.resolve(result);
+                }
+                if (result && result.telemetry) {
+                    telemetryResult = result;
                 }
             } catch (error) {
                 Logger.traceError(error, { command });
             }
 
-            Logger.traceUserData(`end-command-` + command, { duration: timer1.end() });
+            Logger.traceUserData(`end-command-` + command, { ...telemetryResult, duration: timer1.end() });
         });
     };
     context.subscriptions.push(registerCommand("arduino.showBoardManager", () => {
@@ -108,21 +113,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // serial monitor commands
     const monitor = new SerialMonitor();
-    context.subscriptions.push(registerCommand("arduino.selectSerialPort", async () => {
-        await monitor.selectSerialPort();
-    }));
-    context.subscriptions.push(registerCommand("arduino.openSerialMonitor", async () => {
-        await monitor.openSerialMonitor();
-    }));
-    context.subscriptions.push(registerCommand("arduino.changeBaudRate", async () => {
-        await monitor.changeBaudRate();
-    }));
-    context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", async () => {
-        await monitor.sendMessageToSerialPort();
-    }));
-    context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", async () => {
-        await monitor.closeSerialMonitor();
-    }));
+    context.subscriptions.push(registerCommand("arduino.selectSerialPort", monitor.selectSerialPort));
+    context.subscriptions.push(registerCommand("arduino.openSerialMonitor", monitor.openSerialMonitor));
+    context.subscriptions.push(registerCommand("arduino.changeBaudRate", monitor.changeBaudRate));
+    context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", monitor.sendMessageToSerialPort));
+    context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", monitor.closeSerialMonitor));
 
     // Add arduino specific language suport.
     const clangProvider = new ClangProvider(arduinoApp);

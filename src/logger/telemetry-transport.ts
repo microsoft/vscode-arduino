@@ -38,18 +38,17 @@ export class TelemetryTransport extends winston.Transport {
             return;
         }
         this.reporter = new TelemetryReporter(packageInfo.name, packageInfo.version, packageInfo.aiKey);
-
     }
 
-    protected log(level: string, msg: string, meta?: any, callback?: Function) {
-        if (this.reporter && meta && meta.telemetry) {
+    protected log(level: string, message: string, metadata?: any, callback?: Function) {
+        if (this.reporter && metadata && metadata.telemetry) {
             try {
-                delete meta.telemetry;
+                delete metadata.telemetry;
                 let properties: { [key: string]: string; } = {};
                 let measures: { [key: string]: number; } = {};
-                for (let key in Object.keys(meta)) {
+                for (let key in Object.keys(metadata)) {
                     if (typeof key === "string" || key instanceof String) {
-                        let value = meta[key];
+                        let value = metadata[key];
                         if (value === null || typeof value === "string" || value instanceof String) {
                             properties[key] = value;
                         } else if (isNumeric(value)) {
@@ -59,7 +58,7 @@ export class TelemetryTransport extends winston.Transport {
                         }
                     }
                 }
-                this.reporter.sendTelemetryEvent(msg, properties, measures);
+                this.reporter.sendTelemetryEvent(message, properties, measures);
             } catch (telemetryErr) {
                 // If sending telemetry event fails ignore it so it won"t break the extension
                 winston.error("Failed to send telemetry event. error: " + telemetryErr);

@@ -24,37 +24,37 @@ export function configure(context: vscode.ExtensionContext) {
     });
 }
 
-export function info(msg: string, meta?: any) {
-    winston.info(msg, meta);
+export function info(message: string, metadata?: any) {
+    winston.info(message, metadata);
 }
 
-export function debug(msg: string, meta?: any) {
-    winston.debug(msg, meta);
+export function debug(message: string, metadata?: any) {
+    winston.debug(message, metadata);
 }
 
-export function warn(msg: string, meta?: any) {
-    winston.warn(msg, meta);
+export function warn(message: string, metadata?: any) {
+    winston.warn(message, metadata);
 }
 
-export function verbose(msg: string, meta?: any) {
-    winston.verbose(msg, meta);
+export function verbose(message: string, metadata?: any) {
+    winston.verbose(message, metadata);
 }
 
-export function error(msg: string, meta?: any) {
-    winston.error(msg, meta);
+export function error(message: string, metadata?: any) {
+    winston.error(message, metadata);
 }
 
-export function silly(msg: string, meta?: any) {
-    winston.silly(msg, meta);
+export function silly(message: string, metadata?: any) {
+    winston.silly(message, metadata);
 }
 
-export function traceUserData(msg: string, meta?: any) {
-    // use `info` as the log level and add a special flag in meta
-    winston.log("info", msg, { ...meta, telemetry: true });
+export function traceUserData(message: string, metadata?: any) {
+    // use `info` as the log level and add a special flag in metadata
+    winston.log("info", message, { ...metadata, telemetry: true });
 }
 
-export function traceError(err: Error, meta?: any) {
-    // use `info` as the log level and add a special flag in meta
+export function traceErrorOrWarning(level: string, message: string, err: Error, metadata?: any) {
+    // use `info` as the log level and add a special flag in metadata
     let stackArray: string[];
     let firstLine: string = "";
     if (err !== undefined && err.stack !== undefined) {
@@ -64,16 +64,20 @@ export function traceError(err: Error, meta?: any) {
             firstLine = FilterErrorPath(firstLine ? firstLine.replace(/\\/g, "/") : "");
         }
     }
-    winston.log("error", err.message || "exception", { ...meta, firstLine, telemetry: true });
+    winston.log(level, err.message || "unknown error", { ...metadata, firstLine, telemetry: true });
 }
 
-export function notifyAndThrowUserError(err: Error) {
-    traceError(err, { showUser: true });
+export function notifyAndThrowUserError(message: string, err: Error) {
+    notifyUserError(message, err);
     throw err;
 }
 
-export function notifyUserError(err: Error) {
-    traceError(err, { showUser: true });
+export function notifyUserError(message: string, err: Error) {
+    traceErrorOrWarning("error", message, err, { showUser: true, telemetry: true });
+}
+
+export function notifyUserWarning(message: string, err: Error) {
+    traceErrorOrWarning("warn", message, err, { showUser: true, telemetry: true });
 }
 
 export class Timer {
