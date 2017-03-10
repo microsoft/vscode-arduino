@@ -4,8 +4,9 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-
+import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
+import * as Logger from "../logger/logger";
 import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
@@ -74,7 +75,7 @@ export class SerialMonitor {
         }
     }
 
-    public async  openSerialMonitor() {
+    public async openSerialMonitor() {
         if (this._serialPortCtrl) {
             await this._serialPortCtrl.changePort(this._currentPort);
         } else {
@@ -84,36 +85,37 @@ export class SerialMonitor {
             await this._serialPortCtrl.open();
             this.updatePortStatus(true);
         } catch (error) {
-            vscode.window.showWarningMessage(`Failed to open serial port ${this._currentPort} due to error:  + ${error.toString()}`);
+            Logger.notifyUserWarning("openSerialMonitorError", error,
+                `Failed to open serial port ${this._currentPort} due to error: + ${error.toString()}`);
         }
     }
 
-    public async  sendMessageToSerialPort() {
+    public async sendMessageToSerialPort() {
         if (this._serialPortCtrl && this._serialPortCtrl.isActive()) {
             let text = await vscode.window.showInputBox();
             try {
                 await this._serialPortCtrl.sendMessage(text);
             } catch (error) {
-                vscode.window.showWarningMessage("Failed to send message due to error: " + error.toString());
+                Logger.notifyUserWarning("sendMessageToSerialPortError", error, constants.messages.FAILED_SEND_SERIALPORT);
             }
         } else {
-            vscode.window.showWarningMessage("Please open a serial port first!");
+            Logger.notifyUserWarning("sendMessageToSerialPortError", new Error(constants.messages.SEND_BEFORE_OPEN_SERIALPORT));
         }
     }
 
-    public async  changeBaudRate() {
+    public async changeBaudRate() {
         let rates = SerialMonitor.listBaudRates();
         let choose = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
         if (!choose) {
-            // console.log('No rate is selected, keep baud rate no changed.');
+            Logger.warn("No rate is selected, keep baud rate no changed.");
             return;
         }
         if (!parseInt(choose, 10)) {
-            // console.log('Invalid baud rate, keep baud rate no changed.', choose);
+            Logger.warn("Invalid baud rate, keep baud rate no changed.", {value: choose});
             return;
         }
         if (!this._serialPortCtrl) {
-            // console.log('Serial Monitor have not been started!');
+            Logger.warn("Serial Monitor have not been started.");
             return;
         }
         return await this._serialPortCtrl.changeBaudRate(parseInt(choose, 10));
@@ -124,7 +126,7 @@ export class SerialMonitor {
             await this._serialPortCtrl.stop();
             this.updatePortStatus(false);
         } else {
-            vscode.window.showWarningMessage("Serial Monitor has not been started!");
+            Logger.notifyUserWarning("closeSerialMonitorError", new Error(constants.messages.SERIAL_PORT_NOT_STARTED));
         }
     }
 
