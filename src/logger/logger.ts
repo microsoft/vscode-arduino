@@ -2,6 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import * as winston from "winston";
 import TelemetryTransport from "./telemetry-transport";
+import UserNotificationTransport from "./user-notification-transport";
 
 function FilterErrorPath(line: string): string {
     if (line) {
@@ -20,6 +21,7 @@ export function configure(context: vscode.ExtensionContext) {
         transports: [
             new (winston.transports.File)({ level: "warn", filename: context.asAbsolutePath("arduino.log") }),
             new TelemetryTransport({ level: "info", context }),
+            new UserNotificationTransport({ level: "info" }),
         ],
     });
 }
