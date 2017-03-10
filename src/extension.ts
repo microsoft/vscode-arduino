@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
-
+import * as Uuid from "uuid-lib";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "./arduino/arduino";
@@ -17,9 +17,13 @@ import { ClangFormatter } from "./langService/clangFormatter";
 import { CompletionProvider } from "./langService/completionProvider";
 import { DefinitionProvider } from "./langService/definitionProvider";
 import { FormatterProvider } from "./langService/formatterProvider";
+import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
 export async function activate(context: vscode.ExtensionContext) {
+    Logger.configure(context);
+    let activeGuid = Uuid.create().value;
+    Logger.traceUserData("start-activate-extension", {correlationId: activeGuid});
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
     const arduinoApp = new ArduinoApp(arduinoSettings);
@@ -39,48 +43,84 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const arduinoManagerProvider = new ArduinoContentProvider(arduinoApp, boardManager, libraryManager, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.showBoardManager", () => {
+
+    let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
+        return vscode.commands.registerCommand(command, async () => {
+            let guid = Uuid.create().value;
+            Logger.traceUserData(`start-command-` + command, { correlationId: guid });
+            let timer1 = new Logger.Timer();
+            let telemetryResult;
+            try {
+                let result = commandBody();
+                if (result) {
+                    result = await Promise.resolve(result);
+                }
+                if (result && result.telemetry) {
+                    telemetryResult = result;
+                } else if (getUserData) {
+                    telemetryResult = getUserData();
+                }
+            } catch (error) {
+                Logger.traceError("executeCommandError", error, { correlationId: guid, command });
+            }
+
+            Logger.traceUserData(`end-command-` + command, { ...telemetryResult, correlationId: guid, duration: timer1.end() });
+        });
+    };
+    context.subscriptions.push(registerCommand("arduino.showBoardManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.showLibraryManager", () => {
+    context.subscriptions.push(registerCommand("arduino.showLibraryManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Library Manager");
     }));
 
     // change board type
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBoardType", async () => {
+    context.subscriptions.push(registerCommand("arduino.changeBoardType", async () => {
         await boardManager.changeBoardType();
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
+    }, () => {
+        return { board: boardManager.currentBoard.name };
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.verify", () => arduinoApp.verify()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.upload", () => arduinoApp.upload()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.addLibPath", async (path) => await arduinoApp.addLibPath(path)));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.installBoard", async (packageName, arch, version?: string) => {
+    context.subscriptions.push(registerCommand("arduino.verify", () => arduinoApp.verify(), () => {
+        return { board: boardManager.currentBoard.name };
+    }));
+
+    context.subscriptions.push(registerCommand("arduino.upload", () => arduinoApp.upload(),
+        () => {
+            return { board: boardManager.currentBoard.name };
+        }));
+
+    context.subscriptions.push(registerCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));
+    context.subscriptions.push(registerCommand("arduino.installBoard", async (packageName, arch, version?: string) => {
         await arduinoApp.installBoard(packageName, arch, version);
         arduinoManagerProvider.update(BOARD_MANAGER_URI);
+        return { telemetry: true, packageName, arch, version };
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.uninstallBoard", (packagePath) => {
+    context.subscriptions.push(registerCommand("arduino.uninstallBoard", (packagePath) => {
         arduinoApp.uninstallBoard(packagePath);
         arduinoManagerProvider.update(BOARD_MANAGER_URI);
+        return { telemetry: true, packagePath };
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.installLibrary", async (libName, version?: string) => {
+    context.subscriptions.push(registerCommand("arduino.installLibrary", async (libName, version?: string) => {
         await arduinoApp.installLibrary(libName, version);
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
+        return { telemetry: true, libName, version };
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.uninstallLibrary", (libPath) => {
+    context.subscriptions.push(registerCommand("arduino.uninstallLibrary", (libPath) => {
         arduinoApp.uninstallLibrary(libPath);
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
+        return { telemetry: true, libPath };
     }));
 
     // serial monitor commands
     const monitor = new SerialMonitor();
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.selectSerialPort", async () => await monitor.selectSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.openSerialMonitor", async () => await monitor.openSerialMonitor()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.changeBaudRate", async () => await monitor.changeBaudRate()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.sendMessageToSerialPort", async () =>
-        await monitor.sendMessageToSerialPort()));
-    context.subscriptions.push(vscode.commands.registerCommand("arduino.closeSerialMonitor", async () => await monitor.closeSerialMonitor()));
+    context.subscriptions.push(registerCommand("arduino.selectSerialPort", monitor.selectSerialPort.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.openSerialMonitor", monitor.openSerialMonitor.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.changeBaudRate", monitor.changeBaudRate.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", monitor.sendMessageToSerialPort.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", monitor.closeSerialMonitor.bind(monitor)));
 
     // Add arduino specific language suport.
     const clangProvider = new ClangProvider(arduinoApp);
@@ -97,14 +137,18 @@ export async function activate(context: vscode.ExtensionContext) {
     // Example explorer, only work under VSCode insider version.
     if (typeof vscode.window.registerTreeExplorerNodeProvider === "function"
         && vscode.version.indexOf("insider") > -1) {
-        const rootPath = vscode.workspace.rootPath;
         const exampleProvider = require("./arduino/exampleProvider");
         vscode.window.registerTreeExplorerNodeProvider("arduinoExampleTree", new exampleProvider.ExampleProvider(arduinoSettings));
         // This command will be invoked using exactly the node you provided in `resolveChildren`.
-        vscode.commands.registerCommand("arduino.openExample", (node) => {
+        registerCommand("arduino.openExample", (node) => {
             if (node.kind === "leaf") {
                 vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(node.fullPath), true);
             }
         });
     }
+    Logger.traceUserData("end-activate-extension", {correlationId: activeGuid});
+}
+
+export function deactivate() {
+    Logger.traceUserData("deactivate-extension");
 }

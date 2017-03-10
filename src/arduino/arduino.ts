@@ -10,6 +10,7 @@ import * as vscode from "vscode";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
+import * as Logger from "../logger/logger";
 import * as settings from "./settings";
 
 import { DeviceContext, IDeviceContext } from "../deviceContext";
@@ -119,8 +120,7 @@ export class ArduinoApp {
             deviceContext = util.tryParseJSON(fs.readFileSync(configFilePath, "utf8"));
         }
         if (!deviceContext) {
-            vscode.window.showErrorMessage(constants.messages.ARDUINO_FILE_ERROR);
-            throw new Error(constants.messages.ARDUINO_FILE_ERROR);
+            Logger.notifyAndThrowUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
         }
 
         deviceContext.configurations = deviceContext.configurations || [];
@@ -233,7 +233,7 @@ export class ArduinoApp {
     private getBoardDescriptorString(deviceContext: IDeviceContext): string {
         let boardDescriptor = this.boardManager.currentBoard;
         if (!boardDescriptor) {
-            vscode.window.showErrorMessage(constants.messages.NO_BOARD_SELECTED);
+            Logger.notifyUserError("getBoardDescriptorError", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
         }
         let boardString = `${boardDescriptor.platform.package.name}:${boardDescriptor.platform.architecture}:${boardDescriptor.board}`;

@@ -73,7 +73,7 @@ export function mkdirRecursivelySync(dirPath: string): void {
  */
 export function rmdirRecursivelySync(rootPath: string): void {
     if (fs.existsSync(rootPath)) {
-        fs.readdirSync(rootPath).forEach((file, index) => {
+        fs.readdirSync(rootPath).forEach((file) => {
             let curPath = path.join(rootPath, file);
             if (fs.lstatSync(curPath).isDirectory()) { // recurse
                 rmdirRecursivelySync(curPath);
@@ -132,7 +132,7 @@ export function filterJunk(files: any[]): any[] {
 
 export function parseProperties(propertiesFile: string): Thenable<Object> {
     return new Promise((resolve, reject) => {
-        properties.parse(propertiesFile, { path: true}, (error, obj) => {
+        properties.parse(propertiesFile, { path: true }, (error, obj) => {
             if (error) {
                 reject(error);
             } else {
