@@ -49,7 +49,7 @@ export class TelemetryTransport extends winston.Transport {
         if (this.reporter && metadata && metadata.telemetry) {
             try {
                 delete metadata.telemetry;
-                let properties: { [key: string]: string; } = { level: level };
+                let properties: { [key: string]: string; } = { level };
                 let measures: { [key: string]: number; } = {};
                 for (let key of Object.keys(metadata)) {
                     if (typeof key === "string" || key instanceof String) {
