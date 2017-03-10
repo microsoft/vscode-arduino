@@ -7,7 +7,7 @@ import * as childProcess from "child_process";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-
+import * as Logger from "../logger/logger";
 import { fileExistsSync } from "./util";
 
 export function resolveArduinoPath(): string {
@@ -31,7 +31,7 @@ export function resolveArduinoPath(): string {
         // Ignore the errors.
     }
     if (!result) {
-        vscode.window.showErrorMessage("Cannot find the Arduino installation path. You can specify the path in the user settings.");
+        Logger.notifyUserError(new Error("Cannot find the Arduino installation path. You can specify the path in the user settings."));
     }
     return result;
 }
