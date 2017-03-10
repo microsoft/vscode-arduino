@@ -17,9 +17,9 @@ export default class UserNotificationTransport extends winston.Transport {
         if (metadata && metadata.showUser) {
             let notification = (metadata && metadata.notification) ? metadata.notification : message;
             if (level === "warn") {
-                vscode.window.showWarningMessage(message);
+                vscode.window.showWarningMessage(notification);
             } else if (level === "error") {
-                vscode.window.showErrorMessage(message);
+                vscode.window.showErrorMessage(notification);
             } else {
                 winston.error(`Invalid error level '${level}' for user notification.`);
             }
