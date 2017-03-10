@@ -15,7 +15,15 @@
   ],
   "activationEvents": [
     "onLanguage:arduino",
-    "workspaceContains:.vscode/arduino.json"
+    "onLanguage:cpp",
+    "workspaceContains:.vscode/arduino.json",
+    "onCommand:arduino.verify",
+    "onCommand:arduino.upload",
+    "onCommand:arduino.addLibPath",
+    "onCommand:selectSerialPort",
+    "onCommand:changeBoardType",
+    "onCommand:arduino.showBoardManager",
+    "onCommand:arduino.showLibraryManager"
   ],
   "main": "./out/src/extension",
   "contributes": {
