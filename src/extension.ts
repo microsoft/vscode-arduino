@@ -23,7 +23,7 @@ import { SerialMonitor } from "./serialmonitor/serialMonitor";
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     let activeGuid = Uuid.create().value;
-    Logger.traceUserData("start-activate-extension", {correlationId: activeGuid});
+    Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
     const arduinoApp = new ArduinoApp(arduinoSettings);
@@ -146,7 +146,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
     }
-    Logger.traceUserData("end-activate-extension", {correlationId: activeGuid});
+    Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
 export function deactivate() {
