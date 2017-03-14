@@ -105,20 +105,23 @@ export class SerialMonitor {
 
     public async changeBaudRate() {
         let rates = SerialMonitor.listBaudRates();
-        let choose = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
-        if (!choose) {
+        let chosen = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
+        if (!chosen) {
             Logger.warn("No rate is selected, keep baud rate no changed.");
             return;
         }
-        if (!parseInt(choose, 10)) {
-            Logger.warn("Invalid baud rate, keep baud rate no changed.", {value: choose});
+        if (!parseInt(chosen, 10)) {
+            Logger.warn("Invalid baud rate, keep baud rate no changed.", { value: chosen });
             return;
         }
         if (!this._serialPortCtrl) {
             Logger.warn("Serial Monitor have not been started.");
             return;
         }
-        return await this._serialPortCtrl.changeBaudRate(parseInt(choose, 10));
+        let selectedRate: number = parseInt(chosen, 10);
+        await this._serialPortCtrl.changeBaudRate(selectedRate);
+        this._currentBaudRate = selectedRate;
+        this._baudRateStatusBar.text = chosen;
     }
 
     public async closeSerialMonitor() {

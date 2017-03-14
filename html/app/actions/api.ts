@@ -26,8 +26,9 @@ export function installBoard(packageName, arch, version) {
     }).then((response) => response.json());
 }
 
-export function uninstallBoard(packagePath) {
+export function uninstallBoard(boardName, packagePath) {
     return postHTTP("/api/uninstallboard", {
+        boardName,
         packagePath,
     }).then((response) => response.json());
 }
@@ -49,8 +50,9 @@ export function installLibrary(libraryName, version) {
     }).then((response) => response.json());
 }
 
-export function uninstallLibrary(libraryPath) {
+export function uninstallLibrary(libraryName, libraryPath) {
     return postHTTP("/api/uninstalllibrary", {
+        libraryName,
         libraryPath,
     }).then((response) => response.json());
 }

@@ -16,7 +16,7 @@ import * as settings from "./settings";
 import { DeviceContext, IDeviceContext } from "../deviceContext";
 import { BoardManager } from "./boardManager";
 
-export const arduinoChannel = vscode.window.createOutputChannel("Arduino");
+import { arduinoChannel } from "../common/outputChannel";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -74,34 +74,45 @@ export class ArduinoApp {
         }
     }
 
-    public upload() {
+    public async upload() {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
         if (!boardDescriptor) {
             return;
         }
+        arduinoChannel.show();
+
+        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        arduinoChannel.show(true);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
         if (this._settings.logLevel === "verbose") {
             args.push("--verbose");
         }
-        return util.spawn(this._settings.commandPath, arduinoChannel, args);
+        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then((result) => {
+            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+        }, (reason) => {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+        });
     }
 
-    public verify() {
+    public async verify() {
         let dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardDescriptorString(dc);
         if (!boardDescriptor) {
             return;
         }
+        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath];
         if (this._settings.logLevel === "verbose") {
             args.push("--verbose");
         }
-        arduinoChannel.show(true);
-        return util.spawn(this._settings.commandPath, arduinoChannel, args);
+        arduinoChannel.show();
+        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then((result) => {
+            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+        }, (reason) => {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+        });
     }
 
     public addLibPath(libraryPath: string) {
@@ -159,26 +170,35 @@ export class ArduinoApp {
     /**
      * Install arduino board package based on package name and platform hardware architecture.
      */
-    public installBoard(packageName: string, arch: string, version: string = "", showOutput: boolean = true) {
-        arduinoChannel.show(true);
-        return util.spawn(this._settings.commandPath,
-            showOutput ? arduinoChannel : null,
+    public async installBoard(packageName: string, arch: string, version: string = "", showOutput: boolean = true) {
+        arduinoChannel.show();
+        arduinoChannel.start(`Install package - ${packageName}...`);
+        await util.spawn(this._settings.commandPath,
+            showOutput ? arduinoChannel.channel : null,
             ["--install-boards", `${packageName}:${arch}${version && ":" + version}`]);
+        arduinoChannel.end(`Installed board package - ${packageName}`);
     }
 
-    public uninstallBoard(packagePath: string) {
+    public uninstallBoard(boardName: string, packagePath: string) {
+        arduinoChannel.start(`Uninstall board package - ${boardName}...`);
         util.rmdirRecursivelySync(packagePath);
+        arduinoChannel.end(`Installed board package - ${boardName}`);
     }
 
-    public installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
-        arduinoChannel.show(true);
-        return util.spawn(this._settings.commandPath,
-            showOutput ? arduinoChannel : null,
+    public async installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
+        arduinoChannel.show();
+        arduinoChannel.start(`Install library - ${libName}`);
+        await util.spawn(this._settings.commandPath,
+            showOutput ? arduinoChannel.channel : null,
             ["--install-library", `${libName}${version && ":" + version}`]);
+
+        arduinoChannel.end(`Installed libarray - ${libName}`);
     }
 
-    public uninstallLibrary(libPath: string) {
+    public uninstallLibrary(libName: string, libPath: string) {
+        arduinoChannel.start(`Remove library - ${libName}`);
         util.rmdirRecursivelySync(libPath);
+        arduinoChannel.end(`Removed library - ${libName}`);
     }
 
     public getDefaultPackageLibPaths(): string[] {

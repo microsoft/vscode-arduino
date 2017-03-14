@@ -84,6 +84,18 @@
         "title": "Arduino: Manage Libraries"
       }
     ],
+    "keybindings": [
+      {
+        "command": "arduino.verify",
+        "key": "ctrl+r",
+        "mac": "cmd+r"
+      },
+      {
+        "command": "arduino.upload",
+        "key": "ctrl+u",
+        "mac": "cmd+U"
+      }
+    ],
     "menus": {
       "editor/title": [
         {
@@ -138,6 +150,12 @@
           "ino"
         ],
         "configuration": "./syntaxes/arduino.configuration.json"
+      },
+      {
+        "id": "arduino-output",
+        "mimetypes": [
+          "text/x-code-output"
+        ]
       }
     ],
     "grammars": [
@@ -145,6 +163,11 @@
         "language": "arduino",
         "path": "./syntaxes/arduino.tmLanguage",
         "scopeName": "source.cpp.arduino"
+      },
+      {
+        "language": "arduino-output",
+        "scopeName": "arduino.output",
+        "path": "./syntaxes/arduino.output.tmLanguage"
       }
     ],
     "explorer": {
