@@ -87,11 +87,13 @@
     "keybindings": [
       {
         "command": "arduino.verify",
-        "key": "ctrl+alt+v"
+        "key": "ctrl+r",
+        "mac": "cmd+r"
       },
       {
         "command": "arduino.upload",
-        "key": "ctrl+alt+u"
+        "key": "ctrl+u",
+        "mac": "cmd+U"
       }
     ],
     "menus": {

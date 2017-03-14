@@ -93,26 +93,6 @@ export async function activate(context: vscode.ExtensionContext) {
         }));
 
     context.subscriptions.push(registerCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));
-    context.subscriptions.push(registerCommand("arduino.installBoard", async (packageName, arch, version?: string) => {
-        await arduinoApp.installBoard(packageName, arch, version);
-        arduinoManagerProvider.update(BOARD_MANAGER_URI);
-        return { telemetry: true, packageName, arch, version };
-    }));
-    context.subscriptions.push(registerCommand("arduino.uninstallBoard", (packagePath) => {
-        arduinoApp.uninstallBoard(packagePath);
-        arduinoManagerProvider.update(BOARD_MANAGER_URI);
-        return { telemetry: true, packagePath };
-    }));
-    context.subscriptions.push(registerCommand("arduino.installLibrary", async (libName, version?: string) => {
-        await arduinoApp.installLibrary(libName, version);
-        arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
-        return { telemetry: true, libName, version };
-    }));
-    context.subscriptions.push(registerCommand("arduino.uninstallLibrary", (libPath) => {
-        arduinoApp.uninstallLibrary(libPath);
-        arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
-        return { telemetry: true, libPath };
-    }));
 
     // serial monitor commands
     const monitor = new SerialMonitor();
