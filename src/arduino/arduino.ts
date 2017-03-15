@@ -83,6 +83,9 @@ export class ArduinoApp {
         arduinoChannel.show();
 
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+
+        await vscode.commands.executeCommand("arduino.closeSerialMonitor", dc.port);
+
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
         if (this._settings.logLevel === "verbose") {

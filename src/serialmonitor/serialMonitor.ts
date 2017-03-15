@@ -124,8 +124,12 @@ export class SerialMonitor {
         this._baudRateStatusBar.text = chosen;
     }
 
-    public async closeSerialMonitor() {
+    public async closeSerialMonitor(port: string) {
         if (this._serialPortCtrl) {
+            if (port && port !== this._currentPort) {
+                // Port is not opened
+                return;
+            }
             await this._serialPortCtrl.stop();
             this.updatePortStatus(false);
         } else {
