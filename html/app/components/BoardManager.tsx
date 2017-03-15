@@ -106,10 +106,10 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
         <div className="boardmanager">
             {
                 this.props.requesting && (
-                    <div className="mask">Loading...</div>
+                    <div className="mask theme-bgcolor">Loading...</div>
                 )
             }
-            <div className="arduinomanager-toolbar">
+            <div className="arduinomanager-toolbar theme-bgcolor">
                 <div className="dropdown-label">Type</div>
                 <DropdownButton id="typeselector" title={this.state.category} onSelect={this.typeUpdate}>
                     { this.props.categories.map((c, index) => {

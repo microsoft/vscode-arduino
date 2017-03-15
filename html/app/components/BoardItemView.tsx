@@ -32,7 +32,7 @@ export default class BoardView extends React.Component<IBoardProps, IBoardState>
     }
 
     public render() {
-        return (<div className="listitem">
+        return (<div className="listitem theme-listitem">
             { this.buildBoardSectionHeader(this.props.platform) }
             { this.buildBoardSectionBody(this.props.platform) }
             { this.buildBoardSecionButtons(this.props.platform) }
@@ -98,10 +98,10 @@ export default class BoardView extends React.Component<IBoardProps, IBoardState>
     private buildBoardSecionButtons(p) {
         return (<div className="listitem-footer">
             {
-                this.props.installingBoardName === p.name && (<div className="toolbar-mask">Installing...</div>)
+                this.props.installingBoardName === p.name && (<div className="toolbar-mask theme-bgcolor">Installing...</div>)
             }
             {
-                this.props.uninstallingBoardName === p.name && (<div className="toolbar-mask">Removing...</div>)
+                this.props.uninstallingBoardName === p.name && (<div className="toolbar-mask theme-bgcolor">Removing...</div>)
             }
             {
                 p.installedVersion && (

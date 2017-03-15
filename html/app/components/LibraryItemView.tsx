@@ -48,7 +48,7 @@ export default class LibraryItemView extends React.Component<ILibraryProps, ILib
     }
 
     private _render() {
-        return (<div className="listitem">
+        return (<div className="listitem theme-listitem">
             { this.buildLibrarySectionHeader(this.props.library) }
             { this.buildLibrarySectionBody(this.props.library) }
             { this.buildLibrarySectionButtons(this.props.library) }
@@ -121,10 +121,10 @@ export default class LibraryItemView extends React.Component<ILibraryProps, ILib
     private buildLibrarySectionButtons(lib) {
         return (<div className="listitem-footer">
             {
-                this.state.isInstalling && (<div className="toolbar-mask">Installing...</div>)
+                this.state.isInstalling && (<div className="toolbar-mask theme-bgcolor">Installing...</div>)
             }
             {
-                this.state.isUninstalling && (<div className="toolbar-mask">Removing</div>)
+                this.state.isUninstalling && (<div className="toolbar-mask theme-bgcolor">Removing</div>)
             }
             {
                 lib.version && (
