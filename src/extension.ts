@@ -96,11 +96,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // serial monitor commands
     const monitor = new SerialMonitor();
-    context.subscriptions.push(registerCommand("arduino.selectSerialPort", monitor.selectSerialPort.bind(monitor)));
-    context.subscriptions.push(registerCommand("arduino.openSerialMonitor", monitor.openSerialMonitor.bind(monitor)));
-    context.subscriptions.push(registerCommand("arduino.changeBaudRate", monitor.changeBaudRate.bind(monitor)));
-    context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", monitor.sendMessageToSerialPort.bind(monitor)));
-    context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", monitor.closeSerialMonitor.bind(monitor)));
+    context.subscriptions.push(registerCommand("arduino.selectSerialPort", () => monitor.selectSerialPort()));
+    context.subscriptions.push(registerCommand("arduino.openSerialMonitor", () => monitor.openSerialMonitor()));
+    context.subscriptions.push(registerCommand("arduino.changeBaudRate", () => monitor.changeBaudRate()));
+    context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", () => monitor.sendMessageToSerialPort()));
+    context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", (port) => monitor.closeSerialMonitor(port)));
 
     // Add arduino specific language suport.
     const clangProvider = new ClangProvider(arduinoApp);

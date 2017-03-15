@@ -3,6 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
+import * as os from "os";
 import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
 
 interface ISerialPortDetail {
@@ -40,11 +41,10 @@ export class SerialPortCtrl {
     }
 
     public open(): Promise<any> {
-        if (this._outputChannel) {
-            this._outputChannel.clear();
-        } else {
+        if (!this._outputChannel) {
             this._outputChannel = window.createOutputChannel(SerialPortCtrl.SERIAL_MONITOR);
         }
+        this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
         return new Promise((resolve, reject) => {
             if (this._currentSerialPort && this._currentSerialPort.isOpen()) {
                 this._currentSerialPort.close((err) => {
@@ -64,8 +64,10 @@ export class SerialPortCtrl {
                 this._currentSerialPort.on("open", () => {
                     this._currentSerialPort.write("TestingOpen", (err) => {
                         if (err) {
+                            this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
                             reject(err);
                         } else {
+                            this._outputChannel.appendLine(`[Info] Opened the serial port - ${this._currentPort}`);
                             resolve();
                         }
                     });
@@ -129,7 +131,7 @@ export class SerialPortCtrl {
             }
             this._currentSerialPort.close((err) => {
                 if (this._outputChannel) {
-                    this._outputChannel.appendLine("User stopped!");
+                    this._outputChannel.appendLine(`[Done] Closed the serial port ${os.EOL}`);
                 }
                 this._currentSerialPort = null;
                 if (err) {

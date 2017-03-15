@@ -23,7 +23,7 @@
                     </dict>
                 </dict>
                 <key>match</key>
-                <string>(\[Starting\])(.*)</string>
+                <string>(\[Starting\]|\[Info\])(.*)</string>
                 <key>name</key>
                 <string>arduino-output.start</string>
             </dict>
