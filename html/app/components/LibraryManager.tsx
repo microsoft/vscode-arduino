@@ -129,10 +129,10 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
         return (<div className={"librarymanager " + (isOperating ? "disabled" : "")}>
             {
                 this.props.requesting && (
-                    <div className="mask">Loading...</div>
+                    <div className="mask theme-bgcolor">Loading...</div>
                 )
             }
-            <div className="arduinomanager-toolbar">
+            <div className="arduinomanager-toolbar theme-bgcolor">
                 <div className="dropdown-label">Type</div>
                 <DropdownButton id="typeselector" title={this.state.type} onSelect={this.typeUpdate}>
                     { this.props.types.map((c, index) => {

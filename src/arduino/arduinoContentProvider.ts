@@ -40,18 +40,13 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public provideTextDocumentContent(uri: vscode.Uri) {
-        // URI needs to be encoded as a component for proper inclusion in a url
         let type = "";
         if (uri.toString() === Constants.BOARD_MANAGER_URI.toString()) {
             type = "boardmanager";
         } else if (uri.toString() === Constants.LIBRARY_MANAGER_URI.toString()) {
             type = "librarymanager";
         }
-        let encodedUri = encodeURIComponent(uri.toString());
 
-        // Fix for issue #669 "Results Panel not Refreshing Automatically" - always include a unique time
-        // so that the content returned is different. Otherwise VSCode will not refresh the document since it
-        // thinks that there is nothing to be updated.
         let timeNow = new Date().getTime();
         return `
         <html>
@@ -65,7 +60,6 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                     var color = styles.getPropertyValue('--color');
                     var theme = document.body.className;
                     var url = "${this._webserver.getEndpointUri(type)}?" +
-                            "uri=${encodedUri}" +
                             "&theme=" + theme +
                             "&backgroundcolor=" + backgroundcolor +
                             "&color=" + color;

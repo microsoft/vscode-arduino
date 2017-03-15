@@ -6,7 +6,7 @@
 .search-input > input {
   width: 100%;
   font-size: 18px;
-  border: none;
+  border: 1px solid #ccc;
   line-height: 22px;
   padding: 5px 10px 5px 10px;
   height: 34px;

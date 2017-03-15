@@ -1,25 +1,25 @@
-$theme-night-bgcolor: #1a1a1a;
-$theme-night-bgcolor-hover: #333;
-$theme-night-color: #ccc;
-$theme-night-border-color: #505050;
+// vscode-dark styles
+$vscode-dark-bgcolor-hover: #333;
+$vscode-dark-border-color: #505050;
+.vscode-dark {
+    .theme-listitem {
+        border: 1px double $vscode-dark-border-color;
 
-html.theme-night body {
-    background-color: $theme-night-bgcolor;
-    color: $theme-night-color;
-
-    .theme-bgcolor {
-        background-color: $theme-night-bgcolor;
+        &:hover {
+            background-color: $vscode-dark-bgcolor-hover;
+        }
     }
+}
 
-    .theme-bgcolor-hover {
-        background-color: $theme-night-bgcolor-hover
-    }
+// vscode-light styles
+$vscode-light-bgcolor-hover: #e9f3f5;
+$vscode-light-border-color: #505050;
+.vscode-light {
+    .theme-listitem {
+        border: 1px double $vscode-light-border-color;
 
-    .theme-color {
-        color: $theme-night-color;
-    }
-
-    .theme-border {
-        border: 1px double $theme-night-border-color;
+        &:hover {
+            background-color: $vscode-light-bgcolor-hover;
+        }
     }
 }

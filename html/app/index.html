@@ -1,4 +1,41 @@
-<html class="theme-night">
+<html>
+  <head>
+    <style title="themestyle"> </style>
+    <script type="text/javascript">
+      // inherit theme styles from vscode ide
+      var decode = function (s) {
+        return decodeURIComponent(s.replace(/\+/g, " ")); 
+      };
+      var getStyleSheet = function (unique_title) {
+        for(var i=0; i<document.styleSheets.length; i++) {
+          var sheet = document.styleSheets[i];
+          if(sheet.title == unique_title) {
+            return sheet;
+          }
+        }
+      };
+      var match,
+          search = /([^&=]+)=?([^&]*)/g,
+          query  = window.location.search.substring(1),
+          queryParams = {};
+      while (match = search.exec(query)) {
+        queryParams[decode(match[1])] = decode(match[2]);
+      }
+      var supportedThemes = ["vscode-dark", "vscode-light"];
+      var theme = "vscode-dark"; // default theme.
+      if (supportedThemes.indexOf(queryParams["theme"]) > -1) {
+        theme = queryParams["theme"];
+      }
+      var bgcolor = queryParams["backgroundcolor"];
+      var color = queryParams["color"];
+      var stylesheet = getStyleSheet("themestyle");
+      stylesheet.insertRule(".vscode-theme { background-color: " + bgcolor + "; color: " + color + "; }", 0);
+      stylesheet.insertRule(".vscode-theme .theme-bgcolor { background-color: " + bgcolor + "; }", 1);
+      stylesheet.insertRule(".vscode-theme .theme-color { color: " + color + "; }", 2);
+      stylesheet.insertRule("html > body { background-color: " + bgcolor + "; color: " + color + "; }", 3);
+      document.documentElement.className = theme + " vscode-theme";
+    </script>
+  </head>
   <body>
     <div id="mainContent"></div>
   </body>

@@ -10,7 +10,6 @@
 }
 
 .mask {
-    @extend .theme-bgcolor;
     position: absolute;
     z-index: 9999;
     top: 0;
@@ -20,7 +19,6 @@
 }
 
 .arduinomanager-toolbar {
-    @extend .theme-bgcolor;
     height: 60px;
     padding: 15px 10px;
     position: fixed;
@@ -80,13 +78,8 @@ a {
 }
 
 .listitem {
-    @extend .theme-border;
     padding: 5px 10px;
     margin: 10px;
-
-    &:hover {
-        @extend .theme-bgcolor-hover;
-    }
 }
 
 .listitem-header {
@@ -140,7 +133,6 @@ a {
     }
 
     .toolbar-mask {
-        @extend .theme-bgcolor;
         position: absolute;
         z-index: 9999;
         left: 20px;
@@ -148,10 +140,6 @@ a {
         text-align: end;
         margin-top: -5px;
         height: 45px;
-
-        &:hover {
-            @extend .theme-bgcolor-hover;
-        }
     }
 }
 
