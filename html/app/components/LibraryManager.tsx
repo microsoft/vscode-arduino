@@ -112,13 +112,21 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
 
         const SEARCH_KEYS = ["name", "sentence", "paragraph"];
         const filterSearch = createFilter(this.state.searchTerm, SEARCH_KEYS);
+        let totalCount = 0;
         this.props.libraries.forEach((element) => {
             if (filterType(element, this.state.type) && filterTopic(element, this.state.topic) && filterSearch(element)) {
                 element.shouldBeDisplayed = true;
+                totalCount++;
             } else {
                 element.shouldBeDisplayed = false;
             }
         });
+        let totalCountTips = "";
+        if (this.state.type === "All" && this.state.topic === "All" && !this.state.searchTerm) {
+            totalCountTips = `Total ${totalCount} Libraries`;
+        } else {
+            totalCountTips = `${totalCount} Libraries matched`;
+        }
 
         const libraryItemProps = {
             installLibrary: this.props.installLibrary,
@@ -156,7 +164,9 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
                     })
                 }
             </div>
-            <div className="arduinomanager-footer"></div>
+            <div className="arduinomanager-footer theme-bgcolor">
+                <span>{ totalCountTips }</span>
+            </div>
         </div>);
     }
 
