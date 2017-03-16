@@ -81,6 +81,8 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
                         return versionCompare(element.versions[0], element.installedVersion) > 0;
                     }
                     return false;
+                case "Installed":
+                    return !!element.installedVersion;
                 default:
                     return element.category === type;
             }

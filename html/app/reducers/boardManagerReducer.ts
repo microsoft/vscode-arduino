@@ -24,7 +24,7 @@ export default function boardManagerReducer(state = initalState, action) {
                 ...state,
                 errorMessage: "",
                 requesting: true,
-                categories: ["All", "Updatable"],
+                categories: ["All", "Updatable", "Installed"],
             };
         case actions.BOARD_PACKAGES_SUCCESS:
             const categories = util.parseGroups(action.platforms, "category");
@@ -37,7 +37,7 @@ export default function boardManagerReducer(state = initalState, action) {
                 errorMessage: "",
                 requesting: false,
                 platforms: action.platforms,
-                categories: ["All", "Updatable"].concat(categories.sort()),
+                categories: ["All", "Updatable", "Installed"].concat(categories.sort()),
             };
         case actions.BOARD_PACKAGES_FAILURE:
             return {
@@ -45,7 +45,6 @@ export default function boardManagerReducer(state = initalState, action) {
                 errorMessage: action.errorMessage,
                 requesting: false,
                 platforms: [],
-                categories: ["All", "Updatable"],
             };
         case actions.INSTALL_BOARD_REQUEST:
             return {
