@@ -26,7 +26,7 @@ export default class BoardView extends React.Component<IBoardProps, IBoardState>
     constructor(props) {
         super(props);
         this.state = {
-            version: "",
+            version: props.platform.installedVersion ? "" : props.platform.versions[0],
         };
         this.versionUpdate = this.versionUpdate.bind(this);
     }
@@ -85,7 +85,7 @@ export default class BoardView extends React.Component<IBoardProps, IBoardState>
         });
         return (<div className="listitem-container">
             <div>
-                Boards included in this package:<br/> {p.boards.map((board: any) => board.name).join(", ")}  
+                Boards included in this package:<br/> {p.boards.map((board: any) => board.name).join(", ")}
             </div>
             {
                 helpLinks.map((helpLink, index) => {
@@ -122,21 +122,35 @@ export default class BoardView extends React.Component<IBoardProps, IBoardState>
                     </div>
                 )
             }
-            <div className="left-side">
-                <DropdownButton id="versionselector" title={this.state.version || "Select version"}
-                placeholder="Select version" onSelect={this.versionUpdate}>
-                    { p.versions.map((v, index) => {
-                        if (v === p.installedVersion) {
-                            return "";
-                        }
-                        return (<MenuItem key={index} eventKey={v} active={v === this.state.version}>{v}</MenuItem>);
-                    })}
-                </DropdownButton>
-                <Button className="operation-btn" disabled={!this.state.version}
-                onClick={() => this.props.installBoard(p.name, p.package.name, p.architecture, this.state.version)}>
-                Install
-                </Button>
-            </div>
+            {
+                p.versions && p.versions.length > 1 && (
+                    <div className="left-side">
+                        <DropdownButton id="versionselector" title={this.state.version || "Select version"}
+                        placeholder="Select version" onSelect={this.versionUpdate}>
+                            { p.versions.map((v, index) => {
+                                if (v === p.installedVersion) {
+                                    return "";
+                                }
+                                return (<MenuItem key={index} eventKey={v} active={v === this.state.version}>{v}</MenuItem>);
+                            })}
+                        </DropdownButton>
+                        <Button className="operation-btn" disabled={!this.state.version}
+                        onClick={() => this.props.installBoard(p.name, p.package.name, p.architecture, this.state.version)}>
+                        Install
+                        </Button>
+                    </div>
+                )
+            }
+            {
+                p.versions && p.versions.length === 1 && !p.installedVersion && (
+                    <div className="left-side">
+                        <Button className="operation-btn"
+                        onClick={() => this.props.installBoard(p.name, p.package.name, p.architecture, p.versions[0])}>
+                        Install
+                        </Button>
+                    </div>
+                )
+            }
         </div>);
     }
 }

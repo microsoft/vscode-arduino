@@ -102,8 +102,9 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
             uninstallBoard: this.props.uninstallBoard,
         };
 
+        const isOperating = this.props.installingBoardName || this.props.uninstallingBoardName;
         return (
-        <div className="boardmanager">
+        <div className={"boardmanager " + (!!isOperating ? "disabled" : "")}>
             {
                 this.props.requesting && (
                     <div className="mask theme-bgcolor">Loading...</div>

@@ -28,7 +28,7 @@ export default class LibraryItemView extends React.Component<ILibraryProps, ILib
     constructor(props) {
         super(props);
         this.state = {
-            version: "",
+            version: props.library.installed ? "" : props.library.versions[0],
             isInstalling: false,
             isUninstalling: false,
         };
