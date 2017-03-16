@@ -202,14 +202,14 @@ export class BoardManager {
         let indexFiles = ["package_index.json"];
         let preferences = this._arduinoApp.preferences;
         indexFiles = indexFiles.concat(this.getAddtionalIndexFiles());
-        await indexFiles.forEach(async (indexFile) => {
+        for (let indexFile of indexFiles) {
             if (!util.fileExistsSync(path.join(rootPackgeFolder, indexFile))) {
                 await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
                 await this._arduinoApp.initialize(true);
             }
             let packageContent = fs.readFileSync(path.join(rootPackgeFolder, indexFile), "utf8");
             this.parsePackageIndex(JSON.parse(packageContent));
-        });
+        }
 
         this.loadInstalledPlatforms();
         this.loadDefaultPlatforms();
@@ -334,6 +334,10 @@ export class BoardManager {
                 let addedPlatform = this._platforms
                     .find((_plat) => _plat.architecture === plat.architecture && _plat.package.name === plat.package.name);
                 if (addedPlatform) {
+                    // union boards from all versions.
+                    addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
+                        return a.name === b.name;
+                    });
                     addedPlatform.versions.push(plat.version);
                 } else {
                     plat.versions = [plat.version];

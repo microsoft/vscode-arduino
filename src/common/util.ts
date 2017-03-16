@@ -155,3 +155,16 @@ export function formatVersion(version: string): string {
     }
     return versions.join(".");
 }
+
+export function union(a: any[], b: any[], compare?: Function) {
+    const result = [].concat(a);
+    b.forEach((item) => {
+        const exist = result.find((element) => {
+            return (compare ? compare(item, element) : Object.is(item, element));
+        });
+        if (!exist) {
+            result.push(item);
+        }
+    });
+    return result;
+}

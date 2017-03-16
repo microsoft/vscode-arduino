@@ -81,6 +81,8 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
                         return versionCompare(element.versions[0], element.installedVersion) > 0;
                     }
                     return false;
+                case "Installed":
+                    return !!element.installedVersion;
                 default:
                     return element.category === type;
             }
@@ -102,8 +104,9 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
             uninstallBoard: this.props.uninstallBoard,
         };
 
+        const isOperating = this.props.installingBoardName || this.props.uninstallingBoardName;
         return (
-        <div className="boardmanager">
+        <div className={"boardmanager " + (!!isOperating ? "disabled" : "")}>
             {
                 this.props.requesting && (
                     <div className="mask theme-bgcolor">Loading...</div>
