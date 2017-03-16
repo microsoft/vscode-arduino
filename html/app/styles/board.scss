@@ -56,6 +56,16 @@
 
 .arduinomanager-container {
     padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+.arduinomanager-footer {
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    padding: 0px 10px;
 }
 
 a {

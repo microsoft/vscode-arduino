@@ -95,6 +95,12 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
             return filterType(element, this.state.category) && filterSearch(element);
         });
 
+        let totalCountTips = "";
+        if (this.state.category === "All" && !this.state.searchTerm) {
+            totalCountTips = `Total ${filteredPlatforms.length} Boards`;
+        } else {
+            totalCountTips = `${filteredPlatforms.length} Boards matched`;
+        }
         const boardProps = {
             installingBoardName: this.props.installingBoardName,
             installErrorMessage: this.props.installErrorMessage,
@@ -128,7 +134,9 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
                     })
                 }
             </div>
-            <div className="arduinomanager-footer"></div>
+            <div className="arduinomanager-footer theme-bgcolor">
+                <span>{totalCountTips}</span>
+            </div>
         </div>);
     }
 
