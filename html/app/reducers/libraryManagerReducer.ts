@@ -30,9 +30,10 @@ export function libraryManagerReducer(state = initalState, action) {
                 return item.category || "Uncategorized";
             });
             // Sorting versions in descending order.
-            action.libraries.forEach((element) => {
+            // for loop is faster than forEach iterator.
+            for (let element of action.libraries) {
                 element.versions = element.versions ? element.versions.sort(util.versionCompare).reverse() : element.versions;
-            });
+            }
             return {
                 ...state,
                 libraries: action.libraries,

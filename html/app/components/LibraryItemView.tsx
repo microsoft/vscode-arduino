@@ -127,9 +127,13 @@ export default class LibraryItemView extends React.Component<ILibraryProps, ILib
                 this.state.isUninstalling && (<div className="toolbar-mask theme-bgcolor">Removing</div>)
             }
             {
-                lib.version && (
+                lib.installed && (
                     <div className="right-side">
-                        <Button className="operation-btn" onClick={() => this.addLibPath(lib.srcPath)}>Add to Include Path</Button>
+                        {
+                            lib.supported && (
+                                <Button className="operation-btn" onClick={() => this.addLibPath(lib.srcPath)}>Add to Include Path</Button>
+                            )
+                        }
                         {
                             lib.versions && lib.versions.length && util.versionCompare(lib.versions[0], lib.version) > 0 && (
                                 <Button className="operation-btn" onClick={() => this.installLibrary(lib.name, lib.versions[0])}>Update</Button>

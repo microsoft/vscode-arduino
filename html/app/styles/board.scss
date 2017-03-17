@@ -19,7 +19,7 @@
 }
 
 .arduinomanager-toolbar {
-    height: 60px;
+    min-height: 60px;
     padding: 15px 10px;
     position: fixed;
     width: 100%;
@@ -162,6 +162,20 @@ a {
 }
 
 .librarymanager {
+    .arduinomanager-toolbar {
+        min-height: 80px;
+    }
+
+    .supported-checkbox {
+        margin-top: -5px;
+        margin-bottom: 0px;
+        padding-left: 5px;
+    }
+
+    .arduinomanager-container {
+        padding-top: 80px;
+    }
+
     .search-input {
         margin-left: 380px;
         padding-top: 0px;
