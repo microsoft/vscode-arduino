@@ -87,7 +87,7 @@ export class LibraryManager {
         if (os.platform() === "darwin") {
             ideLibraryPath = path.join(arduinoPath, "Arduino.app/Contents/Java/libraries");
         }
-        const ideLibraries = util.filterJunk(fs.readdirSync(ideLibraryPath));
+        const ideLibraries = util.filterJunk(util.readdirSync(ideLibraryPath, true));
         for (let libDir of ideLibraries) {
             if (util.fileExistsSync(path.join(ideLibraryPath, libDir, "library.properties"))) {
                 const properties = <any>await util.parseProperties(path.join(ideLibraryPath, libDir, "library.properties"));
@@ -112,7 +112,7 @@ export class LibraryManager {
             return;
         }
 
-        let installedLibDirs = util.filterJunk(fs.readdirSync(libRoot));
+        let installedLibDirs = util.filterJunk(util.readdirSync(libRoot, true));
         for (let libDir of installedLibDirs) {
             if (util.fileExistsSync(path.join(libRoot, libDir, "library.properties"))) {
                 const properties = <any>await util.parseProperties(path.join(libRoot, libDir, "library.properties"));
@@ -147,7 +147,7 @@ export class LibraryManager {
         let builtInLib = [];
         let builtInLibPath = path.join(rootBoardPath, "libraries");
         if (util.directoryExistsSync(builtInLibPath)) {
-            let libDirs = util.filterJunk(fs.readdirSync(builtInLibPath));
+            let libDirs = util.filterJunk(util.readdirSync(builtInLibPath, true));
             if (!libDirs || !libDirs.length) {
                 return builtInLib;
             }

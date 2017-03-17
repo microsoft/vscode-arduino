@@ -348,11 +348,11 @@ export class BoardManager {
 
     private loadInstalledPlatforms(): void {
         this._installedPlatforms = [];
-        let rootPacakgesPath = path.join(path.join(this._settings.packagePath, "packages"));
-        if (!util.directoryExistsSync(rootPacakgesPath)) {
+        let rootPackagePath = path.join(path.join(this._settings.packagePath, "packages"));
+        if (!util.directoryExistsSync(rootPackagePath)) {
             return;
         }
-        const dirs = util.filterJunk(fs.readdirSync(rootPacakgesPath)); // in Mac, filter .DS_Store file.
+        const dirs = util.filterJunk(util.readdirSync(rootPackagePath, true)); // in Mac, filter .DS_Store file.
         dirs.forEach((packageName) => {
             let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
             if (!util.directoryExistsSync(archPath)) {

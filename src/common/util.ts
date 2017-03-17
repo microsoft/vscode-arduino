@@ -51,6 +51,24 @@ export function directoryExistsSync(dirPath: string): boolean {
     }
 }
 
+/**
+ * This function will implement same function as fs.readdirSync,
+ * besides it could filter folders when the second argument is true.
+ * @function readdirSync
+ * @argument {string} dirPath
+ * @argument {boolean} folderOnly
+ */
+export function readdirSync(dirPath: string, folderOnly: boolean = false): string[] {
+    const dirs = fs.readdirSync(dirPath);
+    if (folderOnly) {
+        return dirs.filter((subdir) => {
+            return directoryExistsSync(path.join(dirPath, subdir));
+        });
+    } else {
+        return dirs;
+    }
+}
+
 export function mkdirRecursivelySync(dirPath: string): void {
     if (directoryExistsSync(dirPath)) {
         return ;
