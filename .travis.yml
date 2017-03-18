@@ -6,6 +6,8 @@ node_js:
 os:
 - linux
 - osx
+# use Ubuntu 14.04 LTS
+dist: trusty
 
 branches:
   only:

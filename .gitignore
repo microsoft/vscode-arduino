@@ -2,3 +2,4 @@ arduino.log
 out
 node_modules
 .vscode-test
+*.vsix
