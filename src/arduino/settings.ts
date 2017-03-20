@@ -20,7 +20,9 @@ export interface IArduinoSettings {
     logLevel: string;
     commandPath: string;
     packagePath: string;
+    defaultPackagePath: string;
     libPath: string;
+    defaultLibPath: string;
     formatterSettings: IClangFormatterSettings;
 }
 
@@ -94,8 +96,24 @@ export class ArduinoSettings implements IArduinoSettings {
         return this._packagePath;
     }
 
+    public get defaultPackagePath(): string {
+        if (os.platform() === "darwin") {
+            return path.join(this.arduinoPath, "Arduino.app/Contents/Java/hardware");
+        } else { // linux and win32.
+            return path.join(this.arduinoPath, "hardware");
+        }
+    }
+
     public get libPath(): string {
         return this._libPath;
+    }
+
+    public get defaultLibPath(): string {
+        if (os.platform() === "darwin") {
+            return path.join(this.arduinoPath, "Arduino.app/Contents/Java/libraries");
+        } else { // linux and win32
+            return path.join(this.arduinoPath, "libraries");
+        }
     }
 
     public get logLevel(): string {

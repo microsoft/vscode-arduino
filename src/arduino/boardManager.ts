@@ -211,8 +211,8 @@ export class BoardManager {
             this.parsePackageIndex(JSON.parse(packageContent));
         }
 
-        this.loadInstalledPlatforms();
         this.loadDefaultPlatforms();
+        this.loadInstalledPlatforms();
 
         this.loadInstalledBoards();
         this.updateStatusBar();
@@ -281,18 +281,10 @@ export class BoardManager {
 
     private loadDefaultPlatforms() {
         // Default arduino package information:
-        const arduinoPath = this._settings.arduinoPath;
         const packageName = "arduino";
         const archName = "avr";
-        let defaultPlatformPath = path.join(arduinoPath, "hardware");
-        const platform = os.platform();
-        if (platform === "darwin") {
-            defaultPlatformPath = path.join(arduinoPath, "Arduino.app/Contents/Java/hardware");
-        } else if (platform === "linux") {
-            // TODO Check default platform path at linux.
-        }
         try {
-            let packageBundled = fs.readFileSync(path.join(defaultPlatformPath, "package_index_bundled.json"), "utf8");
+            let packageBundled = fs.readFileSync(path.join(this._settings.defaultPackagePath, "package_index_bundled.json"), "utf8");
             if (!packageBundled) {
                 return;
             }
@@ -316,7 +308,7 @@ export class BoardManager {
                             return;
                         } else {
                             filteredPlat.installedVersion = v;
-                            filteredPlat.rootBoardPath = path.join(defaultPlatformPath, "arduino/avr");
+                            filteredPlat.rootBoardPath = path.join(this._settings.defaultPackagePath, "arduino", "avr");
                             this.installedPlatforms.push(filteredPlat);
                         }
                     }
@@ -352,11 +344,11 @@ export class BoardManager {
 
     private loadInstalledPlatforms(): void {
         this._installedPlatforms = [];
-        let rootPacakgesPath = path.join(path.join(this._settings.packagePath, "packages"));
-        if (!util.directoryExistsSync(rootPacakgesPath)) {
+        let rootPackagePath = path.join(path.join(this._settings.packagePath, "packages"));
+        if (!util.directoryExistsSync(rootPackagePath)) {
             return;
         }
-        const dirs = util.filterJunk(fs.readdirSync(rootPacakgesPath)); // in Mac, filter .DS_Store file.
+        const dirs = util.filterJunk(util.readdirSync(rootPackagePath, true)); // in Mac, filter .DS_Store file.
         dirs.forEach((packageName) => {
             let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
             if (!util.directoryExistsSync(archPath)) {
@@ -370,6 +362,7 @@ export class BoardManager {
                 let allVersion = util.filterJunk(fs.readdirSync(path.join(archPath, architecture)));
                 let existingPlatform = this._platforms.find((_plat) => _plat.package.name === packageName && _plat.architecture === architecture);
                 if (existingPlatform && allVersion && allVersion.length) {
+                    existingPlatform.defaultPlatform = false;
                     existingPlatform.installedVersion = allVersion[0];
                     existingPlatform.rootBoardPath = path.join(archPath, architecture, allVersion[0]);
                     this._installedPlatforms.push(existingPlatform);
@@ -379,7 +372,6 @@ export class BoardManager {
     }
 
     private loadInstalledBoards(): void {
-        // let boards: Map<string, IBoard> = new Map<string, IBoard>();
         this._boards = new Map<string, IBoard>();
         this.installedPlatforms.forEach((plat) => {
             let dir = plat.rootBoardPath;
