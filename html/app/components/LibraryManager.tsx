@@ -4,7 +4,7 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as React from "react";
-import { Button, DropdownButton, MenuItem } from "react-bootstrap";
+import { Button, Checkbox, DropdownButton, MenuItem } from "react-bootstrap";
 import { connect } from "react-redux";
 import SearchInput, { createFilter } from "react-search-input";
 import * as actions from "../actions";
@@ -28,6 +28,7 @@ interface ILibraryManagerState extends React.Props<any> {
     searchTerm: string;
     type: string;
     topic: string;
+    checked: boolean;
 }
 
 const mapStateToProps = (store) => {
@@ -72,10 +73,12 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
             searchTerm: "",
             type: "All",
             topic: "All",
+            checked: false,
         };
         this.typeUpdate = this.typeUpdate.bind(this);
         this.topicUpdate = this.topicUpdate.bind(this);
         this.searchUpdate = this.searchUpdate.bind(this);
+        this.handleCheck = this.handleCheck.bind(this);
     }
 
     public componentWillMount() {
@@ -103,8 +106,8 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
             switch (topic) {
                 case "All":
                     return true;
-                case "Uncatogorized":
-                    return !element.category;
+                case "Uncategorized":
+                    return !element.category || element.category === topic;
                 default:
                     return element.category === topic;
             }
@@ -114,7 +117,8 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
         const filterSearch = createFilter(this.state.searchTerm, SEARCH_KEYS);
         let totalCount = 0;
         this.props.libraries.forEach((element) => {
-            if (filterType(element, this.state.type) && filterTopic(element, this.state.topic) && filterSearch(element)) {
+            const filterSupported = this.state.checked ? element.supported : true;
+            if (filterSupported && filterType(element, this.state.type) && filterTopic(element, this.state.topic) && filterSearch(element)) {
                 element.shouldBeDisplayed = true;
                 totalCount++;
             } else {
@@ -154,6 +158,7 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
                     })}
                 </DropdownButton>
                 <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
+                <Checkbox className="supported-checkbox" onChange={this.handleCheck}>Only show libraries supported by current board</Checkbox>
             </div>
             <div className="arduinomanager-container">
                 {
@@ -185,6 +190,12 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
     private searchUpdate(term) {
         this.setState({
             searchTerm: term,
+        });
+    }
+
+    private handleCheck() {
+        this.setState({
+            checked: !this.state.checked,
         });
     }
 }
