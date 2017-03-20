@@ -30,11 +30,11 @@
   "contributes": {
     "snippets": [
       {
-        "language": "arduino",
+        "language": "cpp",
         "path": "./snippets/arduino.json"
       },
       {
-        "language": "cpp",
+        "language": "c",
         "path": "./snippets/arduino.json"
       }
     ],
@@ -138,19 +138,15 @@
         }
       }
     },
-    "languages": [
-      {
-        "id": "arduino",
-        "extensions": [
-          ".ino"
-        ],
-        "aliases": [
-          "Arduino",
-          "arduino",
-          "ino"
-        ],
-        "configuration": "./syntaxes/arduino.configuration.json"
+    "configurationDefaults": {
+      "[cpp]": {
+        "editor.quickSuggestions": true
       },
+      "[c]": {
+        "editor.quickSuggestions": true
+      }
+    },
+    "languages": [
       {
         "id": "arduino-output",
         "mimetypes": [
@@ -160,7 +156,7 @@
     ],
     "grammars": [
       {
-        "language": "arduino",
+        "language": "cpp",
         "path": "./syntaxes/arduino.tmLanguage",
         "scopeName": "source.cpp.arduino"
       },
@@ -169,11 +165,7 @@
         "scopeName": "arduino.output",
         "path": "./syntaxes/arduino.output.tmLanguage"
       }
-    ],
-    "explorer": {
-      "treeLabel": "Arduino Examples",
-      "treeExplorerNodeProviderId": "arduinoExampleTree"
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "gulp build",
