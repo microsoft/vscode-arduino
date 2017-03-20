@@ -49,6 +49,7 @@ export class LibraryManager {
 
         await this._arduinoApp.boardManager.loadPackages();
 
+        // Parse libraries index file "library_index.json"
         let libraryIndexFilePath = path.join(this._settings.packagePath, "library_index.json");
         if (!util.fileExistsSync(libraryIndexFilePath)) {
             await this._arduinoApp.initializeLibrary();
@@ -56,11 +57,15 @@ export class LibraryManager {
         let packageContent = fs.readFileSync(libraryIndexFilePath, "utf8");
         this.parseLibraryIndex(JSON.parse(packageContent));
 
-        await this.loadIdeLibraries();
-        await this.loadInstalledLibraries();
+        // Load default Arduino libraries from Arduino installation package.
+        await this.loadInstalledLibraries(this._settings.defaultLibPath, true);
+        // Load manually installed libraries.
+        await this.loadInstalledLibraries(this._settings.libPath, false);
+        // Load libraries from installed board packages.
         const builtinLibs = await this.loadBoardLibraries();
         this._libraries = Array.from(this._libraryMap.values());
         this._libraries = this._libraries.concat(builtinLibs);
+        // Mark those libraries that are supported by current board's architecture.
         this.tagSupportedLibraries();
     }
 
@@ -81,34 +86,8 @@ export class LibraryManager {
         });
     }
 
-    private async loadIdeLibraries() {
-        const arduinoPath = this._settings.arduinoPath;
-        let ideLibraryPath = path.join(arduinoPath, "libraries"); // linux and win32
-        if (os.platform() === "darwin") {
-            ideLibraryPath = path.join(arduinoPath, "Arduino.app/Contents/Java/libraries");
-        }
-        const ideLibraries = util.filterJunk(util.readdirSync(ideLibraryPath, true));
-        for (let libDir of ideLibraries) {
-            if (util.fileExistsSync(path.join(ideLibraryPath, libDir, "library.properties"))) {
-                const properties = <any>await util.parseProperties(path.join(ideLibraryPath, libDir, "library.properties"));
-                const formattedName = properties.name.replace(/\s+/g, "_");
-                let sourceLib = this._libraryMap.get(formattedName);
-                if (sourceLib) {
-                    sourceLib.version = util.formatVersion(properties.version);
-                    sourceLib.builtIn = true;
-                    sourceLib.installed = true;
-                    sourceLib.installedPath = path.join(ideLibraryPath, libDir);
-                    sourceLib.srcPath = path.join(ideLibraryPath, libDir, "src");
-                    // If lib src folder doesn't exist, then fallback to the lib root path as source folder.
-                    sourceLib.srcPath = util.directoryExistsSync(sourceLib.srcPath) ? sourceLib.srcPath : path.join(ideLibraryPath, libDir);
-                }
-            }
-        }
-    }
-
-    private async loadInstalledLibraries() {
-        const libRoot = this._settings.libPath;
-        if (!util.directoryExistsSync(this._settings.libPath)) {
+    private async loadInstalledLibraries(libRoot: string, isBuiltin: boolean) {
+        if (!util.directoryExistsSync(libRoot)) {
             return;
         }
 
@@ -120,7 +99,7 @@ export class LibraryManager {
                 let sourceLib = this._libraryMap.get(formattedName);
                 if (sourceLib) {
                     sourceLib.version = util.formatVersion(properties.version);
-                    sourceLib.builtIn = false;
+                    sourceLib.builtIn = isBuiltin;
                     sourceLib.installed = true;
                     sourceLib.installedPath = path.join(libRoot, libDir);
                     sourceLib.srcPath = path.join(libRoot, libDir, "src");
@@ -131,6 +110,7 @@ export class LibraryManager {
         }
     }
 
+    // Builtin libraries from board packages.
     private async loadBoardLibraries() {
         let builtinLibs = [];
         const librarySet = new Set(this._libraryMap.keys());
@@ -152,40 +132,28 @@ export class LibraryManager {
                 return builtInLib;
             }
             for (let libDir of libDirs) {
-                if (!util.fileExistsSync(path.join(builtInLibPath, libDir, "library.properties"))) {
-                    const properties = <ILibrary>{};
-                    properties.name = libDir;
-                    properties.builtIn = true;
-                    properties.installedPath = path.join(builtInLibPath, libDir);
-                    properties.srcPath = path.join(builtInLibPath, libDir, "src");
-                    // If lib src folder doesn't exist, then fallback to lib root path as source folder.
-                    properties.srcPath = util.directoryExistsSync(properties.srcPath) ? properties.srcPath : path.join(builtInLibPath, libDir);
-                    properties.installed = true;
-                    properties.architectures = [architecture];
-                    // For libraries with the same name, append architecture info to name to avoid duplication.
-                    if (librarySet.has(properties.name)) {
-                        properties.name = properties.name + "(" + architecture + ")";
-                    }
-                    librarySet.add(properties.name);
-                    builtInLib.push(properties);
+                let sourceLib = <ILibrary>{};
+                if (util.fileExistsSync(path.join(builtInLibPath, libDir, "library.properties"))) {
+                    const properties = <any>await util.parseProperties(path.join(builtInLibPath, libDir, "library.properties"));
+                    sourceLib = { ... properties };
+                    sourceLib.version = util.formatVersion(sourceLib.version);
+                    sourceLib.website = properties.url;
                 } else {
-                    let properties = <any>await util.parseProperties(path.join(builtInLibPath, libDir, "library.properties"));
-                    properties.version = util.formatVersion(properties.version);
-                    properties.builtIn = true;
-                    properties.installedPath = path.join(builtInLibPath, libDir);
-                    properties.srcPath = path.join(builtInLibPath, libDir, "src");
-                    // If lib src folder doesn't exist, then fallback to lib root path as source folder.
-                    properties.srcPath = util.directoryExistsSync(properties.srcPath) ? properties.srcPath : path.join(builtInLibPath, libDir);
-                    properties.installed = true;
-                    properties.website = properties.url;
-                    properties.architectures = [architecture];
-                    // For libraries with the same name, append architecture info to name to avoid duplication.
-                    if (librarySet.has(properties.name)) {
-                        properties.name = properties.name + "(" + architecture + ")";
-                    }
-                    librarySet.add(properties.name);
-                    builtInLib.push(properties);
+                    sourceLib.name = libDir;
                 }
+                sourceLib.builtIn = true;
+                sourceLib.installed = true;
+                sourceLib.installedPath = path.join(builtInLibPath, libDir);
+                sourceLib.srcPath = path.join(builtInLibPath, libDir, "src");
+                // If lib src folder doesn't exist, then fallback to lib root path as source folder.
+                sourceLib.srcPath = util.directoryExistsSync(sourceLib.srcPath) ? sourceLib.srcPath : path.join(builtInLibPath, libDir);
+                sourceLib.architectures = [architecture];
+                // For libraries with the same name, append architecture info to name to avoid duplication.
+                if (librarySet.has(sourceLib.name)) {
+                    sourceLib.name = sourceLib.name + "(" + architecture + ")";
+                }
+                librarySet.add(sourceLib.name);
+                builtInLib.push(sourceLib);
             }
         }
         return builtInLib;

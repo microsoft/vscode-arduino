@@ -52,6 +52,9 @@ export default class BoardView extends React.Component<IBoardProps, IBoardState>
     private buildBoardSectionHeader(p) {
         return (<div>
             <span className="listitem-header">{p.name}</span>
+            {
+                p.defaultPlatform && (<span> Built-In </span>)
+            }
             <span className="listitem-author"> by <span className="listitem-header">{p.package.maintainer}</span></span>
             {
                 p.installedVersion && (

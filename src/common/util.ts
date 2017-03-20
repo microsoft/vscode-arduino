@@ -52,8 +52,8 @@ export function directoryExistsSync(dirPath: string): boolean {
 }
 
 /**
- * This function will implement same function as fs.readdirSync,
- * besides it could filter folders when the second argument is true.
+ * This function will implement the same function as the fs.readdirSync,
+ * besides it could filter out folders only when the second argument is true.
  * @function readdirSync
  * @argument {string} dirPath
  * @argument {boolean} folderOnly
