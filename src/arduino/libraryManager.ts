@@ -152,8 +152,10 @@ export class LibraryManager {
                 if (librarySet.has(sourceLib.name)) {
                     sourceLib.name = sourceLib.name + "(" + architecture + ")";
                 }
-                librarySet.add(sourceLib.name);
-                builtInLib.push(sourceLib);
+                if (!librarySet.has(sourceLib.name)) {
+                    librarySet.add(sourceLib.name);
+                    builtInLib.push(sourceLib);
+                }
             }
         }
         return builtInLib;

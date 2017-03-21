@@ -20,19 +20,35 @@
 
 .arduinomanager-toolbar {
     min-height: 60px;
-    padding: 15px 10px;
+    padding: 10px 10px;
     position: fixed;
     width: 100%;
     z-index: 100;
+}
+
+.arduinomanager-container {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+.arduinomanager-footer {
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    padding: 0px 10px;
+}
+
+.dropdown-filter {
+    padding: 5px 5px;
+    display: inline-block;
 
     .dropdown-label {
-        float: left;
-        padding-top: 8px;
-        margin: 0px 5px;
+        margin-right: 5px;
     }
 
     .dropdown {
-        float: left;
         button {
             text-align: left;
             width: 150px;
@@ -52,20 +68,6 @@
             overflow: auto;
         }
     }
-}
-
-.arduinomanager-container {
-    padding-top: 60px;
-    padding-bottom: 40px;
-}
-
-.arduinomanager-footer {
-    height: 40px;
-    line-height: 40px;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    padding: 0px 10px;
 }
 
 a {
@@ -154,10 +156,17 @@ a {
 }
 
 .boardmanager {
+    .dropdown-filter {
+        float: left;
+    }
+
     .search-input {
-        margin-left: 190px;
-        padding-top: 0px;
+        margin-left: 195px;
         color: #333;
+    }
+
+    .arduinomanager-container {
+        padding-top: 55px;
     }
 }
 
@@ -167,18 +176,53 @@ a {
     }
 
     .supported-checkbox {
-        margin-top: -5px;
+        margin-top: 5px;
         margin-bottom: 0px;
         padding-left: 5px;
-    }
 
-    .arduinomanager-container {
-        padding-top: 80px;
+        label {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
     }
 
     .search-input {
-        margin-left: 380px;
-        padding-top: 0px;
         color: #333;
     }
+
+    @media only screen and (min-width: 560px) {
+        .dropdown-filter {
+            float: left;
+        }
+
+        .search-input {
+            margin-left: 400px;
+        }
+
+        .arduinomanager-container {
+            padding-top: 80px;
+        }
+    }
+
+    @media only screen and (max-width: 559px) {
+        .dropdown-filter {
+            display: inline-block;
+        }
+
+        .arduinomanager-container {
+            padding-top: 123px;
+        }
+    }
+
+    @media only screen and (max-width: 405px) {
+        .dropdown-filter {
+            display: block;
+        }
+
+        .arduinomanager-container {
+            padding-top: 167px;
+        }
+    }
 }
+

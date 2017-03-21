@@ -145,18 +145,22 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
                 )
             }
             <div className="arduinomanager-toolbar theme-bgcolor">
-                <div className="dropdown-label">Type</div>
-                <DropdownButton id="typeselector" title={this.state.type} onSelect={this.typeUpdate}>
-                    { this.props.types.map((c, index) => {
-                        return (<MenuItem key={index} eventKey={c} active={c === this.state.type}>{c}</MenuItem>);
-                    })}
-                </DropdownButton>
-                <div className="dropdown-label">Topic</div>
-                <DropdownButton id="topicselector" title={this.state.topic} onSelect={this.topicUpdate}>
-                    { this.props.categories.map((c, index) => {
-                        return (<MenuItem key={index} eventKey={c} active={c === this.state.topic}>{c}</MenuItem>);
-                    })}
-                </DropdownButton>
+                <div className="dropdown-filter">
+                    <span className="dropdown-label">Type</span>
+                    <DropdownButton id="typeselector" title={this.state.type} onSelect={this.typeUpdate}>
+                        { this.props.types.map((c, index) => {
+                            return (<MenuItem key={index} eventKey={c} active={c === this.state.type}>{c}</MenuItem>);
+                        })}
+                    </DropdownButton>
+                </div>
+                <div className="dropdown-filter">
+                    <span className="dropdown-label">Topic</span>
+                    <DropdownButton id="topicselector" title={this.state.topic} onSelect={this.topicUpdate}>
+                        { this.props.categories.map((c, index) => {
+                            return (<MenuItem key={index} eventKey={c} active={c === this.state.topic}>{c}</MenuItem>);
+                        })}
+                    </DropdownButton>
+                </div>
                 <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
                 <Checkbox className="supported-checkbox" onChange={this.handleCheck}>Only show libraries supported by current board</Checkbox>
             </div>
