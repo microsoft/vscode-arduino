@@ -129,7 +129,7 @@ export class ArduinoApp {
         const configFilePath = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
         let deviceContext = null;
         if (!util.fileExistsSync(configFilePath)) {
-            util.mkdirRecursivelySync(configFilePath);
+            util.mkdirRecursivelySync(path.dirname(configFilePath));
             deviceContext = {};
         } else {
             deviceContext = util.tryParseJSON(fs.readFileSync(configFilePath, "utf8"));
