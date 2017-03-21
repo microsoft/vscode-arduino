@@ -131,10 +131,6 @@
             "info",
             "verbose"
           ]
-        },
-        "arduino.clangFormatStyle": {
-          "type": "string",
-          "desription": "The clang-format style value. Set this value to file if want to use the .clang-format file"
         }
       }
     },
@@ -172,6 +168,9 @@
     "postinstall": "node ./node_modules/vscode/bin/install && cd ./html && npm install",
     "test": "node ./node_modules/vscode/bin/test"
   },
+  "extensionDependencies": [
+    "ms-vscode.cpptools"
+  ],
   "devDependencies": {
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
