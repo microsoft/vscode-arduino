@@ -119,12 +119,14 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
                 )
             }
             <div className="arduinomanager-toolbar theme-bgcolor">
-                <div className="dropdown-label">Type</div>
-                <DropdownButton id="typeselector" title={this.state.category} onSelect={this.typeUpdate}>
-                    { this.props.categories.map((c, index) => {
-                        return (<MenuItem key={index} eventKey={c} active={c === this.state.category}>{c}</MenuItem>);
-                    })}
-                </DropdownButton>
+                <div className="dropdown-filter">
+                    <span className="dropdown-label">Type</span>
+                    <DropdownButton id="typeselector" title={this.state.category} onSelect={this.typeUpdate}>
+                        { this.props.categories.map((c, index) => {
+                            return (<MenuItem key={index} eventKey={c} active={c === this.state.category}>{c}</MenuItem>);
+                        })}
+                    </DropdownButton>
+                </div>
                 <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
             </div>
             <div className="arduinomanager-container">
