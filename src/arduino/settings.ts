@@ -167,12 +167,12 @@ export class ArduinoSettings implements IArduinoSettings {
                 resolve(docFolder);
             }
         }).then((folder: string) => {
-            this._libPath = path.normalize(path.join(folder, "Arduino/libraries"));
-            // For some case, the libPath looks like "%USERPROFILE%\Documents\Arduino\libraries",
+            // For some case, docFolder parsed from win32 registry looks like "%USERPROFILE%\Documents,
             // Should replace the environment variables with actual value.
-            this._libPath = this._libPath.replace(/%([^%]+)%/g, (match, p1) => {
+            folder = folder.replace(/%([^%]+)%/g, (match, p1) => {
                 return process.env[p1];
             });
+            this._libPath = path.normalize(path.join(folder, "Arduino/libraries"));
             if (util.fileExistsSync(path.join(arduinoPath, "AppxManifest.xml"))) {
                 this._packagePath = path.join(folder, "ArduinoData");
             } else {
