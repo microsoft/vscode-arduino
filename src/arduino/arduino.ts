@@ -180,10 +180,15 @@ export class ArduinoApp {
     public async installBoard(packageName: string, arch: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
         arduinoChannel.start(`Install package - ${packageName}...`);
-        await util.spawn(this._settings.commandPath,
-            showOutput ? arduinoChannel.channel : null,
-            ["--install-boards", `${packageName}:${arch}${version && ":" + version}`]);
-        arduinoChannel.end(`Installed board package - ${packageName}${os.EOL}`);
+        try {
+            await util.spawn(this._settings.commandPath,
+                showOutput ? arduinoChannel.channel : null,
+                ["--install-boards", `${packageName}:${arch}${version && ":" + version}`]);
+
+            arduinoChannel.end(`Installed board package - ${packageName}${os.EOL}`);
+        } catch (error) {
+            arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+        }
     }
 
     public uninstallBoard(boardName: string, packagePath: string) {
@@ -195,11 +200,15 @@ export class ArduinoApp {
     public async installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
         arduinoChannel.start(`Install library - ${libName}`);
-        await util.spawn(this._settings.commandPath,
-            showOutput ? arduinoChannel.channel : null,
-            ["--install-library", `${libName}${version && ":" + version}`]);
+        try {
+            await util.spawn(this._settings.commandPath,
+                showOutput ? arduinoChannel.channel : null,
+                ["--install-library", `${libName}${version && ":" + version}`]);
 
-        arduinoChannel.end(`Installed libarray - ${libName}${os.EOL}`);
+            arduinoChannel.end(`Installed library - ${libName}${os.EOL}`);
+        } catch (error) {
+            arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+        }
     }
 
     public uninstallLibrary(libName: string, libPath: string) {
