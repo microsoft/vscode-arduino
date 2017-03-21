@@ -42,13 +42,13 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
 
     let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
-        return vscode.commands.registerCommand(command, async () => {
+        return vscode.commands.registerCommand(command, async (...args: any[]) => {
             let guid = Uuid.create().value;
             Logger.traceUserData(`start-command-` + command, { correlationId: guid });
             let timer1 = new Logger.Timer();
             let telemetryResult;
             try {
-                let result = commandBody();
+                let result = commandBody(...args);
                 if (result) {
                     result = await Promise.resolve(result);
                 }

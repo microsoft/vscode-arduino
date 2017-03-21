@@ -132,7 +132,7 @@ export class SerialMonitor {
             }
             await this._serialPortCtrl.stop();
             this.updatePortStatus(false);
-        } else {
+        } else if (!port) {
             Logger.notifyUserWarning("closeSerialMonitorError", new Error(constants.messages.SERIAL_PORT_NOT_STARTED));
         }
     }
