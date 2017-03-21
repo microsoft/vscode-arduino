@@ -244,6 +244,7 @@ export class BoardManager {
             dc.board = this.getBoardKey((<any>chosen).entry);
             this._currentBoard = (<any>chosen).entry;
             this._boardStatusBar.text = chosen.label;
+            this._arduinoApp.addLibPath(null);
         }
     }
 

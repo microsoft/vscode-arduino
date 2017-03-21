@@ -126,9 +126,10 @@ export class ArduinoApp {
             libPaths = this.getDefaultPackageLibPaths();
         }
 
-        const configFilePath = path.join(vscode.workspace.rootPath, constants.ARDUINO_CONFIG_FILE);
+        const configFilePath = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
         let deviceContext = null;
         if (!util.fileExistsSync(configFilePath)) {
+            util.mkdirRecursivelySync(configFilePath);
             deviceContext = {};
         } else {
             deviceContext = util.tryParseJSON(fs.readFileSync(configFilePath, "utf8"));
@@ -142,6 +143,8 @@ export class ArduinoApp {
         deviceContext.configurations.forEach((section) => {
             if (section.name === util.getCppConfigPlatform()) {
                 configSection = section;
+                configSection.browse = configSection.browse || {};
+                configSection.browse.limitSymbolsToIncludedHeaders = false;
             }
         });
 
@@ -149,6 +152,7 @@ export class ArduinoApp {
             configSection = {
                 name: util.getCppConfigPlatform(),
                 includePath: [],
+                browse: { limitSymbolsToIncludedHeaders: false },
             };
             deviceContext.configurations.push(configSection);
         }
@@ -179,13 +183,13 @@ export class ArduinoApp {
         await util.spawn(this._settings.commandPath,
             showOutput ? arduinoChannel.channel : null,
             ["--install-boards", `${packageName}:${arch}${version && ":" + version}`]);
-        arduinoChannel.end(`Installed board package - ${packageName}`);
+        arduinoChannel.end(`Installed board package - ${packageName}${os.EOL}`);
     }
 
     public uninstallBoard(boardName: string, packagePath: string) {
         arduinoChannel.start(`Uninstall board package - ${boardName}...`);
         util.rmdirRecursivelySync(packagePath);
-        arduinoChannel.end(`Installed board package - ${boardName}`);
+        arduinoChannel.end(`Uninstalled board package - ${boardName}${os.EOL}`);
     }
 
     public async installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
@@ -195,13 +199,13 @@ export class ArduinoApp {
             showOutput ? arduinoChannel.channel : null,
             ["--install-library", `${libName}${version && ":" + version}`]);
 
-        arduinoChannel.end(`Installed libarray - ${libName}`);
+        arduinoChannel.end(`Installed libarray - ${libName}${os.EOL}`);
     }
 
     public uninstallLibrary(libName: string, libPath: string) {
         arduinoChannel.start(`Remove library - ${libName}`);
         util.rmdirRecursivelySync(libPath);
-        arduinoChannel.end(`Removed library - ${libName}`);
+        arduinoChannel.end(`Removed library - ${libName}${os.EOL}`);
     }
 
     public getDefaultPackageLibPaths(): string[] {

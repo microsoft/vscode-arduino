@@ -13,10 +13,7 @@ import { ArduinoSettings } from "./arduino/settings";
 import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_MANAGER_URI, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
 import { ClangProvider } from "./langService/clang";
-import { ClangFormatter } from "./langService/clangFormatter";
 import { CompletionProvider } from "./langService/completionProvider";
-import { DefinitionProvider } from "./langService/definitionProvider";
-import { FormatterProvider } from "./langService/formatterProvider";
 import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
@@ -102,17 +99,8 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(registerCommand("arduino.sendMessageToSerialPort", () => monitor.sendMessageToSerialPort()));
     context.subscriptions.push(registerCommand("arduino.closeSerialMonitor", (port) => monitor.closeSerialMonitor(port)));
 
-    // Add arduino specific language suport.
-    const clangProvider = new ClangProvider(arduinoApp);
-    clangProvider.initialize();
-    const completionProvider = new CompletionProvider(clangProvider);
-    context.subscriptions.push(clangProvider);
+    const completionProvider = new CompletionProvider(arduinoApp);
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
-    const definitionProvider = new DefinitionProvider(clangProvider);
-    context.subscriptions.push(vscode.languages.registerDefinitionProvider(ARDUINO_MODE, definitionProvider));
-    const clangFormatter = new ClangFormatter(arduinoSettings);
-    const formatterProvider = new FormatterProvider(clangFormatter);
-    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(ARDUINO_MODE, formatterProvider));
 
     // Example explorer, only work under VSCode insider version.
     if (typeof vscode.window.registerTreeExplorerNodeProvider === "function"
