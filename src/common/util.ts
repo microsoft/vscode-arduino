@@ -72,7 +72,7 @@ export function readdirSync(dirPath: string, folderOnly: boolean = false): strin
 /**
  * Recursively create directories. Equals to "mkdir -p"
  * @function mkdirRecursivelySync
- * @argument {string} dirPath 
+ * @argument {string} dirPath
  */
 export function mkdirRecursivelySync(dirPath: string): void {
     if (directoryExistsSync(dirPath)) {
