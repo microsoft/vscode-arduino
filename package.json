@@ -135,7 +135,7 @@
         "arduino.autoUpdateIndexFiles": {
           "type": "boolean",
           "default": false,
-          "description": "This option used to control whether to auto-update package_index.json or library_index.json index files or not. If true, means that each time when you open Boards Manager/Library Manager, the extension will download latest index files first. If false, means that if index files exist on local disk, then don't download again."
+          "description": "Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Boards Manager/Libraries Manager, download latest index files first. Otherwise, using index files cached on local disk for Boards Manager/Libraries Manager."
         }
       }
     },
