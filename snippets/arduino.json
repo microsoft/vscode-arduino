@@ -18,7 +18,9 @@
         "prefix": "aloop",
         "body": [
             "void loop()",
-            "{\n}"
+            "{",
+            "\t${0}",
+            "}"
         ],
         "description": "Function loop"
     },
@@ -26,7 +28,9 @@
         "prefix": "asetup",
         "body": [
             "void setup()",
-            "{\n}"
+            "{",
+            "\t${0}",
+            "}"
         ],
         "description": "Function setup"
     },
