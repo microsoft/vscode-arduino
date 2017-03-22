@@ -270,7 +270,7 @@ export class BoardManager {
         return this._currentBoard;
     }
 
-    public getInstalledPlatforms() {
+    public getInstalledPlatforms(): any[] {
         // Always using manually installed platforms to overwrite the same platform from arduino installation directory.
         const installedPlatforms = this.getDefaultPlatforms();
         const manuallyInstalled = this.getManuallyInstalledPlatforms();
@@ -342,12 +342,12 @@ export class BoardManager {
     }
 
     // Default arduino package information from arduino installation directory.
-    private getDefaultPlatforms() {
+    private getDefaultPlatforms(): any[] {
         const defaultPlatforms = [];
         try {
             let packageBundled = fs.readFileSync(path.join(this._settings.defaultPackagePath, "package_index_bundled.json"), "utf8");
             if (!packageBundled) {
-                return;
+                return defaultPlatforms;
             }
             let bundledObject = JSON.parse(packageBundled);
             if (bundledObject && bundledObject.packages) {
@@ -371,7 +371,7 @@ export class BoardManager {
     }
 
     // User manually installed packages.
-    private getManuallyInstalledPlatforms() {
+    private getManuallyInstalledPlatforms(): any[] {
         const manuallyInstalled = [];
         let rootPackagePath = path.join(path.join(this._settings.packagePath, "packages"));
         if (!util.directoryExistsSync(rootPackagePath)) {
