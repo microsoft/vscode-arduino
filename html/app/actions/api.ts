@@ -14,8 +14,8 @@ function postHTTP(url, postData) {
     return window.fetch(request);
 }
 
-export function getBoardPackages() {
-    return window.fetch("/api/boardpackages").then((response) => response.json());
+export function getBoardPackages(update) {
+    return window.fetch(`/api/boardpackages?update=${update}`).then((response) => response.json());
 }
 
 export function installBoard(packageName, arch, version) {
@@ -39,8 +39,8 @@ export function openLink(link) {
     }).then((response) => response.json());
 }
 
-export function getLibraries() {
-    return window.fetch("/api/libraries").then((response) => response.json());
+export function getLibraries(update) {
+    return window.fetch(`/api/libraries?update=${update}`).then((response) => response.json());
 }
 
 export function installLibrary(libraryName, version) {

@@ -149,9 +149,9 @@ export function uninstallLibraryFailure(libraryName, errorMessage) {
     };
 }
 
-export function getBoardPackages(dispatch) {
+export function getBoardPackages(dispatch, update: boolean) {
     dispatch(boardPackagesRequest());
-    API.getBoardPackages().then((response) => {
+    API.getBoardPackages(update).then((response) => {
         const { platforms } = <any>response;
         dispatch(boardPackagesSuccess(JSONHelper.retrocycle(platforms)));
     }).catch((error) => {
@@ -183,9 +183,9 @@ export function uninstallBoard(dispatch, boardName, packagePath, callback?: Func
     });
 }
 
-export function getLibraries(dispatch, callback?: Function) {
+export function getLibraries(dispatch, update: boolean, callback?: Function) {
     dispatch(librariesRequest());
-    API.getLibraries().then((response) => {
+    API.getLibraries(update).then((response) => {
         const { libraries } = <any>response;
         dispatch(librariesSuccess(libraries));
         if (callback) {

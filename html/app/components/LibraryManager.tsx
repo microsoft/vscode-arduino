@@ -45,11 +45,11 @@ const mapStateToProps = (store) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        loadLibraries: () => actions.getLibraries(dispatch),
+        loadLibraries: () => actions.getLibraries(dispatch, true),
         installLibrary: (libraryName, version, callback) => actions.installLibrary(dispatch, libraryName, version, (error) => {
             if (!error) {
                 // Refresh library manager view
-                actions.getLibraries(dispatch, callback);
+                actions.getLibraries(dispatch, false, callback);
             } else {
                 callback();
             }
@@ -57,7 +57,7 @@ const mapDispatchToProps = (dispatch) => {
         uninstallLibrary: (libraryName, libraryPath, callback) => actions.uninstallLibrary(dispatch, libraryName, libraryPath, (error) => {
             if (!error) {
                 // Refresh library manager view
-                actions.getLibraries(dispatch, callback);
+                actions.getLibraries(dispatch, false, callback);
             } else {
                 callback();
             }

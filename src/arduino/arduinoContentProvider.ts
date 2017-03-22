@@ -11,12 +11,14 @@ import { ArduinoApp } from "./arduino";
 import { BoardManager } from "./boardManager";
 import { LibraryManager } from "./libraryManager";
 import LocalWebServer from "./localWebServer";
+import { IArduinoSettings } from "./settings";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
     constructor(
+        private _settings: IArduinoSettings,
         private _arduinoApp: ArduinoApp,
         private _boardManager: BoardManager,
         private _libraryManager: LibraryManager,
@@ -86,7 +88,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getBoardPackages(req, res) {
-        await this._boardManager.loadPackages();
+        const update = (this._settings.autoUpdateIndexFiles && req.query.update === "true");
+        await this._boardManager.loadPackages(update);
         return res.json({
             platforms: JSONHelper.decycle(this._boardManager.platforms, undefined),
         });
@@ -142,7 +145,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getLibraries(req, res) {
-        await this._libraryManager.loadLibraries();
+        const update = (this._settings.autoUpdateIndexFiles && req.query.update === "true");
+        await this._libraryManager.loadLibraries(update);
         return res.json({
             libraries: this._libraryManager.libraries,
         });

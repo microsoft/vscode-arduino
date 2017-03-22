@@ -126,6 +126,11 @@
             "info",
             "verbose"
           ]
+        },
+        "arduino.autoUpdateIndexFiles": {
+          "type": "boolean",
+          "default": false,
+          "description": "Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Boards Manager/Libraries Manager, download latest index files first. Otherwise, using index files cached on local disk for Boards Manager/Libraries Manager."
         }
       }
     },

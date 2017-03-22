@@ -38,7 +38,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await boardManager.loadPackages();
     const libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
 
-    const arduinoManagerProvider = new ArduinoContentProvider(arduinoApp, boardManager, libraryManager, context.extensionPath);
+    const arduinoManagerProvider = new ArduinoContentProvider(arduinoSettings, arduinoApp, boardManager, libraryManager, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
 
     let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {

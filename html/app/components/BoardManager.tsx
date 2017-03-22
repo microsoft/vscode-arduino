@@ -45,12 +45,12 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        loadBoardPackages: () => actions.getBoardPackages(dispatch),
+        loadBoardPackages: () => actions.getBoardPackages(dispatch, true),
         installBoard: (boardName, packageName, arch, version) => actions.installBoard(dispatch, boardName, packageName, arch, version, () => {
-            actions.getBoardPackages(dispatch);
+            actions.getBoardPackages(dispatch, false);
         }),
         uninstallBoard: (boardName, packagePath) => actions.uninstallBoard(dispatch, boardName, packagePath, () => {
-            actions.getBoardPackages(dispatch);
+            actions.getBoardPackages(dispatch, false);
         }),
     };
 };

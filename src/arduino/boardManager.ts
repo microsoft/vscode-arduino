@@ -194,16 +194,21 @@ export class BoardManager {
         this._boardStatusBar.tooltip = "Change Board Type";
     }
 
-    public async loadPackages() {
+    public async loadPackages(update: boolean = false) {
         this._packages = [];
         this._platforms = [];
+        this._installedPlatforms = [];
 
-        let rootPackgeFolder = this._settings.packagePath;
-        let indexFiles = ["package_index.json"];
-        let preferences = this._arduinoApp.preferences;
-        indexFiles = indexFiles.concat(this.getAddtionalIndexFiles());
+        if (update) { // Update index files.
+            await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
+            await this._arduinoApp.initialize(true);
+        }
+
+        // Parse package index files.
+        const indexFiles = ["package_index.json"].concat(this.getAddtionalIndexFiles());
+        const rootPackgeFolder = this._settings.packagePath;
         for (let indexFile of indexFiles) {
-            if (!util.fileExistsSync(path.join(rootPackgeFolder, indexFile))) {
+            if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFile))) {
                 await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
                 await this._arduinoApp.initialize(true);
             }
@@ -211,9 +216,10 @@ export class BoardManager {
             this.parsePackageIndex(JSON.parse(packageContent));
         }
 
-        this.loadDefaultPlatforms();
+        // Load default platforms from arduino installation directory and user manually installed platforms.
         this.loadInstalledPlatforms();
 
+        // Load all supported boards type.
         this.loadInstalledBoards();
         this.updateStatusBar();
         this._boardStatusBar.show();
@@ -256,16 +262,31 @@ export class BoardManager {
         return this._platforms;
     }
 
-    public get installedPlatforms(): IPlatform[] {
-        return this._installedPlatforms;
-    }
-
     public get installedBoards(): Map<string, IBoard> {
         return this._boards;
     }
 
     public get currentBoard(): IBoard {
         return this._currentBoard;
+    }
+
+    public getInstalledPlatforms(): any[] {
+        // Always using manually installed platforms to overwrite the same platform from arduino installation directory.
+        const installedPlatforms = this.getDefaultPlatforms();
+        const manuallyInstalled = this.getManuallyInstalledPlatforms();
+        manuallyInstalled.forEach((plat) => {
+            const find = installedPlatforms.find((_plat) => {
+                return _plat.packageName === plat.packageName && _plat.architecture === plat.architecture;
+            });
+            if (!find) {
+                installedPlatforms.push(plat);
+            } else {
+                find.defaultPlatform = plat.defaultPlatform;
+                find.version = plat.version;
+                find.rootBoardPath = plat.rootBoardPath;
+            }
+        });
+        return installedPlatforms;
     }
 
     private updateStatusBar(): void {
@@ -276,45 +297,6 @@ export class BoardManager {
             this._boardStatusBar.text = selectedBoard.name;
         } else {
             this._boardStatusBar.text = "<Select Board Type>";
-        }
-    }
-
-    private loadDefaultPlatforms() {
-        // Default arduino package information:
-        const packageName = "arduino";
-        const archName = "avr";
-        try {
-            let packageBundled = fs.readFileSync(path.join(this._settings.defaultPackagePath, "package_index_bundled.json"), "utf8");
-            if (!packageBundled) {
-                return;
-            }
-            let bundledObject = JSON.parse(packageBundled);
-            if (bundledObject && bundledObject.packages && bundledObject.packages.length && bundledObject.packages[0].platforms) {
-                let platforms = bundledObject.packages[0].platforms;
-                if (platforms && platforms.length && platforms.length > 0) {
-                    const v = platforms[0].version;
-                    if (v) {
-                        let filteredPlat = this._platforms.find((_plat) => _plat.package.name === packageName && _plat.architecture === archName);
-                        if (!filteredPlat) {
-                            return;
-                        }
-                        filteredPlat.defaultPlatform = true;
-                        if (filteredPlat.installedVersion) {
-                            let installedPlat = this.installedPlatforms
-                                .find((_plat) => _plat.package.name === packageName && _plat.architecture === archName);
-                            if (installedPlat) {
-                                installedPlat.defaultPlatform = true;
-                            }
-                            return;
-                        } else {
-                            filteredPlat.installedVersion = v;
-                            filteredPlat.rootBoardPath = path.join(this._settings.defaultPackagePath, "arduino", "avr");
-                            this.installedPlatforms.push(filteredPlat);
-                        }
-                    }
-                }
-            }
-        } catch (ex) {
         }
     }
 
@@ -342,38 +324,85 @@ export class BoardManager {
         });
     }
 
-    private loadInstalledPlatforms(): void {
-        this._installedPlatforms = [];
-        let rootPackagePath = path.join(path.join(this._settings.packagePath, "packages"));
-        if (!util.directoryExistsSync(rootPackagePath)) {
-            return;
-        }
-        const dirs = util.filterJunk(util.readdirSync(rootPackagePath, true)); // in Mac, filter .DS_Store file.
-        dirs.forEach((packageName) => {
-            let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
-            if (!util.directoryExistsSync(archPath)) {
-                return;
-            }
-            let architectures = util.filterJunk(fs.readdirSync(archPath));
-            if (!architectures || !architectures.length) {
-                return;
-            }
-            architectures.forEach((architecture) => {
-                let allVersion = util.filterJunk(fs.readdirSync(path.join(archPath, architecture)));
-                let existingPlatform = this._platforms.find((_plat) => _plat.package.name === packageName && _plat.architecture === architecture);
-                if (existingPlatform && allVersion && allVersion.length) {
-                    existingPlatform.defaultPlatform = false;
-                    existingPlatform.installedVersion = allVersion[0];
-                    existingPlatform.rootBoardPath = path.join(archPath, architecture, allVersion[0]);
+    private loadInstalledPlatforms() {
+        const installed = this.getInstalledPlatforms();
+        installed.forEach((platform) => {
+            let existingPlatform = this._platforms.find((_plat) => {
+                return _plat.package.name === platform.packageName && _plat.architecture === platform.architecture;
+            });
+            if (existingPlatform) {
+                existingPlatform.defaultPlatform = platform.defaultPlatform;
+                if (!existingPlatform.installedVersion) {
+                    existingPlatform.installedVersion = platform.version;
+                    existingPlatform.rootBoardPath = platform.rootBoardPath;
                     this._installedPlatforms.push(existingPlatform);
                 }
-            });
+            }
         });
+    }
+
+    // Default arduino package information from arduino installation directory.
+    private getDefaultPlatforms(): any[] {
+        const defaultPlatforms = [];
+        try {
+            let packageBundled = fs.readFileSync(path.join(this._settings.defaultPackagePath, "package_index_bundled.json"), "utf8");
+            if (!packageBundled) {
+                return defaultPlatforms;
+            }
+            let bundledObject = JSON.parse(packageBundled);
+            if (bundledObject && bundledObject.packages) {
+                for (let pkg of bundledObject.packages) {
+                    for (let platform of pkg.platforms) {
+                        if (platform.version) {
+                            defaultPlatforms.push({
+                                packageName: pkg.name,
+                                architecture: platform.architecture,
+                                version: platform.version,
+                                rootBoardPath: path.join(this._settings.defaultPackagePath, pkg.name, platform.architecture),
+                                defaultPlatform: true,
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (ex) {
+        }
+        return defaultPlatforms;
+    }
+
+    // User manually installed packages.
+    private getManuallyInstalledPlatforms(): any[] {
+        const manuallyInstalled = [];
+        let rootPackagePath = path.join(path.join(this._settings.packagePath, "packages"));
+        if (!util.directoryExistsSync(rootPackagePath)) {
+            return manuallyInstalled;
+        }
+        const dirs = util.filterJunk(util.readdirSync(rootPackagePath, true)); // in Mac, filter .DS_Store file.
+        for (let packageName of dirs) {
+            let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
+            if (!util.directoryExistsSync(archPath)) {
+                continue;
+            }
+            let architectures = util.filterJunk(fs.readdirSync(archPath));
+            architectures.forEach((architecture) => {
+                let allVersion = util.filterJunk(fs.readdirSync(path.join(archPath, architecture)));
+                if (allVersion && allVersion.length) {
+                    manuallyInstalled.push({
+                        packageName,
+                        architecture,
+                        version: allVersion[0],
+                        rootBoardPath: path.join(archPath, architecture, allVersion[0]),
+                        defaultPlatform: false,
+                    });
+                }
+            });
+        }
+        return manuallyInstalled;
     }
 
     private loadInstalledBoards(): void {
         this._boards = new Map<string, IBoard>();
-        this.installedPlatforms.forEach((plat) => {
+        this._installedPlatforms.forEach((plat) => {
             let dir = plat.rootBoardPath;
             if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
                 let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
