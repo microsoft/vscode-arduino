@@ -43,17 +43,16 @@ export class LibraryManager {
         return this._libraries;
     }
 
-    public async loadLibraries() {
+    public async loadLibraries(update: boolean = false) {
         this._libraryMap = new Map<string, ILibrary>();
         this._libraries = [];
 
-        await this._arduinoApp.boardManager.loadPackages();
+        let libraryIndexFilePath = path.join(this._settings.packagePath, "library_index.json");
+        if (update || !util.fileExistsSync(libraryIndexFilePath)) {
+            await this._arduinoApp.initializeLibrary(true);
+        }
 
         // Parse libraries index file "library_index.json"
-        let libraryIndexFilePath = path.join(this._settings.packagePath, "library_index.json");
-        if (!util.fileExistsSync(libraryIndexFilePath)) {
-            await this._arduinoApp.initializeLibrary();
-        }
         let packageContent = fs.readFileSync(libraryIndexFilePath, "utf8");
         this.parseLibraryIndex(JSON.parse(packageContent));
 
@@ -114,11 +113,10 @@ export class LibraryManager {
     private async loadBoardLibraries() {
         let builtinLibs = [];
         const librarySet = new Set(this._libraryMap.keys());
-        for (let board of this._arduinoApp.boardManager.platforms) {
-            if (board.installedVersion) {
-                const libs = await this.parseBoardLibraries(board.rootBoardPath, board.architecture, librarySet);
-                builtinLibs = builtinLibs.concat(libs);
-            }
+        const installedPlatforms = this._arduinoApp.boardManager.getInstalledPlatforms();
+        for (let board of installedPlatforms) {
+            const libs = await this.parseBoardLibraries(board.rootBoardPath, board.architecture, librarySet);
+            builtinLibs = builtinLibs.concat(libs);
         }
         return builtinLibs;
     }

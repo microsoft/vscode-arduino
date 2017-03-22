@@ -41,7 +41,7 @@ export class ArduinoApp {
         if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
                 // Use the dummy package to initialize the Arduino IDE
-                await this.installBoard("dummy", "dummy", "", false);
+                await this.installBoard("dummy", "", "", true);
             } catch (ex) {
             }
         }
@@ -49,12 +49,13 @@ export class ArduinoApp {
 
     /**
      * Initialize the arduino library.
+     * @param {boolean} force - Whether force refresh library index file
      */
-    public async initializeLibrary() {
-        if (!util.fileExistsSync(path.join(this._settings.packagePath, "library_index.json"))) {
+    public async initializeLibrary(force: boolean = false) {
+        if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "library_index.json"))) {
             try {
                 // Use the dummy library to initialize the Arduino IDE
-                await this.installLibrary("dummy", "", false);
+                await this.installLibrary("dummy", "", true);
             } catch (ex) {
             }
         }
@@ -177,17 +178,35 @@ export class ArduinoApp {
     /**
      * Install arduino board package based on package name and platform hardware architecture.
      */
-    public async installBoard(packageName: string, arch: string, version: string = "", showOutput: boolean = true) {
+    public async installBoard(packageName: string, arch: string = "", version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
-        arduinoChannel.start(`Install package - ${packageName}...`);
+        const updatingIndex = packageName === "dummy" && !arch && !version;
+        if (updatingIndex) {
+            arduinoChannel.start(`Update package index files...`);
+        } else {
+            arduinoChannel.start(`Install package - ${packageName}...`);
+        }
         try {
             await util.spawn(this._settings.commandPath,
                 showOutput ? arduinoChannel.channel : null,
-                ["--install-boards", `${packageName}:${arch}${version && ":" + version}`]);
+                ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`]);
 
-            arduinoChannel.end(`Installed board package - ${packageName}${os.EOL}`);
+            if (updatingIndex) {
+                arduinoChannel.end("Updated package index files.");
+            } else {
+                arduinoChannel.end(`Installed board package - ${packageName}${os.EOL}`);
+            }
         } catch (error) {
-            arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+            // If a platform with the same version is already installed, nothing is installed and program exits with exit code 1
+            if (error.code === 1) {
+                if (updatingIndex) {
+                    arduinoChannel.end("Updated package index files.");
+                } else {
+                    arduinoChannel.end(`Installed board package - ${packageName}${os.EOL}`);
+                }
+            } else {
+                arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+            }
         }
     }
 
@@ -199,15 +218,33 @@ export class ArduinoApp {
 
     public async installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
-        arduinoChannel.start(`Install library - ${libName}`);
+        const updatingIndex = (libName === "dummy" && !version);
+        if (updatingIndex) {
+            arduinoChannel.start("Update library index files...");
+        } else {
+            arduinoChannel.start(`Install library - ${libName}`);
+        }
         try {
             await util.spawn(this._settings.commandPath,
                 showOutput ? arduinoChannel.channel : null,
                 ["--install-library", `${libName}${version && ":" + version}`]);
 
-            arduinoChannel.end(`Installed library - ${libName}${os.EOL}`);
+            if (updatingIndex) {
+                arduinoChannel.end("Updated library index files.");
+            } else {
+                arduinoChannel.end(`Installed library - ${libName}${os.EOL}`);
+            }
         } catch (error) {
-            arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+            // If a library with the same version is already installed, nothing is installed and program exits with exit code 1
+            if (error.code === 1) {
+                if (updatingIndex) {
+                    arduinoChannel.end("Updated library index files.");
+                } else {
+                    arduinoChannel.end(`Installed library - ${libName}${os.EOL}`);
+                }
+            } else {
+                arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+            }
         }
     }
 

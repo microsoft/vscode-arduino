@@ -17,6 +17,7 @@ import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
 export interface IArduinoSettings {
     arduinoPath: string;
     additionalUrls: string | string[];
+    autoUpdateIndexFiles: boolean;
     logLevel: string;
     commandPath: string;
     packagePath: string;
@@ -114,6 +115,11 @@ export class ArduinoSettings implements IArduinoSettings {
         } else { // linux and win32
             return path.join(this.arduinoPath, "libraries");
         }
+    }
+
+    public get autoUpdateIndexFiles(): boolean {
+        const workspaceConfig = vscode.workspace.getConfiguration();
+        return workspaceConfig.get<boolean>("arduino.autoUpdateIndexFiles");
     }
 
     public get logLevel(): string {
