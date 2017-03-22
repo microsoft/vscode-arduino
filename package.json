@@ -20,7 +20,6 @@
     "workspaceContains:.vscode/arduino.json",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
-    "onCommand:arduino.addLibPath",
     "onCommand:selectSerialPort",
     "onCommand:changeBoardType",
     "onCommand:arduino.showBoardManager",
@@ -46,10 +45,6 @@
       {
         "command": "arduino.upload",
         "title": "Arduino: Upload"
-      },
-      {
-        "command": "arduino.addLibPath",
-        "title": "Arduino: Add library paths"
       },
       {
         "command": "arduino.selectSerialPort",
@@ -81,7 +76,7 @@
       },
       {
         "command": "arduino.showLibraryManager",
-        "title": "Arduino: Manage Libraries"
+        "title": "Arduino: Libraries Manager"
       }
     ],
     "keybindings": [
