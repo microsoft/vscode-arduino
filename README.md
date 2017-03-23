@@ -15,7 +15,6 @@ Welcome to **Arduino** for Visual Studio Code! The Arduino extension makes it ea
 ## Prerequisites
 
 - [Arduino IDE](https://www.arduino.cc/en/main/software). Please choose stable version for your operating system.
-- [clang](http://releases.llvm.org/download.html). Please install the pre-built binaries for your operating system.
 - [Visual Studio Code](https://code.visualstudio.com/#alt-downloads)
 
 ## Using
