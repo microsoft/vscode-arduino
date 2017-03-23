@@ -188,6 +188,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         } else {
             try {
                 await this._arduinoApp.addLibPath(req.body.path);
+                await this._arduinoApp.includeLibrary(req.body.path);
                 return res.json({
                     status: "OK",
                 });
