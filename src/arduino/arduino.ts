@@ -188,7 +188,7 @@ export class ArduinoApp {
             });
             const hIncludes = hFiles.map((hFile) => {
                 return `#include <${path.basename(hFile)}>`;
-            }).join("\r\n");
+            }).join(os.EOL);
 
             // Open the sketch and bring up it to current visible view.  
             let textDocument = await vscode.workspace.openTextDocument(appPath);
@@ -199,7 +199,7 @@ export class ArduinoApp {
             if (activeEditor) {
                 // Insert *.h at the beginning of the sketch code.
                 await activeEditor.edit((editBuilder) => {
-                    editBuilder.insert(new vscode.Position(0, 0), hIncludes + "\r\n\r\n");
+                    editBuilder.insert(new vscode.Position(0, 0), `${hIncludes}${os.EOL}${os.EOL}`);
                 });
             }
         }
