@@ -131,7 +131,7 @@ export default class LibraryItemView extends React.Component<ILibraryProps, ILib
                     <div className="right-side">
                         {
                             lib.supported && (
-                                <Button className="operation-btn" onClick={() => this.addLibPath(lib.srcPath)}>Add to Include Path</Button>
+                                <Button className="operation-btn" onClick={() => this.addLibPath(lib.srcPath)}>Include Library</Button>
                             )
                         }
                         {

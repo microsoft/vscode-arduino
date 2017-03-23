@@ -4,6 +4,7 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
+import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -119,6 +120,7 @@ export class ArduinoApp {
         });
     }
 
+    // Add selected library path to the intellisense search path.
     public addLibPath(libraryPath: string) {
         let libPaths;
         if (libraryPath) {
@@ -173,6 +175,34 @@ export class ArduinoApp {
         });
 
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
+    }
+
+    // Include the *.h header files from selected library to the arduino sketch.
+    public async includeLibrary(libraryPath: string) {
+        let dc = DeviceContext.getIntance();
+        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        if (util.fileExistsSync(appPath)) {
+            const hFiles = glob.sync(`${libraryPath}/*.h`, {
+                nodir: true,
+                matchBase: true,
+            });
+            const hIncludes = hFiles.map((hFile) => {
+                return `#include <${path.basename(hFile)}>`;
+            }).join(os.EOL);
+
+            // Open the sketch and bring up it to current visible view.
+            let textDocument = await vscode.workspace.openTextDocument(appPath);
+            await vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);
+            const activeEditor = vscode.window.visibleTextEditors.find((textEditor) => {
+                return path.resolve(textEditor.document.fileName) === path.resolve(appPath);
+            });
+            if (activeEditor) {
+                // Insert *.h at the beginning of the sketch code.
+                await activeEditor.edit((editBuilder) => {
+                    editBuilder.insert(new vscode.Position(0, 0), `${hIncludes}${os.EOL}${os.EOL}`);
+                });
+            }
+        }
     }
 
     /**
