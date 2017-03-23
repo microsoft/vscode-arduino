@@ -190,7 +190,7 @@ export class ArduinoApp {
                 return `#include <${path.basename(hFile)}>`;
             }).join(os.EOL);
 
-            // Open the sketch and bring up it to current visible view.  
+            // Open the sketch and bring up it to current visible view.
             let textDocument = await vscode.workspace.openTextDocument(appPath);
             await vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);
             const activeEditor = vscode.window.visibleTextEditors.find((textEditor) => {
