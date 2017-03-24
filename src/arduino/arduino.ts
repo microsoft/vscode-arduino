@@ -87,6 +87,7 @@ export class ArduinoApp {
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
         await vscode.commands.executeCommand("arduino.closeSerialMonitor", dc.port);
+        await vscode.workspace.saveAll(false);
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
@@ -106,6 +107,8 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
+        await vscode.workspace.saveAll(false);
+
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath];
