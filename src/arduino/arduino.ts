@@ -78,7 +78,7 @@ export class ArduinoApp {
 
     public async upload() {
         let dc = DeviceContext.getIntance();
-        const boardDescriptor = this.getBoardDescriptorString(dc);
+        const boardDescriptor = this.getBoardBuildString(dc);
         if (!boardDescriptor) {
             return;
         }
@@ -103,7 +103,7 @@ export class ArduinoApp {
 
     public async verify() {
         let dc = DeviceContext.getIntance();
-        const boardDescriptor = this.getBoardDescriptorString(dc);
+        const boardDescriptor = this.getBoardBuildString(dc);
         if (!boardDescriptor) {
             return;
         }
@@ -336,13 +336,13 @@ export class ArduinoApp {
         });
     }
 
-    private getBoardDescriptorString(deviceContext: IDeviceContext): string {
-        let boardDescriptor = this.boardManager.currentBoard;
-        if (!boardDescriptor) {
+    private getBoardBuildString(deviceContext: IDeviceContext): string {
+        let selectedBoard = this.boardManager.currentBoard;
+        if (!selectedBoard) {
             Logger.notifyUserError("getBoardDescriptorError", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
         }
-        let boardString = `${boardDescriptor.platform.package.name}:${boardDescriptor.platform.architecture}:${boardDescriptor.board}`;
+        let boardString = selectedBoard.getBuildConfig();
         return boardString;
     }
 }

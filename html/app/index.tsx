@@ -8,6 +8,7 @@ import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { browserHistory, IndexRoute, Link, Route, Router } from "react-router";
 import { applyMiddleware, createStore } from "redux";
+import BoardConfig from "./components/BoardConfig";
 import BoardManager from "./components/BoardManager";
 import LibraryManager from "./components/LibraryManager";
 import reducer from "./reducers";
@@ -33,6 +34,7 @@ ReactDOM.render(
       <Route path="/" component={App}>
         <Route path="boardmanager" component={BoardManager} />
         <Route path="librarymanager" component={LibraryManager} />
+        <Route path="boardconfig" component={BoardConfig} />
       </Route>
     </Router>
   </Provider>,

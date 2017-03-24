@@ -65,7 +65,8 @@ export class SerialPortCtrl {
                 this._outputChannel.show();
                 this._currentSerialPort.on("open", () => {
                     this._currentSerialPort.write("TestingOpen", (err) => {
-                        if (err) {
+                        // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
+                        if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
                             this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
                             reject(err);
                         } else {

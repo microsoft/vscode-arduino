@@ -24,6 +24,9 @@ export const INSTALL_LIBRARY_FAILURE = "INSTALL_LIBRARY_FAILURE";
 export const UNINSTALL_LIBRARY_REQUEST = "UNINSTALL_LIBRARY_REQUEST";
 export const UNINSTALL_LIBRARY_SUCCESS = "UNINSTALL_LIBRARY_SUCCESS";
 export const UNINSTALL_LIBRARY_FAILURE = "UNINSTALL_LIBRARY_FAILURE";
+export const CONFIGITEMS_REQUEST = "CONFIGITEMS_REQUEST";
+export const CONFIGITEMS_SUCCESS = "CONFIGITEMS_SUCCESS";
+export const CONFIGITEMS_FAILURE = "CONFIGITEMS_FAILURE";
 
 export function boardPackagesRequest() {
     return {
@@ -149,6 +152,26 @@ export function uninstallLibraryFailure(libraryName, errorMessage) {
     };
 }
 
+export function configItemsRequest() {
+    return {
+        type: CONFIGITEMS_REQUEST,
+    };
+}
+
+export function configItemsSuccess(configitems) {
+    return {
+        type: CONFIGITEMS_SUCCESS,
+        configitems,
+    };
+}
+
+export function configItemsFailure(errorMessage) {
+    return {
+        type: CONFIGITEMS_FAILURE,
+        errorMessage,
+    };
+}
+
 export function getBoardPackages(dispatch, update: boolean) {
     dispatch(boardPackagesRequest());
     API.getBoardPackages(update).then((response) => {
@@ -225,6 +248,22 @@ export function uninstallLibrary(dispatch, libraryName, libraryPath, callback?: 
         dispatch(uninstallLibraryFailure(libraryName, error));
         if (callback) {
             callback(error);
+        }
+    });
+}
+
+export function getConfigItems(dispatch, callback?: Function) {
+    dispatch(configItemsRequest());
+    API.getConfigItems().then((response) => {
+        const { configitems } = <any>response;
+        dispatch(configItemsSuccess(configitems));
+        if (callback) {
+            callback();
+        }
+    }).catch((error) => {
+        dispatch(configItemsFailure(error));
+        if (callback) {
+            callback();
         }
     });
 }

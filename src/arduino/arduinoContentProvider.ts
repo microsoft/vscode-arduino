@@ -38,6 +38,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this._webserver.addPostHandler("/api/installlibrary", async (req, res) => await this.installLibrary(req, res));
         this._webserver.addPostHandler("/api/uninstalllibrary", async (req, res) => await this.uninstallLibrary(req, res));
         this._webserver.addPostHandler("/api/addlibpath", async (req, res) => await this.addLibPath(req, res));
+        this._webserver.addHandler("/boardConfig", (req, res) => this.getBoardConfigView(req, res));
+        this._webserver.addHandler("/api/configitems", async (req, res) => await this.getBoardConfig(req, res));
+        this._webserver.addPostHandler("/api/updateconfig", async (req, res) => await this.updateConfig(req, res));
         this._webserver.start();
     }
 
@@ -47,6 +50,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             type = "boardmanager";
         } else if (uri.toString() === Constants.LIBRARY_MANAGER_URI.toString()) {
             type = "librarymanager";
+        } else if (uri.toString() === Constants.BOARD_CONFIG_URI.toString()) {
+            type = "boardConfig";
         }
 
         let timeNow = new Date().getTime();
@@ -194,6 +199,31 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                 });
             } catch (error) {
                 return res.status(500).send(`Add library path failed with message "code:${error.code}, err:${error.stderr}"`);
+            }
+        }
+    }
+
+    public getBoardConfigView(req, res) {
+        return res.sendFile(path.join(this._extensionPath, "./out/html/index.html"));
+    }
+
+    public async getBoardConfig(req, res) {
+        return res.json({
+            configitems: this._boardManager.currentBoard.configItems,
+        });
+    }
+
+    public async updateConfig(req, res) {
+        if (!req.body.configId || !req.body.optionId) {
+            return res.status(400).send("BAD Request! Missing parameters!");
+        } else {
+            try {
+                this._boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Update board config failed with message "code:${error.code}, err:${error.stderr}"`);
             }
         }
     }
