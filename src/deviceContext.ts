@@ -84,13 +84,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * @method
      */
     public loadContext(): Thenable<Object> {
-        let preferences = this.arduinoApp.preferences;
-        this._sketch = "app/app.ino";
-        if (preferences) {
-            this._board = preferences.get("board");
-            this._port = preferences.get("serial.port");
-        }
 
+        this._sketch = "app/app.ino";
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
                 let deviceConfigJson: any = {};

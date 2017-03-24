@@ -16,7 +16,10 @@ export interface ISerialPortDetail {
     productId: string;
 }
 
-export class SerialMonitor {
+export class SerialMonitor implements vscode.Disposable {
+
+    public static SERIAL_MONITOR: string = "Serial Monitor";
+
     public static DEFAULT_BAUD_RATE: number = 9600;
 
     public static listBaudRates(): number[] {
@@ -35,7 +38,10 @@ export class SerialMonitor {
 
     private _serialPortCtrl: SerialPortCtrl = null;
 
+    private _outputChannel: vscode.OutputChannel;
+
     constructor() {
+        this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
         this._portsStatusBar.command = "arduino.selectSerialPort";
@@ -53,6 +59,12 @@ export class SerialMonitor {
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = SerialMonitor.DEFAULT_BAUD_RATE.toString();
         this.updatePortListStatus(null);
+    }
+
+    public async dispose() {
+        if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
+            await this._serialPortCtrl.stop();
+        }
     }
 
     public async selectSerialPort() {
@@ -77,9 +89,14 @@ export class SerialMonitor {
 
     public async openSerialMonitor() {
         if (this._serialPortCtrl) {
-            await this._serialPortCtrl.changePort(this._currentPort);
+            if (this._currentPort !== this._serialPortCtrl.currentPort) {
+                await this._serialPortCtrl.changePort(this._currentPort);
+            } else if (this._serialPortCtrl.isActive) {
+                vscode.window.showWarningMessage(`Serial monitor is already opened for ${this._currentPort}`);
+                return;
+            }
         } else {
-            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate);
+            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._outputChannel);
         }
         try {
             await this._serialPortCtrl.open();
@@ -91,7 +108,7 @@ export class SerialMonitor {
     }
 
     public async sendMessageToSerialPort() {
-        if (this._serialPortCtrl && this._serialPortCtrl.isActive()) {
+        if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
             let text = await vscode.window.showInputBox();
             try {
                 await this._serialPortCtrl.sendMessage(text);

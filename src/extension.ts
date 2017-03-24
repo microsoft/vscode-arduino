@@ -93,6 +93,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // serial monitor commands
     const monitor = new SerialMonitor();
+    context.subscriptions.push(monitor);
     context.subscriptions.push(registerCommand("arduino.selectSerialPort", () => monitor.selectSerialPort()));
     context.subscriptions.push(registerCommand("arduino.openSerialMonitor", () => monitor.openSerialMonitor()));
     context.subscriptions.push(registerCommand("arduino.changeBaudRate", () => monitor.changeBaudRate()));

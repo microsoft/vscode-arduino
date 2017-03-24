@@ -14,8 +14,6 @@ interface ISerialPortDetail {
 }
 
 export class SerialPortCtrl {
-    public static SERIAL_MONITOR: string = "Serial Monitor";
-
     public static list(): Promise<ISerialPortDetail[]> {
         return new Promise((resolve, reject) => {
             SerialPortCtrl.serialport.list((e: any, ports: ISerialPortDetail[]) => {
@@ -30,20 +28,24 @@ export class SerialPortCtrl {
 
     private static serialport = require("../../../vendor/serialport-native");
 
-    private _outputChannel: OutputChannel;
     private _currentPort: string;
     private _currentBaudRate: number;
     private _currentSerialPort = null;
 
-    public constructor(port: string, baudRate: number) {
+    public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
         this._currentBaudRate = baudRate;
         this._currentPort = port;
     }
 
+    public get isActive(): boolean {
+        return this._currentSerialPort && this._currentSerialPort.isOpen();
+    }
+
+    public get currentPort(): string {
+        return this._currentPort;
+    }
+
     public open(): Promise<any> {
-        if (!this._outputChannel) {
-            this._outputChannel = window.createOutputChannel(SerialPortCtrl.SERIAL_MONITOR);
-        }
         this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
         return new Promise((resolve, reject) => {
             if (this._currentSerialPort && this._currentSerialPort.isOpen()) {
@@ -84,13 +86,9 @@ export class SerialPortCtrl {
         });
     }
 
-    public isActive(): boolean {
-        return this._currentSerialPort && this._currentSerialPort.isOpen();
-    }
-
     public sendMessage(text: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            if (!text || !this._currentSerialPort || !this.isActive()) {
+            if (!text || !this._currentSerialPort || !this.isActive) {
                 resolve();
                 return;
             }
@@ -107,8 +105,12 @@ export class SerialPortCtrl {
 
     public changePort(newPort: string): Promise<any> {
         return new Promise((resolve, reject) => {
+            if (newPort === this._currentPort) {
+                resolve();
+                return;
+            }
             this._currentPort = newPort;
-            if (!this._currentSerialPort || !this.isActive()) {
+            if (!this._currentSerialPort || !this.isActive) {
                 resolve();
                 return;
             }
@@ -125,7 +127,7 @@ export class SerialPortCtrl {
 
     public stop(): Promise<any> {
         return new Promise((resolve, reject) => {
-            if (!this._currentSerialPort || !this.isActive()) {
+            if (!this._currentSerialPort || !this.isActive) {
                 resolve();
                 return;
             }
@@ -145,7 +147,7 @@ export class SerialPortCtrl {
     public changeBaudRate(newRate: number): Promise<any> {
         return new Promise((resolve, reject) => {
             this._currentBaudRate = newRate;
-            if (!this._currentSerialPort || !this.isActive()) {
+            if (!this._currentSerialPort || !this.isActive) {
                 resolve();
                 return;
             }
