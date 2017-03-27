@@ -43,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
         return vscode.commands.registerCommand(command, async (...args: any[]) => {
-            let guid = Uuid.create().value;
+            let guid = Uuid().replace(/\-/g, "");
             Logger.traceUserData(`start-command-` + command, { correlationId: guid });
             let timer1 = new Logger.Timer();
             let telemetryResult;
