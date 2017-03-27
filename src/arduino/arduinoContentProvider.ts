@@ -223,7 +223,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             try {
                 await Promise.resolve(handler(req, res));
             } catch (error) {
-                Logger.traceError("expressHanlderError", error, { correlationId: guid, handlerName, ...properties });
+                Logger.traceError("expressHandlerError", error, { correlationId: guid, handlerName, ...properties });
             }
             Logger.traceUserData(`end-` + handlerName, { correlationId: guid, duration: timer1.end() });
         };
