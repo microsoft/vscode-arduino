@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
-import * as Uuid from "uuid-lib";
+import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "./arduino/arduino";
@@ -19,7 +19,7 @@ import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
-    let activeGuid = Uuid.create().value;
+    let activeGuid = Uuid().replace(/\-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
