@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
-import * as Uuid from "uuid-lib";
+import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "./arduino/arduino";
@@ -19,7 +19,7 @@ import { SerialMonitor } from "./serialmonitor/serialMonitor";
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
-    let activeGuid = Uuid.create().value;
+    let activeGuid = Uuid().replace(/\-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
@@ -43,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
         return vscode.commands.registerCommand(command, async (...args: any[]) => {
-            let guid = Uuid.create().value;
+            let guid = Uuid().replace(/\-/g, "");
             Logger.traceUserData(`start-command-` + command, { correlationId: guid });
             let timer1 = new Logger.Timer();
             let telemetryResult;
