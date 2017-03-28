@@ -4,9 +4,11 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as path from "path";
+import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
+import * as Logger from "../logger/logger";
 import { ArduinoApp } from "./arduino";
 import { BoardManager } from "./boardManager";
 import { LibraryManager } from "./libraryManager";
@@ -28,19 +30,21 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public initialize() {
         this._webserver = new LocalWebServer(this._extensionPath);
-        this._webserver.addHandler("/boardmanager", (req, res) => this.getBoardManagerView(req, res));
-        this._webserver.addHandler("/api/boardpackages", async (req, res) => await this.getBoardPackages(req, res));
-        this._webserver.addPostHandler("/api/installboard", async (req, res) => await this.installPackage(req, res));
-        this._webserver.addPostHandler("/api/uninstallboard", async (req, res) => await this.uninstallPackage(req, res));
-        this._webserver.addPostHandler("/api/openlink", async (req, res) => await this.openLink(req, res));
-        this._webserver.addHandler("/librarymanager", (req, res) => this.getLibraryManagerView(req, res));
-        this._webserver.addHandler("/api/libraries", async (req, res) => await this.getLibraries(req, res));
-        this._webserver.addPostHandler("/api/installlibrary", async (req, res) => await this.installLibrary(req, res));
-        this._webserver.addPostHandler("/api/uninstalllibrary", async (req, res) => await this.uninstallLibrary(req, res));
-        this._webserver.addPostHandler("/api/addlibpath", async (req, res) => await this.addLibPath(req, res));
-        this._webserver.addHandler("/boardconfig", (req, res) => this.getBoardConfigView(req, res));
-        this._webserver.addHandler("/api/configitems", async (req, res) => await this.getBoardConfig(req, res));
-        this._webserver.addPostHandler("/api/updateconfig", async (req, res) => await this.updateConfig(req, res));
+
+        this.addHandlerWithLogger("show-boardmanager", "/boardmanager", (req, res) => this.getBoardManagerView(req, res));
+        this.addHandlerWithLogger("show-packagemanager", "/api/boardpackages", async (req, res) => await this.getBoardPackages(req, res));
+        this.addHandlerWithLogger("install-board", "/api/installboard", async (req, res) => await this.installPackage(req, res), true);
+        this.addHandlerWithLogger("uninstall-board", "/api/uninstallboard", async (req, res) => await this.uninstallPackage(req, res), true);
+        this.addHandlerWithLogger("open-link", "/api/openlink", async (req, res) => await this.openLink(req, res), true);
+        this.addHandlerWithLogger("show-librarymanager", "/librarymanager", (req, res) => this.getLibraryManagerView(req, res));
+        this.addHandlerWithLogger("load-libraries", "/api/libraries", async (req, res) => await this.getLibraries(req, res));
+        this.addHandlerWithLogger("install-library", "/api/installlibrary", async (req, res) => await this.installLibrary(req, res), true);
+        this.addHandlerWithLogger("uninstall-library", "/api/uninstalllibrary", async (req, res) => await this.uninstallLibrary(req, res), true);
+        this.addHandlerWithLogger("add-libpath", "/api/addlibpath", async (req, res) => await this.addLibPath(req, res), true);
+        this.addHandlerWithLogger("show-boardconfig", "/boardconfig", (req, res) => this.getBoardConfigView(req, res));
+        this.addHandlerWithLogger("load-configitems", "/api/configitems", async (req, res) => await this.getBoardConfig(req, res));
+        this.addHandlerWithLogger("update-config", "//api/updateconfig", async (req, res) => await this.updateConfig(req, res));
+
         this._webserver.start();
     }
 
@@ -225,6 +229,29 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             } catch (error) {
                 return res.status(500).send(`Update board config failed with message "code:${error.code}, err:${error.stderr}"`);
             }
+        }
+    }
+
+    private async addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false): Promise<void> {
+        let wrappedHandler = async (req, res) => {
+            let guid = Uuid().replace(/\-/g, "");
+            let properties = {};
+            if (post) {
+                properties = { ...req.body };
+            }
+            Logger.traceUserData(`start-` + handlerName, { correlationId: guid, ...properties });
+            let timer1 = new Logger.Timer();
+            try {
+                await Promise.resolve(handler(req, res));
+            } catch (error) {
+                Logger.traceError("expressHandlerError", error, { correlationId: guid, handlerName, ...properties });
+            }
+            Logger.traceUserData(`end-` + handlerName, { correlationId: guid, duration: timer1.end() });
+        };
+        if (post) {
+            this._webserver.addPostHandler(url, wrappedHandler);
+        } else {
+            this._webserver.addHandler(url, wrappedHandler);
         }
     }
 }
