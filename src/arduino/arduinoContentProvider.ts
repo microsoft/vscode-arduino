@@ -33,19 +33,19 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("show-boardmanager", "/boardmanager", (req, res) => this.getBoardManagerView(req, res));
         this.addHandlerWithLogger("show-packagemanager", "/api/boardpackages", async (req, res) => await this.getBoardPackages(req, res));
         this.addHandlerWithLogger("install-board", "/api/installboard", async (req, res) => await this.installPackage(req, res),
-            true, ["packageName", "arch", "version"]);
+            true);
         this.addHandlerWithLogger("uninstall-board", "/api/uninstallboard", async (req, res) => await this.uninstallPackage(req, res),
-            true, ["boardName", "packagePath"]);
+            true);
         this.addHandlerWithLogger("open-link", "/api/openlink", async (req, res) => await this.openLink(req, res),
-            true, ["link"]);
+            true);
         this.addHandlerWithLogger("show-librarymanager", "/librarymanager", (req, res) => this.getLibraryManagerView(req, res));
         this.addHandlerWithLogger("load-libraries", "/api/libraries", async (req, res) => await this.getLibraries(req, res));
         this.addHandlerWithLogger("install-library", "/api/installlibrary", async (req, res) => await this.installLibrary(req, res),
-            true, ["libraryName", "version"]);
+            true);
         this.addHandlerWithLogger("uninstall-library", "/api/uninstalllibrary", async (req, res) => await this.uninstallLibrary(req, res),
-            true, ["libraryName", "libraryPath"]);
+            true);
         this.addHandlerWithLogger("add-libpath", "/api/addlibpath", async (req, res) => await this.addLibPath(req, res),
-            true, ["path"]);
+            true);
         this._webserver.start();
     }
 
@@ -206,17 +206,12 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         }
     }
 
-    private async addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false,
-                                       parameterNames: string[] = []): Promise<void> {
+    private async addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false): Promise<void> {
         let wrappedHandler = async(req, res) => {
             let guid = Uuid().replace(/\-/g, "");
             let properties = {};
-            if (post && parameterNames && parameterNames.length) {
-                for (let key of parameterNames) {
-                    if (req.body[key] !== undefined) {
-                        properties[key] = req.body[key];
-                    }
-                }
+            if (post) {
+                properties = {...req.body};
             }
             Logger.traceUserData(`start-` + handlerName, { correlationId: guid, ...properties });
             let timer1 = new Logger.Timer();
