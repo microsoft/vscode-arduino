@@ -73,7 +73,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(registerCommand("arduino.showBoardConfig", () => {
-        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_CONFIG_URI, vscode.ViewColumn.Two, "Arduino Test Board");
+        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_CONFIG_URI, vscode.ViewColumn.Two, "Arduino Board Configuration");
     }));
 
     // change board type

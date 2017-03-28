@@ -339,7 +339,7 @@ export class ArduinoApp {
     private getBoardBuildString(deviceContext: IDeviceContext): string {
         let selectedBoard = this.boardManager.currentBoard;
         if (!selectedBoard) {
-            Logger.notifyUserError("getBoardDescriptorError", new Error(constants.messages.NO_BOARD_SELECTED));
+            Logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
         }
         let boardString = selectedBoard.getBuildConfig();

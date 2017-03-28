@@ -40,7 +40,7 @@ export class BoardManager {
         this._configStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 6);
         this._configStatusBar.command = "arduino.showBoardConfig";
         this._configStatusBar.text = "Config";
-        this._configStatusBar.tooltip = "Config board";
+        this._configStatusBar.tooltip = "Config Board";
     }
 
     public async loadPackages(update: boolean = false) {
