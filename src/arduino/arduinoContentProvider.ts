@@ -43,7 +43,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("add-libpath", "/api/addlibpath", async (req, res) => await this.addLibPath(req, res), true);
         this.addHandlerWithLogger("show-boardconfig", "/boardconfig", (req, res) => this.getBoardConfigView(req, res));
         this.addHandlerWithLogger("load-configitems", "/api/configitems", async (req, res) => await this.getBoardConfig(req, res));
-        this.addHandlerWithLogger("update-config", "//api/updateconfig", async (req, res) => await this.updateConfig(req, res));
+        this.addHandlerWithLogger("update-config", "/api/updateconfig", async (req, res) => await this.updateConfig(req, res), true);
 
         this._webserver.start();
     }
