@@ -62,3 +62,14 @@ export function addLibPath(path) {
         path,
     }).then((response) => response.json());
 }
+
+export function getConfigItems() {
+    return window.fetch(`/api/configitems`).then((response) => response.json());
+}
+
+export function updateConfigItem(configId, optionId) {
+    return postHTTP("/api/updateconfig", {
+        configId,
+        optionId,
+    }).then((response) => response.json());
+}

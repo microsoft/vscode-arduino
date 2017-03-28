@@ -10,7 +10,7 @@ import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
 import { BoardManager } from "./arduino/boardManager";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ArduinoSettings } from "./arduino/settings";
-import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_MANAGER_URI, LIBRARY_MANAGER_URI } from "./common/constants";
+import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
 import { ClangProvider } from "./langService/clang";
 import { CompletionProvider } from "./langService/completionProvider";
@@ -70,6 +70,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(registerCommand("arduino.showLibraryManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Libraries Manager");
+    }));
+
+    context.subscriptions.push(registerCommand("arduino.showBoardConfig", () => {
+        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_CONFIG_URI, vscode.ViewColumn.Two, "Arduino Board Configuration");
     }));
 
     // change board type

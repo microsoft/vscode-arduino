@@ -12,167 +12,9 @@ import * as util from "../common/util";
 
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
+import { Board, parseBoardDescriptor } from "./board";
+import { IBoard, IPackage, IPlatform } from "./package";
 import { IArduinoSettings } from "./settings";
-
-/**
- * Interface that represents an individual package contributor from Arduino package index.
- * @interface
- */
-export interface IPackage {
-    /**
-     * Package name
-     * @property {string}
-     */
-    name: string;
-
-    /**
-     * Package author email
-     * @property {string}
-     */
-    email: string;
-
-    /**
-     * Package maintainer
-     * @property {string}
-     */
-    maintainer: string;
-
-    /**
-     * Package support website URL
-     * @property {string}
-     */
-    websiteURL: string;
-
-    /**
-     * Help information include online link(s)
-     * @property: {any}
-     */
-    help: any;
-
-    /**
-     * Supported platforms that contain in this package.
-     * @property {IPlatform[]}
-     */
-    platforms: IPlatform[];
-
-    /**
-     * Provided tools that contain in this package.
-     */
-    tools: Object[];
-}
-
-/**
- * Interface that represents the supported platforms from the contribution packages.
- *
- * The interface has merged all the supported versions.
- *
- * @interface
- */
-export interface IPlatform {
-    /**
-     * Platform name
-     * @property {string}
-     */
-    name: string;
-
-    /**
-     * Targeting architecture of the platform.
-     * @property {string}
-     */
-    architecture: string;
-
-    /**
-     * Category, can be these values: "Arduino", "Arduino Certified", "Partner", "ESP8266", ...
-     * @property {string}
-     */
-    category: string;
-
-    /**
-     * Provide URL of the platform
-     * @property {string}
-     */
-    url: string;
-
-    /**
-     * Whether is the default platform come with the installation.
-     * @property {boolean}
-     */
-    defaultPlatform?: boolean;
-
-    /**
-     * The raw version when load the object from json object. This value should not be used after the
-     * platforms information has been parsed.
-     * @property {string}
-     */
-    version: string;
-
-    /**
-     * All supported version fro this platform.
-     * @property {string[]}
-     */
-    versions: string[];
-
-    /**
-     * Installed platform on the local Arduino IDE
-     * @property {string}
-     */
-    installedVersion: string;
-
-    /**
-     * Root path that contains all the files, board description under the specified version.
-     * @property {string}
-     */
-    rootBoardPath: string;
-
-    /**
-     * The board desriptor information supported by this platform.
-     * @property {IBoard[]}
-     */
-    boards: any[];
-
-    /**
-     * Help information object include online link(s).
-     * @property {any}
-     */
-    help: any;
-
-    /**
-     * Parent package information
-     * @property {IPackage}
-     */
-    package: IPackage;
-}
-
-/**
- * Interface for classes that represent an Arduino supported board.
- *
- * @interface
- */
-export interface IBoard {
-    /**
-     * Board aliasname for Arduino compilation such as `huzzah`, `yun`
-     * @property {string}
-     */
-    board: string;
-
-    /**
-     * The human readable name displayed on the Arduino IDE Boards Manager
-     * @property {string}
-     */
-    name?: string;
-
-    /**
-     * Board specified parameters
-     * @property {Map}
-     */
-    parameters?: Map<string, string>;
-
-    /**
-     * Reference to the platform that contains this board.
-     * @prop {IPlatform}
-     */
-    platform: IPlatform;
-}
 
 export class BoardManager {
 
@@ -186,12 +28,19 @@ export class BoardManager {
 
     private _boardStatusBar: vscode.StatusBarItem;
 
+    private _configStatusBar: vscode.StatusBarItem;
+
     private _currentBoard: IBoard;
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._boardStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 5);
         this._boardStatusBar.command = "arduino.changeBoardType";
         this._boardStatusBar.tooltip = "Change Board Type";
+
+        this._configStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 6);
+        this._configStatusBar.command = "arduino.showBoardConfig";
+        this._configStatusBar.text = "Config";
+        this._configStatusBar.tooltip = "Config Board";
     }
 
     public async loadPackages(update: boolean = false) {
@@ -247,8 +96,14 @@ export class BoardManager {
         }));
         if (chosen && chosen.label) {
             const dc = DeviceContext.getIntance();
-            dc.board = this.getBoardKey((<any>chosen).entry);
+            dc.board = ((<any>chosen).entry).key;
             this._currentBoard = (<any>chosen).entry;
+            dc.configuration = this._currentBoard.customConfig;
+            if (dc.configuration) {
+                this._configStatusBar.show();
+            } else {
+                this._configStatusBar.hide();
+            }
             this._boardStatusBar.text = chosen.label;
             this._arduinoApp.addLibPath(null);
         }
@@ -295,8 +150,15 @@ export class BoardManager {
         if (selectedBoard) {
             this._currentBoard = selectedBoard;
             this._boardStatusBar.text = selectedBoard.name;
+            if (dc.configuration) {
+                this._configStatusBar.show();
+                this._currentBoard.loadConfig(dc.configuration);
+            } else {
+                this._configStatusBar.hide();
+            }
         } else {
             this._boardStatusBar.text = "<Select Board Type>";
+            this._configStatusBar.hide();
         }
     }
 
@@ -406,10 +268,9 @@ export class BoardManager {
             let dir = plat.rootBoardPath;
             if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
                 let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
-                let res = this.parseBoardDescriptorFile(boardContent, plat);
+                let res = parseBoardDescriptor(boardContent, plat);
                 res.forEach((bd) => {
-                    let fullKey = this.getBoardKey(bd);
-                    this._boards.set(fullKey, bd);
+                    this._boards.set(bd.key, bd);
                 });
             }
         });
@@ -419,38 +280,6 @@ export class BoardManager {
         let result = [];
         this._boards.forEach((b) => {
             result.push(b);
-        });
-        return result;
-    }
-
-    private parseBoardDescriptorFile(boardDescriptor: string, plat: IPlatform): Map<string, IBoard> {
-        const boardLineRegex = /([^\.]+)\.(\S+)=(.+)/;
-
-        let result = new Map<string, IBoard>();
-        let lines = boardDescriptor.split(/[\r|\r\n|\n]/);
-
-        lines.forEach((line) => {
-            // Ignore comments and menu discription lines.
-            if (line.startsWith("#") || line.startsWith("menu.")) {
-                return;
-            }
-            let match = boardLineRegex.exec(line);
-            if (match && match.length > 3) {
-                let boardObject = result.get(match[1]);
-                if (!boardObject) {
-                    boardObject = {
-                        board: match[1],
-                        platform: plat,
-                        parameters: new Map<string, string>(),
-                    };
-                    result.set(boardObject.board, boardObject);
-                }
-                if (match[2] === "name") {
-                    boardObject.name = match[3].trim();
-                } else {
-                    boardObject.parameters.set(match[2], match[3]);
-                }
-            }
         });
         return result;
     }
@@ -489,11 +318,5 @@ export class BoardManager {
             return [];
         }
         return <string[]>urls;
-    }
-    /**
-     * @returns {string} Return board key in format packageName:arch:boardName
-     */
-    private getBoardKey(board: IBoard) {
-        return `${board.platform.package.name}:${board.platform.architecture}:${board.board}`;
     }
 }

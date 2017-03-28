@@ -11,7 +11,7 @@ import * as util from "./common/util";
 import * as Logger from "./logger/logger";
 
 import { ArduinoApp } from "./arduino/arduino";
-import { IBoard } from "./arduino/boardManager";
+import { IBoard } from "./arduino/package";
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
 
 /**
@@ -36,6 +36,12 @@ export interface IDeviceContext {
      * @property {string}
      */
     sketch: string;
+
+    /**
+     * Arduino custom board configuration
+     * @property {string}
+     */
+    configuration: string;
 }
 
 export class DeviceContext implements IDeviceContext, vscode.Disposable {
@@ -51,6 +57,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _board: string;
 
     private _sketch: string;
+
+    private _configuration: string;
 
     private _arduinoApp: ArduinoApp;
 
@@ -84,7 +92,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * @method
      */
     public loadContext(): Thenable<Object> {
-
         this._sketch = "app/app.ino";
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
@@ -96,6 +103,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._port = deviceConfigJson.port || this._port;
                         this._board = deviceConfigJson.board || this._board;
                         this._sketch = deviceConfigJson.sketch || this._sketch;
+                        this._configuration = deviceConfigJson.configuration || this._configuration;
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
@@ -117,6 +125,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.sketch = this.sketch;
         deviceConfigJson.port = this.port;
         deviceConfigJson.board = this.board;
+        deviceConfigJson.configuration = this.configuration;
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
         fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, null, 4));
@@ -146,6 +155,15 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set sketch(value: string) {
         this._sketch = value;
+        this.saveContext();
+    }
+
+    public get configuration() {
+        return this._configuration;
+    }
+
+    public set configuration(value: string) {
+        this._configuration = value;
         this.saveContext();
     }
 }
