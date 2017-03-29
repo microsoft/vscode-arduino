@@ -7,7 +7,6 @@ import * as fs from "fs";
 import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
-import * as shell from "shelljs";
 import * as vscode from "vscode";
 
 import * as constants from "../common/constants";
@@ -333,12 +332,12 @@ export class ArduinoApp {
         let destExample = "";
         if (util.directoryExistsSync(example)) {
             destExample = tmpName(path.join(sketchPath, path.basename(example)));
-            shell.cp("-Rf", example, destExample);
+            util.cp(example, destExample);
         } else if (util.fileExistsSync(example)) {
             const exampleName = path.basename(example, path.extname(example));
             destExample = tmpName(path.join(sketchPath, exampleName));
             util.mkdirRecursivelySync(destExample);
-            shell.cp("-Rf", example, path.join(destExample, path.basename(example)));
+            util.cp(example, path.join(destExample, path.basename(example)));
         }
         if (destExample) {
             // Step 2: Scaffold the example project to an arduino project.

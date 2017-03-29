@@ -108,6 +108,63 @@ export function rmdirRecursivelySync(rootPath: string): void {
     }
 }
 
+function copyFileSync(src, dest, overwrite: boolean = true): boolean {
+    if (!fileExistsSync(src) || (!overwrite && fileExistsSync(dest))) {
+        return false;
+    }
+    const BUF_LENGTH = 64 * 1024;
+    const buf = new Buffer(BUF_LENGTH);
+    let lastBytes = BUF_LENGTH;
+    let pos = 0;
+    try {
+        const srcFd = fs.openSync(src, "r");
+        const destFd = fs.openSync(dest, "w");
+        while (lastBytes === BUF_LENGTH) {
+            lastBytes = fs.readSync(srcFd, buf, 0, BUF_LENGTH, pos);
+            fs.writeSync(destFd, buf, 0, lastBytes);
+            pos += lastBytes;
+        }
+        fs.closeSync(srcFd);
+        fs.closeSync(destFd);
+    } catch (error) {
+        return false;
+    }
+    return true;
+}
+
+function copyFolderRecursivelySync(src, dest) {
+    if (!directoryExistsSync(src)) {
+        return ;
+    }
+    if (!directoryExistsSync(dest)) {
+        mkdirRecursivelySync(dest);
+    }
+
+    const items = fs.readdirSync(src);
+    for (let item of items) {
+        const fullPath = path.join(src, item);
+        const targetPath = path.join(dest, item);
+        if (directoryExistsSync(fullPath)) {
+            copyFolderRecursivelySync(fullPath, targetPath);
+        } else if (fileExistsSync(fullPath)) {
+            copyFileSync(fullPath, targetPath);
+        }
+    }
+}
+
+/**
+ * Copy files & directories recursively. Equals to "cp -r"
+ * @argument {string} src 
+ * @argument {string} dest 
+ */
+export function cp(src, dest) {
+    if (fileExistsSync(src)) {
+        copyFileSync(src, dest);
+    } else if (directoryExistsSync(src)) {
+        copyFolderRecursivelySync(src, dest);
+    }
+}
+
 export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<Object> {
     return new Promise((resolve, reject) => {
         let stdout = "";
