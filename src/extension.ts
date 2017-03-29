@@ -84,6 +84,8 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: boardManager.currentBoard.name };
     }));
 
+    context.subscriptions.push(registerCommand("arduino.initialize", async () => await deviceContext.initialize()));
+
     context.subscriptions.push(registerCommand("arduino.verify", () => arduinoApp.verify(), () => {
         return { board: boardManager.currentBoard.name };
     }));

@@ -42,6 +42,8 @@ export interface IDeviceContext {
      * @property {string}
      */
     configuration: string;
+
+    initialize(): void;
 }
 
 export class DeviceContext implements IDeviceContext, vscode.Disposable {
@@ -165,5 +167,31 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public set configuration(value: string) {
         this._configuration = value;
         this.saveContext();
+    }
+
+    public async initialize() {
+        if (util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))) {
+            vscode.window.showInformationMessage("Arduino configuration is already generated.");
+            return;
+        } else {
+            await vscode.commands.executeCommand("arduino.changeBoardType");
+            await vscode.workspace.findFiles("**/*.ino", null)
+                .then(async (fileUris) => {
+                    if (fileUris.length === 1) {
+                        this.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
+                    } else if (fileUris.length > 1) {
+                        let chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
+                            return <vscode.QuickPickItem>{
+                                label: path.relative(vscode.workspace.rootPath, fileUri.fsPath),
+                                description: fileUri.fsPath,
+                            };
+                        }), { placeHolder: "Select the main sketch file" });
+                        if (chosen && chosen.label) {
+                            this.sketch = chosen.label;
+                        }
+                    }
+                });
+            vscode.window.showInformationMessage("The workspace is initialized with Arduino extension support.");
+        }
     }
 }

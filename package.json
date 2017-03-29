@@ -15,7 +15,6 @@
     "Formatters"
   ],
   "activationEvents": [
-    "onLanguage:arduino",
     "onLanguage:cpp",
     "workspaceContains:.vscode/arduino.json",
     "onCommand:arduino.verify",
@@ -27,8 +26,7 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
-    "snippets": [
-      {
+    "snippets": [{
         "language": "cpp",
         "path": "./snippets/arduino.json"
       },
@@ -37,7 +35,10 @@
         "path": "./snippets/arduino.json"
       }
     ],
-    "commands": [
+    "commands": [{
+        "command": "arduino.initialize",
+        "title": "Arduino: Initialize"
+      },
       {
         "command": "arduino.verify",
         "title": "Arduino: Verify"
@@ -79,30 +80,17 @@
         "title": "Arduino: Libraries Manager"
       }
     ],
-    "keybindings": [
-      {
+    "keybindings": [{
         "command": "arduino.verify",
-        "key": "ctrl+r",
-        "mac": "cmd+r"
+        "key": "ctrl+a ctrl+r",
+        "mac": "cmd+a cmd+r"
       },
       {
         "command": "arduino.upload",
-        "key": "ctrl+u",
-        "mac": "cmd+U"
+        "key": "ctrl+a ctrl+u",
+        "mac": "cmd+a cmd+u"
       }
     ],
-    "menus": {
-      "editor/title": [
-        {
-          "command": "arduino.showBoardManager",
-          "when": "resourceLangId == arduino"
-        },
-        {
-          "command": "arduino.showLibraryManager",
-          "when": "resourceLangId == arduino"
-        }
-      ]
-    },
     "configuration": {
       "type": "object",
       "title": "Arduino configuration",
@@ -142,16 +130,13 @@
         "editor.quickSuggestions": true
       }
     },
-    "languages": [
-      {
-        "id": "arduino-output",
-        "mimetypes": [
-          "text/x-code-output"
-        ]
-      }
-    ],
-    "grammars": [
-      {
+    "languages": [{
+      "id": "arduino-output",
+      "mimetypes": [
+        "text/x-code-output"
+      ]
+    }],
+    "grammars": [{
         "language": "cpp",
         "path": "./syntaxes/arduino.tmLanguage",
         "scopeName": "source.cpp.arduino"

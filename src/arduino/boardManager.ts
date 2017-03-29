@@ -37,7 +37,7 @@ export class BoardManager {
         this._boardStatusBar.command = "arduino.changeBoardType";
         this._boardStatusBar.tooltip = "Change Board Type";
 
-        this._configStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 6);
+        this._configStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 4);
         this._configStatusBar.command = "arduino.showBoardConfig";
         this._configStatusBar.text = "Config";
         this._configStatusBar.tooltip = "Config Board";
@@ -93,7 +93,7 @@ export class BoardManager {
             } else {
                 return a.description > b.description ? 1 : -1;
             }
-        }));
+        }), { placeHolder: "Select board type" });
         if (chosen && chosen.label) {
             const dc = DeviceContext.getIntance();
             dc.board = ((<any>chosen).entry).key;
