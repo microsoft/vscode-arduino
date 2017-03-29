@@ -12,7 +12,6 @@ import { LibraryManager } from "./arduino/libraryManager";
 import { ArduinoSettings } from "./arduino/settings";
 import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
-import { ClangProvider } from "./langService/clang";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
