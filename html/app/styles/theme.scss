@@ -9,6 +9,14 @@ $vscode-dark-border-color: #505050;
             background-color: $vscode-dark-bgcolor-hover;
         }
     }
+
+    .rc-tree {
+        .rc-tree-node-content-wrapper {
+            &:hover {
+                background-color: #4a4848;
+            }
+        }
+    }
 }
 
 // vscode-light styles
@@ -20,6 +28,14 @@ $vscode-light-border-color: #505050;
 
         &:hover {
             background-color: $vscode-light-bgcolor-hover;
+        }
+    }
+
+    .rc-tree {
+        .rc-tree-node-content-wrapper {
+            &:hover {
+                background-color: $vscode-light-bgcolor-hover;
+            }
         }
     }
 }

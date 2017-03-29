@@ -3,7 +3,10 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
+import "rc-tree/dist/rc-tree.min.css";
+import "./react-search-input.css";
+
 import "./board.scss";
 import "./bootstrap.min.css";
-import "./react-search-input.css";
+import "./example.scss";
 import "./theme.scss";

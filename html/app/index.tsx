@@ -10,6 +10,7 @@ import { browserHistory, IndexRoute, Link, Route, Router } from "react-router";
 import { applyMiddleware, createStore } from "redux";
 import BoardConfig from "./components/BoardConfig";
 import BoardManager from "./components/BoardManager";
+import ExampleTreeView from "./components/ExampleTreeView";
 import LibraryManager from "./components/LibraryManager";
 import reducer from "./reducers";
 
@@ -35,6 +36,7 @@ ReactDOM.render(
         <Route path="boardmanager" component={BoardManager} />
         <Route path="librarymanager" component={LibraryManager} />
         <Route path="boardconfig" component={BoardConfig} />
+        <Route path="examples" component={ExampleTreeView} />
       </Route>
     </Router>
   </Provider>,

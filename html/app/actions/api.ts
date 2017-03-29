@@ -73,3 +73,13 @@ export function updateConfigItem(configId, optionId) {
         optionId,
     }).then((response) => response.json());
 }
+
+export function getExamples() {
+    return window.fetch("/api/examples").then((response) => response.json());
+}
+
+export function openExample(examplePath) {
+    return postHTTP("/api/openexample", {
+        path: examplePath,
+    }).then((response) => response.json());
+}

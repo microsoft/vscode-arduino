@@ -27,102 +27,105 @@ export const UNINSTALL_LIBRARY_FAILURE = "UNINSTALL_LIBRARY_FAILURE";
 export const CONFIGITEMS_REQUEST = "CONFIGITEMS_REQUEST";
 export const CONFIGITEMS_SUCCESS = "CONFIGITEMS_SUCCESS";
 export const CONFIGITEMS_FAILURE = "CONFIGITEMS_FAILURE";
+export const EXAMPLES_REQUEST = "EXAMPLES_REQUEST";
+export const EXAMPLES_SUCCESS = "EXAMPLES_SUCCESS";
+export const EXAMPLES_FAILURE = "EXAMPLES_FAILURE";
 
-export function boardPackagesRequest() {
+function boardPackagesRequest() {
     return {
         type: BOARD_PACKAGES_REQUEST,
     };
 }
 
-export function boardPackagesSuccess(platforms) {
+function boardPackagesSuccess(platforms) {
     return {
         type: BOARD_PACKAGES_SUCCESS,
         platforms,
     };
 }
 
-export function boardPackagesFailure(errorMessage) {
+function boardPackagesFailure(errorMessage) {
     return {
         type: BOARD_PACKAGES_FAILURE,
         errorMessage,
     };
 }
 
-export function installBoardRequest(boardName) {
+function installBoardRequest(boardName) {
     return {
         type: INSTALL_BOARD_REQUEST,
         boardName,
     };
 }
 
-export function installBoardSuccess() {
+function installBoardSuccess() {
     return {
         type: INSTALL_BOARD_SUCCESS,
     };
 }
 
-export function installBoardFailure(errorMessage) {
+function installBoardFailure(errorMessage) {
     return {
         type: INSTALL_BOARD_FAILURE,
         errorMessage,
     };
 }
 
-export function uninstallBoardRequest(boardName) {
+function uninstallBoardRequest(boardName) {
     return {
         type: UNINSTALL_BOARD_REQUEST,
         boardName,
     };
 }
 
-export function uninstallBoardSuccess() {
+function uninstallBoardSuccess() {
     return {
         type: UNINSTALL_BOARD_SUCCESS,
     };
 }
 
-export function uninstallBoardFailure(errorMessage) {
+function uninstallBoardFailure(errorMessage) {
     return {
         type: UNINSTALL_BOARD_FAILURE,
         errorMessage,
     };
 }
 
-export function librariesRequest() {
+function librariesRequest() {
     return {
         type: LIBRARIES_REQUEST,
     };
 }
 
-export function librariesSuccess(libraries) {
+function librariesSuccess(libraries) {
     return {
         type: LIBRARIES_SUCCESS,
         libraries,
     };
 }
 
-export function librariesFailure(errorMessage) {
+function librariesFailure(errorMessage) {
     return {
         type: LIBRARIES_FAILURE,
         errorMessage,
     };
 }
 
-export function installLibraryRequest(libraryName) {
+function installLibraryRequest(libraryName) {
     return {
         type: INSTALL_LIBRARY_REQUEST,
         libraryName,
     };
 }
 
-export function installLibrarySuccess(libraryName) {
+function installLibrarySuccess(libraryName) {
     return {
         type: INSTALL_LIBRARY_SUCCESS,
         libraryName,
     };
 }
 
-export function installLibraryFailure(libraryName, errorMessage) {
+function installLibraryFailure(libraryName, errorMessage) {
     return {
         type: INSTALL_LIBRARY_FAILURE,
         libraryName,
@@ -130,21 +133,21 @@ export function installLibraryFailure(libraryName, errorMessage) {
     };
 }
 
-export function uninstallLibraryRequest(libraryName) {
+function uninstallLibraryRequest(libraryName) {
     return {
         type: UNINSTALL_LIBRARY_REQUEST,
         libraryName,
     };
 }
 
-export function uninstallLibrarySuccess(libraryName) {
+function uninstallLibrarySuccess(libraryName) {
     return {
         type: UNINSTALL_LIBRARY_SUCCESS,
         libraryName,
     };
 }
 
-export function uninstallLibraryFailure(libraryName, errorMessage) {
+function uninstallLibraryFailure(libraryName, errorMessage) {
     return {
         type: UNINSTALL_LIBRARY_FAILURE,
         libraryName,
@@ -152,22 +155,42 @@ export function uninstallLibraryFailure(libraryName, errorMessage) {
     };
 }
 
-export function configItemsRequest() {
+function configItemsRequest() {
     return {
         type: CONFIGITEMS_REQUEST,
     };
 }
 
-export function configItemsSuccess(configitems) {
+function configItemsSuccess(configitems) {
     return {
         type: CONFIGITEMS_SUCCESS,
         configitems,
     };
 }
 
-export function configItemsFailure(errorMessage) {
+function configItemsFailure(errorMessage) {
     return {
         type: CONFIGITEMS_FAILURE,
+        errorMessage,
+    };
+}
+
+function examplesRequest() {
+    return {
+        type: EXAMPLES_REQUEST,
+    };
+}
+
+function exampleSuccess(examples) {
+    return {
+        type: EXAMPLES_SUCCESS,
+        examples,
+    };
+}
+
+function exampleFailure(errorMessage) {
+    return {
+        type: EXAMPLES_FAILURE,
         errorMessage,
     };
 }
@@ -265,5 +288,15 @@ export function getConfigItems(dispatch, callback?: Function) {
         if (callback) {
             callback();
         }
+    });
+}
+
+export function getExamples(dispatch) {
+    dispatch(examplesRequest());
+    API.getExamples().then((response) => {
+        const { examples } = <any>response;
+        dispatch(exampleSuccess(examples));
+    }).catch((error) => {
+        dispatch(exampleFailure(error));
     });
 }

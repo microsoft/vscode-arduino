@@ -22,7 +22,8 @@
     "onCommand:selectSerialPort",
     "onCommand:changeBoardType",
     "onCommand:arduino.showBoardManager",
-    "onCommand:arduino.showLibraryManager"
+    "onCommand:arduino.showLibraryManager",
+    "onCommand:arduino.showExamples"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -78,6 +79,10 @@
       {
         "command": "arduino.showLibraryManager",
         "title": "Arduino: Libraries Manager"
+      },
+      {
+        "command": "arduino.showExamples",
+        "title": "Arduino: Examples"
       }
     ],
     "keybindings": [{
@@ -178,6 +183,7 @@
     "express": "^4.14.1",
     "glob": "^7.1.1",
     "properties": "^1.2.1",
+    "shelljs": "^0.7.7",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.6",
     "winreg": "^1.2.3",

@@ -8,9 +8,10 @@ import * as vscode from "vscode";
 import { ArduinoApp } from "./arduino/arduino";
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
 import { BoardManager } from "./arduino/boardManager";
+import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ArduinoSettings } from "./arduino/settings";
-import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, LIBRARY_MANAGER_URI } from "./common/constants";
+import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
@@ -36,8 +37,12 @@ export async function activate(context: vscode.ExtensionContext) {
     arduinoApp.boardManager = boardManager;
     await boardManager.loadPackages();
     const libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
+    arduinoApp.libraryManager = libraryManager;
 
-    const arduinoManagerProvider = new ArduinoContentProvider(arduinoSettings, arduinoApp, boardManager, libraryManager, context.extensionPath);
+    const exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
+    arduinoApp.exampleManager = exampleManager;
+
+    const arduinoManagerProvider = new ArduinoContentProvider(arduinoSettings, arduinoApp, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
 
     let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
@@ -75,10 +80,15 @@ export async function activate(context: vscode.ExtensionContext) {
         return vscode.commands.executeCommand("vscode.previewHtml", BOARD_CONFIG_URI, vscode.ViewColumn.Two, "Arduino Board Configuration");
     }));
 
+    context.subscriptions.push(registerCommand("arduino.showExamples", () => {
+        return vscode.commands.executeCommand("vscode.previewHtml", EXAMPLES_URI, vscode.ViewColumn.Two, "Arduino Examples");
+    }));
+
     // change board type
     context.subscriptions.push(registerCommand("arduino.changeBoardType", async () => {
         await boardManager.changeBoardType();
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
+        arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
         return { board: boardManager.currentBoard.name };
     }));
@@ -108,18 +118,6 @@ export async function activate(context: vscode.ExtensionContext) {
     const completionProvider = new CompletionProvider(arduinoApp);
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
 
-    // Example explorer, only work under VSCode insider version.
-    if (typeof vscode.window.registerTreeExplorerNodeProvider === "function"
-        && vscode.version.indexOf("insider") > -1) {
-        const exampleProvider = require("./arduino/exampleProvider");
-        vscode.window.registerTreeExplorerNodeProvider("arduinoExampleTree", new exampleProvider.ExampleProvider(arduinoSettings));
-        // This command will be invoked using exactly the node you provided in `resolveChildren`.
-        registerCommand("arduino.openExample", (node) => {
-            if (node.kind === "leaf") {
-                vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(node.fullPath), true);
-            }
-        });
-    }
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
