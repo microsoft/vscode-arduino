@@ -82,13 +82,13 @@
     ],
     "keybindings": [{
         "command": "arduino.verify",
-        "key": "ctrl+v",
-        "mac": "cmd+v"
+        "key": "ctrl+a ctrl+r",
+        "mac": "cmd+a cmd+r"
       },
       {
         "command": "arduino.upload",
-        "key": "ctrl+u",
-        "mac": "cmd+u"
+        "key": "ctrl+a ctrl+u",
+        "mac": "cmd+a cmd+u"
       }
     ],
     "configuration": {
