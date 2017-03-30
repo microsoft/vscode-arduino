@@ -21,14 +21,18 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
     private _watcher: vscode.FileSystemWatcher;
 
-    private _cppConfigFile: string = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
+    private _cppConfigFile: string;
 
     constructor(private _arduinoApp: ArduinoApp) {
-        this.updateLibList();
-        this._watcher = vscode.workspace.createFileSystemWatcher(this._cppConfigFile);
-        this._watcher.onDidCreate(() => this.updateLibList());
-        this._watcher.onDidChange(() => this.updateLibList());
-        this._watcher.onDidDelete(() => this.updateLibList());
+        if (vscode.workspace && vscode.workspace.rootPath) {
+            this._cppConfigFile = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
+            this.updateLibList();
+
+            this._watcher = vscode.workspace.createFileSystemWatcher(this._cppConfigFile);
+            this._watcher.onDidCreate(() => this.updateLibList());
+            this._watcher.onDidChange(() => this.updateLibList());
+            this._watcher.onDidDelete(() => this.updateLibList());
+        }
     }
 
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
@@ -54,7 +58,6 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         });
 
         if (fs.existsSync(this._cppConfigFile)) {
-
             const deviceConfig = util.tryParseJSON(fs.readFileSync(this._cppConfigFile, "utf8"));
             if (deviceConfig) {
                 if (deviceConfig.sketch) {
