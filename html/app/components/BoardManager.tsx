@@ -8,6 +8,7 @@ import { Button, DropdownButton, MenuItem } from "react-bootstrap";
 import { connect } from "react-redux";
 import SearchInput, { createFilter } from "react-search-input";
 import * as actions from "../actions";
+import * as API from "../actions/api";
 import { versionCompare } from "../utils/util";
 import BoardItemView from "./BoardItemView";
 
@@ -138,6 +139,8 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
             </div>
             <div className="arduinomanager-footer theme-bgcolor">
                 <span>{totalCountTips}</span>
+                <a className="help-link right-side" title="Configure Additional Boards Manager URLs"
+                   onClick={() => API.openSettings()}>Addtional URLs</a>
             </div>
         </div>);
     }
