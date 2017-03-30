@@ -40,7 +40,8 @@
             ],
             'link_settings': {
               'libraries': [
-                '-ludev'
+                '-L/lib/x86_64-linux-gnu',
+                '-Wl,-rpath,-ludev'
               ]
             }
           }
