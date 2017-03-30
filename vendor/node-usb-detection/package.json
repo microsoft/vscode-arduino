@@ -27,14 +27,13 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^2.9.27",
-    "eventemitter2": ">=0.4.11",
-    "nan": "^2.2.0"
+    "eventemitter2": "^4.1.0"
   },
   "devDependencies": {
     "chai": "^3.0.0",
     "chai-as-promised": "^5.1.0",
     "chalk": "^1.0.0",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "nan": "^2.4.0"
   }
 }
