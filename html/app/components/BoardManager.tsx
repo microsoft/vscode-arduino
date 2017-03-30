@@ -140,7 +140,7 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
             <div className="arduinomanager-footer theme-bgcolor">
                 <span>{totalCountTips}</span>
                 <a className="help-link right-side" title="Configure Additional Boards Manager URLs"
-                   onClick={() => API.openSettings()}>Addtional URLs</a>
+                   onClick={() => API.openSettings()}>Additional URLs</a>
             </div>
         </div>);
     }
