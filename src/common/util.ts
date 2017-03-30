@@ -108,28 +108,42 @@ export function rmdirRecursivelySync(rootPath: string): void {
     }
 }
 
-function copyFileSync(src, dest, overwrite: boolean = true): boolean {
+function copyFileSync(src, dest, overwrite: boolean = true) {
     if (!fileExistsSync(src) || (!overwrite && fileExistsSync(dest))) {
-        return false;
+        return ;
     }
     const BUF_LENGTH = 64 * 1024;
     const buf = new Buffer(BUF_LENGTH);
     let lastBytes = BUF_LENGTH;
     let pos = 0;
+    let srcFd = null;
+    let destFd = null;
+
     try {
-        const srcFd = fs.openSync(src, "r");
-        const destFd = fs.openSync(dest, "w");
+        srcFd = fs.openSync(src, "r");
+    } catch (error) {
+    }
+
+    try {
+        destFd = fs.openSync(dest, "w");
+    } catch (error) {
+    }
+
+    try {
         while (lastBytes === BUF_LENGTH) {
             lastBytes = fs.readSync(srcFd, buf, 0, BUF_LENGTH, pos);
             fs.writeSync(destFd, buf, 0, lastBytes);
             pos += lastBytes;
         }
-        fs.closeSync(srcFd);
-        fs.closeSync(destFd);
     } catch (error) {
-        return false;
     }
-    return true;
+
+    if (srcFd) {
+        fs.closeSync(srcFd);
+    }
+    if (destFd) {
+        fs.closeSync(destFd);
+    }
 }
 
 function copyFolderRecursivelySync(src, dest) {
@@ -159,9 +173,19 @@ function copyFolderRecursivelySync(src, dest) {
  */
 export function cp(src, dest) {
     if (fileExistsSync(src)) {
-        copyFileSync(src, dest);
+        let targetFile = dest;
+        if (directoryExistsSync(dest)) {
+            targetFile = path.join(dest, path.basename(src));
+        }
+        if (path.relative(src, targetFile)) {
+            // if the source and target file is the same, skip copying.
+            return ;
+        }
+        copyFileSync(src, targetFile);
     } else if (directoryExistsSync(src)) {
         copyFolderRecursivelySync(src, dest);
+    } else {
+        throw new Error(`No such file or directory: ${src}`);
     }
 }
 
