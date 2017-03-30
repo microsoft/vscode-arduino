@@ -29,14 +29,14 @@ export class ExampleManager {
         examples.push({
             name: "Built-in Examples",
             path: path.join(this._settings.arduinoPath, "examples"),
-            children: this.parseExamples(path.join(this._settings.arduinoPath, "examples")),
+            children: this.parseExamples(this._settings.defaultExamplePath),
         });
 
         // load Examples from default libraries under arduino installation directory.
         examples.push({
             name: "Examples for any board",
             path: path.join(this._settings.arduinoPath, "libraries"),
-            children: await this.parseExamplesFromLibrary(path.join(this._settings.arduinoPath, "libraries")),
+            children: await this.parseExamplesFromLibrary(this._settings.defaultLibPath),
         });
 
         // load Examples from current board's firmware package directory.

@@ -20,6 +20,7 @@ export interface IArduinoSettings {
     autoUpdateIndexFiles: boolean;
     logLevel: string;
     commandPath: string;
+    defaultExamplePath: string;
     packagePath: string;
     defaultPackagePath: string;
     libPath: string;
@@ -91,6 +92,14 @@ export class ArduinoSettings implements IArduinoSettings {
     public get additionalUrls(): string {
         const workspaceConfig = vscode.workspace.getConfiguration();
         return workspaceConfig.get<string>("arduino.additionalUrls");
+    }
+
+    public get defaultExamplePath(): string {
+        if (os.platform() === "darwin") {
+            return path.join(this.arduinoPath, "Arduino.app/Contents/Java/examples");
+        } else {
+            return path.join(this.arduinoPath, "examples");
+        }
     }
 
     public get packagePath(): string {
