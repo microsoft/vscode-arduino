@@ -108,6 +108,87 @@ export function rmdirRecursivelySync(rootPath: string): void {
     }
 }
 
+function copyFileSync(src, dest, overwrite: boolean = true) {
+    if (!fileExistsSync(src) || (!overwrite && fileExistsSync(dest))) {
+        return ;
+    }
+    const BUF_LENGTH = 64 * 1024;
+    const buf = new Buffer(BUF_LENGTH);
+    let lastBytes = BUF_LENGTH;
+    let pos = 0;
+    let srcFd = null;
+    let destFd = null;
+
+    try {
+        srcFd = fs.openSync(src, "r");
+    } catch (error) {
+    }
+
+    try {
+        destFd = fs.openSync(dest, "w");
+    } catch (error) {
+    }
+
+    try {
+        while (lastBytes === BUF_LENGTH) {
+            lastBytes = fs.readSync(srcFd, buf, 0, BUF_LENGTH, pos);
+            fs.writeSync(destFd, buf, 0, lastBytes);
+            pos += lastBytes;
+        }
+    } catch (error) {
+    }
+
+    if (srcFd) {
+        fs.closeSync(srcFd);
+    }
+    if (destFd) {
+        fs.closeSync(destFd);
+    }
+}
+
+function copyFolderRecursivelySync(src, dest) {
+    if (!directoryExistsSync(src)) {
+        return ;
+    }
+    if (!directoryExistsSync(dest)) {
+        mkdirRecursivelySync(dest);
+    }
+
+    const items = fs.readdirSync(src);
+    for (let item of items) {
+        const fullPath = path.join(src, item);
+        const targetPath = path.join(dest, item);
+        if (directoryExistsSync(fullPath)) {
+            copyFolderRecursivelySync(fullPath, targetPath);
+        } else if (fileExistsSync(fullPath)) {
+            copyFileSync(fullPath, targetPath);
+        }
+    }
+}
+
+/**
+ * Copy files & directories recursively. Equals to "cp -r"
+ * @argument {string} src
+ * @argument {string} dest
+ */
+export function cp(src, dest) {
+    if (fileExistsSync(src)) {
+        let targetFile = dest;
+        if (directoryExistsSync(dest)) {
+            targetFile = path.join(dest, path.basename(src));
+        }
+        if (path.relative(src, targetFile)) {
+            // if the source and target file is the same, skip copying.
+            return ;
+        }
+        copyFileSync(src, targetFile);
+    } else if (directoryExistsSync(src)) {
+        copyFolderRecursivelySync(src, dest);
+    } else {
+        throw new Error(`No such file or directory: ${src}`);
+    }
+}
+
 export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<Object> {
     return new Promise((resolve, reject) => {
         let stdout = "";

@@ -87,8 +87,8 @@ export default class LibraryItemView extends React.Component<ILibraryProps, ILib
         });
     }
 
-    private addLibPath(path) {
-        API.addLibPath(path);
+    private addLibPath(srcPath) {
+        API.addLibPath(srcPath);
     }
 
     private buildLibrarySectionHeader(lib) {

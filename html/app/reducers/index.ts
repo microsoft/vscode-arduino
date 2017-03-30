@@ -6,11 +6,13 @@
 import { combineReducers } from "redux";
 import boardConfigReducer from "./boardConfigReducer";
 import boardManagerReducer from "./boardManagerReducer";
-import { libraryManagerReducer } from "./libraryManagerReducer";
+import exampleReducer from "./exampleReducer";
+import libraryManagerReducer from "./libraryManagerReducer";
 
 const rootReducer = combineReducers({
     boardManagerStore: boardManagerReducer,
     boardConfigStore: boardConfigReducer,
+    exampleStore: exampleReducer,
     libraryManagerStore: libraryManagerReducer,
 });
 

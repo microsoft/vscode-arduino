@@ -1,0 +1,18 @@
+
+.exampleview.rc-tree {
+     li {
+         .rc-tree-node-content-wrapper {
+            height: 25px;
+        }
+
+        .rc-tree-node-selected {
+            background-color: inherit;
+            border: none;
+            opacity: inherit;
+        }
+
+        a {
+            color: inherit;
+        }
+     }
+}
