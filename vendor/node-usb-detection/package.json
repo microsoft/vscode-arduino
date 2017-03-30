@@ -1,0 +1,39 @@
+{
+  "name": "usb-detection",
+  "version": "1.4.0",
+  "description": "Listen to USB devices and detect changes on them.",
+  "main": "lib/index.js",
+  "gypfile": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/MadLittleMods/node-usb-detection.git"
+  },
+  "keywords": [
+    "usb",
+    "device",
+    "hardware",
+    "list",
+    "insert",
+    "add",
+    "remove",
+    "change",
+    "plug",
+    "unplug",
+    "notification"
+  ],
+  "homepage": "https://github.com/MadLittleMods/node-usb-detection",
+  "bugs": {
+    "url": "https://github.com/MadLittleMods/node-usb-detection/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "eventemitter2": "^4.1.0"
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "chai-as-promised": "^5.1.0",
+    "chalk": "^1.0.0",
+    "mocha": "^2.2.5",
+    "nan": "^2.4.0"
+  }
+}
