@@ -154,8 +154,8 @@ function copyFolderRecursivelySync(src, dest) {
 
 /**
  * Copy files & directories recursively. Equals to "cp -r"
- * @argument {string} src 
- * @argument {string} dest 
+ * @argument {string} src
+ * @argument {string} dest
  */
 export function cp(src, dest) {
     if (fileExistsSync(src)) {
