@@ -70,14 +70,18 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * @constructor
      */
     private constructor() {
-        this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE));
-        this._watcher.onDidCreate(() => this.loadContext());
-        this._watcher.onDidChange(() => this.loadContext());
-        this._watcher.onDidDelete(() => this.loadContext());
+        if (vscode.workspace && vscode.workspace.rootPath) {
+            this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE));
+            this._watcher.onDidCreate(() => this.loadContext());
+            this._watcher.onDidChange(() => this.loadContext());
+            this._watcher.onDidDelete(() => this.loadContext());
+        }
     }
 
     public dispose() {
-        this._watcher.dispose();
+        if (this._watcher) {
+            this._watcher.dispose();
+        }
     }
 
     public get arduinoApp(): ArduinoApp {
