@@ -95,18 +95,22 @@ export class BoardManager {
             }
         }), { placeHolder: "Select board type" });
         if (chosen && chosen.label) {
-            const dc = DeviceContext.getIntance();
-            dc.board = ((<any>chosen).entry).key;
-            this._currentBoard = (<any>chosen).entry;
-            dc.configuration = this._currentBoard.customConfig;
-            if (dc.configuration) {
-                this._configStatusBar.show();
-            } else {
-                this._configStatusBar.hide();
-            }
-            this._boardStatusBar.text = chosen.label;
-            this._arduinoApp.addLibPath(null);
+            this.doChangeBoardType((<any>chosen).entry);
         }
+    }
+
+    public doChangeBoardType(targetBoard: IBoard) {
+        const dc = DeviceContext.getIntance();
+        dc.board = targetBoard.key;
+        this._currentBoard = targetBoard;
+        dc.configuration = this._currentBoard.customConfig;
+        if (dc.configuration) {
+            this._configStatusBar.show();
+        } else {
+            this._configStatusBar.hide();
+        }
+        this._boardStatusBar.text = targetBoard.name;
+        this._arduinoApp.addLibPath(null);
     }
 
     public get packages(): IPackage[] {
@@ -142,6 +146,34 @@ export class BoardManager {
             }
         });
         return installedPlatforms;
+    }
+
+    public updateInstalledPlatforms(pkgName: string, arch: string) {
+        let archPath = path.join(this._settings.packagePath, "packages", pkgName, "hardware", arch);
+
+        let allVersion = util.filterJunk(fs.readdirSync(archPath));
+        if (allVersion && allVersion.length) {
+            const newPlatform = {
+                packageName: pkgName,
+                architecture: arch,
+                version: allVersion[0],
+                rootBoardPath: path.join(archPath, allVersion[0]),
+                defaultPlatform: false,
+            };
+
+            let existingPlatform = this._platforms.find((_plat) => {
+                return _plat.package.name === pkgName && _plat.architecture === arch;
+            });
+            if (existingPlatform) {
+                existingPlatform.defaultPlatform = newPlatform.defaultPlatform;
+                if (!existingPlatform.installedVersion) {
+                    existingPlatform.installedVersion = newPlatform.version;
+                    existingPlatform.rootBoardPath = newPlatform.rootBoardPath;
+                    this._installedPlatforms.push(existingPlatform);
+                }
+                this.loadInstalledBoardsFromPlatform(existingPlatform);
+            }
+        }
     }
 
     private updateStatusBar(): void {
@@ -265,15 +297,19 @@ export class BoardManager {
     private loadInstalledBoards(): void {
         this._boards = new Map<string, IBoard>();
         this._installedPlatforms.forEach((plat) => {
-            let dir = plat.rootBoardPath;
-            if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
-                let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
-                let res = parseBoardDescriptor(boardContent, plat);
-                res.forEach((bd) => {
-                    this._boards.set(bd.key, bd);
-                });
-            }
+            this.loadInstalledBoardsFromPlatform(plat);
         });
+    }
+
+    private loadInstalledBoardsFromPlatform(plat: IPlatform) {
+        let dir = plat.rootBoardPath;
+        if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
+            let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
+            let res = parseBoardDescriptor(boardContent, plat);
+            res.forEach((bd) => {
+                this._boards.set(bd.key, bd);
+            });
+        }
     }
 
     private listBoards(): IBoard[] {

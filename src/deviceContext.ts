@@ -175,7 +175,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public async initialize() {
         if (util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))) {
-            vscode.window.showInformationMessage("Arduino configuration is already generated.");
+            vscode.window.showInformationMessage("Arduino.json is already generated.");
             return;
         } else {
             await vscode.commands.executeCommand("arduino.changeBoardType");
@@ -195,7 +195,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         }
                     }
                 });
-            vscode.window.showInformationMessage("The workspace is initialized with Arduino extension support.");
+            vscode.window.showInformationMessage("The workspace is initialized with the Arduino extension support.");
         }
     }
 }
