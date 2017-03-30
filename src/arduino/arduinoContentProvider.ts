@@ -34,6 +34,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("install-board", "/api/installboard", async (req, res) => await this.installPackage(req, res), true);
         this.addHandlerWithLogger("uninstall-board", "/api/uninstallboard", async (req, res) => await this.uninstallPackage(req, res), true);
         this.addHandlerWithLogger("open-link", "/api/openlink", async (req, res) => await this.openLink(req, res), true);
+        this.addHandlerWithLogger("open-settings", "/api/opensettings", (req, res) => this.openSettings(req, res), true);
 
         // Arduino Libraries Manager
         this.addHandlerWithLogger("show-librarymanager", "/librarymanager", (req, res) => this.getHtmlView(req, res));
@@ -156,6 +157,13 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                 return res.status(500).send(`Cannot open the link with error message "${error}"`);
             }
         }
+    }
+
+    public openSettings(req, res) {
+        vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+        return res.json({
+            status: "OK",
+        });
     }
 
     public async getLibraries(req, res) {
