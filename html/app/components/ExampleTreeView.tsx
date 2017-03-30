@@ -66,9 +66,9 @@ class ExampleTreeView extends React.Component<IExampleViewProps, IExampleViewSta
     }
 
     private openExample(selectedKeys, event) {
-        if (event.node.props.isLeaf && selectedKeys.length) {
-            API.openExample(selectedKeys[0]);
-        } else if (!event.node.props.isLeaf) {
+        if (event.node.props.isLeaf) {
+            API.openExample(event.node.props.eventKey);
+        } else {
             const index = this.state.expandedKeys.indexOf(event.node.props.eventKey);
             const expanded = !event.node.props.expanded;
             if (expanded && index === -1) {

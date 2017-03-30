@@ -311,7 +311,7 @@ export class ArduinoApp {
         return result;
     }
 
-    public async openExample(example) {
+    public openExample(example) {
         function tmpName(name) {
             let counter = 0;
             let candidateName = name;
@@ -374,7 +374,7 @@ export class ArduinoApp {
             }
 
             // Step 3: Open the arduino project at a new vscode window.
-            await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(destExample), true);
+            vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(destExample), true);
         }
         return destExample;
     }

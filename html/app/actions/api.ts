@@ -57,9 +57,9 @@ export function uninstallLibrary(libraryName, libraryPath) {
     }).then((response) => response.json());
 }
 
-export function addLibPath(path) {
+export function addLibPath(libraryPath) {
     return postHTTP("/api/addlibpath", {
-        path,
+        libraryPath,
     }).then((response) => response.json());
 }
 
@@ -80,6 +80,6 @@ export function getExamples() {
 
 export function openExample(examplePath) {
     return postHTTP("/api/openexample", {
-        path: examplePath,
+        examplePath,
     }).then((response) => response.json());
 }

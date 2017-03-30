@@ -50,7 +50,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         // Arduino Examples TreeView
         this.addHandlerWithLogger("show-examplesview", "/examples", (req, res) => this.getHtmlView(req, res));
         this.addHandlerWithLogger("load-examples", "/api/examples", async (req, res) => await this.getExamples(req, res));
-        this.addHandlerWithLogger("open-example", "/api/openexample", async (req, res) => await this.openExample(req, res), true);
+        this.addHandlerWithLogger("open-example", "/api/openexample", (req, res) => this.openExample(req, res), true);
 
         this._webserver.start();
     }
@@ -197,12 +197,12 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async addLibPath(req, res) {
-        if (!req.body.path) {
-            return res.status(400).send("BAD Request! Missing { path } parameters!");
+        if (!req.body.libraryPath) {
+            return res.status(400).send("BAD Request! Missing { libraryPath } parameters!");
         } else {
             try {
-                await this._arduinoApp.addLibPath(req.body.path);
-                await this._arduinoApp.includeLibrary(req.body.path);
+                await this._arduinoApp.addLibPath(req.body.libraryPath);
+                await this._arduinoApp.includeLibrary(req.body.libraryPath);
                 return res.json({
                     status: "OK",
                 });
@@ -240,12 +240,12 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         });
     }
 
-    public async openExample(req, res) {
-        if (!req.body.path) {
-            return res.status(400).send("BAD Request! Missing { path } parameter!");
+    public openExample(req, res) {
+        if (!req.body.examplePath) {
+            return res.status(400).send("BAD Request! Missing { examplePath } parameter!");
         } else {
             try {
-                await this._arduinoApp.openExample(req.body.path);
+                this._arduinoApp.openExample(req.body.examplePath);
                 return res.json({
                     status: "OK",
                 });
