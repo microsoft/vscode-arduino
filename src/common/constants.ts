@@ -19,6 +19,7 @@ export const ARDUINO_MANAGER_PROTOCOL = "arduino-manager";
 export const BOARD_MANAGER_URI = vscode.Uri.parse("arduino-manager://arduino/arduino-boardsmanager");
 export const LIBRARY_MANAGER_URI = vscode.Uri.parse("arduino-manager://arduino/arduino-librariesmanager");
 export const BOARD_CONFIG_URI = vscode.Uri.parse("arduino-manager://arduino/arduino-config");
+export const EXAMPLES_URI = vscode.Uri.parse("arduino-manager://arduino/arduino-examples");
 
 export const messages = {
     ARDUINO_FILE_ERROR: "The arduino.json file format is not correct.",

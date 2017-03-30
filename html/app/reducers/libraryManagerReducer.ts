@@ -16,7 +16,7 @@ const initalState = {
     uninstallingLibraryName: "",
 };
 
-export function libraryManagerReducer(state = initalState, action) {
+export default function libraryManagerReducer(state = initalState, action) {
     switch (action.type) {
         case actions.LIBRARIES_REQUEST:
             return {

@@ -57,9 +57,9 @@ export function uninstallLibrary(libraryName, libraryPath) {
     }).then((response) => response.json());
 }
 
-export function addLibPath(path) {
+export function addLibPath(libraryPath) {
     return postHTTP("/api/addlibpath", {
-        path,
+        libraryPath,
     }).then((response) => response.json());
 }
 
@@ -71,5 +71,15 @@ export function updateConfigItem(configId, optionId) {
     return postHTTP("/api/updateconfig", {
         configId,
         optionId,
+    }).then((response) => response.json());
+}
+
+export function getExamples() {
+    return window.fetch("/api/examples").then((response) => response.json());
+}
+
+export function openExample(examplePath) {
+    return postHTTP("/api/openexample", {
+        examplePath,
     }).then((response) => response.json());
 }

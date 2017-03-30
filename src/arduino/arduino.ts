@@ -16,6 +16,8 @@ import * as settings from "./settings";
 
 import { DeviceContext, IDeviceContext } from "../deviceContext";
 import { BoardManager } from "./boardManager";
+import { ExampleManager } from "./exampleManager";
+import { LibraryManager } from "./libraryManager";
 
 import { arduinoChannel } from "../common/outputChannel";
 
@@ -27,6 +29,10 @@ export class ArduinoApp {
     private _preferences: Map<string, string>;
 
     private _boardManager: BoardManager;
+
+    private _libraryManager: LibraryManager;
+
+    private _exampleManager: ExampleManager;
 
     /**
      * @param {IArduinoSettings} ArduinoSetting object.
@@ -305,11 +311,83 @@ export class ArduinoApp {
         return result;
     }
 
+    public openExample(example) {
+        function tmpName(name) {
+            let counter = 0;
+            let candidateName = name;
+            while (true) {
+                if (!util.fileExistsSync(candidateName) && !util.directoryExistsSync(candidateName)) {
+                    return candidateName;
+                }
+                counter++;
+                candidateName = `${name}_${counter}`;
+            }
+        }
+
+        // Step 1: Copy the example project to a temporary directory.
+        const sketchPath = this.preferences.get("sketchbook.path") || path.dirname(this._settings.libPath);
+        if (!util.directoryExistsSync(sketchPath)) {
+            util.mkdirRecursivelySync(sketchPath);
+        }
+        let destExample = "";
+        if (util.directoryExistsSync(example)) {
+            destExample = tmpName(path.join(sketchPath, path.basename(example)));
+            util.cp(example, destExample);
+        } else if (util.fileExistsSync(example)) {
+            const exampleName = path.basename(example, path.extname(example));
+            destExample = tmpName(path.join(sketchPath, exampleName));
+            util.mkdirRecursivelySync(destExample);
+            util.cp(example, path.join(destExample, path.basename(example)));
+        }
+        if (destExample) {
+            // Step 2: Scaffold the example project to an arduino project.
+            const items = fs.readdirSync(destExample);
+            const sketchFile = items.find((item) => {
+                return util.fileExistsSync(path.join(destExample, item)) && item.endsWith(".ino");
+            });
+            if (sketchFile) {
+                // Generate arduino.json
+                const dc = DeviceContext.getIntance();
+                const arduinoJson = {
+                    sketch: sketchFile,
+                    port: dc.port || "COM1",
+                    board: dc.board,
+                    configuration: dc.configuration,
+                };
+                const arduinoConfigFilePath = path.join(destExample, constants.ARDUINO_CONFIG_FILE);
+                util.mkdirRecursivelySync(path.dirname(arduinoConfigFilePath));
+                fs.writeFileSync(arduinoConfigFilePath, JSON.stringify(arduinoJson, null, 4));
+
+                // Generate cpptools intellisense config
+                const cppConfigFilePath = path.join(destExample, constants.CPP_CONFIG_FILE);
+                const cppConfig = {
+                    configurations: [{
+                        name: util.getCppConfigPlatform(),
+                        includePath: this.getDefaultPackageLibPaths(),
+                        browse: {
+                            limitSymbolsToIncludedHeaders: false,
+                        },
+                    }],
+                };
+                util.mkdirRecursivelySync(path.dirname(cppConfigFilePath));
+                fs.writeFileSync(cppConfigFilePath, JSON.stringify(cppConfig, null, 4));
+            }
+
+            // Step 3: Open the arduino project at a new vscode window.
+            vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(destExample), true);
+        }
+        return destExample;
+    }
+
     public get preferences() {
         if (!this._preferences) {
             this.loadPreferences();
         }
         return this._preferences;
+    }
+
+    public get settings() {
+        return this._settings;
     }
 
     public get boardManager() {
@@ -318,6 +396,22 @@ export class ArduinoApp {
 
     public set boardManager(value: BoardManager) {
         this._boardManager = value;
+    }
+
+    public get libraryManager() {
+        return this._libraryManager;
+    }
+
+    public set libraryManager(value: LibraryManager) {
+        this._libraryManager = value;
+    }
+
+    public get exampleManager() {
+        return this._exampleManager;
+    }
+
+    public set exampleManager(value: ExampleManager) {
+        this._exampleManager = value;
     }
 
     private loadPreferences() {
