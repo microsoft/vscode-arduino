@@ -16,6 +16,7 @@ import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
+import { UsbDetector } from "./serialmonitor/usbDetector";
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
@@ -117,6 +118,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const completionProvider = new CompletionProvider(arduinoApp);
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
+
+    const usbDetector = new UsbDetector(arduinoApp, boardManager, context.extensionPath);
+    usbDetector.startListening();
 
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
