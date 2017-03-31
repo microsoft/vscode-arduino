@@ -13,7 +13,7 @@ export function parseGroups(sourceArray: any[], key): any[] {
             groupName = item[key];
         }
         groupName = [].concat(groupName);
-        for (let group of groupName) {
+        for (const group of groupName) {
             if (group && !groups[group]) {
                 groups[group] = true;
             }
@@ -79,7 +79,7 @@ export function shallowEqual(objA, objB, keys?: any[]) {
     }
 
     // Test for A's keys different from B.
-    for (let key of keysA) {
+    for (const key of keysA) {
         if (!Object.prototype.hasOwnProperty.call(objB, key) || !Object.is(objA[key], objB[key])) {
             return false;
         }

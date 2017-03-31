@@ -42,7 +42,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         const match = text.match(/^\s*#\s*include\s*(<[^>]*|"[^"]*)$/);
 
         if (match) {
-            let result = [];
+            const result = [];
             this._headerFiles.forEach((headerFile) => {
                 result.push(new vscode.CompletionItem(headerFile, vscode.CompletionItemKind.File));
             });
@@ -91,7 +91,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         const subItems = fs.readdirSync(libPath);
         subItems.forEach((item) => {
             try {
-                let state = fs.statSync(path.join(libPath, item));
+                const state = fs.statSync(path.join(libPath, item));
                 if (state.isFile() && item.endsWith(".h")) {
                     this._headerFiles.add(item);
                 } else if (state.isDirectory()) {

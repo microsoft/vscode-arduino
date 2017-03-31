@@ -205,7 +205,7 @@ export function getBoardPackages(dispatch, update: boolean) {
     });
 }
 
-export function installBoard(dispatch, boardName, packageName, arch, version, callback?: Function) {
+export function installBoard(dispatch, boardName, packageName, arch, version, callback?: () => void) {
     dispatch(installBoardRequest(boardName));
     API.installBoard(packageName, arch, version).then((response) => {
         dispatch(installBoardSuccess());
@@ -217,7 +217,7 @@ export function installBoard(dispatch, boardName, packageName, arch, version, ca
     });
 }
 
-export function uninstallBoard(dispatch, boardName, packagePath, callback?: Function) {
+export function uninstallBoard(dispatch, boardName, packagePath, callback?: () => void) {
     dispatch(uninstallBoardRequest(boardName));
     API.uninstallBoard(boardName, packagePath).then((response) => {
         dispatch(uninstallBoardSuccess());
@@ -229,7 +229,7 @@ export function uninstallBoard(dispatch, boardName, packagePath, callback?: Func
     });
 }
 
-export function getLibraries(dispatch, update: boolean, callback?: Function) {
+export function getLibraries(dispatch, update: boolean, callback?: () => void) {
     dispatch(librariesRequest());
     API.getLibraries(update).then((response) => {
         const { libraries } = <any>response;
@@ -245,7 +245,7 @@ export function getLibraries(dispatch, update: boolean, callback?: Function) {
     });
 }
 
-export function installLibrary(dispatch, libraryName, version, callback?: Function) {
+export function installLibrary(dispatch, libraryName, version, callback?: (error?) => void) {
     dispatch(installLibraryRequest(libraryName));
     API.installLibrary(libraryName, version).then((response) => {
         dispatch(installLibrarySuccess(libraryName));
@@ -260,7 +260,7 @@ export function installLibrary(dispatch, libraryName, version, callback?: Functi
     });
 }
 
-export function uninstallLibrary(dispatch, libraryName, libraryPath, callback?: Function) {
+export function uninstallLibrary(dispatch, libraryName, libraryPath, callback?: (error?) => void) {
     dispatch(uninstallLibraryRequest(libraryName));
     API.uninstallLibrary(libraryName, libraryPath).then((response) => {
         dispatch(uninstallLibrarySuccess(libraryName));
@@ -275,7 +275,7 @@ export function uninstallLibrary(dispatch, libraryName, libraryPath, callback?: 
     });
 }
 
-export function getConfigItems(dispatch, callback?: Function) {
+export function getConfigItems(dispatch, callback?: () => void) {
     dispatch(configItemsRequest());
     API.getConfigItems().then((response) => {
         const { configitems } = <any>response;

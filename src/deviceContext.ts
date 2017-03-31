@@ -97,7 +97,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * and the setting only depends on device.json.
      * @method
      */
-    public loadContext(): Thenable<Object> {
+    public loadContext(): Thenable<object> {
         this._sketch = "app/app.ino";
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
@@ -184,7 +184,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     if (fileUris.length === 1) {
                         this.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
                     } else if (fileUris.length > 1) {
-                        let chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
+                        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
                             return <vscode.QuickPickItem>{
                                 label: path.relative(vscode.workspace.rootPath, fileUri.fsPath),
                                 description: fileUri.fsPath,

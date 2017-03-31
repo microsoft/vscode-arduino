@@ -1,5 +1,5 @@
 {
-    "extends": "tslint:recommended",
+    "extends": "tslint:latest",
     "rules": {
         "variable-name": [
             true,
@@ -30,6 +30,7 @@
         "max-line-length": [
             true,
             150
-        ]
+        ], 
+        "no-angle-bracket-type-assertion": false
     }
 }

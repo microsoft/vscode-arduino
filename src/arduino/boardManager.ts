@@ -56,12 +56,12 @@ export class BoardManager {
         // Parse package index files.
         const indexFiles = ["package_index.json"].concat(this.getAddtionalIndexFiles());
         const rootPackgeFolder = this._settings.packagePath;
-        for (let indexFile of indexFiles) {
+        for (const indexFile of indexFiles) {
             if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFile))) {
                 await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
                 await this._arduinoApp.initialize(true);
             }
-            let packageContent = fs.readFileSync(path.join(rootPackgeFolder, indexFile), "utf8");
+            const packageContent = fs.readFileSync(path.join(rootPackgeFolder, indexFile), "utf8");
             this.parsePackageIndex(JSON.parse(packageContent));
         }
 
@@ -75,13 +75,13 @@ export class BoardManager {
     }
 
     public async changeBoardType() {
-        let supportedBoardTypes = this.listBoards();
+        const supportedBoardTypes = this.listBoards();
         if (supportedBoardTypes.length === 0) {
             vscode.window.showInformationMessage("No supported board is available.");
             return;
         }
         // TODO:? Add separator item between different platforms.
-        let chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>supportedBoardTypes.map((entry): vscode.QuickPickItem => {
+        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>supportedBoardTypes.map((entry): vscode.QuickPickItem => {
             return <vscode.QuickPickItem>{
                 label: entry.name,
                 description: entry.platform.name,
@@ -149,9 +149,9 @@ export class BoardManager {
     }
 
     public updateInstalledPlatforms(pkgName: string, arch: string) {
-        let archPath = path.join(this._settings.packagePath, "packages", pkgName, "hardware", arch);
+        const archPath = path.join(this._settings.packagePath, "packages", pkgName, "hardware", arch);
 
-        let allVersion = util.filterJunk(fs.readdirSync(archPath));
+        const allVersion = util.filterJunk(fs.readdirSync(archPath));
         if (allVersion && allVersion.length) {
             const newPlatform = {
                 packageName: pkgName,
@@ -161,7 +161,7 @@ export class BoardManager {
                 defaultPlatform: false,
             };
 
-            let existingPlatform = this._platforms.find((_plat) => {
+            const existingPlatform = this._platforms.find((_plat) => {
                 return _plat.package.name === pkgName && _plat.architecture === arch;
             });
             if (existingPlatform) {
@@ -178,7 +178,7 @@ export class BoardManager {
 
     private updateStatusBar(): void {
         const dc = DeviceContext.getIntance();
-        let selectedBoard = this._boards.get(dc.board);
+        const selectedBoard = this._boards.get(dc.board);
         if (selectedBoard) {
             this._currentBoard = selectedBoard;
             this._boardStatusBar.text = selectedBoard.name;
@@ -200,7 +200,7 @@ export class BoardManager {
         rawModel.packages.forEach((pkg) => {
             pkg.platforms.forEach((plat) => {
                 plat.package = pkg;
-                let addedPlatform = this._platforms
+                const addedPlatform = this._platforms
                     .find((_plat) => _plat.architecture === plat.architecture && _plat.package.name === plat.package.name);
                 if (addedPlatform) {
                     // union boards from all versions.
@@ -221,7 +221,7 @@ export class BoardManager {
     private loadInstalledPlatforms() {
         const installed = this.getInstalledPlatforms();
         installed.forEach((platform) => {
-            let existingPlatform = this._platforms.find((_plat) => {
+            const existingPlatform = this._platforms.find((_plat) => {
                 return _plat.package.name === platform.packageName && _plat.architecture === platform.architecture;
             });
             if (existingPlatform) {
@@ -239,14 +239,14 @@ export class BoardManager {
     private getDefaultPlatforms(): any[] {
         const defaultPlatforms = [];
         try {
-            let packageBundled = fs.readFileSync(path.join(this._settings.defaultPackagePath, "package_index_bundled.json"), "utf8");
+            const packageBundled = fs.readFileSync(path.join(this._settings.defaultPackagePath, "package_index_bundled.json"), "utf8");
             if (!packageBundled) {
                 return defaultPlatforms;
             }
-            let bundledObject = JSON.parse(packageBundled);
+            const bundledObject = JSON.parse(packageBundled);
             if (bundledObject && bundledObject.packages) {
-                for (let pkg of bundledObject.packages) {
-                    for (let platform of pkg.platforms) {
+                for (const pkg of bundledObject.packages) {
+                    for (const platform of pkg.platforms) {
                         if (platform.version) {
                             defaultPlatforms.push({
                                 packageName: pkg.name,
@@ -267,19 +267,19 @@ export class BoardManager {
     // User manually installed packages.
     private getManuallyInstalledPlatforms(): any[] {
         const manuallyInstalled = [];
-        let rootPackagePath = path.join(path.join(this._settings.packagePath, "packages"));
+        const rootPackagePath = path.join(path.join(this._settings.packagePath, "packages"));
         if (!util.directoryExistsSync(rootPackagePath)) {
             return manuallyInstalled;
         }
         const dirs = util.filterJunk(util.readdirSync(rootPackagePath, true)); // in Mac, filter .DS_Store file.
-        for (let packageName of dirs) {
-            let archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
+        for (const packageName of dirs) {
+            const archPath = path.join(this._settings.packagePath, "packages", packageName, "hardware");
             if (!util.directoryExistsSync(archPath)) {
                 continue;
             }
-            let architectures = util.filterJunk(fs.readdirSync(archPath));
+            const architectures = util.filterJunk(fs.readdirSync(archPath));
             architectures.forEach((architecture) => {
-                let allVersion = util.filterJunk(fs.readdirSync(path.join(archPath, architecture)));
+                const allVersion = util.filterJunk(fs.readdirSync(path.join(archPath, architecture)));
                 if (allVersion && allVersion.length) {
                     manuallyInstalled.push({
                         packageName,
@@ -302,10 +302,10 @@ export class BoardManager {
     }
 
     private loadInstalledBoardsFromPlatform(plat: IPlatform) {
-        let dir = plat.rootBoardPath;
+        const dir = plat.rootBoardPath;
         if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
-            let boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
-            let res = parseBoardDescriptor(boardContent, plat);
+            const boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
+            const res = parseBoardDescriptor(boardContent, plat);
             res.forEach((bd) => {
                 this._boards.set(bd.key, bd);
             });
@@ -313,7 +313,7 @@ export class BoardManager {
     }
 
     private listBoards(): IBoard[] {
-        let result = [];
+        const result = [];
         this._boards.forEach((b) => {
             result.push(b);
         });
@@ -321,18 +321,18 @@ export class BoardManager {
     }
 
     private getAddtionalIndexFiles(): string[] {
-        let result = [];
-        let urls = this.getAdditionalUrls();
+        const result = [];
+        const urls = this.getAdditionalUrls();
 
         urls.forEach((urlString) => {
             if (!urlString) {
                 return;
             }
-            let normalizedUrl = url.parse(urlString);
+            const normalizedUrl = url.parse(urlString);
             if (!normalizedUrl) {
                 return;
             }
-            let indexFileName = normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
+            const indexFileName = normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
             result.push(indexFileName);
         });
 
@@ -341,7 +341,7 @@ export class BoardManager {
 
     private getAdditionalUrls(): string[] {
         let additionalUrls = this._settings.additionalUrls;
-        let preferences = this._arduinoApp.preferences;
+        const preferences = this._arduinoApp.preferences;
         if (!additionalUrls && preferences && preferences.has("boardsmanager.additional.urls")) {
             additionalUrls = preferences.get("boardsmanager.additional.urls");
         }

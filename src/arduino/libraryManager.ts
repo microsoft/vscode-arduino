@@ -47,13 +47,13 @@ export class LibraryManager {
         this._libraryMap = new Map<string, ILibrary>();
         this._libraries = [];
 
-        let libraryIndexFilePath = path.join(this._settings.packagePath, "library_index.json");
+        const libraryIndexFilePath = path.join(this._settings.packagePath, "library_index.json");
         if (update || !util.fileExistsSync(libraryIndexFilePath)) {
             await this._arduinoApp.initializeLibrary(true);
         }
 
         // Parse libraries index file "library_index.json"
-        let packageContent = fs.readFileSync(libraryIndexFilePath, "utf8");
+        const packageContent = fs.readFileSync(libraryIndexFilePath, "utf8");
         this.parseLibraryIndex(JSON.parse(packageContent));
 
         // Load default Arduino libraries from Arduino installation package.
@@ -73,7 +73,7 @@ export class LibraryManager {
             // Arduino install-library program will replace the blank space of the library folder name with underscore,
             // here format library name consistently for better parsing at the next steps.
             const formattedName = library.name.replace(/\s+/g, "_");
-            let existingLib = this._libraryMap.get(formattedName);
+            const existingLib = this._libraryMap.get(formattedName);
             if (existingLib) {
                 existingLib.versions.push(library.version);
             } else {
@@ -90,12 +90,12 @@ export class LibraryManager {
             return;
         }
 
-        let installedLibDirs = util.filterJunk(util.readdirSync(libRoot, true));
-        for (let libDir of installedLibDirs) {
+        const installedLibDirs = util.filterJunk(util.readdirSync(libRoot, true));
+        for (const libDir of installedLibDirs) {
             if (util.fileExistsSync(path.join(libRoot, libDir, "library.properties"))) {
                 const properties = <any>await util.parseProperties(path.join(libRoot, libDir, "library.properties"));
                 const formattedName = properties.name.replace(/\s+/g, "_");
-                let sourceLib = this._libraryMap.get(formattedName);
+                const sourceLib = this._libraryMap.get(formattedName);
                 if (sourceLib) {
                     sourceLib.version = util.formatVersion(properties.version);
                     sourceLib.builtIn = isBuiltin;
@@ -114,7 +114,7 @@ export class LibraryManager {
         let builtinLibs = [];
         const librarySet = new Set(this._libraryMap.keys());
         const installedPlatforms = this._arduinoApp.boardManager.getInstalledPlatforms();
-        for (let board of installedPlatforms) {
+        for (const board of installedPlatforms) {
             const libs = await this.parseBoardLibraries(board.rootBoardPath, board.architecture, librarySet);
             builtinLibs = builtinLibs.concat(libs);
         }
@@ -122,14 +122,14 @@ export class LibraryManager {
     }
 
     private async parseBoardLibraries(rootBoardPath, architecture, librarySet: Set<any>) {
-        let builtInLib = [];
-        let builtInLibPath = path.join(rootBoardPath, "libraries");
+        const builtInLib = [];
+        const builtInLibPath = path.join(rootBoardPath, "libraries");
         if (util.directoryExistsSync(builtInLibPath)) {
-            let libDirs = util.filterJunk(util.readdirSync(builtInLibPath, true));
+            const libDirs = util.filterJunk(util.readdirSync(builtInLibPath, true));
             if (!libDirs || !libDirs.length) {
                 return builtInLib;
             }
-            for (let libDir of libDirs) {
+            for (const libDir of libDirs) {
                 let sourceLib = <ILibrary>{};
                 if (util.fileExistsSync(path.join(builtInLibPath, libDir, "library.properties"))) {
                     const properties = <any>await util.parseProperties(path.join(builtInLibPath, libDir, "library.properties"));
@@ -164,7 +164,7 @@ export class LibraryManager {
         if (!currentBoard) {
             return;
         }
-        let targetArch = currentBoard.platform.architecture;
+        const targetArch = currentBoard.platform.architecture;
         this._libraries.forEach((library) => {
             library.supported = !!(<string[]>library.architectures).find((arch) => {
                 return arch.indexOf(targetArch) >= 0 || arch.indexOf("*") >= 0;

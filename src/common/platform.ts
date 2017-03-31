@@ -36,7 +36,7 @@ export function resolveArduinoPath(): string {
     if (!result) {
         if (plat === "darwin") {
             const defaultCommonPaths = [path.join(process.env.HOME, "Applications"), "/Applications"];
-            for (let scanPath of defaultCommonPaths) {
+            for (const scanPath of defaultCommonPaths) {
                 if (directoryExistsSync(path.join(scanPath, "Arduino.app"))) {
                     result = scanPath;
                     break;
@@ -46,7 +46,7 @@ export function resolveArduinoPath(): string {
             // TODO
         } else if (plat === "win32") {
             const defaultCommonPaths = [process.env.ProgramFiles, process.env["ProgramFiles(x86)"]];
-            for (let scanPath of defaultCommonPaths) {
+            for (const scanPath of defaultCommonPaths) {
                 if (scanPath && directoryExistsSync(path.join(scanPath, "Arduino"))) {
                     result = path.join(scanPath, "Arduino");
                     break;
