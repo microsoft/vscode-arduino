@@ -1,8 +1,25 @@
+@import "../sprites-generated/spritesheet";
 
 .exampleview.rc-tree {
      li {
          .rc-tree-node-content-wrapper {
             height: 25px;
+        }
+
+        span.rc-tree-switcher.rc-tree-noline_open {
+            margin-top: 3px;
+        }
+
+        .rc-tree-icon__open {
+            @extend .icon-openfolder;
+        }
+
+        .rc-tree-icon__close {
+            @extend .icon-folder;
+        }
+
+        .rc-tree-icon__docu {
+            @extend .icon-ino;
         }
 
         .rc-tree-node-selected {
