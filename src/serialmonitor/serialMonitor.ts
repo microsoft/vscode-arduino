@@ -50,7 +50,7 @@ export class SerialMonitor implements vscode.Disposable {
 
         this._openPortStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 3);
         this._openPortStatusBar.command = "arduino.openSerialMonitor";
-        this._openPortStatusBar.text = `$(key)`;
+        this._openPortStatusBar.text = `$(plug)`;
         this._openPortStatusBar.tooltip = "Open Port";
         this._openPortStatusBar.show();
 
@@ -176,7 +176,7 @@ export class SerialMonitor implements vscode.Disposable {
             this._baudRateStatusBar.show();
         } else {
             this._openPortStatusBar.command = "arduino.openSerialMonitor";
-            this._openPortStatusBar.text = `$(key)`;
+            this._openPortStatusBar.text = `$(plug)`;
             this._openPortStatusBar.tooltip = "Open Serial Monitor";
             this._baudRateStatusBar.hide();
         }

@@ -8,7 +8,7 @@
   "engines": {
     "vscode": "^1.7.0"
   },
-  "enableProposedApi": false,
+  "icon": "images/icon.png",
   "categories": [
     "Languages",
     "Snippets",
