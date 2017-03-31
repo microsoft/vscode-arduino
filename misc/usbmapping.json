@@ -12,8 +12,7 @@
         "name": "Intel Edison",
         "package": "arduino",
         "architecture": "samd",
-        "id": "mkr1000"
-
+        "id": "edison"
     },
     {
         "vid": "10c4",
