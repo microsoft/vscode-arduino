@@ -8,6 +8,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
 import { BoardManager } from "../arduino/boardManager";
+import * as util from "../common/util";
 
 export class UsbDetector {
 
@@ -40,6 +41,13 @@ export class UsbDetector {
                                     this._boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
                                     bd = this._boardManager.installedBoards.get(boardKey);
                                     this._boardManager.doChangeBoardType(bd);
+                                    if (this._boardManager.currentBoard) {
+                                        const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
+                                        if (util.fileExistsSync(readme)) {
+                                            vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
+                                        }
+                                        vscode.commands.executeCommand("arduino.showExamples");
+                                    }
                                 });
                         }
                     });
