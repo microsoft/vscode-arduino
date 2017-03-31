@@ -6,44 +6,39 @@ Welcome to **Arduino** for Visual Studio Code! The Arduino extension makes it ea
 * Built-in Arduino board and library manager.
 * Built-in Arduino example list.
 * Built-in serial port monitoring tool.
-* IntelliSense support and syntax highlighting.
+* IntelliSense support and syntax highlighting based on C++ for VSCode.
 * Snippets for \*.ino files.
+* Automatic Arduino project initialization for \*.ino file.
 * Commond Palette(F1) integration for most common Arduino commands (e.g. Verify, Upload...).
-* TBD: Customizable extension options including command shortcuts and more.
-* TBD: F5 integration with debugging support.
 
 ## Prerequisites
 
 - [Arduino IDE](https://www.arduino.cc/en/main/software). Please choose stable version for your operating system.
 - [Visual Studio Code](https://code.visualstudio.com/#alt-downloads)
+- [C/C++ for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools). Follow the steps to install or update to version 0.10.5 or later.
 
 ## Using
 - First, open your Visual Studio Code to install the **vscode-arduino** extension manually from Extensions Activity Bar.
 
-![Install from VSIX](/images/install_from_vsix.png)
+![Install from VSIX](images/install_from_vsix.png)
 
-- Open an exsiting Arduino sketch folder and change the language mode to **Arduino**.
-
-![Change language mode](/images/change_language_mode.png)
-
-- Press **F1** or **Ctrl+Shift+P** to open command palette, select and run **Add library paths**. There will be a `arduino.json` file generated in your `.vscode` folder.
-
-![Add lib paths](/images/add_lib_path.png)
-
-- Start working on your Arduino sketch by using the commands below.
+- Open your Arduino sketch folder or create an \*.ino file. Choose your Arduino board from status bar to get started.
 
 ## Commands
 This extension provides several commands in the Command Palette (**F1** or **Ctrl+Shift+P**) for working with `*.ino` files:
-- **Arduino: Add library path**: Init the config file, which contains platform related configurations.
-- **Arduino: Verify**: Build (verify) your sketch (\*.ino) file.
-- **Arduino: Upload**: Build your sketch file and deploy (upload) to your Arduino board via serial port.
-- **Arduino: Open Serial Monitoring**: Open serial monotoring tool in the intergrated output window.
-- **Arduino: Send Text to Serial Port**: Send a line of text via the specified serial port.
-- **Arduino: Stop Serial Monitor**: Stop serial monitoring tool and release the occupied serial port.
-- **Arduino: Boards Manager**: Manage development platforms for additional boards.
-- **Arduino: Manage Libraries**: Show a list of libraries that are already installed or ready for installation.
+
+- **Arduino: Boards Manager**: Manage development platforms for additional boards. You can add 3rd party Arduino board / Additional Board Manager URLs in Boards Manager.
 - **Arduino: Change Baud Rate**: Change the band rate of current serial port communication.
-- **Arduino: Change Board Type**: Switch your board type or platform.
+- **Arduino: Change Board Type**: Show the list of installed board. Switch your board type or platform.
+- **Arduino: Close Serial Monitor**: Stop serial monitoring tool and release the occupied serial port.
+- **Arduino: Examples**: Show example list.
+- **Arduino: Initialize**：Initialize your Arduino project.
+- **Arduino: Libraries Manage**: Show a list of libraries that are already installed or ready for installation.
+- **Arduino: Open Serial Monitor**: Open serial monotoring tool in the intergrated output window.
+- **Arduino: Select Serial Port**: List all avaliable serial ports. Switch the serial port you want to use. 
+- **Arduino: Send Text to Serial Port**: Send a line of text via the specified serial port.
+- **Arduino: Upload**: Build your sketch file and deploy (upload) to your Arduino board via serial port.
+- **Arduino: Verify**: Build (verify) your sketch files.
 
 ## Supported Operating Systems
 Currently this extension supports the following operatings systems:
