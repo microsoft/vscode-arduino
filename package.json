@@ -8,7 +8,7 @@
   "engines": {
     "vscode": "^1.7.0"
   },
-  "icon": "images/icon.png",
+  "icon": "images/arduino.svg",
   "categories": [
     "Languages",
     "Snippets",
