@@ -76,7 +76,7 @@ export function readdirSync(dirPath: string, folderOnly: boolean = false): strin
  */
 export function mkdirRecursivelySync(dirPath: string): void {
     if (directoryExistsSync(dirPath)) {
-        return ;
+        return;
     }
     const dirname = path.dirname(dirPath);
     if (path.normalize(dirname) === path.normalize(dirPath)) {
@@ -97,7 +97,7 @@ export function mkdirRecursivelySync(dirPath: string): void {
 export function rmdirRecursivelySync(rootPath: string): void {
     if (fs.existsSync(rootPath)) {
         fs.readdirSync(rootPath).forEach((file) => {
-            let curPath = path.join(rootPath, file);
+            const curPath = path.join(rootPath, file);
             if (fs.lstatSync(curPath).isDirectory()) { // recurse
                 rmdirRecursivelySync(curPath);
             } else { // delete file
@@ -110,7 +110,7 @@ export function rmdirRecursivelySync(rootPath: string): void {
 
 function copyFileSync(src, dest, overwrite: boolean = true) {
     if (!fileExistsSync(src) || (!overwrite && fileExistsSync(dest))) {
-        return ;
+        return;
     }
     const BUF_LENGTH = 64 * 1024;
     const buf = new Buffer(BUF_LENGTH);
@@ -148,14 +148,14 @@ function copyFileSync(src, dest, overwrite: boolean = true) {
 
 function copyFolderRecursivelySync(src, dest) {
     if (!directoryExistsSync(src)) {
-        return ;
+        return;
     }
     if (!directoryExistsSync(dest)) {
         mkdirRecursivelySync(dest);
     }
 
     const items = fs.readdirSync(src);
-    for (let item of items) {
+    for (const item of items) {
         const fullPath = path.join(src, item);
         const targetPath = path.join(dest, item);
         if (directoryExistsSync(fullPath)) {
@@ -179,7 +179,7 @@ export function cp(src, dest) {
         }
         if (path.relative(src, targetFile)) {
             // if the source and target file is the same, skip copying.
-            return ;
+            return;
         }
         copyFileSync(src, targetFile);
     } else if (directoryExistsSync(src)) {
@@ -189,10 +189,10 @@ export function cp(src, dest) {
     }
 }
 
-export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<Object> {
+export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<object> {
     return new Promise((resolve, reject) => {
-        let stdout = "";
-        let stderr = "";
+        const stdout = "";
+        const stderr = "";
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
         const child = childProcess.spawn(command, args, options);
 
@@ -234,7 +234,7 @@ export function filterJunk(files: any[]): any[] {
     return files.filter((file) => !isJunk(file));
 }
 
-export function parseProperties(propertiesFile: string): Thenable<Object> {
+export function parseProperties(propertiesFile: string): Thenable<object> {
     return new Promise((resolve, reject) => {
         properties.parse(propertiesFile, { path: true }, (error, obj) => {
             if (error) {
@@ -260,7 +260,7 @@ export function formatVersion(version: string): string {
     return versions.join(".");
 }
 
-export function union(a: any[], b: any[], compare?: Function) {
+export function union(a: any[], b: any[], compare?: (item1, item2) => boolean) {
     const result = [].concat(a);
     b.forEach((item) => {
         const exist = result.find((element) => {

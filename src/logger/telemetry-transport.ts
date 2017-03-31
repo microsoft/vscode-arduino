@@ -13,7 +13,7 @@ interface IPackageInfo {
 }
 
 function getPackageInfo(context: vscode.ExtensionContext): IPackageInfo {
-    let extensionPackage = require(context.asAbsolutePath("./package.json"));
+    const extensionPackage = require(context.asAbsolutePath("./package.json"));
     if (extensionPackage) {
         return {
             name: extensionPackage.name,
@@ -31,13 +31,13 @@ export class TelemetryTransport extends winston.Transport {
     private name: string;
     private reporter: TelemetryReporter;
     constructor(options: any) {
-        super({...options, context: null});
+        super({ ...options, context: null });
         this.name = "telemetry";
         if (!options.context) {
             winston.error("Failed to initialize telemetry, please set the vscode context in options.");
             return;
         }
-        let packageInfo = getPackageInfo(options.context);
+        const packageInfo = getPackageInfo(options.context);
         if (!packageInfo.aiKey) {
             winston.error("Failed to initialize telemetry due to no aiKey in package.json.");
             return;
@@ -45,15 +45,15 @@ export class TelemetryTransport extends winston.Transport {
         this.reporter = new TelemetryReporter(packageInfo.name, packageInfo.version, packageInfo.aiKey);
     }
 
-    protected log(level: string, message: string, metadata?: any, callback?: Function) {
+    protected log(level: string, message: string, metadata?: any, callback?: (arg1, arg2) => void) {
         if (this.reporter && metadata && metadata.telemetry) {
             try {
                 delete metadata.telemetry;
-                let properties: { [key: string]: string; } = { level };
-                let measures: { [key: string]: number; } = {};
-                for (let key of Object.keys(metadata)) {
+                const properties: { [key: string]: string; } = { level };
+                const measures: { [key: string]: number; } = {};
+                for (const key of Object.keys(metadata)) {
                     if (typeof key === "string" || key instanceof String) {
-                        let value = metadata[key];
+                        const value = metadata[key];
                         if (value === null || typeof value === "string" || value instanceof String) {
                             properties[key] = value;
                         } else if (isNumeric(value)) {
@@ -70,7 +70,9 @@ export class TelemetryTransport extends winston.Transport {
             }
         }
         super.emit("logged");
-        callback(null, true);
+        if (callback) {
+            callback(null, true);
+        }
     }
 }
 

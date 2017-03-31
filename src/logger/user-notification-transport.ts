@@ -12,9 +12,9 @@ export default class UserNotificationTransport extends winston.Transport {
         super(options);
     }
 
-    protected log(level: string, message: string, metadata?: any, callback?: Function) {
+    protected log(level: string, message: string, metadata?: any, callback?: (arg1, arg2) => void) {
         if (metadata && metadata.showUser) {
-            let notification = (metadata && metadata.notification) ? metadata.notification : message;
+            const notification = (metadata && metadata.notification) ? metadata.notification : message;
             if (level === "warn") {
                 vscode.window.showWarningMessage(notification);
             } else if (level === "error") {
@@ -24,6 +24,8 @@ export default class UserNotificationTransport extends winston.Transport {
             }
         }
         super.emit("logged");
-        callback(null, true);
+        if (callback) {
+            callback(null, true);
+        }
     }
 }

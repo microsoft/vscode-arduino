@@ -31,7 +31,7 @@ export default function libraryManagerReducer(state = initalState, action) {
             });
             // Sorting versions in descending order.
             // for loop is faster than forEach iterator.
-            for (let element of action.libraries) {
+            for (const element of action.libraries) {
                 element.versions = element.versions ? element.versions.sort(util.versionCompare).reverse() : element.versions;
             }
             return {

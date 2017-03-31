@@ -68,13 +68,13 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async selectSerialPort() {
-        let lists = await SerialPortCtrl.list();
+        const lists = await SerialPortCtrl.list();
         if (!lists.length) {
             vscode.window.showInformationMessage("No serial port is available.");
             return;
         }
 
-        let chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
+        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
             return {
                 description: l.manufacturer,
                 label: l.comName,
@@ -109,7 +109,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async sendMessageToSerialPort() {
         if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
-            let text = await vscode.window.showInputBox();
+            const text = await vscode.window.showInputBox();
             try {
                 await this._serialPortCtrl.sendMessage(text);
             } catch (error) {
@@ -121,8 +121,8 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async changeBaudRate() {
-        let rates = SerialMonitor.listBaudRates();
-        let chosen = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
+        const rates = SerialMonitor.listBaudRates();
+        const chosen = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
         if (!chosen) {
             Logger.warn("No rate is selected, keep baud rate no changed.");
             return;
@@ -135,7 +135,7 @@ export class SerialMonitor implements vscode.Disposable {
             Logger.warn("Serial Monitor have not been started.");
             return;
         }
-        let selectedRate: number = parseInt(chosen, 10);
+        const selectedRate: number = parseInt(chosen, 10);
         await this._serialPortCtrl.changeBaudRate(selectedRate);
         this._currentBaudRate = selectedRate;
         this._baudRateStatusBar.text = chosen;

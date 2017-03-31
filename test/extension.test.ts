@@ -12,7 +12,7 @@ suite("Arduino Extension Tests", () => {
     });
 
     // tslint:disable-next-line: only-arrow-functions
-    test("should be able to activate the extension", function (done) {
+    test("should be able to activate the extension", (done) => {
         this.timeout(1 * 60 * 1000);
         vscode.extensions.getExtension("Microsoft.vscode-arduino").activate().then((api) => {
             done();

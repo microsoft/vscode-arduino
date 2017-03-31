@@ -43,7 +43,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("uninstall-library", "/api/uninstalllibrary", async (req, res) => await this.uninstallLibrary(req, res), true);
         this.addHandlerWithLogger("add-libpath", "/api/addlibpath", async (req, res) => await this.addLibPath(req, res), true);
 
-	    // Arduino Board Config
+        // Arduino Board Config
         this.addHandlerWithLogger("show-boardconfig", "/boardconfig", (req, res) => this.getHtmlView(req, res));
         this.addHandlerWithLogger("load-configitems", "/api/configitems", async (req, res) => await this.getBoardConfig(req, res));
         this.addHandlerWithLogger("update-config", "/api/updateconfig", async (req, res) => await this.updateConfig(req, res), true);
@@ -68,7 +68,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             type = "examples";
         }
 
-        let timeNow = new Date().getTime();
+        const timeNow = new Date().getTime();
         return `
         <html>
         <head>
@@ -264,14 +264,14 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     private async addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false): Promise<void> {
-        let wrappedHandler = async (req, res) => {
-            let guid = Uuid().replace(/\-/g, "");
+        const wrappedHandler = async (req, res) => {
+            const guid = Uuid().replace(/\-/g, "");
             let properties = {};
             if (post) {
                 properties = { ...req.body };
             }
             Logger.traceUserData(`start-` + handlerName, { correlationId: guid, ...properties });
-            let timer1 = new Logger.Timer();
+            const timer1 = new Logger.Timer();
             try {
                 await Promise.resolve(handler(req, res));
             } catch (error) {

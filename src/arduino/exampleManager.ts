@@ -102,11 +102,11 @@ export class ExampleManager {
         const examples = [];
         const inCompatibles = [];
         const libraries = util.readdirSync(rootPath, true);
-        for (let library of libraries) {
+        for (const library of libraries) {
             const propertiesFile = path.join(rootPath, library, "library.properties");
             if (util.fileExistsSync(propertiesFile)) {
-                let properties = <any>await util.parseProperties(propertiesFile);
-                let children = this.parseExamples(path.join(rootPath, library, "examples"));
+                const properties = <any>await util.parseProperties(propertiesFile);
+                const children = this.parseExamples(path.join(rootPath, library, "examples"));
                 if (children.length) {
                     if (this.isSupported(properties.architectures)) {
                         examples.push({
@@ -151,7 +151,7 @@ export class ExampleManager {
             return true;
         }
 
-        let targetArch = currentBoard.platform.architecture;
+        const targetArch = currentBoard.platform.architecture;
         return architectures.indexOf(targetArch) >= 0 || architectures.indexOf("*") >= 0;
     }
 }

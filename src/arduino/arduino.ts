@@ -83,7 +83,7 @@ export class ArduinoApp {
     }
 
     public async upload() {
-        let dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardBuildString(dc);
         if (!boardDescriptor) {
             return;
@@ -108,7 +108,7 @@ export class ArduinoApp {
     }
 
     public async verify() {
-        let dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardBuildString(dc);
         if (!boardDescriptor) {
             return;
@@ -172,7 +172,7 @@ export class ArduinoApp {
         libPaths.forEach((childLibPath) => {
             childLibPath = path.resolve(path.normalize(childLibPath));
             if (configSection.includePath && configSection.includePath.length) {
-                for (let existingPath of configSection.includePath) {
+                for (const existingPath of configSection.includePath) {
                     if (childLibPath === path.resolve(path.normalize(existingPath))) {
                         return;
                     }
@@ -188,7 +188,7 @@ export class ArduinoApp {
 
     // Include the *.h header files from selected library to the arduino sketch.
     public async includeLibrary(libraryPath: string) {
-        let dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getIntance();
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         if (util.fileExistsSync(appPath)) {
             const hFiles = glob.sync(`${libraryPath}/*.h`, {
@@ -200,7 +200,7 @@ export class ArduinoApp {
             }).join(os.EOL);
 
             // Open the sketch and bring up it to current visible view.
-            let textDocument = await vscode.workspace.openTextDocument(appPath);
+            const textDocument = await vscode.workspace.openTextDocument(appPath);
             await vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);
             const activeEditor = vscode.window.visibleTextEditors.find((textEditor) => {
                 return path.resolve(textEditor.document.fileName) === path.resolve(appPath);
@@ -294,14 +294,14 @@ export class ArduinoApp {
     }
 
     public getDefaultPackageLibPaths(): string[] {
-        let result = [];
-        let boardDescriptor = this._boardManager.currentBoard;
+        const result = [];
+        const boardDescriptor = this._boardManager.currentBoard;
         if (!boardDescriptor) {
             return result;
         }
-        let toolsPath = boardDescriptor.platform.rootBoardPath;
+        const toolsPath = boardDescriptor.platform.rootBoardPath;
         if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
-            let coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
+            const coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
             if (coreLibs && coreLibs.length > 0) {
                 coreLibs.forEach((coreLib) => {
                     result.push(path.normalize(path.join(toolsPath, "cores", coreLib)));
@@ -422,7 +422,7 @@ export class ArduinoApp {
         const lines = rawText.split("\n");
         lines.forEach((line) => {
             if (line) {
-                let match = lineRegex.exec(line);
+                const match = lineRegex.exec(line);
                 if (match && match.length > 2) {
                     this._preferences.set(match[1], match[2]);
                 }
@@ -431,12 +431,12 @@ export class ArduinoApp {
     }
 
     private getBoardBuildString(deviceContext: IDeviceContext): string {
-        let selectedBoard = this.boardManager.currentBoard;
+        const selectedBoard = this.boardManager.currentBoard;
         if (!selectedBoard) {
             Logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
         }
-        let boardString = selectedBoard.getBuildConfig();
+        const boardString = selectedBoard.getBuildConfig();
         return boardString;
     }
 }

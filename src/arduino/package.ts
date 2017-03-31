@@ -47,7 +47,7 @@ export interface IPackage {
     /**
      * Provided tools that contain in this package.
      */
-    tools: Object[];
+    tools: Array<object>;
 }
 
 /**

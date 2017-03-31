@@ -19,7 +19,7 @@ export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): 
             return;
         }
 
-        let match = boardLineRegex.exec(line);
+        const match = boardLineRegex.exec(line);
         if (match && match.length > 3) {
             if (line.startsWith("menu.")) {
                 menuMap.set(match[2], match[3]);
@@ -62,12 +62,12 @@ export class Board implements IBoard {
     public addParameter(key: string, value: string): void {
         const match = key.match(MENU_REGEX);
         if (match) {
-            let existingItem = this._configItems.find((item) => item.id === match[1]);
+            const existingItem = this._configItems.find((item) => item.id === match[1]);
             if (existingItem) {
                 if (!existingItem.selectedOption) {
                     existingItem.selectedOption = match[2];
                 }
-                let existingOption = existingItem.options.find((opt) => opt.id === match[2]);
+                const existingOption = existingItem.options.find((opt) => opt.id === match[2]);
                 if (!existingOption) {
                     existingItem.options.push({ id: match[2], displayName: value });
                 }
@@ -84,7 +84,7 @@ export class Board implements IBoard {
 
     public getBuildConfig(): string {
         const config = this.customConfig;
-        let res = `${this.platform.package.name}:${this.platform.architecture}:${this.board}${config ? ":" + config : ""}`;
+        const res = `${this.platform.package.name}:${this.platform.architecture}:${this.board}${config ? ":" + config : ""}`;
         return res;
     }
 

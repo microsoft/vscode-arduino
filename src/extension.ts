@@ -20,7 +20,7 @@ import { UsbDetector } from "./serialmonitor/usbDetector";
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
-    let activeGuid = Uuid().replace(/\-/g, "");
+    const activeGuid = Uuid().replace(/\-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await arduinoApp.initialize();
 
     // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
-    let deviceContext = DeviceContext.getIntance();
+    const deviceContext = DeviceContext.getIntance();
     deviceContext.arduinoApp = arduinoApp;
     await deviceContext.loadContext();
     context.subscriptions.push(deviceContext);
@@ -46,11 +46,11 @@ export async function activate(context: vscode.ExtensionContext) {
     const arduinoManagerProvider = new ArduinoContentProvider(arduinoSettings, arduinoApp, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
 
-    let registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
+    const registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
         return vscode.commands.registerCommand(command, async (...args: any[]) => {
-            let guid = Uuid().replace(/\-/g, "");
+            const guid = Uuid().replace(/\-/g, "");
             Logger.traceUserData(`start-command-` + command, { correlationId: guid });
-            let timer1 = new Logger.Timer();
+            const timer1 = new Logger.Timer();
             let telemetryResult;
             try {
                 let result = commandBody(...args);

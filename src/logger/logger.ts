@@ -10,7 +10,7 @@ import UserNotificationTransport from "./user-notification-transport";
 
 function FilterErrorPath(line: string): string {
     if (line) {
-        let values: string[] = line.split("/out/");
+        const values: string[] = line.split("/out/");
         if (values.length <= 1) {
             // Didn't match expected format
             return line;
@@ -106,7 +106,7 @@ export class Timer {
         if (!this._startTime) {
             return -1;
         } else {
-            let endTime = process.hrtime(this._startTime);
+            const endTime = process.hrtime(this._startTime);
             return endTime[0] * 1000 + endTime[1] / 1000000;
         }
     }

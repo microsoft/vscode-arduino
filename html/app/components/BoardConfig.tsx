@@ -14,9 +14,6 @@ interface IBoardConfigProps extends React.Props<any> {
     loadConfigItems: () => void;
 }
 
-interface IBoardConfigState extends React.Props<any> {
-}
-
 const mapStateToProps = (state) => {
     return {
         configitems: state.boardConfigStore.configitems,
@@ -29,7 +26,7 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-class BoardConfig extends React.Component<IBoardConfigProps, IBoardConfigState> {
+class BoardConfig extends React.Component<IBoardConfigProps, React.Props<any>> {
     constructor(props) {
         super(props);
         this.state = {};
