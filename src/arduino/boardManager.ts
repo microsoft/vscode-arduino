@@ -340,19 +340,22 @@ export class BoardManager {
     }
 
     private getAdditionalUrls(): string[] {
-        let additionalUrls = this._settings.additionalUrls;
-        const preferences = this._arduinoApp.preferences;
-        if (!additionalUrls && preferences && preferences.has("boardsmanager.additional.urls")) {
-            additionalUrls = preferences.get("boardsmanager.additional.urls");
-        }
-        let urls = additionalUrls;
-        if (additionalUrls) {
-            if (!Array.isArray(urls) && typeof urls === "string") {
-                urls = (<string>additionalUrls).split(",");
+        function formatUrls(urls): string[] {
+            if (urls) {
+                if (!Array.isArray(urls) && typeof urls === "string") {
+                    return (<string>urls).split(",");
+                }
+                return <string[]> urls;
             }
-        } else {
             return [];
         }
-        return <string[]>urls;
+        // For better compatibility, merge urls both in user settings and arduino IDE preferences.
+        const settingsUrls = formatUrls(this._settings.additionalUrls);
+        let preferencesUrls = [];
+        const preferences = this._arduinoApp.preferences;
+        if (preferences && preferences.has("boardsmanager.additional.urls")) {
+            preferencesUrls = formatUrls(preferences.get("boardsmanager.additional.urls"));
+        }
+        return util.union(settingsUrls, preferencesUrls);
     }
 }
