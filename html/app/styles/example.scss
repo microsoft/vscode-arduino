@@ -1,4 +1,3 @@
-@import "../sprites-generated/spritesheet";
 
 .exampleview.rc-tree {
      li {
@@ -8,18 +7,32 @@
 
         span.rc-tree-switcher.rc-tree-noline_open {
             margin-top: 3px;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23646465' d='M11 10H5.344L11 4.414V10z'/%3E%3C/svg%3E");
+            background-position: 0px 0px;
+        }
+
+        span.rc-tree-switcher.rc-tree-noline_close {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23646465' d='M6 4v8l4-4-4-4zm1 2.414L8.586 8 7 9.586V6.414z'/%3E%3C/svg%3E");
+            background-position: 0px 0px;
+        }
+
+        span.rc-tree-iconEle {
+            margin-right: 6px;
         }
 
         .rc-tree-icon__open {
-            @extend .icon-openfolder;
+            background-image: url("../sprites/FolderOpen_16x.svg");
+            background-position: 0px 0px;
         }
 
         .rc-tree-icon__close {
-            @extend .icon-folder;
+            background-image: url("../sprites/Folder_16x.svg");
+            background-position: 0px 0px;
         }
 
         .rc-tree-icon__docu {
-            @extend .icon-ino;
+            background-image: url("../sprites/ino_16x.svg");
+            background-position: 0px 0px;
         }
 
         .rc-tree-node-selected {
@@ -32,4 +45,26 @@
             color: inherit;
         }
      }
+}
+
+.vscode-dark {
+    .exampleview.rc-tree {
+        li {
+            span.rc-tree-switcher.rc-tree-noline_open {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23E8E8E8' d='M11 10H5.344L11 4.414V10z'/%3E%3C/svg%3E");
+            }
+
+            span.rc-tree-switcher.rc-tree-noline_close {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23E8E8E8' d='M6 4v8l4-4-4-4zm1 2.414L8.586 8 7 9.586V6.414z'/%3E%3C/svg%3E");
+            }
+
+            .rc-tree-icon__open {
+                background-image: url("../sprites/FolderOpen_16x_inverse.svg");
+            }
+
+            .rc-tree-icon__close {
+                background-image: url("../sprites/Folder_16x_inverse.svg");
+            }
+        }
+    }
 }
