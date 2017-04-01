@@ -33,15 +33,20 @@ export class UsbDetector {
 
                 let bd = this._boardManager.installedBoards.get(boardKey);
                 if (!bd) {
-                    vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No").then((ans) => {
-                        if (ans === "Yes") {
-                            this._arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
-                                .then((res) => {
-                                    this._boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
-                                    bd = this._boardManager.installedBoards.get(boardKey);
-                                    this._boardManager.doChangeBoardType(bd);
-                                });
-                        }
+                    this._boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackgeContent) => {
+                        vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No").then((ans) => {
+                            if (ans === "Yes") {
+                                this._arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
+                                    .then((res) => {
+                                        if (shouldLoadPackgeContent) {
+                                            this._boardManager.loadPackageContent(deviceDescriptor.indexFile);
+                                        }
+                                        this._boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
+                                        bd = this._boardManager.installedBoards.get(boardKey);
+                                        this._boardManager.doChangeBoardType(bd);
+                                    });
+                            }
+                        });
                     });
                 } else if (this._boardManager.currentBoard) {
                     const currBoard = this._boardManager.currentBoard;
@@ -65,8 +70,13 @@ export class UsbDetector {
 
     private getUsbDeviceDescriptor(vendorId: string, productId: string, extensionRoot: string): any {
         if (!this._boardDescriptors) {
+            this._boardDescriptors = [];
             const fileContent = fs.readFileSync(path.join(extensionRoot, "misc", "usbmapping.json"), "utf8");
-            this._boardDescriptors = JSON.parse(fileContent);
+            const boardIndexes = JSON.parse(fileContent);
+            boardIndexes.forEach((boardIndex) => {
+                boardIndex.boards.forEach((board) => board.indexFile = boardIndex.index_file);
+                this._boardDescriptors = this._boardDescriptors.concat(boardIndex.boards);
+            });
         }
         return this._boardDescriptors.find((obj) => {
             return obj.vid === vendorId && obj.pid === productId;

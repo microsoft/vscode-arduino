@@ -54,15 +54,18 @@ export class BoardManager {
         }
 
         // Parse package index files.
-        const indexFiles = ["package_index.json"].concat(this.getAddtionalIndexFiles());
+        const indexFiles = ["package_index.json"].concat(this.getAdditionalUrls());
         const rootPackgeFolder = this._settings.packagePath;
         for (const indexFile of indexFiles) {
-            if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFile))) {
+            const indexFileName = this.getIndexFileName(indexFile);
+            if (!indexFileName) {
+                continue;
+            }
+            if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
                 await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
                 await this._arduinoApp.initialize(true);
             }
-            const packageContent = fs.readFileSync(path.join(rootPackgeFolder, indexFile), "utf8");
-            this.parsePackageIndex(JSON.parse(packageContent));
+            this.loadPackageContent(indexFileName);
         }
 
         // Load default platforms from arduino installation directory and user manually installed platforms.
@@ -97,6 +100,20 @@ export class BoardManager {
         if (chosen && chosen.label) {
             this.doChangeBoardType((<any>chosen).entry);
         }
+    }
+
+    public async updatePackageIndex(indexUri: string): Promise<boolean> {
+        const indexFileName = this.getIndexFileName(indexUri);
+        if (util.fileExistsSync(path.join(this._settings.packagePath, indexFileName))) {
+            return false;
+        }
+        let allUrls = this.getAdditionalUrls();
+        if (!(allUrls.indexOf(indexUri) >= 0)) {
+            allUrls = allUrls.concat(indexUri);
+            await this._settings.updateAdditionalUrls(allUrls);
+            await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
+        }
+        return true;
     }
 
     public doChangeBoardType(targetBoard: IBoard) {
@@ -148,6 +165,37 @@ export class BoardManager {
         return installedPlatforms;
     }
 
+    public loadPackageContent(indexFile: string): void {
+        const indexFileName = this.getIndexFileName(indexFile);
+        const packageContent = fs.readFileSync(path.join(this._settings.packagePath, indexFileName), "utf8");
+        if (!packageContent) {
+            return;
+        }
+        const rawModel = JSON.parse(packageContent);
+
+        this._packages.concat(rawModel.packages);
+
+        rawModel.packages.forEach((pkg) => {
+            pkg.platforms.forEach((plat) => {
+                plat.package = pkg;
+                const addedPlatform = this._platforms
+                    .find((_plat) => _plat.architecture === plat.architecture && _plat.package.name === plat.package.name);
+                if (addedPlatform) {
+                    // union boards from all versions.
+                    addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
+                        return a.name === b.name;
+                    });
+                    addedPlatform.versions.push(plat.version);
+                } else {
+                    plat.versions = [plat.version];
+                    // Clear the version information since the plat will be used to contain all supported versions.
+                    plat.version = "";
+                    this._platforms.push(plat);
+                }
+            });
+        });
+    }
+
     public updateInstalledPlatforms(pkgName: string, arch: string) {
         const archPath = path.join(this._settings.packagePath, "packages", pkgName, "hardware", arch);
 
@@ -192,30 +240,6 @@ export class BoardManager {
             this._boardStatusBar.text = "<Select Board Type>";
             this._configStatusBar.hide();
         }
-    }
-
-    private parsePackageIndex(rawModel: any): void {
-        this._packages.concat(rawModel.packages);
-
-        rawModel.packages.forEach((pkg) => {
-            pkg.platforms.forEach((plat) => {
-                plat.package = pkg;
-                const addedPlatform = this._platforms
-                    .find((_plat) => _plat.architecture === plat.architecture && _plat.package.name === plat.package.name);
-                if (addedPlatform) {
-                    // union boards from all versions.
-                    addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
-                        return a.name === b.name;
-                    });
-                    addedPlatform.versions.push(plat.version);
-                } else {
-                    plat.versions = [plat.version];
-                    // Clear the version information since the plat will be used to contain all supported versions.
-                    plat.version = "";
-                    this._platforms.push(plat);
-                }
-            });
-        });
     }
 
     private loadInstalledPlatforms() {
@@ -320,23 +344,15 @@ export class BoardManager {
         return result;
     }
 
-    private getAddtionalIndexFiles(): string[] {
-        const result = [];
-        const urls = this.getAdditionalUrls();
-
-        urls.forEach((urlString) => {
-            if (!urlString) {
-                return;
-            }
-            const normalizedUrl = url.parse(urlString);
-            if (!normalizedUrl) {
-                return;
-            }
-            const indexFileName = normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
-            result.push(indexFileName);
-        });
-
-        return result;
+    private getIndexFileName(uriString: string): string {
+        if (!uriString) {
+            return;
+        }
+        const normalizedUrl = url.parse(uriString);
+        if (!normalizedUrl) {
+            return;
+        }
+        return normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
     }
 
     private getAdditionalUrls(): string[] {
