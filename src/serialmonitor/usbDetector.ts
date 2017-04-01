@@ -4,6 +4,7 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
@@ -18,6 +19,9 @@ export class UsbDetector {
     }
 
     public async startListening() {
+        if (os.platform() === "linux") {
+            return;
+        }
         const usbDector = require("../../../vendor/node-usb-detection");
 
         usbDector.on("add", (device) => {
