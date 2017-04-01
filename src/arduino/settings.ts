@@ -26,6 +26,7 @@ export interface IArduinoSettings {
     libPath: string;
     defaultLibPath: string;
     formatterSettings: IClangFormatterSettings;
+    updateAdditionalUrls(urls: string | string[]): void;
 }
 
 export interface IClangFormatterSettings {
@@ -92,6 +93,11 @@ export class ArduinoSettings implements IArduinoSettings {
     public get additionalUrls(): string {
         const workspaceConfig = vscode.workspace.getConfiguration();
         return workspaceConfig.get<string>("arduino.additionalUrls");
+    }
+
+    public async updateAdditionalUrls(value) {
+        const workspaceConfig = vscode.workspace.getConfiguration();
+        await workspaceConfig.update("arduino.additionalUrls", value, true);
     }
 
     public get defaultExamplePath(): string {
