@@ -189,6 +189,14 @@ export function cp(src, dest) {
     }
 }
 
+/**
+ * Check if the specified file is an arduino file (*.ino, *.pde).
+ * @argument {string} filePath
+ */
+export function isArduinoFile(filePath): boolean {
+    return fileExistsSync(filePath) && (path.extname(filePath) === ".ino" || path.extname(filePath) === ".pde");
+}
+
 export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<object> {
     return new Promise((resolve, reject) => {
         const stdout = "";
