@@ -343,7 +343,7 @@ export class ArduinoApp {
             // Step 2: Scaffold the example project to an arduino project.
             const items = fs.readdirSync(destExample);
             const sketchFile = items.find((item) => {
-                return util.fileExistsSync(path.join(destExample, item)) && item.endsWith(".ino");
+                return util.isArduinoFile(path.join(destExample, item));
             });
             if (sketchFile) {
                 // Generate arduino.json
