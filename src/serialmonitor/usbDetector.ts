@@ -26,8 +26,9 @@ export class UsbDetector {
 
         usbDector.on("add", (device) => {
             if (device.vendorId && device.productId) {
-                const deviceDescriptor = this.getUsbDeviceDescriptor(device.vendorId.toString(16),
-                    device.productId.toString(16),
+                const deviceDescriptor = this.getUsbDeviceDescriptor(
+                    util.padStart(device.vendorId.toString(16), 4, "0"), // vid and pid both are 2 bytes long.
+                    util.padStart(device.productId.toString(16), 4, "0"),
                     this._extensionRoot);
 
                 // Not supported device for discovery.
