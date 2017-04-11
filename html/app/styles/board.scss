@@ -171,6 +171,10 @@ a {
 }
 
 .librarymanager {
+    .listitem:last-child {
+        margin-bottom: 40px;
+    }
+
     .arduinomanager-toolbar {
         min-height: 80px;
     }
