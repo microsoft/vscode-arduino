@@ -280,3 +280,33 @@ export function union(a: any[], b: any[], compare?: (item1, item2) => boolean) {
     });
     return result;
 }
+
+/**
+ * This method pads the current string with another string (repeated, if needed)
+ * so that the resulting string reaches the given length.
+ * The padding is applied from the start (left) of the current string.
+ * @argument {string} sourceString
+ * @argument {string} targetLength
+ * @argument {string} padString
+ */
+export function padStart(sourceString: string, targetLength: number, padString?: string): string {
+    if (!sourceString) {
+        return sourceString;
+    }
+
+    if (!String.prototype.padStart) {
+        // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+        padString = String(padString || " ");
+        if (sourceString.length > targetLength) {
+            return sourceString;
+        } else {
+            targetLength = targetLength - sourceString.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength / padString.length); // append to original to ensure we are longer than needed
+            }
+            return padString.slice(0, targetLength) + sourceString;
+        }
+    } else {
+        return sourceString.padStart(targetLength, padString);
+    }
+}
