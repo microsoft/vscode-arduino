@@ -290,6 +290,10 @@ export function union(a: any[], b: any[], compare?: (item1, item2) => boolean) {
  * @argument {string} padString
  */
 export function padStart(sourceString: string, targetLength: number, padString?: string): string {
+    if (!sourceString) {
+        return sourceString;
+    }
+
     if (!String.prototype.padStart) {
         // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
         padString = String(padString || " ");
