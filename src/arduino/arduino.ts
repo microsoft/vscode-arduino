@@ -88,6 +88,11 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
+
+        if (!dc.sketch) {
+            await this.getMainSketch(dc);
+        }
+
         arduinoChannel.show();
 
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
@@ -113,6 +118,11 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
+
+        if (!dc.sketch) {
+            await this.getMainSketch(dc);
+        }
+
         await vscode.workspace.saveAll(false);
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
@@ -438,5 +448,27 @@ export class ArduinoApp {
         }
         const boardString = selectedBoard.getBuildConfig();
         return boardString;
+    }
+
+    private async getMainSketch(dc: DeviceContext) {
+        await vscode.workspace.findFiles("**/*.ino", null)
+            .then(async (fileUris) => {
+                if (fileUris.length === 1) {
+                    dc.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
+                } else if (fileUris.length > 1) {
+                    const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
+                        return <vscode.QuickPickItem>{
+                            label: path.relative(vscode.workspace.rootPath, fileUri.fsPath),
+                            description: fileUri.fsPath,
+                        };
+                    }), { placeHolder: "Select the main sketch file" });
+                    if (chosen && chosen.label) {
+                        dc.sketch = chosen.label;
+                    }
+                } else {
+                    vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
+                    throw new Error("No sketch file was found.");
+                }
+            });
     }
 }
