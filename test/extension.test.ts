@@ -8,13 +8,13 @@ import * as vscode from "vscode";
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Arduino Extension Tests", () => {
     test("should be present", () => {
-        assert.ok(vscode.extensions.getExtension("Microsoft.vscode-arduino"));
+        assert.ok(vscode.extensions.getExtension("vsciot-vscode.vscode-arduino"));
     });
 
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to activate the extension", function(done) {
         this.timeout(1 * 60 * 1000);
-        vscode.extensions.getExtension("Microsoft.vscode-arduino").activate().then((api) => {
+        vscode.extensions.getExtension("vsciot-vscode.vscode-arduino").activate().then((api) => {
             done();
         });
     });
