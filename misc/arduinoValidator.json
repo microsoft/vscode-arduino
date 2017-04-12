@@ -1,0 +1,27 @@
+{
+    "title": "JSON schema for Arduino configuration file",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "sketch": {
+            "description": "The main sketch file name of Arduino",
+            "type": "string",
+            "minLength": 1
+        },
+        "port": {
+            "description": "Serial port name",
+            "type": "string",
+            "minLength": 1
+        },
+        "board": {
+            "description": "Arduino board type",
+            "type": "string",
+            "minLength": 1
+        },
+        "configuration": {
+            "description": "Custom Arduino board configuration",
+            "type": "string",
+            "minLength": 1
+        }
+    }
+}

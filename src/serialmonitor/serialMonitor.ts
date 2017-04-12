@@ -67,23 +67,36 @@ export class SerialMonitor implements vscode.Disposable {
         }
     }
 
-    public async selectSerialPort() {
+    public async selectSerialPort(vid: string, pid: string) {
         const lists = await SerialPortCtrl.list();
         if (!lists.length) {
             vscode.window.showInformationMessage("No serial port is available.");
             return;
         }
 
-        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
-            return {
-                description: l.manufacturer,
-                label: l.comName,
-            };
-        }).sort((a, b): number => {
-            return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
-        }));
-        if (chosen && chosen.label) {
-            this.updatePortListStatus(chosen.label);
+        if (vid && pid) {
+            const foundPort = lists.find((p) => {
+                if (p.productId && p.vendorId) {
+                    return p.productId.toLowerCase() === pid.toLowerCase()
+                        && p.vendorId.toLowerCase() === vid.toLowerCase();
+                }
+                return false;
+            });
+            if (foundPort) {
+                this.updatePortListStatus(foundPort.comName);
+            }
+        } else {
+            const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
+                return {
+                    description: l.manufacturer,
+                    label: l.comName,
+                };
+            }).sort((a, b): number => {
+                return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
+            }));
+            if (chosen && chosen.label) {
+                this.updatePortListStatus(chosen.label);
+            }
         }
     }
 

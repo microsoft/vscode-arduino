@@ -88,8 +88,15 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
-        arduinoChannel.show();
+        if (!dc.sketch) {
+            await this.getMainSketch(dc);
+        }
+        if (!dc.port) {
+            vscode.window.showErrorMessage("Please specify the upload serial port.");
+            return;
+        }
 
+        arduinoChannel.show();
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
         await vscode.commands.executeCommand("arduino.closeSerialMonitor", dc.port);
@@ -113,6 +120,11 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
+
+        if (!dc.sketch) {
+            await this.getMainSketch(dc);
+        }
+
         await vscode.workspace.saveAll(false);
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
@@ -438,5 +450,13 @@ export class ArduinoApp {
         }
         const boardString = selectedBoard.getBuildConfig();
         return boardString;
+    }
+
+    private async getMainSketch(dc: DeviceContext) {
+        await dc.resolveMainSketch();
+        if (!dc.sketch) {
+            vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
+            throw new Error("No sketch file was found.");
+        }
     }
 }

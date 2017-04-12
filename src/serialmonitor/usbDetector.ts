@@ -10,12 +10,17 @@ import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
 import { BoardManager } from "../arduino/boardManager";
 import * as util from "../common/util";
+import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
     private _boardDescriptors = null;
 
-    constructor(private _arduinoApp: ArduinoApp, private _boardManager: BoardManager, private _extensionRoot: string) {
+    constructor(
+        private _arduinoApp: ArduinoApp,
+        private _boardManager: BoardManager,
+        private _serialMonitor: SerialMonitor,
+        private _extensionRoot: string) {
     }
 
     public async startListening() {
@@ -49,7 +54,7 @@ export class UsbDetector {
                                         }
                                         this._boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
                                         bd = this._boardManager.installedBoards.get(boardKey);
-                                        this._boardManager.doChangeBoardType(bd);
+                                        this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
 
                                         if (this._boardManager.currentBoard) {
                                             const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
@@ -71,15 +76,20 @@ export class UsbDetector {
                             "Yes", "No")
                             .then((ans) => {
                                 if (ans === "Yes") {
-                                    return this._boardManager.doChangeBoardType(bd);
+                                    return this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
                                 }
                             });
                     }
                 } else {
-                    this._boardManager.doChangeBoardType(bd);
+                    this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
                 }
             }
         });
+    }
+
+    private switchBoard(bd, vid, pid) {
+        this._boardManager.doChangeBoardType(bd);
+        this._serialMonitor.selectSerialPort(vid, pid);
     }
 
     private getUsbDeviceDescriptor(vendorId: string, productId: string, extensionRoot: string): any {
