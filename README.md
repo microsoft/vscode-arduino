@@ -40,6 +40,20 @@ This extension provides several commands in the Command Palette (**F1** or **Ctr
 - **Arduino: Upload**: Build your sketch file and deploy (upload) to your Arduino board via serial port.
 - **Arduino: Verify**: Build (verify) your sketch files.
 
+## Options
+The following Visual Studio Code settings are available for the Arduino extension. These can be set in user preferences `cmd + ,` or workspace settings (.vscode/settings.json)
+
+```json
+{
+    "arduino.additionalUrls": "",
+    "arduino.autoUpdateIndexFiles": true,
+    "arduino.logLevel": "verbose"
+}
+```
+- `arduino.additionalUrls` - Additional URLs for 3-rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array.
+- `arduino.autoUpdateIndexFiles` - Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Boards Manager/Libraries Manager, download latest index files first. Otherwise, using index files cached on local disk for Boards Manager/Libraries Manager.
+- `arduino.logLevel` - CLI output log level. Could be info or verbose.
+
 ## Supported Operating Systems
 Currently this extension supports the following operatings systems:
 
