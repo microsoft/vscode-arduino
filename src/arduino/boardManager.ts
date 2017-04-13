@@ -167,6 +167,9 @@ export class BoardManager {
 
     public loadPackageContent(indexFile: string): void {
         const indexFileName = this.getIndexFileName(indexFile);
+        if (!util.fileExistsSync(path.join(this._settings.packagePath, indexFileName))) {
+            return ;
+        }
         const packageContent = fs.readFileSync(path.join(this._settings.packagePath, indexFileName), "utf8");
         if (!packageContent) {
             return;
