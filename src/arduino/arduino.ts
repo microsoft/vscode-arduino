@@ -77,7 +77,7 @@ export class ArduinoApp {
         try {
             await util.spawn(this._settings.commandPath,
                 null,
-                ["--pref", `${key}=${value}`]);
+                ["--pref", `${key}=${value}`, "--save-prefs"]);
         } catch (ex) {
         }
     }
