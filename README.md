@@ -2,7 +2,7 @@
 
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/Microsoft/vscode-arduino)
 
-Welcome to **Arduino** for Visual Studio Code! The Arduino extension makes it easy to code, build and deploy your Arduino sketches in Visual Studio Code.
+Welcome to **Arduino** <sup>preview</sup> for Visual Studio Code! The Arduino extension makes it easy to code, build and deploy your Arduino sketches in Visual Studio Code.
 
 * IntelliSense and syntax highlighting for Arduino sketches
 * Verify and upload your sketches in Visual Studio Code
