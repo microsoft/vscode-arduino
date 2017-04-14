@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
+  "preview": true,
   "engines": {
     "vscode": "^1.7.0"
   },
