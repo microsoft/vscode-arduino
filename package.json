@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.0.9-rc",
+  "version": "0.1.0-rc",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "engines": {
@@ -34,7 +34,8 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
-    "snippets": [{
+    "snippets": [
+      {
         "language": "cpp",
         "path": "./snippets/arduino.json"
       },
@@ -43,7 +44,8 @@
         "path": "./snippets/arduino.json"
       }
     ],
-    "commands": [{
+    "commands": [
+      {
         "command": "arduino.initialize",
         "title": "Arduino: Initialize"
       },
@@ -92,7 +94,8 @@
         "title": "Arduino: Examples"
       }
     ],
-    "keybindings": [{
+    "keybindings": [
+      {
         "command": "arduino.verify",
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r"
@@ -142,13 +145,16 @@
         "editor.quickSuggestions": true
       }
     },
-    "languages": [{
-      "id": "arduino-output",
-      "mimetypes": [
-        "text/x-code-output"
-      ]
-    }],
-    "grammars": [{
+    "languages": [
+      {
+        "id": "arduino-output",
+        "mimetypes": [
+          "text/x-code-output"
+        ]
+      }
+    ],
+    "grammars": [
+      {
         "language": "cpp",
         "path": "./syntaxes/arduino.tmLanguage",
         "scopeName": "source.cpp.arduino"
@@ -159,10 +165,12 @@
         "path": "./syntaxes/arduino.output.tmLanguage"
       }
     ],
-    "jsonValidation": [{
-      "fileMatch": "arduino.json",
-      "url": "./misc/arduinoValidator.json"
-    }]
+    "jsonValidation": [
+      {
+        "fileMatch": "arduino.json",
+        "url": "./misc/arduinoValidator.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "gulp build",
