@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.1.1
+- HotFix: Update display tag. 
+
 ## Version 0.1.0
 - Release date: April 14, 2017
 - Release status: Public Preview
