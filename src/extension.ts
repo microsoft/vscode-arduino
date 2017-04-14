@@ -69,6 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
             Logger.traceUserData(`end-command-` + command, { ...telemetryResult, correlationId: guid, duration: timer1.end() });
         });
     };
+
     context.subscriptions.push(registerCommand("arduino.showBoardManager", () => {
         return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
     }));
@@ -121,6 +122,20 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const usbDetector = new UsbDetector(arduinoApp, boardManager, serialMonitor, context.extensionPath);
     usbDetector.startListening();
+
+    const updateStatusBar = () => {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (!activeEditor || (activeEditor.document.languageId !== "cpp" && activeEditor.document.languageId !== "c")) {
+            boardManager.updateStatusBar(false);
+        } else {
+            boardManager.updateStatusBar(true);
+        }
+    };
+
+    vscode.window.onDidChangeActiveTextEditor((e: vscode.TextEditor) => {
+        updateStatusBar();
+    });
+    updateStatusBar();
 
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
