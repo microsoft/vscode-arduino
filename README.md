@@ -12,7 +12,7 @@ Welcome to **Arduino** for Visual Studio Code! The Arduino extension makes it ea
 * Commond Palette (F1) integration of frequently used commands (e.g. Verify, Upload...)
 
 ## Prerequisites
-Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software)
+Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software#download).
 
 ## Installation
 Open VS Code and press `F1` or `Ctrl + Shift + P` to open command palette, select **Install Extension** and type `vscode-arduino`.
@@ -25,14 +25,14 @@ ext install vscode-arduino
 ## Commands
 This extension provides several commands in the Command Palette (**F1** or **Ctrl+Shift+P**) for working with `*.ino` files:
 
-- **Arduino: Boards Manager**: Manage development platforms for additional boards. You can add 3rd party Arduino board / Additional Board Manager URLs in Boards Manager.
+- **Arduino: Boards Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in board manager.
 - **Arduino: Change Baud Rate**: Change the baud rate of selected serial port.
 - **Arduino: Change Board Type**: Change board type or platform.
-- **Arduino: Close Serial Monitor**: Stop Serial Monitor and release the serial port.
+- **Arduino: Close Serial Monitor**: Stop serial monitor and release the serial port.
 - **Arduino: Examples**: Show example list.
 - **Arduino: Initialize**：Scaffold a VS Code project with an Arduino sketch.
 - **Arduino: Libraries Manager**: Explore and manage libraries.
-- **Arduino: Open Serial Monitor**: Open Serial Monitor in the intergrated output window.
+- **Arduino: Open Serial Monitor**: Open serial monitor in the intergrated output window.
 - **Arduino: Select Serial Port**: Change the current serial port. 
 - **Arduino: Send Text to Serial Port**: Send a line of text via the current serial port.
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
