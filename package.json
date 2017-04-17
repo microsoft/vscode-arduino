@@ -176,7 +176,7 @@
   "scripts": {
     "vscode:prepublish": "gulp build",
     "postinstall": "node ./node_modules/vscode/bin/install && cd ./html && npm install",
-    "test": "node ./node_modules/vscode/bin/test"
+    "test": "gulp test"
   },
   "extensionDependencies": [
     "ms-vscode.cpptools"

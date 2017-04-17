@@ -9,6 +9,7 @@ const del = require('del');
 
 const fs = require("fs");
 const path = require("path");
+const childProcess = require("child_process");
 
 //...
 gulp.task("tslint", () => {
@@ -61,8 +62,52 @@ gulp.task("genAikey", (done) => {
     } else {
         packageJson.aiKey = process.env["INT_AIKEY"] || packageJson.aiKey;
     }
-    fs.writeFileSync("package.json", JSON.stringify(packageJson));
+    fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
     done();
+});
+
+gulp.task("test", (done) => {
+    function removeExtensionDependencies() {
+        const packageJson = JSON.parse(fs.readFileSync("package.json"));
+        packageJson.extensionDependencies = [];
+        fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
+    }
+    function restoreExtensionDependencies() {
+        const packageJson = JSON.parse(fs.readFileSync("package.json"));
+        packageJson.extensionDependencies = ["ms-vscode.cpptools"];
+        fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
+    }
+
+    // When using cli command "npm test" to exec test, the depended extensions (cpptools) are not available so that
+    // the extension cannot be activated. As a workaround, remove extensionDependencies from package.json before running test 
+    // and restore extensionDependencies after test exited.
+    removeExtensionDependencies();
+
+    const child = childProcess.spawn("node", ["./node_modules/vscode/bin/test"], {
+        cwd: __dirname,
+        env: Object.assign({}, process.env, { CODE_TESTS_WORKSPACE: path.join(__dirname, "test/resources/blink") }),
+    });
+
+    child.stdout.on("data", (data) => {
+        gutil.log(data.toString().trim());
+    });
+
+    child.stderr.on("data", (data) => {
+        gutil.log(gutil.colors.red(data.toString().trim()));
+    });
+
+    child.on("error", (error) => {
+        gutil.log(gutil.colors.red(error));
+    });
+
+    child.on("exit", (code) => {
+        restoreExtensionDependencies();
+        if (code === 0) {
+            done();
+        } else {
+            done(code);
+        }
+    });
 });
 
 gulp.task("build", (done) => {
