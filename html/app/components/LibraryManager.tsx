@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { Button, Checkbox, DropdownButton, MenuItem } from "react-bootstrap";
+import * as ReactList from "react-list";
 import { connect } from "react-redux";
 import SearchInput, { createFilter } from "react-search-input";
 import * as actions from "../actions";
@@ -115,16 +116,15 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
 
         const SEARCH_KEYS = ["name", "sentence", "paragraph"];
         const filterSearch = createFilter(this.state.searchTerm, SEARCH_KEYS);
-        let totalCount = 0;
-        this.props.libraries.forEach((element) => {
+        const filteredLibraries = this.props.libraries.filter((element) => {
             const filterSupported = this.state.checked ? element.supported : true;
             if (filterSupported && filterType(element, this.state.type) && filterTopic(element, this.state.topic) && filterSearch(element)) {
-                element.shouldBeDisplayed = true;
-                totalCount++;
+                return true;
             } else {
-                element.shouldBeDisplayed = false;
+                return false;
             }
         });
+        const totalCount = filteredLibraries.length;
         let totalCountTips = "";
         if (this.state.type === "All" && this.state.topic === "All" && !this.state.searchTerm) {
             totalCountTips = `Total ${totalCount} Libraries`;
@@ -137,6 +137,13 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
             uninstallLibrary: this.props.uninstallLibrary,
         };
         const isOperating = !!this.props.installingLibraryName || !!this.props.uninstallingLibraryName;
+
+        const itemRenderer = (index, key) => {
+            return (<LibraryItemView key={filteredLibraries[index].name} library={filteredLibraries[index]} {...libraryItemProps}/>);
+        };
+        const itemSizeEstimator = (index, cache) => {
+            return 200;
+        };
 
         return (<div className={"librarymanager " + (isOperating ? "disabled" : "")}>
             {
@@ -165,13 +172,7 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
                 <Checkbox className="supported-checkbox" onChange={this.handleCheck}>Only show libraries supported by current board</Checkbox>
             </div>
             <div className="arduinomanager-container">
-                {
-                    this.props.libraries.map((library, index) => {
-                        return (<div key={library.name} className={library.shouldBeDisplayed ? "" : "hidden"}>
-                                <LibraryItemView library={library} {...libraryItemProps}/>
-                            </div>);
-                    })
-                }
+                <ReactList itemRenderer={itemRenderer} itemSizeEstimator={itemSizeEstimator} length={filteredLibraries.length} type="variable"/>
             </div>
             <div className="arduinomanager-footer theme-bgcolor">
                 <span>{ totalCountTips }</span>

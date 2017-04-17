@@ -67,23 +67,39 @@ export class SerialMonitor implements vscode.Disposable {
         }
     }
 
-    public async selectSerialPort() {
+    public async selectSerialPort(vid: string, pid: string) {
         const lists = await SerialPortCtrl.list();
         if (!lists.length) {
             vscode.window.showInformationMessage("No serial port is available.");
             return;
         }
 
-        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
-            return {
-                description: l.manufacturer,
-                label: l.comName,
-            };
-        }).sort((a, b): number => {
-            return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
-        }));
-        if (chosen && chosen.label) {
-            this.updatePortListStatus(chosen.label);
+        if (vid && pid) {
+            const valueOfVid = parseInt(vid, 16);
+            const valueOfPid = parseInt(pid, 16);
+            const foundPort = lists.find((p) => {
+                // The pid and vid returned by SerialPortCtrl start with 0x prefix in Mac, but no 0x prefix in Win32.
+                // Should compare with decimal value to keep compatibility.
+                if (p.productId && p.vendorId) {
+                    return parseInt(p.productId, 16) === valueOfPid && parseInt(p.vendorId, 16) === valueOfVid;
+                }
+                return false;
+            });
+            if (foundPort) {
+                this.updatePortListStatus(foundPort.comName);
+            }
+        } else {
+            const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
+                return {
+                    description: l.manufacturer,
+                    label: l.comName,
+                };
+            }).sort((a, b): number => {
+                return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
+            }));
+            if (chosen && chosen.label) {
+                this.updatePortListStatus(chosen.label);
+            }
         }
     }
 

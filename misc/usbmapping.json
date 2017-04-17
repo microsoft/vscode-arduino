@@ -38,8 +38,8 @@
         "vid": "239a",
         "pid": "800b",
         "name": "Adafruit Feather M0",
-        "package": "arduino",
-        "architecture": "esp8266",
-        "id": "mkr1000"
+        "package": "adafruit",
+        "architecture": "samd",
+        "id": "adafruit_feather_m0"
     }]
 }]

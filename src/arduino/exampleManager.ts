@@ -28,33 +28,43 @@ export class ExampleManager {
         // load Built-in Examples from examples folder under arduino installation directory.
         examples.push({
             name: "Built-in Examples",
-            path: path.join(this._settings.arduinoPath, "examples"),
+            path: this._settings.defaultExamplePath,
             children: this.parseExamples(this._settings.defaultExamplePath),
         });
 
         // load Examples from default libraries under arduino installation directory.
-        examples.push({
-            name: "Examples for any board",
-            path: path.join(this._settings.arduinoPath, "libraries"),
-            children: await this.parseExamplesFromLibrary(this._settings.defaultLibPath),
-        });
+        const examplesFromDefaultLibraries = await this.parseExamplesFromLibrary(this._settings.defaultLibPath, true);
+        if (examplesFromDefaultLibraries.length) {
+            examples.push({
+                name: "Examples for any board",
+                path: this._settings.defaultLibPath,
+                children: examplesFromDefaultLibraries,
+            });
+        }
 
         // load Examples from current board's firmware package directory.
         if (this._arduinoApp.boardManager.currentBoard) {
             const currentBoard = this._arduinoApp.boardManager.currentBoard;
-            examples.push({
-                name: `Examples for ${currentBoard.name}`,
-                path: path.join(currentBoard.platform.rootBoardPath, "libraries"),
-                children: await this.parseExamplesFromLibrary(path.join(currentBoard.platform.rootBoardPath, "libraries")),
-            });
+            const currentBoardLibrariesPath = path.join(currentBoard.platform.rootBoardPath, "libraries");
+            const examplesFromCurrentBoard = await this.parseExamplesFromLibrary(currentBoardLibrariesPath, false);
+            if (examplesFromCurrentBoard.length) {
+                examples.push({
+                    name: `Examples for ${currentBoard.name}`,
+                    path: currentBoardLibrariesPath,
+                    children: examplesFromCurrentBoard,
+                });
+            }
         }
 
         // load Examples from Custom Libraries
-        examples.push({
-            name: "Examples from Custom Libraries",
-            path: this._settings.libPath,
-            children: await this.parseExamplesFromLibrary(this._settings.libPath, true),
-        });
+        const examplesFromCustomLibraries = await this.parseExamplesFromLibrary(this._settings.libPath, true, true);
+        if (examplesFromCustomLibraries.length) {
+            examples.push({
+                name: "Examples from Custom Libraries",
+                path: this._settings.libPath,
+                children: examplesFromCustomLibraries,
+            });
+        }
         return examples;
     }
 
@@ -87,7 +97,8 @@ export class ExampleManager {
                 const currentExample = <IExampleNode> {
                     name: path.basename(exampleFolders[i]),
                     path: currentPath,
-                    isLeaf: this.isExampleFolder(currentPath), // If *ino file exists on the first level child, then mark this folder as leaf node.
+                    // If there is *.ino files existing in current folder, then mark this folder as leaf node.
+                    isLeaf: this.isExampleFolder(currentPath),
                     children: [],
                 };
                 exampleMap.set(currentPath, currentExample);
@@ -98,33 +109,45 @@ export class ExampleManager {
         return rootNode.children;
     }
 
-    private async parseExamplesFromLibrary(rootPath: string, needParsingIncompatible: boolean = false) {
+    private async parseExamplesFromLibrary(rootPath: string, checkCompatibility: boolean, categorizeIncompatible: boolean = false) {
         const examples = [];
         const inCompatibles = [];
         const libraries = util.readdirSync(rootPath, true);
         for (const library of libraries) {
-            const propertiesFile = path.join(rootPath, library, "library.properties");
-            if (util.fileExistsSync(propertiesFile)) {
-                const properties = <any>await util.parseProperties(propertiesFile);
+            if (checkCompatibility) {
+                const propertiesFile = path.join(rootPath, library, "library.properties");
+                if (util.fileExistsSync(propertiesFile)) {
+                    const properties = <any>await util.parseProperties(propertiesFile);
+                    const children = this.parseExamples(path.join(rootPath, library, "examples"));
+                    if (children.length) {
+                        if (this.isSupported(properties.architectures)) {
+                            examples.push({
+                                name: library,
+                                path: path.join(rootPath, library),
+                                children,
+                            });
+                        } else if (categorizeIncompatible) {
+                            inCompatibles.push({
+                                name: library,
+                                path: path.join(rootPath, library),
+                                children,
+                            });
+                        }
+                    }
+                }
+            } else {
                 const children = this.parseExamples(path.join(rootPath, library, "examples"));
                 if (children.length) {
-                    if (this.isSupported(properties.architectures)) {
-                        examples.push({
-                            name: library,
-                            path: path.join(rootPath, library),
-                            children,
-                        });
-                    } else if (needParsingIncompatible) {
-                        inCompatibles.push({
-                            name: library,
-                            path: path.join(rootPath, library),
-                            children,
-                        });
-                    }
+                    examples.push({
+                        name: library,
+                        path: path.join(rootPath, library),
+                        children,
+                    });
                 }
             }
         }
-        if (needParsingIncompatible && inCompatibles.length) {
+
+        if (categorizeIncompatible && inCompatibles.length) {
             examples.push({
                 name: "INCOMPATIBLE",
                 path: "INCOMPATIBLE",
@@ -137,7 +160,7 @@ export class ExampleManager {
     private isExampleFolder(dirname) {
         const items = fs.readdirSync(dirname);
         const ino = items.find((item) => {
-            return util.fileExistsSync(path.join(dirname, item)) && item.endsWith(".ino");
+            return util.isArduinoFile(path.join(dirname, item));
         });
         return !!ino;
     }

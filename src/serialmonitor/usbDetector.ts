@@ -10,12 +10,17 @@ import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
 import { BoardManager } from "../arduino/boardManager";
 import * as util from "../common/util";
+import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
     private _boardDescriptors = null;
 
-    constructor(private _arduinoApp: ArduinoApp, private _boardManager: BoardManager, private _extensionRoot: string) {
+    constructor(
+        private _arduinoApp: ArduinoApp,
+        private _boardManager: BoardManager,
+        private _serialMonitor: SerialMonitor,
+        private _extensionRoot: string) {
     }
 
     public async startListening() {
@@ -26,8 +31,9 @@ export class UsbDetector {
 
         usbDector.on("add", (device) => {
             if (device.vendorId && device.productId) {
-                const deviceDescriptor = this.getUsbDeviceDescriptor(device.vendorId.toString(16),
-                    device.productId.toString(16),
+                const deviceDescriptor = this.getUsbDeviceDescriptor(
+                    util.padStart(device.vendorId.toString(16), 4, "0"), // vid and pid both are 2 bytes long.
+                    util.padStart(device.productId.toString(16), 4, "0"),
                     this._extensionRoot);
 
                 // Not supported device for discovery.
@@ -48,7 +54,7 @@ export class UsbDetector {
                                         }
                                         this._boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
                                         bd = this._boardManager.installedBoards.get(boardKey);
-                                        this._boardManager.doChangeBoardType(bd);
+                                        this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
 
                                         if (this._boardManager.currentBoard) {
                                             const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
@@ -70,15 +76,20 @@ export class UsbDetector {
                             "Yes", "No")
                             .then((ans) => {
                                 if (ans === "Yes") {
-                                    return this._boardManager.doChangeBoardType(bd);
+                                    return this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
                                 }
                             });
                     }
                 } else {
-                    this._boardManager.doChangeBoardType(bd);
+                    this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
                 }
             }
         });
+    }
+
+    private switchBoard(bd, vid, pid) {
+        this._boardManager.doChangeBoardType(bd);
+        this._serialMonitor.selectSerialPort(vid, pid);
     }
 
     private getUsbDeviceDescriptor(vendorId: string, productId: string, extensionRoot: string): any {

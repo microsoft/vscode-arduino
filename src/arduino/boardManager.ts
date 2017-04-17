@@ -167,6 +167,9 @@ export class BoardManager {
 
     public loadPackageContent(indexFile: string): void {
         const indexFileName = this.getIndexFileName(indexFile);
+        if (!util.fileExistsSync(path.join(this._settings.packagePath, indexFileName))) {
+            return;
+        }
         const packageContent = fs.readFileSync(path.join(this._settings.packagePath, indexFileName), "utf8");
         if (!packageContent) {
             return;
@@ -224,20 +227,26 @@ export class BoardManager {
         }
     }
 
-    private updateStatusBar(): void {
-        const dc = DeviceContext.getIntance();
-        const selectedBoard = this._boards.get(dc.board);
-        if (selectedBoard) {
-            this._currentBoard = selectedBoard;
-            this._boardStatusBar.text = selectedBoard.name;
-            if (dc.configuration) {
-                this._configStatusBar.show();
-                this._currentBoard.loadConfig(dc.configuration);
+    public updateStatusBar(show: boolean = true): void {
+        if (show) {
+            this._boardStatusBar.show();
+            const dc = DeviceContext.getIntance();
+            const selectedBoard = this._boards.get(dc.board);
+            if (selectedBoard) {
+                this._currentBoard = selectedBoard;
+                this._boardStatusBar.text = selectedBoard.name;
+                if (dc.configuration) {
+                    this._configStatusBar.show();
+                    this._currentBoard.loadConfig(dc.configuration);
+                } else {
+                    this._configStatusBar.hide();
+                }
             } else {
+                this._boardStatusBar.text = "<Select Board Type>";
                 this._configStatusBar.hide();
             }
         } else {
-            this._boardStatusBar.text = "<Select Board Type>";
+            this._boardStatusBar.hide();
             this._configStatusBar.hide();
         }
     }
@@ -361,7 +370,7 @@ export class BoardManager {
                 if (!Array.isArray(urls) && typeof urls === "string") {
                     return (<string>urls).split(",");
                 }
-                return <string[]> urls;
+                return <string[]>urls;
             }
             return [];
         }

@@ -98,7 +98,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * @method
      */
     public loadContext(): Thenable<object> {
-        this._sketch = "app/app.ino";
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
                 let deviceConfigJson: any = {};
@@ -179,23 +178,27 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             return;
         } else {
             await vscode.commands.executeCommand("arduino.changeBoardType");
-            await vscode.workspace.findFiles("**/*.ino", null)
-                .then(async (fileUris) => {
-                    if (fileUris.length === 1) {
-                        this.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
-                    } else if (fileUris.length > 1) {
-                        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
-                            return <vscode.QuickPickItem>{
-                                label: path.relative(vscode.workspace.rootPath, fileUri.fsPath),
-                                description: fileUri.fsPath,
-                            };
-                        }), { placeHolder: "Select the main sketch file" });
-                        if (chosen && chosen.label) {
-                            this.sketch = chosen.label;
-                        }
-                    }
-                });
+            await this.resolveMainSketch();
             vscode.window.showInformationMessage("The workspace is initialized with the Arduino extension support.");
         }
+    }
+
+    public async resolveMainSketch() {
+        return await vscode.workspace.findFiles("**/*.ino", null)
+            .then(async (fileUris) => {
+                if (fileUris.length === 1) {
+                    this.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
+                } else if (fileUris.length > 1) {
+                    const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
+                        return <vscode.QuickPickItem>{
+                            label: path.relative(vscode.workspace.rootPath, fileUri.fsPath),
+                            description: fileUri.fsPath,
+                        };
+                    }), { placeHolder: "Select the main sketch file" });
+                    if (chosen && chosen.label) {
+                        this.sketch = chosen.label;
+                    }
+                }
+            });
     }
 }

@@ -2,9 +2,10 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.0.8-rc",
-  "publisher": "Microsoft",
+  "version": "0.1.1",
+  "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
+  "preview": true,
   "engines": {
     "vscode": "^1.7.0"
   },
@@ -13,6 +14,13 @@
     "Languages",
     "Snippets",
     "Formatters"
+  ],
+  "keywords": [
+    "arduino",
+    "iot",
+    "snippet",
+    "C",
+    "C++"
   ],
   "activationEvents": [
     "onLanguage:cpp",
@@ -90,13 +98,13 @@
     "keybindings": [
       {
         "command": "arduino.verify",
-        "key": "ctrl+a ctrl+r",
-        "mac": "cmd+a cmd+r"
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r"
       },
       {
         "command": "arduino.upload",
-        "key": "ctrl+a ctrl+u",
-        "mac": "cmd+a cmd+u"
+        "key": "ctrl+alt+u",
+        "mac": "cmd+alt+u"
       }
     ],
     "configuration": {
@@ -157,12 +165,18 @@
         "scopeName": "arduino.output",
         "path": "./syntaxes/arduino.output.tmLanguage"
       }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": "arduino.json",
+        "url": "./misc/arduinoValidator.json"
+      }
     ]
   },
   "scripts": {
     "vscode:prepublish": "gulp build",
     "postinstall": "node ./node_modules/vscode/bin/install && cd ./html && npm install",
-    "test": "node ./node_modules/vscode/bin/test"
+    "test": "gulp test"
   },
   "extensionDependencies": [
     "ms-vscode.cpptools"

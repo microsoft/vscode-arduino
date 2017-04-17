@@ -77,7 +77,7 @@ export class ArduinoApp {
         try {
             await util.spawn(this._settings.commandPath,
                 null,
-                ["--pref", `${key}=${value}`]);
+                ["--pref", `${key}=${value}`, "--save-prefs"]);
         } catch (ex) {
         }
     }
@@ -88,8 +88,15 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
-        arduinoChannel.show();
+        if (!dc.sketch) {
+            await this.getMainSketch(dc);
+        }
+        if (!dc.port) {
+            vscode.window.showErrorMessage("Please specify the upload serial port.");
+            return;
+        }
 
+        arduinoChannel.show();
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
         await vscode.commands.executeCommand("arduino.closeSerialMonitor", dc.port);
@@ -113,6 +120,11 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
+
+        if (!dc.sketch) {
+            await this.getMainSketch(dc);
+        }
+
         await vscode.workspace.saveAll(false);
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
@@ -343,7 +355,7 @@ export class ArduinoApp {
             // Step 2: Scaffold the example project to an arduino project.
             const items = fs.readdirSync(destExample);
             const sketchFile = items.find((item) => {
-                return util.fileExistsSync(path.join(destExample, item)) && item.endsWith(".ino");
+                return util.isArduinoFile(path.join(destExample, item));
             });
             if (sketchFile) {
                 // Generate arduino.json
@@ -438,5 +450,13 @@ export class ArduinoApp {
         }
         const boardString = selectedBoard.getBuildConfig();
         return boardString;
+    }
+
+    private async getMainSketch(dc: DeviceContext) {
+        await dc.resolveMainSketch();
+        if (!dc.sketch) {
+            vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
+            throw new Error("No sketch file was found.");
+        }
     }
 }
