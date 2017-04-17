@@ -18,9 +18,14 @@ env:
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
+    sudo apt-get install arduino;
     export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
     sh -e /etc/init.d/xvfb start;
     sleep 3;
+  fi
+- if [ $TRAVIS_OS_NAME == "osx" ]; then
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+    brew cask install arduino;
   fi
 
 install:
