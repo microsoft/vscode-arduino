@@ -8,7 +8,6 @@ void setup() {
 
 void loop() {
   Serial.println("Hello World");
-  int a = 1;
   digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
   digitalWrite(LED_BUILTIN, HIGH);

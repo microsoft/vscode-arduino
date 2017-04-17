@@ -85,7 +85,7 @@ gulp.task("test", (done) => {
 
     const child = childProcess.spawn("node", ["./node_modules/vscode/bin/test"], {
         cwd: __dirname,
-        env: Object.assign({}, process.env, { CODE_TESTS_WORKSPACE: path.join(__dirname, "test/blink") }),
+        env: Object.assign({}, process.env, { CODE_TESTS_WORKSPACE: path.join(__dirname, "test/resources/blink") }),
     });
 
     child.stdout.on("data", (data) => {
