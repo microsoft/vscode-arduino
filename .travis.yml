@@ -32,9 +32,8 @@ install:
 script:
 - gulp tslint
 - gulp genAikey
-- npm run vscode:prepublish
-- npm test --silent
 - vsce package
+- npm test --silent
 
 deploy:
   # deploy to github release
