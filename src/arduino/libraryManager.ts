@@ -104,6 +104,7 @@ export class LibraryManager {
                 }
                 sourceLib.version = util.formatVersion(properties.version);
             } else {
+                // For manually imported library, library.properties may be missing. Take the folder name as library name.
                 sourceLib = this._libraryMap.get(libDir);
                 if (!sourceLib) {
                     sourceLib = <ILibrary> {
