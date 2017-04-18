@@ -19,4 +19,5 @@ suite("Arduino: Verify: Build (verify) your sketch files.", () => {
             done(new Error(error));
         }
     });
+    
 });
