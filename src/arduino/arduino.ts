@@ -45,6 +45,13 @@ export class ArduinoApp {
      * @param {boolean} force - Whether force initialzie the arduino
      */
     public async initialize(force: boolean = false) {
+        if (!util.fileExistsSync(path.join(this._settings.packagePath, "preferences.txt"))) {
+            try {
+                // Use empty pref value to initialize preference.txt file
+                await this.setPref("boardsmanager.additional.urls", "");
+            } catch (ex) {
+            }
+        }
         if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
                 // Use the dummy package to initialize the Arduino IDE

@@ -114,25 +114,24 @@ export class ExampleManager {
         const inCompatibles = [];
         const libraries = util.readdirSync(rootPath, true);
         for (const library of libraries) {
-            if (checkCompatibility) {
-                const propertiesFile = path.join(rootPath, library, "library.properties");
-                if (util.fileExistsSync(propertiesFile)) {
-                    const properties = <any>await util.parseProperties(propertiesFile);
-                    const children = this.parseExamples(path.join(rootPath, library, "examples"));
-                    if (children.length) {
-                        if (this.isSupported(properties.architectures)) {
-                            examples.push({
-                                name: library,
-                                path: path.join(rootPath, library),
-                                children,
-                            });
-                        } else if (categorizeIncompatible) {
-                            inCompatibles.push({
-                                name: library,
-                                path: path.join(rootPath, library),
-                                children,
-                            });
-                        }
+            const propertiesFile = path.join(rootPath, library, "library.properties");
+            if (checkCompatibility && util.fileExistsSync(propertiesFile)) {
+                const properties = <any>await util.parseProperties(propertiesFile);
+                const children = this.parseExamples(path.join(rootPath, library, "examples"));
+                if (children.length) {
+                    // When missing architectures field in library.properties, fall it back to "*".
+                    if (this.isSupported(properties.architectures || "*")) {
+                        examples.push({
+                            name: library,
+                            path: path.join(rootPath, library),
+                            children,
+                        });
+                    } else if (categorizeIncompatible) {
+                        inCompatibles.push({
+                            name: library,
+                            path: path.join(rootPath, library),
+                            children,
+                        });
                     }
                 }
             } else {
