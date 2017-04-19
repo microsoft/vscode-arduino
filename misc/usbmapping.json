@@ -14,6 +14,27 @@
         "package": "arduino",
         "architecture": "samd",
         "id": "edison"
+    }, {
+        "vid": "2a03",
+        "pid": "804f",
+        "name": "Arduino M0 Pro (Native USB Port)",
+        "package": "arduino",
+        "architecture": "samd",
+        "id": "mzero_pro_bl"
+    }, {
+        "vid": "2341",
+        "pid": "8041",
+        "name": "Arduino Yún",
+        "package": "arduino",
+        "architecture": "avr",
+        "id": "yun"
+    }, {
+        "vid": "2341",
+        "pid": "003e",
+        "name": "Arduino Due",
+        "package": "arduino",
+        "architecture": "sam",
+        "id": "arduino_due_x"
     }]
 }, {
     "index_file": "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
