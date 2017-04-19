@@ -92,20 +92,34 @@ export class LibraryManager {
 
         const installedLibDirs = util.filterJunk(util.readdirSync(libRoot, true));
         for (const libDir of installedLibDirs) {
+            let sourceLib = null;
             if (util.fileExistsSync(path.join(libRoot, libDir, "library.properties"))) {
                 const properties = <any>await util.parseProperties(path.join(libRoot, libDir, "library.properties"));
                 const formattedName = properties.name.replace(/\s+/g, "_");
-                const sourceLib = this._libraryMap.get(formattedName);
-                if (sourceLib) {
-                    sourceLib.version = util.formatVersion(properties.version);
-                    sourceLib.builtIn = isBuiltin;
-                    sourceLib.installed = true;
-                    sourceLib.installedPath = path.join(libRoot, libDir);
-                    sourceLib.srcPath = path.join(libRoot, libDir, "src");
-                    // If lib src folder doesn't exist, then fallback to the lib root path as source folder.
-                    sourceLib.srcPath = util.directoryExistsSync(sourceLib.srcPath) ? sourceLib.srcPath : path.join(libRoot, libDir);
+                sourceLib = this._libraryMap.get(formattedName);
+                if (!sourceLib) {
+                    sourceLib = { ... properties };
+                    sourceLib.website = properties.url;
+                    this._libraryMap.set(formattedName, sourceLib);
+                }
+                sourceLib.version = util.formatVersion(properties.version);
+            } else {
+                // For manually imported library, library.properties may be missing. Take the folder name as library name.
+                sourceLib = this._libraryMap.get(libDir);
+                if (!sourceLib) {
+                    sourceLib = <ILibrary> {
+                        name: libDir,
+                        types: ["Contributed"],
+                    };
+                    this._libraryMap.set(libDir, sourceLib);
                 }
             }
+            sourceLib.builtIn = isBuiltin;
+            sourceLib.installed = true;
+            sourceLib.installedPath = path.join(libRoot, libDir);
+            sourceLib.srcPath = path.join(libRoot, libDir, "src");
+            // If lib src folder doesn't exist, then fallback to the lib root path as source folder.
+            sourceLib.srcPath = util.directoryExistsSync(sourceLib.srcPath) ? sourceLib.srcPath : path.join(libRoot, libDir);
         }
     }
 
@@ -166,7 +180,8 @@ export class LibraryManager {
         }
         const targetArch = currentBoard.platform.architecture;
         this._libraries.forEach((library) => {
-            library.supported = !!(<string[]>library.architectures).find((arch) => {
+            const architectures = [].concat(library.architectures || "*");
+            library.supported = !!architectures.find((arch) => {
                 return arch.indexOf(targetArch) >= 0 || arch.indexOf("*") >= 0;
             });
         });
