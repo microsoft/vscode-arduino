@@ -14,10 +14,10 @@ suite("Arduino Extension Tests", () => {
     // The extension is already activated by vscode before running mocha test framework.
     // No need to test activate any more. So commenting this case.
     // tslint:disable-next-line: only-arrow-functions
-    // test("should be able to activate the extension", function(done) {
-    //     this.timeout(3 * 60 * 1000);
-    //     vscode.extensions.getExtension("vsciot-vscode.vscode-arduino").activate().then((api) => {
-    //         done();
-    //     });
-    // });
+    test("should be able to activate the extension", function(done) {
+        this.timeout(6 * 60 * 1000);
+        vscode.extensions.getExtension("vsciot-vscode.vscode-arduino").activate().then((api) => {
+            done();
+        });
+    });
 });
