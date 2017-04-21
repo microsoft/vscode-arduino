@@ -1,5 +1,5 @@
 {
     "sketch": "blink.ino",
-    "port": "/dev/ttyS0",
+    "port": "COM4",
     "board": "arduino:avr:yun"
 }
