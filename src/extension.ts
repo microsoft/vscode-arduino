@@ -125,7 +125,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const updateStatusBar = () => {
         const activeEditor = vscode.window.activeTextEditor;
-        if (!activeEditor || (activeEditor.document.languageId !== "cpp" && activeEditor.document.languageId !== "c")) {
+        if (!activeEditor || (activeEditor.document.languageId !== "cpp"
+            && activeEditor.document.languageId !== "c"
+            && !activeEditor.document.fileName.endsWith("arduino.json"))) {
             boardManager.updateStatusBar(false);
         } else {
             boardManager.updateStatusBar(true);
