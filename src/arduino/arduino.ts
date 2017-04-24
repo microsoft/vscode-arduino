@@ -136,7 +136,7 @@ export class ArduinoApp {
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["--verify", "--board", boardDescriptor, "--port", dc.port, appPath];
+        const args = ["--verify", "--board", boardDescriptor, appPath];
         if (this._settings.logLevel === "verbose") {
             args.push("--verbose");
         }
