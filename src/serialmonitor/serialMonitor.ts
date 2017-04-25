@@ -26,6 +26,15 @@ export class SerialMonitor implements vscode.Disposable {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
     }
 
+    public static getIntance(): SerialMonitor {
+        if (SerialMonitor._serailMonitor === null) {
+            SerialMonitor._serailMonitor = new SerialMonitor();
+        }
+        return SerialMonitor._serailMonitor;
+    }
+
+    private static _serailMonitor: SerialMonitor = null;
+
     private _currentPort: string;
 
     private _currentBaudRate: number;
@@ -40,7 +49,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _outputChannel: vscode.OutputChannel;
 
-    constructor() {
+    private constructor() {
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
@@ -157,16 +166,18 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.text = chosen;
     }
 
-    public async closeSerialMonitor(port: string) {
+    public async closeSerialMonitor(port: string, showWarning: boolean = true): Promise<boolean> {
         if (this._serialPortCtrl) {
-            if (port && port !== this._currentPort) {
+            if (port && port !== this._serialPortCtrl.currentPort) {
                 // Port is not opened
-                return;
+                return false;
             }
-            await this._serialPortCtrl.stop();
+            const result = await this._serialPortCtrl.stop();
             this.updatePortStatus(false);
-        } else if (!port) {
+            return result;
+        } else if (!port && showWarning) {
             Logger.notifyUserWarning("closeSerialMonitorError", new Error(constants.messages.SERIAL_PORT_NOT_STARTED));
+            return false;
         }
     }
 
