@@ -14,6 +14,8 @@ import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
+    private _usbDector: null;
+
     private _boardDescriptors = null;
 
     constructor(
@@ -26,9 +28,13 @@ export class UsbDetector {
         if (os.platform() === "linux") {
             return;
         }
-        const usbDector = require("../../../vendor/node-usb-detection");
+        this._usbDector = require("../../../vendor/node-usb-detection");
 
-        usbDector.on("add", (device) => {
+        if (!this._usbDector) {
+            return;
+        }
+
+        this._usbDector.on("add", (device) => {
             if (device.vendorId && device.productId) {
                 const deviceDescriptor = this.getUsbDeviceDescriptor(
                     util.padStart(device.vendorId.toString(16), 4, "0"), // vid and pid both are 2 bytes long.
@@ -84,6 +90,12 @@ export class UsbDetector {
                 }
             }
         });
+    }
+
+    public stopListening() {
+        if (this._usbDector) {
+            this._usbDector.stopMonitoring();
+        }
     }
 
     private switchBoard(bd, vid, pid) {

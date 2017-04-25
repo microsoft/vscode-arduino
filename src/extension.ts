@@ -18,6 +18,8 @@ import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
 
+let usbDetector: UsbDetector = null;
+
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = Uuid().replace(/\-/g, "");
@@ -120,7 +122,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const completionProvider = new CompletionProvider(arduinoApp);
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
 
-    const usbDetector = new UsbDetector(arduinoApp, boardManager, context.extensionPath);
+    usbDetector = new UsbDetector(arduinoApp, boardManager, context.extensionPath);
     usbDetector.startListening();
 
     const updateStatusBar = () => {
@@ -145,5 +147,8 @@ export async function activate(context: vscode.ExtensionContext) {
 export async function deactivate() {
     const monitor = SerialMonitor.getIntance();
     await monitor.closeSerialMonitor(null, false);
+    if (usbDetector) {
+        usbDetector.stopListening();
+    }
     Logger.traceUserData("deactivate-extension");
 }

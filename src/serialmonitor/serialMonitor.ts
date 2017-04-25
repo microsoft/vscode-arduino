@@ -27,10 +27,13 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public static getIntance(): SerialMonitor {
+        if (SerialMonitor._serailMonitor === null) {
+            SerialMonitor._serailMonitor = new SerialMonitor();
+        }
         return SerialMonitor._serailMonitor;
     }
 
-    private static _serailMonitor: SerialMonitor = new SerialMonitor();
+    private static _serailMonitor: SerialMonitor = null;
 
     private _currentPort: string;
 
