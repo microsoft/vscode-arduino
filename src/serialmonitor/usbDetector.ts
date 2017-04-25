@@ -19,7 +19,6 @@ export class UsbDetector {
     constructor(
         private _arduinoApp: ArduinoApp,
         private _boardManager: BoardManager,
-        private _serialMonitor: SerialMonitor,
         private _extensionRoot: string) {
     }
 
@@ -89,7 +88,8 @@ export class UsbDetector {
 
     private switchBoard(bd, vid, pid) {
         this._boardManager.doChangeBoardType(bd);
-        this._serialMonitor.selectSerialPort(vid, pid);
+        const monitor = SerialMonitor.getIntance();
+        monitor.selectSerialPort(vid, pid);
     }
 
     private getUsbDeviceDescriptor(vendorId: string, productId: string, extensionRoot: string): any {

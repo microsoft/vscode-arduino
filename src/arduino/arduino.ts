@@ -20,6 +20,7 @@ import { ExampleManager } from "./exampleManager";
 import { LibraryManager } from "./libraryManager";
 
 import { arduinoChannel } from "../common/outputChannel";
+import { SerialMonitor } from "../serialmonitor/serialMonitor";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -106,7 +107,9 @@ export class ArduinoApp {
         arduinoChannel.show();
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
-        await vscode.commands.executeCommand("arduino.closeSerialMonitor", dc.port);
+        const serialMonitor = SerialMonitor.getIntance();
+
+        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
         await vscode.workspace.saveAll(false);
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
@@ -114,7 +117,10 @@ export class ArduinoApp {
         if (this._settings.logLevel === "verbose") {
             args.push("--verbose");
         }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then((result) => {
+        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async (result) => {
+            if (needRestore) {
+                await serialMonitor.openSerialMonitor();
+            }
             arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
         }, (reason) => {
             arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
