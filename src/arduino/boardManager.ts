@@ -10,6 +10,7 @@ import * as url from "url";
 import * as vscode from "vscode";
 import * as util from "../common/util";
 
+import { arduinoChannel } from "../common/outputChannel";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { Board, parseBoardDescriptor } from "./board";
@@ -174,7 +175,15 @@ export class BoardManager {
         if (!packageContent) {
             return;
         }
-        const rawModel = JSON.parse(packageContent);
+
+        let rawModel = null;
+        try {
+            rawModel = JSON.parse(packageContent);
+        } catch (ex) {
+            arduinoChannel.error(`Invalid json file "${path.join(this._settings.packagePath, indexFileName)}".
+            Suggest to remove it manually and allow boardmanager to re-download it.`);
+            return ;
+        }
 
         this._packages.concat(rawModel.packages);
 
@@ -202,7 +211,7 @@ export class BoardManager {
     public updateInstalledPlatforms(pkgName: string, arch: string) {
         const archPath = path.join(this._settings.packagePath, "packages", pkgName, "hardware", arch);
 
-        const allVersion = util.filterJunk(fs.readdirSync(archPath));
+        const allVersion = util.filterJunk(util.readdirSync(archPath, true));
         if (allVersion && allVersion.length) {
             const newPlatform = {
                 packageName: pkgName,
@@ -310,9 +319,9 @@ export class BoardManager {
             if (!util.directoryExistsSync(archPath)) {
                 continue;
             }
-            const architectures = util.filterJunk(fs.readdirSync(archPath));
+            const architectures = util.filterJunk(util.readdirSync(archPath, true));
             architectures.forEach((architecture) => {
-                const allVersion = util.filterJunk(fs.readdirSync(path.join(archPath, architecture)));
+                const allVersion = util.filterJunk(util.readdirSync(path.join(archPath, architecture), true));
                 if (allVersion && allVersion.length) {
                     manuallyInstalled.push({
                         packageName,
