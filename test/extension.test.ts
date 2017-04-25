@@ -16,6 +16,7 @@ suite("Arduino Extension Tests", () => {
     // No need to test activate any more. So commenting this case.
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to activate the extension", function(done) {
+        this.timeout(60 * 1000);
         const extension = vscode.extensions.getExtension("vsciot-vscode.vscode-arduino");
         if (!extension.isActive) {
             extension.activate().then((api) => {
