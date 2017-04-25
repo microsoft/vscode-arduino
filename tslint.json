@@ -31,6 +31,7 @@
             true,
             150
         ], 
-        "no-angle-bracket-type-assertion": false
+        "no-angle-bracket-type-assertion": false,
+        "only-arrow-functions": false
     }
 }
