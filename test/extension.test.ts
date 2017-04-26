@@ -27,7 +27,7 @@ suite("Arduino Extension Tests", () => {
         }
     });
 
-    test("should be register Arduino commands", () => {
+    test("should be able to register Arduino commands", () => {
             return vscode.commands.getCommands(true).then((commands) => {
                 const ARDUINO_COMMANDS = [
                     "arduino.verify",
