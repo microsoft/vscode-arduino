@@ -200,7 +200,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                             if (value && /^\w+\.ino$/.test(value.trim())) {
                                 return null;
                             } else {
-                                return "Invalid skectch file name";
+                                return "Invalid sketch file name";
                             }
                         },
                     });
