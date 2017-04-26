@@ -105,7 +105,7 @@ export class SerialMonitor implements vscode.Disposable {
                 };
             }).sort((a, b): number => {
                 return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
-            }), { placeHolder: "Select serial port" });
+            }), { placeHolder: "Select a serial port" });
             if (chosen && chosen.label) {
                 this.updatePortListStatus(chosen.label);
             }
@@ -114,7 +114,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async openSerialMonitor() {
         if (!this._currentPort) {
-            const ans = await vscode.window.showInformationMessage("No serial port was selected, please select serial port first", "Yes", "No");
+            const ans = await vscode.window.showInformationMessage("No serial port was selected, please select a serial port first", "Yes", "No");
             if (ans === "Yes") {
                 await this.selectSerialPort(null, null);
             }
@@ -135,7 +135,7 @@ export class SerialMonitor implements vscode.Disposable {
         }
 
         if (!this._serialPortCtrl.currentPort) {
-            vscode.window.showErrorMessage("No serial port was selected, please select serial port first.");
+            Logger.traceError("openSerialMonitorError", new Error(`Failed to open serial port ${this._currentPort}`));
             return ;
         }
 
