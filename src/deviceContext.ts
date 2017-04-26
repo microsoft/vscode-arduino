@@ -4,6 +4,7 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as constants from "./common/constants";
@@ -177,16 +178,52 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             vscode.window.showInformationMessage("Arduino.json is already generated.");
             return;
         } else {
-            await vscode.commands.executeCommand("arduino.changeBoardType");
             await this.resolveMainSketch();
-            vscode.window.showInformationMessage("The workspace is initialized with the Arduino extension support.");
+            if (this.sketch) {
+                await vscode.commands.executeCommand("arduino.changeBoardType");
+                vscode.window.showInformationMessage("The workspace is initialized with the Arduino extension support.");
+            } else {
+                vscode.window.showInformationMessage("No *.ino sketch file was found or selected, so skip initialize command.");
+            }
         }
     }
 
     public async resolveMainSketch() {
         return await vscode.workspace.findFiles("**/*.ino", null)
             .then(async (fileUris) => {
-                if (fileUris.length === 1) {
+                if (fileUris.length === 0) {
+                    let newSketchFileName = await vscode.window.showInputBox({
+                        value: "app.ino",
+                        prompt: "No .ino file was found on workspace, initialize sketch first",
+                        placeHolder: "Input new sketch file name",
+                        validateInput: (value) => {
+                            if (value && /^\w+\.ino$/.test(value.trim())) {
+                                return null;
+                            } else {
+                                return "Invalid skectch file name";
+                            }
+                        },
+                    });
+                    newSketchFileName = (newSketchFileName && newSketchFileName.trim()) || "";
+                    if (/^\w+\.ino$/.test(newSketchFileName)) {
+                        const snippets = [
+                            "void setup()",
+                            "{",
+                            "\t",
+                            "}",
+                            "",
+                            "void loop()",
+                            "{",
+                            "\t",
+                            "}",
+                        ];
+                        fs.writeFileSync(path.join(vscode.workspace.rootPath, newSketchFileName), snippets.join(os.EOL));
+                        this.sketch = newSketchFileName;
+                        // Open the new sketch file.
+                        const textDocument = await vscode.workspace.openTextDocument(path.join(vscode.workspace.rootPath, newSketchFileName));
+                        vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);
+                    }
+                } else if (fileUris.length === 1) {
                     this.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
                 } else if (fileUris.length > 1) {
                     const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {

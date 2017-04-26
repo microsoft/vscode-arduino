@@ -2,6 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
+import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
@@ -24,6 +25,18 @@ export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = Uuid().replace(/\-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
+    // Show a warning message if the working file is not in the workspace folder.
+    // People should know the extension might not work appropriately, they should look for the doc to get started.
+    const activeEditor = vscode.window.activeTextEditor;
+    if (activeEditor && activeEditor.document.fileName.endsWith(".ino")) {
+        const workingFile = path.normalize(activeEditor.document.fileName);
+        const workspaceFolder = (vscode.workspace && vscode.workspace.rootPath) || "";
+        if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
+            vscode.window.showWarningMessage(`The working file "${workingFile}" is not in the workspace folder, ` +
+            "the arduino extension might not work appropriately.");
+        }
+    }
+
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
     const arduinoApp = new ArduinoApp(arduinoSettings);
