@@ -25,14 +25,14 @@ export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = Uuid().replace(/\-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
-    // Show a warning message if the working file is not in the workspace folder.
+    // Show a warning message if the working file is not under the workspace folder.
     // People should know the extension might not work appropriately, they should look for the doc to get started.
-    const activeEditor = vscode.window.activeTextEditor;
-    if (activeEditor && activeEditor.document.fileName.endsWith(".ino")) {
-        const workingFile = path.normalize(activeEditor.document.fileName);
+    const openEditor = vscode.window.activeTextEditor;
+    if (openEditor && openEditor.document.fileName.endsWith(".ino")) {
+        const workingFile = path.normalize(openEditor.document.fileName);
         const workspaceFolder = (vscode.workspace && vscode.workspace.rootPath) || "";
         if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
-            vscode.window.showWarningMessage(`The working file "${workingFile}" is not in the workspace folder, ` +
+            vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
             "the arduino extension might not work appropriately.");
         }
     }
@@ -45,6 +45,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
     const deviceContext = DeviceContext.getIntance();
     deviceContext.arduinoApp = arduinoApp;
+    deviceContext.extensionPath = context.extensionPath;
     await deviceContext.loadContext();
     context.subscriptions.push(deviceContext);
 

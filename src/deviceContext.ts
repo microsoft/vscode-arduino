@@ -65,6 +65,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _arduinoApp: ArduinoApp;
 
+    private _extensionPath: string;
+
     private _watcher: vscode.FileSystemWatcher;
 
     /**
@@ -91,6 +93,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set arduinoApp(value: ArduinoApp) {
         this._arduinoApp = value;
+    }
+
+    public get extensionPath(): string {
+        return this._extensionPath;
+    }
+
+    public set extensionPath(value: string) {
+        this._extensionPath = value;
     }
 
     /**
@@ -195,33 +205,25 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     let newSketchFileName = await vscode.window.showInputBox({
                         value: "app.ino",
                         prompt: "No .ino file was found on workspace, initialize sketch first",
-                        placeHolder: "Input new sketch file name",
+                        placeHolder: "Input the sketch file name",
                         validateInput: (value) => {
-                            if (value && /^\w+\.ino$/.test(value.trim())) {
+                            if (value && /^\w+\.((ino)|(cpp)|c)$/.test(value.trim())) {
                                 return null;
                             } else {
-                                return "Invalid sketch file name";
+                                return "Invalid sketch file name. Should be *.ino/*.cpp/*.c";
                             }
                         },
                     });
                     newSketchFileName = (newSketchFileName && newSketchFileName.trim()) || "";
-                    if (/^\w+\.ino$/.test(newSketchFileName)) {
-                        const snippets = [
-                            "void setup()",
-                            "{",
-                            "\t",
-                            "}",
-                            "",
-                            "void loop()",
-                            "{",
-                            "\t",
-                            "}",
-                        ];
-                        fs.writeFileSync(path.join(vscode.workspace.rootPath, newSketchFileName), snippets.join(os.EOL));
+                    if (newSketchFileName) {
+                        const snippets = fs.readFileSync(path.join(this.extensionPath, "snippets", "sample.ino"));
+                        fs.writeFileSync(path.join(vscode.workspace.rootPath, newSketchFileName), snippets);
                         this.sketch = newSketchFileName;
                         // Open the new sketch file.
                         const textDocument = await vscode.workspace.openTextDocument(path.join(vscode.workspace.rootPath, newSketchFileName));
                         vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);
+                    } else {
+                        this._sketch = undefined;
                     }
                 } else if (fileUris.length === 1) {
                     this.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
