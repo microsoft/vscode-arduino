@@ -11,7 +11,7 @@ Welcome to **Arduino** <sup>preview</sup> for Visual Studio Code! The Arduino ex
 * Built-in serial monitor
 * Snippets for sketches
 * Automatic Arduino project scaffolding
-* Commond Palette (F1) integration of frequently used commands (e.g. Verify, Upload...)
+* Command Palette (F1) integration of frequently used commands (e.g. Verify, Upload...)
 
 ## Prerequisites
 Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software#download).
