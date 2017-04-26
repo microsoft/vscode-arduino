@@ -96,7 +96,7 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
-        if (!dc.sketch) {
+        if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
         if (!dc.port) {
@@ -134,7 +134,7 @@ export class ArduinoApp {
             return;
         }
 
-        if (!dc.sketch) {
+        if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
 
