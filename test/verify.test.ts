@@ -7,10 +7,9 @@ import * as vscode from "vscode";
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Arduino: Verify: Build (verify) your sketch files.", () => {
-    test("should be run command: Arduino verify", function(done) {
-        this.timeout(3 * 60 * 1000);
+    test("should be run command: Arduino verify", (done) => {
         try {
-            // Press Ctrl+ R to run "arduino:verify" command.
+            // Press ctrl+alt+r to run "arduino:verify" command.
             vscode.commands.executeCommand("arduino.verify").then((result) => {
                 vscode.window.showInformationMessage("verify sketch successfully");
                 done();
@@ -19,6 +18,6 @@ suite("Arduino: Verify: Build (verify) your sketch files.", () => {
         } catch (error) {
             done(new Error(error));
         }
-    });
+    }).timeout(3 * 60 * 1000);
 
 });
