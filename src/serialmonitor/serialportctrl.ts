@@ -129,7 +129,7 @@ export class SerialPortCtrl {
     public stop(): Promise<any> {
         return new Promise((resolve, reject) => {
             if (!this._currentSerialPort || !this.isActive) {
-                resolve();
+                resolve(false);
                 return;
             }
             this._currentSerialPort.close((err) => {
@@ -140,7 +140,7 @@ export class SerialPortCtrl {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve();
+                    resolve(true);
                 }
             });
         });
