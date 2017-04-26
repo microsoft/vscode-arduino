@@ -10,8 +10,7 @@ suite("Arduino: Verify: Build (verify) your sketch files.", () => {
     test("should be run command: Arduino verify", (done) => {
         try {
             // Press ctrl+alt+r to run "arduino:verify" command.
-            vscode.commands.executeCommand("arduino.verify").then((result) => {
-                vscode.window.showInformationMessage("verify sketch successfully");
+            vscode.commands.executeCommand("arduino.verify").then((result)  => {
                 done();
             });
 
