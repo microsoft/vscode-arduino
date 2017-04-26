@@ -2,6 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
+import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
@@ -18,10 +19,24 @@ import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
 
+let usbDetector: UsbDetector = null;
+
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = Uuid().replace(/\-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
+    // Show a warning message if the working file is not under the workspace folder.
+    // People should know the extension might not work appropriately, they should look for the doc to get started.
+    const openEditor = vscode.window.activeTextEditor;
+    if (openEditor && openEditor.document.fileName.endsWith(".ino")) {
+        const workingFile = path.normalize(openEditor.document.fileName);
+        const workspaceFolder = (vscode.workspace && vscode.workspace.rootPath) || "";
+        if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
+            vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
+            "the arduino extension might not work appropriately.");
+        }
+    }
+
     const arduinoSettings = new ArduinoSettings();
     await arduinoSettings.initialize();
     const arduinoApp = new ArduinoApp(arduinoSettings);
@@ -30,6 +45,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
     const deviceContext = DeviceContext.getIntance();
     deviceContext.arduinoApp = arduinoApp;
+    deviceContext.extensionPath = context.extensionPath;
     await deviceContext.loadContext();
     context.subscriptions.push(deviceContext);
 
@@ -109,7 +125,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(registerCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));
 
     // serial monitor commands
-    const serialMonitor = new SerialMonitor();
+    const serialMonitor = SerialMonitor.getIntance();
     context.subscriptions.push(serialMonitor);
     context.subscriptions.push(registerCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null)));
     context.subscriptions.push(registerCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor()));
@@ -120,7 +136,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const completionProvider = new CompletionProvider(arduinoApp);
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
 
-    const usbDetector = new UsbDetector(arduinoApp, boardManager, serialMonitor, context.extensionPath);
+    usbDetector = new UsbDetector(arduinoApp, boardManager, context.extensionPath);
     usbDetector.startListening();
 
     const updateStatusBar = () => {
@@ -142,6 +158,11 @@ export async function activate(context: vscode.ExtensionContext) {
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
-export function deactivate() {
+export async function deactivate() {
+    const monitor = SerialMonitor.getIntance();
+    await monitor.closeSerialMonitor(null, false);
+    if (usbDetector) {
+        usbDetector.stopListening();
+    }
     Logger.traceUserData("deactivate-extension");
 }

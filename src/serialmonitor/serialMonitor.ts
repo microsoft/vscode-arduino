@@ -26,6 +26,15 @@ export class SerialMonitor implements vscode.Disposable {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
     }
 
+    public static getIntance(): SerialMonitor {
+        if (SerialMonitor._serailMonitor === null) {
+            SerialMonitor._serailMonitor = new SerialMonitor();
+        }
+        return SerialMonitor._serailMonitor;
+    }
+
+    private static _serailMonitor: SerialMonitor = null;
+
     private _currentPort: string;
 
     private _currentBaudRate: number;
@@ -40,7 +49,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _outputChannel: vscode.OutputChannel;
 
-    constructor() {
+    private constructor() {
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
@@ -51,7 +60,7 @@ export class SerialMonitor implements vscode.Disposable {
         this._openPortStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 3);
         this._openPortStatusBar.command = "arduino.openSerialMonitor";
         this._openPortStatusBar.text = `$(plug)`;
-        this._openPortStatusBar.tooltip = "Open Port";
+        this._openPortStatusBar.tooltip = "Open Serial Monitor";
         this._openPortStatusBar.show();
 
         this._baudRateStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 4);
@@ -96,7 +105,7 @@ export class SerialMonitor implements vscode.Disposable {
                 };
             }).sort((a, b): number => {
                 return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
-            }));
+            }), { placeHolder: "Select a serial port" });
             if (chosen && chosen.label) {
                 this.updatePortListStatus(chosen.label);
             }
@@ -104,6 +113,16 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async openSerialMonitor() {
+        if (!this._currentPort) {
+            const ans = await vscode.window.showInformationMessage("No serial port was selected, please select a serial port first", "Yes", "No");
+            if (ans === "Yes") {
+                await this.selectSerialPort(null, null);
+            }
+            if (!this._currentPort) {
+                return ;
+            }
+        }
+
         if (this._serialPortCtrl) {
             if (this._currentPort !== this._serialPortCtrl.currentPort) {
                 await this._serialPortCtrl.changePort(this._currentPort);
@@ -114,6 +133,12 @@ export class SerialMonitor implements vscode.Disposable {
         } else {
             this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._outputChannel);
         }
+
+        if (!this._serialPortCtrl.currentPort) {
+            Logger.traceError("openSerialMonitorError", new Error(`Failed to open serial port ${this._currentPort}`));
+            return ;
+        }
+
         try {
             await this._serialPortCtrl.open();
             this.updatePortStatus(true);
@@ -157,16 +182,18 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.text = chosen;
     }
 
-    public async closeSerialMonitor(port: string) {
+    public async closeSerialMonitor(port: string, showWarning: boolean = true): Promise<boolean> {
         if (this._serialPortCtrl) {
-            if (port && port !== this._currentPort) {
+            if (port && port !== this._serialPortCtrl.currentPort) {
                 // Port is not opened
-                return;
+                return false;
             }
-            await this._serialPortCtrl.stop();
+            const result = await this._serialPortCtrl.stop();
             this.updatePortStatus(false);
-        } else if (!port) {
+            return result;
+        } else if (!port && showWarning) {
             Logger.notifyUserWarning("closeSerialMonitorError", new Error(constants.messages.SERIAL_PORT_NOT_STARTED));
+            return false;
         }
     }
 
