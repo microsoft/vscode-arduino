@@ -3,13 +3,16 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
+import * as crypto from "crypto";
 import * as fs from "fs";
+import { getMac } from "getmac";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
 import { BoardManager } from "../arduino/boardManager";
 import * as util from "../common/util";
+import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
@@ -46,6 +49,10 @@ export class UsbDetector {
                     return;
                 }
                 const boardKey = `${deviceDescriptor.package}:${deviceDescriptor.architecture}:${deviceDescriptor.id}`;
+
+                getMac((err, mac) => {
+                    Logger.traceUserData("detected a board", { hash_mac_address: crypto.createHash("md5").update(mac).digest("hex"), boardKey });
+                });
 
                 let bd = this._boardManager.installedBoards.get(boardKey);
                 if (!bd) {
