@@ -21,6 +21,8 @@ import { UsbDetector } from "./serialmonitor/usbDetector";
 
 let usbDetector: UsbDetector = null;
 
+const status: any = {};
+
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = Uuid().replace(/\-/g, "");
@@ -33,7 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const workspaceFolder = (vscode.workspace && vscode.workspace.rootPath) || "";
         if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
             vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
-            "the arduino extension might not work appropriately.");
+                "the arduino extension might not work appropriately.");
         }
     }
 
@@ -113,11 +115,23 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(registerCommand("arduino.initialize", async () => await deviceContext.initialize()));
 
-    context.subscriptions.push(registerCommand("arduino.verify", () => arduinoApp.verify(), () => {
+    context.subscriptions.push(registerCommand("arduino.verify", async () => {
+        if (!status.compile) {
+            status.compile = "verify";
+            await arduinoApp.verify();
+            delete status.compile;
+        }
+    }, () => {
         return { board: boardManager.currentBoard.name };
     }));
 
-    context.subscriptions.push(registerCommand("arduino.upload", () => arduinoApp.upload(),
+    context.subscriptions.push(registerCommand("arduino.upload", async () => {
+        if (!status.compile) {
+            status.compile = "upload";
+            await arduinoApp.upload();
+            delete status.compile;
+        }
+    },
         () => {
             return { board: boardManager.currentBoard.name };
         }));
