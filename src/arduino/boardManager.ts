@@ -386,7 +386,7 @@ export class BoardManager {
         // For better compatibility, merge urls both in user settings and arduino IDE preferences.
         const settingsUrls = formatUrls(this._settings.additionalUrls);
         let preferencesUrls = [];
-        const preferences = this._arduinoApp.preferences;
+        const preferences = this._settings.preferences;
         if (preferences && preferences.has("boardsmanager.additional.urls")) {
             preferencesUrls = formatUrls(preferences.get("boardsmanager.additional.urls"));
         }

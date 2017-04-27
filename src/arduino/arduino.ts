@@ -27,8 +27,6 @@ import { SerialMonitor } from "../serialmonitor/serialMonitor";
  */
 export class ArduinoApp {
 
-    private _preferences: Map<string, string>;
-
     private _boardManager: BoardManager;
 
     private _libraryManager: LibraryManager;
@@ -50,6 +48,7 @@ export class ArduinoApp {
             try {
                 // Use empty pref value to initialize preference.txt file
                 await this.setPref("boardsmanager.additional.urls", "");
+                this._settings.loadPreferences(); // reload preferences.
             } catch (ex) {
             }
         }
@@ -350,7 +349,7 @@ export class ArduinoApp {
         }
 
         // Step 1: Copy the example project to a temporary directory.
-        const sketchPath = this.preferences.get("sketchbook.path") || path.dirname(this._settings.libPath);
+        const sketchPath = path.join(this._settings.sketchbookPath, "generated_examples");
         if (!util.directoryExistsSync(sketchPath)) {
             util.mkdirRecursivelySync(sketchPath);
         }
@@ -404,13 +403,6 @@ export class ArduinoApp {
         return destExample;
     }
 
-    public get preferences() {
-        if (!this._preferences) {
-            this.loadPreferences();
-        }
-        return this._preferences;
-    }
-
     public get settings() {
         return this._settings;
     }
@@ -437,22 +429,6 @@ export class ArduinoApp {
 
     public set exampleManager(value: ExampleManager) {
         this._exampleManager = value;
-    }
-
-    private loadPreferences() {
-        this._preferences = new Map<string, string>();
-        const lineRegex = /(\S+)=(\S+)/;
-
-        const rawText = fs.readFileSync(path.join(this._settings.packagePath, "preferences.txt"), "utf8");
-        const lines = rawText.split("\n");
-        lines.forEach((line) => {
-            if (line) {
-                const match = lineRegex.exec(line);
-                if (match && match.length > 2) {
-                    this._preferences.set(match[1], match[2]);
-                }
-            }
-        });
     }
 
     private getBoardBuildString(deviceContext: IDeviceContext): string {

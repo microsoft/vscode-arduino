@@ -23,9 +23,11 @@ export interface IArduinoSettings {
     defaultExamplePath: string;
     packagePath: string;
     defaultPackagePath: string;
-    libPath: string;
     defaultLibPath: string;
     formatterSettings: IClangFormatterSettings;
+    sketchbookPath: string;
+    preferences: Map<string, string>;
+    loadPreferences(): void;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -38,11 +40,13 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _packagePath: string;
 
-    private _libPath: string;
-
     private _logLevel: string;
 
     private _clangFormatterSettings: IClangFormatterSettings;
+
+    private _sketchbookPath: string;
+
+    private _preferences: Map<string, string>;
 
     public constructor() {
     }
@@ -53,10 +57,10 @@ export class ArduinoSettings implements IArduinoSettings {
             await this.updateWindowsPath(this.arduinoPath);
         } else if (platform === "linux") {
             this._packagePath = path.join(process.env.HOME, ".arduino15");
-            this._libPath = path.join(process.env.HOME, "Arduino/libraries");
+            this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
         } else if (platform === "darwin") {
             this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
-            this._libPath = path.join(process.env.HOME, "Documents/Arduino/libraries");
+            this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Documents/Arduino");
         }
         this.loadClangFormatterSettings();
     }
@@ -120,10 +124,6 @@ export class ArduinoSettings implements IArduinoSettings {
         }
     }
 
-    public get libPath(): string {
-        return this._libPath;
-    }
-
     public get defaultLibPath(): string {
         if (os.platform() === "darwin") {
             return path.join(this.arduinoPath, "Arduino.app/Contents/Java/libraries");
@@ -155,6 +155,36 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get formatterSettings(): IClangFormatterSettings {
         return this._clangFormatterSettings;
+    }
+
+    public get sketchbookPath() {
+        return this._sketchbookPath;
+    }
+
+    public get preferences() {
+        if (!this._preferences) {
+            this.loadPreferences();
+        }
+        return this._preferences;
+    }
+
+    public loadPreferences() {
+        this._preferences = new Map<string, string>();
+        const lineRegex = /(\S+)=(\S+)/;
+        const preferencesFile = path.join(this.packagePath, "preferences.txt");
+
+        if (util.fileExistsSync(preferencesFile)) {
+            const rawText = fs.readFileSync(preferencesFile, "utf8");
+            const lines = rawText.split("\n");
+            lines.forEach((line) => {
+                if (line) {
+                    const match = lineRegex.exec(line);
+                    if (match && match.length > 2) {
+                        this._preferences.set(match[1], match[2]);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -193,12 +223,12 @@ export class ArduinoSettings implements IArduinoSettings {
             folder = folder.replace(/%([^%]+)%/g, (match, p1) => {
                 return process.env[p1];
             });
-            this._libPath = path.normalize(path.join(folder, "Arduino/libraries"));
             if (util.fileExistsSync(path.join(arduinoPath, "AppxManifest.xml"))) {
                 this._packagePath = path.join(folder, "ArduinoData");
             } else {
                 this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
             }
+            this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(folder, "Arduino");
             return true;
         });
     }

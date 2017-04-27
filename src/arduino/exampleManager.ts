@@ -57,11 +57,12 @@ export class ExampleManager {
         }
 
         // load Examples from Custom Libraries
-        const examplesFromCustomLibraries = await this.parseExamplesFromLibrary(this._settings.libPath, true, true);
+        const customLibrariesPath = path.join(this._settings.sketchbookPath, "libraries");
+        const examplesFromCustomLibraries = await this.parseExamplesFromLibrary(customLibrariesPath, true, true);
         if (examplesFromCustomLibraries.length) {
             examples.push({
                 name: "Examples from Custom Libraries",
-                path: this._settings.libPath,
+                path: customLibrariesPath,
                 children: examplesFromCustomLibraries,
             });
         }
