@@ -3,9 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-import * as crypto from "crypto";
 import * as fs from "fs";
-import { getMac } from "getmac";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -49,10 +47,7 @@ export class UsbDetector {
                     return;
                 }
                 const boardKey = `${deviceDescriptor.package}:${deviceDescriptor.architecture}:${deviceDescriptor.id}`;
-
-                getMac((err, mac) => {
-                    Logger.traceUserData("detected a board", { hash_mac_address: crypto.createHash("md5").update(mac).digest("hex"), boardKey });
-                });
+                Logger.traceUserData("detected a board", { board: boardKey });
 
                 let bd = this._boardManager.installedBoards.get(boardKey);
                 if (!bd) {
