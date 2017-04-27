@@ -27,6 +27,34 @@ suite("Arduino Extension Tests", () => {
         }
     });
 
+    test("should be able to register Arduino commands", () => {
+            return vscode.commands.getCommands(true).then((commands) => {
+                const ARDUINO_COMMANDS = [
+                    "arduino.verify",
+                    "arduino.upload",
+                    "arduino.showBoardManager",
+                    "arduino.showLibraryManager",
+                    "arduino.showBoardConfig",
+                    "arduino.showExamples",
+                    "arduino.changeBoardType",
+                    "arduino.initialize",
+                    "arduino.addLibPath",
+                    "arduino.selectSerialPort",
+                    "arduino.openSerialMonitor",
+                    "arduino.changeBaudRate",
+                    "arduino.sendMessageToSerialPort",
+                    "arduino.closeSerialMonitor",
+                ];
+
+                const foundArduinoCommands = commands.filter((value) => {
+                    return ARDUINO_COMMANDS.indexOf(value) >= 0 || value.startsWith("arduino.");
+                });
+
+                const errorMsg = "Some Arduino commands are not registered properly or a new command is not added to the test";
+                assert.equal(foundArduinoCommands.length, ARDUINO_COMMANDS.length, errorMsg);
+            });
+        });
+
     suiteTeardown(() => {
         // When running test on osx, the vscode instance is hanging there after tests finished and cause mocha timeout.
         // As a workaround, closing usb-detection process manually would make test window exit normally.
