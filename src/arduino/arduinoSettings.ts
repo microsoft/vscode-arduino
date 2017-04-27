@@ -14,7 +14,7 @@ import * as util from "../common/util";
 
 import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
 
-import { UserSettings } from "./userSettings";
+import { VscodeSettings } from "./vscodeSettings";
 
 export interface IArduinoSettings {
     arduinoPath: string;
@@ -61,7 +61,7 @@ export class ArduinoSettings implements IArduinoSettings {
             // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
             // "usual software installation directory for each os".
             // 1. Search vscode user settings first.
-            const configValue = UserSettings.getIntance().arduinoPath;
+            const configValue = VscodeSettings.getIntance().arduinoPath;
             if (!configValue || !configValue.trim()) {
                 // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
                 this._arduinoPath = resolveArduinoPath();

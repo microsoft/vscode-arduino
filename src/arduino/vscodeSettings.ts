@@ -5,32 +5,24 @@
 
 import * as vscode from "vscode";
 
-export interface IUserSettings {
+export interface IVscodeSettings {
     arduinoPath: string;
     additionalUrls: string | string[];
     autoUpdateIndexFiles: boolean;
     logLevel: string;
-    formatterSettings: IClangFormatterSettings;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
-export interface IClangFormatterSettings {
-    style: string;
-}
-
-export class UserSettings implements IUserSettings {
-    public static getIntance(): IUserSettings {
-        if (!UserSettings._instance) {
-            UserSettings._instance = new UserSettings();
+export class VscodeSettings implements IVscodeSettings {
+    public static getIntance(): IVscodeSettings {
+        if (!VscodeSettings._instance) {
+            VscodeSettings._instance = new VscodeSettings();
         }
-        return UserSettings._instance;
+        return VscodeSettings._instance;
     }
 
-    private static _instance: IUserSettings;
-    private _clangFormatterSettings: IClangFormatterSettings;
-
+    private static _instance: IVscodeSettings;
     private constructor() {
-        this.loadClangFormatterSettings();
     }
 
     public get arduinoPath(): string {
@@ -56,16 +48,5 @@ export class UserSettings implements IUserSettings {
     public get logLevel(): string {
         const workspaceConfig = vscode.workspace.getConfiguration();
         return workspaceConfig.get<string>("arduino.logLevel") || "info";
-    }
-
-    public get formatterSettings(): IClangFormatterSettings {
-        return this._clangFormatterSettings;
-    }
-
-    private loadClangFormatterSettings() {
-        const workspaceConfig = vscode.workspace.getConfiguration();
-        this._clangFormatterSettings = {
-            style: workspaceConfig.get<string>("arduino.clangFormatStyle"),
-        };
     }
 }

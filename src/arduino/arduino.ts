@@ -18,7 +18,7 @@ import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
 import { LibraryManager } from "./libraryManager";
-import { UserSettings } from "./userSettings";
+import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
@@ -114,7 +114,7 @@ export class ArduinoApp {
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (UserSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async (result) => {
@@ -143,7 +143,7 @@ export class ArduinoApp {
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (UserSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
         arduinoChannel.show();

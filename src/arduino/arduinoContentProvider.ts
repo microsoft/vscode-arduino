@@ -14,7 +14,7 @@ import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { LibraryManager } from "./libraryManager";
 import LocalWebServer from "./localWebServer";
-import { UserSettings } from "./userSettings";
+import { VscodeSettings } from "./vscodeSettings";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
@@ -108,7 +108,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getBoardPackages(req, res) {
-        const update = (UserSettings.getIntance().autoUpdateIndexFiles && req.query.update === "true");
+        const update = (VscodeSettings.getIntance().autoUpdateIndexFiles && req.query.update === "true");
         await this._arduinoApp.boardManager.loadPackages(update);
         return res.json({
             platforms: JSONHelper.decycle(this._arduinoApp.boardManager.platforms, undefined),
@@ -168,7 +168,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getLibraries(req, res) {
-        const update = (UserSettings.getIntance().autoUpdateIndexFiles && req.query.update === "true");
+        const update = (VscodeSettings.getIntance().autoUpdateIndexFiles && req.query.update === "true");
         await this._arduinoApp.libraryManager.loadLibraries(update);
         return res.json({
             libraries: this._arduinoApp.libraryManager.libraries,

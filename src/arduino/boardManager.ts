@@ -16,7 +16,7 @@ import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
 import { Board, parseBoardDescriptor } from "./board";
 import { IBoard, IPackage, IPlatform } from "./package";
-import { UserSettings } from "./userSettings";
+import { VscodeSettings } from "./vscodeSettings";
 
 export class BoardManager {
 
@@ -113,7 +113,7 @@ export class BoardManager {
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
-            await UserSettings.getIntance().updateAdditionalUrls(allUrls);
+            await VscodeSettings.getIntance().updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
@@ -386,7 +386,7 @@ export class BoardManager {
             return [];
         }
         // For better compatibility, merge urls both in user settings and arduino IDE preferences.
-        const settingsUrls = formatUrls(UserSettings.getIntance().additionalUrls);
+        const settingsUrls = formatUrls(VscodeSettings.getIntance().additionalUrls);
         let preferencesUrls = [];
         const preferences = this._settings.preferences;
         if (preferences && preferences.has("boardsmanager.additional.urls")) {
