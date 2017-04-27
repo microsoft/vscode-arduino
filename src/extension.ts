@@ -8,10 +8,10 @@ import * as vscode from "vscode";
 
 import { ArduinoApp } from "./arduino/arduino";
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
+import { ArduinoSettings } from "./arduino/arduinoSettings";
 import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
-import { ArduinoSettings } from "./arduino/settings";
 import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
