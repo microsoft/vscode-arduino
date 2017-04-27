@@ -12,12 +12,13 @@ import * as vscode from "vscode";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
-import * as settings from "./settings";
 
 import { DeviceContext, IDeviceContext } from "../deviceContext";
+import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
 import { LibraryManager } from "./libraryManager";
+import { UserSettings } from "./userSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
@@ -36,7 +37,7 @@ export class ArduinoApp {
     /**
      * @param {IArduinoSettings} ArduinoSetting object.
      */
-    constructor(private _settings: settings.IArduinoSettings) {
+    constructor(private _settings: IArduinoSettings) {
     }
 
     /**
@@ -44,7 +45,7 @@ export class ArduinoApp {
      * @param {boolean} force - Whether force initialzie the arduino
      */
     public async initialize(force: boolean = false) {
-        if (!util.fileExistsSync(path.join(this._settings.packagePath, "preferences.txt"))) {
+        if (!util.fileExistsSync(this._settings.preferencePath)) {
             try {
                 // Use empty pref value to initialize preference.txt file
                 await this.setPref("boardsmanager.additional.urls", "");
@@ -113,7 +114,7 @@ export class ArduinoApp {
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (this._settings.logLevel === "verbose") {
+        if (UserSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async (result) => {
@@ -142,7 +143,7 @@ export class ArduinoApp {
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (this._settings.logLevel === "verbose") {
+        if (UserSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
         arduinoChannel.show();

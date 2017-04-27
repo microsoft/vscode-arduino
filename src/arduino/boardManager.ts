@@ -13,9 +13,10 @@ import * as util from "../common/util";
 import { arduinoChannel } from "../common/outputChannel";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
+import { IArduinoSettings } from "./arduinoSettings";
 import { Board, parseBoardDescriptor } from "./board";
 import { IBoard, IPackage, IPlatform } from "./package";
-import { IArduinoSettings } from "./settings";
+import { UserSettings } from "./userSettings";
 
 export class BoardManager {
 
@@ -49,13 +50,14 @@ export class BoardManager {
         this._platforms = [];
         this._installedPlatforms = [];
 
+        const addiontionalUrls = this.getAdditionalUrls();
         if (update) { // Update index files.
-            await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
+            await this.setPreferenceUrls(addiontionalUrls);
             await this._arduinoApp.initialize(true);
         }
 
         // Parse package index files.
-        const indexFiles = ["package_index.json"].concat(this.getAdditionalUrls());
+        const indexFiles = ["package_index.json"].concat(addiontionalUrls);
         const rootPackgeFolder = this._settings.packagePath;
         for (const indexFile of indexFiles) {
             const indexFileName = this.getIndexFileName(indexFile);
@@ -63,7 +65,7 @@ export class BoardManager {
                 continue;
             }
             if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
-                await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
+                await this.setPreferenceUrls(addiontionalUrls);
                 await this._arduinoApp.initialize(true);
             }
             this.loadPackageContent(indexFileName);
@@ -111,7 +113,7 @@ export class BoardManager {
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
-            await this._settings.updateAdditionalUrls(allUrls);
+            await UserSettings.getIntance().updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
@@ -384,12 +386,19 @@ export class BoardManager {
             return [];
         }
         // For better compatibility, merge urls both in user settings and arduino IDE preferences.
-        const settingsUrls = formatUrls(this._settings.additionalUrls);
+        const settingsUrls = formatUrls(UserSettings.getIntance().additionalUrls);
         let preferencesUrls = [];
         const preferences = this._settings.preferences;
         if (preferences && preferences.has("boardsmanager.additional.urls")) {
             preferencesUrls = formatUrls(preferences.get("boardsmanager.additional.urls"));
         }
         return util.union(settingsUrls, preferencesUrls);
+    }
+
+    private async setPreferenceUrls(addiontionalUrls: string[]) {
+        const settingsUrls = addiontionalUrls.join(",");
+        if (this._settings.preferences.get("boardsmanager.additional.urls") !== settingsUrls) {
+            await this._arduinoApp.setPref("boardsmanager.additional.urls", settingsUrls);
+        }
     }
 }

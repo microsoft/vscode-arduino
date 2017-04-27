@@ -9,7 +9,7 @@ import * as path from "path";
 
 import * as util from "../common/util";
 import { ArduinoApp } from "./arduino";
-import { IArduinoSettings } from "./settings";
+import { IArduinoSettings } from "./arduinoSettings";
 
 export interface ILibrary {
     name: string;
