@@ -10,6 +10,7 @@ import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
 import { BoardManager } from "../arduino/boardManager";
 import * as util from "../common/util";
+import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
@@ -46,6 +47,7 @@ export class UsbDetector {
                     return;
                 }
                 const boardKey = `${deviceDescriptor.package}:${deviceDescriptor.architecture}:${deviceDescriptor.id}`;
+                Logger.traceUserData("detected a board", { board: boardKey });
 
                 let bd = this._boardManager.installedBoards.get(boardKey);
                 if (!bd) {
