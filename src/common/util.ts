@@ -310,3 +310,27 @@ export function padStart(sourceString: string, targetLength: number, padString?:
         return sourceString.padStart(targetLength, padString);
     }
 }
+
+export function parseConfigFile(fullFileName, filterComment: boolean = true): Map<string, string> {
+    const result = new Map<string, string>();
+    const lineRegex = /(\S+)=(\S+)/;
+
+    if (fileExistsSync(fullFileName)) {
+        const rawText = fs.readFileSync(fullFileName, "utf8");
+        const lines = rawText.split("\n");
+        lines.forEach((line) => {
+            if (line) {
+                if (filterComment) {
+                    if (line.trim() && line.startsWith("#")) {
+                        return;
+                    }
+                }
+                const match = lineRegex.exec(line);
+                if (match && match.length > 2) {
+                    result.set(match[1], match[2]);
+                }
+            }
+        });
+    }
+    return result;
+}

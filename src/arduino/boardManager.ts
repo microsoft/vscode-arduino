@@ -152,8 +152,8 @@ export class BoardManager {
     public getInstalledPlatforms(): any[] {
         // Always using manually installed platforms to overwrite the same platform from arduino installation directory.
         const installedPlatforms = this.getDefaultPlatforms();
-        const manuallyInstalled = this.getManuallyInstalledPlatforms();
-        manuallyInstalled.forEach((plat) => {
+
+        const mergePlatform = (plat) => {
             const find = installedPlatforms.find((_plat) => {
                 return _plat.packageName === plat.packageName && _plat.architecture === plat.architecture;
             });
@@ -164,7 +164,14 @@ export class BoardManager {
                 find.version = plat.version;
                 find.rootBoardPath = plat.rootBoardPath;
             }
-        });
+        };
+
+        const customPlatforms = this.getCustomPlatforms();
+        const manuallyInstalled = this.getManuallyInstalledPlatforms();
+
+        customPlatforms.forEach(mergePlatform);
+        manuallyInstalled.forEach(mergePlatform);
+
         return installedPlatforms;
     }
 
@@ -184,7 +191,7 @@ export class BoardManager {
         } catch (ex) {
             arduinoChannel.error(`Invalid json file "${path.join(this._settings.packagePath, indexFileName)}".
             Suggest to remove it manually and allow boardmanager to re-download it.`);
-            return ;
+            return;
         }
 
         this._packages.concat(rawModel.packages);
@@ -275,12 +282,15 @@ export class BoardManager {
                     existingPlatform.rootBoardPath = platform.rootBoardPath;
                     this._installedPlatforms.push(existingPlatform);
                 }
+            } else {
+                platform.installedVersion = platform.version;
+                this._installedPlatforms.push(platform);
             }
         });
     }
 
     // Default arduino package information from arduino installation directory.
-    private getDefaultPlatforms(): any[] {
+    private getDefaultPlatforms(): IPlatform[] {
         const defaultPlatforms = [];
         try {
             const packageBundled = fs.readFileSync(path.join(this._settings.defaultPackagePath, "package_index_bundled.json"), "utf8");
@@ -306,6 +316,39 @@ export class BoardManager {
         } catch (ex) {
         }
         return defaultPlatforms;
+    }
+
+    private getCustomPlatforms(): IPlatform[] {
+        const customPlatforms = [];
+        const hardwareFolder = path.join(this._settings.sketchbookPath, "hardware");
+        if (!util.directoryExistsSync(hardwareFolder)) {
+            return customPlatforms;
+        }
+
+        const dirs = util.filterJunk(util.readdirSync(hardwareFolder, true)); // in Mac, filter .DS_Store file.
+        if (!dirs || dirs.length < 1) {
+            return customPlatforms;
+        }
+        for (const packageName of dirs) {
+            const architectures = util.filterJunk(util.readdirSync(path.join(hardwareFolder, packageName), true));
+            if (!architectures || architectures.length < 1) {
+                continue;
+            }
+            architectures.forEach((architecture) => {
+                const platformFolder = path.join(hardwareFolder, packageName, architecture);
+                if (util.fileExistsSync(path.join(platformFolder, "boards.txt")) && util.fileExistsSync(path.join(platformFolder, "platform.txt"))) {
+                    const configs = util.parseConfigFile(path.join(platformFolder, "platform.txt"));
+                    customPlatforms.push({
+                        packageName,
+                        architecture,
+                        version: configs.get("version"),
+                        rootBoardPath: path.join(hardwareFolder, packageName, architecture),
+                        defaultPlatform: false,
+                    });
+                }
+            });
+        }
+        return customPlatforms;
     }
 
     // User manually installed packages.
