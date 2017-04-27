@@ -137,21 +137,7 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public loadPreferences() {
-        this._preferences = new Map<string, string>();
-        const lineRegex = /(\S+)=(\S+)/;
-
-        if (util.fileExistsSync(this.preferencePath)) {
-            const rawText = fs.readFileSync(this.preferencePath, "utf8");
-            const lines = rawText.split("\n");
-            lines.forEach((line) => {
-                if (line) {
-                    const match = lineRegex.exec(line);
-                    if (match && match.length > 2) {
-                        this._preferences.set(match[1], match[2]);
-                    }
-                }
-            });
-        }
+        this._preferences = util.parseConfigFile(this.preferencePath);
     }
 
     /**

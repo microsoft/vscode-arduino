@@ -129,7 +129,13 @@ export interface IPlatform {
      * Parent package information
      * @property {IPackage}
      */
-    package: IPackage;
+    package?: IPackage;
+
+    /**
+     * For custom package, only package name available.
+     * @property {packageName}
+     */
+    packageName?: string;
 }
 
 export interface IBoardConfigOption {

@@ -84,7 +84,7 @@ export class Board implements IBoard {
 
     public getBuildConfig(): string {
         const config = this.customConfig;
-        const res = `${this.platform.package.name}:${this.platform.architecture}:${this.board}${config ? ":" + config : ""}`;
+        const res = `${this.getPackageName()}:${this.platform.architecture}:${this.board}${config ? ":" + config : ""}`;
         return res;
     }
 
@@ -92,7 +92,7 @@ export class Board implements IBoard {
      * @returns {string} Return board key in format packageName:arch:boardName
      */
     public get key() {
-        return `${this.platform.package.name}:${this.platform.architecture}:${this.board}`;
+        return `${this.getPackageName()}:${this.platform.architecture}:${this.board}`;
     }
 
     public get customConfig(): string {
@@ -127,5 +127,9 @@ export class Board implements IBoard {
         const dc = DeviceContext.getIntance();
         dc.configuration = this.customConfig;
         return true;
+    }
+
+    private getPackageName() {
+        return this.platform.packageName ? this.platform.packageName : this.platform.package.name;
     }
 }
