@@ -78,13 +78,13 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                     console.log('reloaded results window at time ${timeNow}ms');
                     var doc = document.documentElement;
                     var styles = window.getComputedStyle(doc);
-                    var backgroundcolor = styles.getPropertyValue('--background-color');
-                    var color = styles.getPropertyValue('--color');
-                    var theme = document.body.className;
+                    var backgroundcolor = styles.getPropertyValue('--background-color') || '#1e1e1e';
+                    var color = styles.getPropertyValue('--color') || '#d4d4d4';
+                    var theme = document.body.className || 'vscode-dark';
                     var url = "${this._webserver.getEndpointUri(type)}?" +
-                            "theme=" + theme +
-                            "&backgroundcolor=" + backgroundcolor +
-                            "&color=" + color;
+                            "theme=" + encodeURIComponent(theme.trim()) +
+                            "&backgroundcolor=" + encodeURIComponent(backgroundcolor.trim()) +
+                            "&color=" + encodeURIComponent(color.trim());
                     document.getElementById('frame').src = url;
                 };
             </script>
