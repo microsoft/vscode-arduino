@@ -15,6 +15,8 @@ Welcome to **Arduino** <sup>preview</sup> for Visual Studio Code! The Arduino ex
 
 ## Prerequisites
 Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software#download).
+- The supported Arduino IDE versions are 1.6.x and later.
+- The Windows Store's version of Arduino IDE is not supported because of the sandbox environment of Windows app.
 
 ## Installation
 Open VS Code and press `F1` or `Ctrl + Shift + P` to open command palette, select **Install Extension** and type `vscode-arduino`.
@@ -35,7 +37,7 @@ This extension provides several commands in the Command Palette (**F1** or **Ctr
 - **Arduino: Initialize**：Scaffold a VS Code project with an Arduino sketch.
 - **Arduino: Libraries Manager**: Explore and manage libraries.
 - **Arduino: Open Serial Monitor**: Open serial monitor in the intergrated output window.
-- **Arduino: Select Serial Port**: Change the current serial port. 
+- **Arduino: Select Serial Port**: Change the current serial port.
 - **Arduino: Send Text to Serial Port**: Send a line of text via the current serial port.
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
 - **Arduino: Verify**: Build sketch.
@@ -62,6 +64,7 @@ Currently this extension supports the following operatings systems:
 - Windows 7 and later (32-bit and 64-bit)
 - macOS 10.10 and later
 - Ubuntu 16.04
+  - The extension might work on other Linux distro as some user reported but without gurantee.
 
 ## Contact Us
 If you'd like to help us build the best Arduino experience with VS Code, you can talk directly to the product team in our [gitter chat room](https://gitter.im/Microsoft/vscode-arduino).
