@@ -6,13 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Support manually imported library in libraries manager
-- Support 3rd party boards
+- Support 3rd-party boards
 - Add more devices (Arduino M0 Pro/Arduino Yún/Arduino Due) for auto discovery
-- Add native binary version for electron 1.6.6 to unblock VSCode's future upgrade
+- Add native binaries version for electron 1.6.6 to unblock VSCode's future upgrade
 - Scaffold an empty sketch under current workspace folder
 
 ### Changed
-- Make the arduino.json configurable through ui
+- Make the arduino.json configurable through UI
 - Refine extension activation events
 - Restore previous active serial monitor after upload is completed
 - Auto-resolve the sketch file path when the file is not existing for verify/upload
