@@ -4,6 +4,8 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
+import * as fsp from "fs-plus";
+import * as mkdirp from "mkdirp";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -15,6 +17,9 @@ import { ArduinoApp } from "./arduino/arduino";
 import { IBoard } from "./arduino/package";
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
 
+let getUserHome = () => {
+    return process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+};
 /**
  * Interface that represents the arduino context information.
  * @interface
@@ -109,6 +114,21 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * @method
      */
     public loadContext(): Thenable<object> {
+        if (!vscode.workspace.rootPath) {
+            if (!fsp.isFileSync(path.join(getUserHome(), ARDUINO_CONFIG_FILE))) {
+                return;
+            }
+            const deviceConfigJson = util.tryParseJSON(fs.readFileSync(path.join(getUserHome(), ARDUINO_CONFIG_FILE), "utf8"));
+            if (deviceConfigJson) {
+                this._port = deviceConfigJson.port || this._port;
+                this._board = deviceConfigJson.board || this._board;
+                this._sketch = deviceConfigJson.sketch || this._sketch;
+                this._configuration = deviceConfigJson.configuration || this._configuration;
+            } else {
+                Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
+            }
+            return;
+        }
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
                 let deviceConfigJson: any = {};
@@ -129,7 +149,12 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public saveContext() {
-        const deviceConfigFile = path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE);
+        let rootPath = vscode.workspace.rootPath;
+        if (!rootPath) {
+            rootPath = getUserHome();
+        }
+        const deviceConfigFile = path.join(rootPath, ARDUINO_CONFIG_FILE);
+        mkdirp.sync(path.dirname(deviceConfigFile));
         let deviceConfigJson: any = {};
         if (util.fileExistsSync(deviceConfigFile)) {
             deviceConfigJson = util.tryParseJSON(fs.readFileSync(deviceConfigFile, "utf8"));

@@ -44,7 +44,7 @@ export class ArduinoSettings implements IArduinoSettings {
     public async initialize() {
         const platform = os.platform();
         if (platform === "win32") {
-            await this.updateWindowsPath(this.arduinoPath);
+            await this.updateWindowsPath(await this.tryResolveArduinoPath());
         } else if (platform === "linux") {
             this._packagePath = path.join(process.env.HOME, ".arduino15");
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
@@ -54,17 +54,14 @@ export class ArduinoSettings implements IArduinoSettings {
         }
     }
 
-    public get arduinoPath(): string {
-        if (this._arduinoPath) {
-            return this._arduinoPath;
-        } else {
-            // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
+    public async tryResolveArduinoPath(): Promise<string> {
+        // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
             // "usual software installation directory for each os".
             // 1. Search vscode user settings first.
             const configValue = VscodeSettings.getIntance().arduinoPath;
             if (!configValue || !configValue.trim()) {
                 // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
-                this._arduinoPath = resolveArduinoPath();
+                this._arduinoPath = await resolveArduinoPath();
             } else {
                 this._arduinoPath = configValue;
             }
@@ -79,6 +76,13 @@ export class ArduinoSettings implements IArduinoSettings {
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             }
             return this._arduinoPath;
+    }    
+
+    public get arduinoPath(): string {
+        if (this._arduinoPath) {
+            return this._arduinoPath;
+        } else {
+            throw new Error("_arduinoPath not initialized");
         }
     }
 

@@ -106,7 +106,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // change board type
     context.subscriptions.push(registerCommand("arduino.changeBoardType", async () => {
-        await boardManager.changeBoardType();
+         try {
+            await boardManager.changeBoardType();
+        } catch (exception) {
+            Logger.error(exception.message);
+        }
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
         arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
@@ -121,6 +125,12 @@ export async function activate(context: vscode.ExtensionContext) {
             await arduinoApp.verify();
             delete status.compile;
         }
+    }, () => {
+        return { board: boardManager.currentBoard.name };
+    }));
+
+    context.subscriptions.push(registerCommand("arduino.reloadExample", () => {
+        arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
         return { board: boardManager.currentBoard.name };
     }));
