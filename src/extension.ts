@@ -13,6 +13,7 @@ import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI } from "./common/constants";
+import { DebugConfigurator } from "./debug/configurator";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
@@ -137,6 +138,12 @@ export async function activate(context: vscode.ExtensionContext) {
         }));
 
     context.subscriptions.push(registerCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));
+
+    const arduinoConfigurator = new DebugConfigurator(context.extensionPath, arduinoApp, arduinoSettings, boardManager);
+    //  Arduino debugger
+    context.subscriptions.push(registerCommand("arduino.debug.startSession", async (config) => {
+        await arduinoConfigurator.run(config);
+    }));
 
     // serial monitor commands
     const serialMonitor = SerialMonitor.getIntance();

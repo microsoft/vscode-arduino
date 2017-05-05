@@ -294,7 +294,7 @@ export function padStart(sourceString: string, targetLength: number, padString?:
         return sourceString;
     }
 
-    if (!String.prototype.padStart) {
+    if (!(String.prototype as any).padStart) {
         // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
         padString = String(padString || " ");
         if (sourceString.length > targetLength) {
@@ -307,7 +307,7 @@ export function padStart(sourceString: string, targetLength: number, padString?:
             return padString.slice(0, targetLength) + sourceString;
         }
     } else {
-        return sourceString.padStart(targetLength, padString);
+        return (sourceString as any).padStart(targetLength, padString);
     }
 }
 

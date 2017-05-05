@@ -15,7 +15,7 @@ import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
-    private _usbDector: null;
+    private _usbDector;
 
     private _boardDescriptors = null;
 
