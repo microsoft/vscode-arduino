@@ -43,8 +43,9 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public async initialize() {
         const platform = os.platform();
+        await this.tryResolveArduinoPath();
         if (platform === "win32") {
-            await this.updateWindowsPath(await this.tryResolveArduinoPath());
+            await this.updateWindowsPath(this.arduinoPath);
         } else if (platform === "linux") {
             this._packagePath = path.join(process.env.HOME, ".arduino15");
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
