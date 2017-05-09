@@ -92,7 +92,7 @@ export class DebugConfigurator {
 
     private resolveDebuggerPath(config) {
         if (!config.miDebuggerPath) {
-            config.miDebuggerPath = platform.findFile(this.getTargetExecutalbeFileName("arm-none-eabi-gdb"),
+            config.miDebuggerPath = platform.findFile(this.getExecutableFileName("arm-none-eabi-gdb"),
                 path.join(this._arduinoSettings.packagePath, "packages", this._boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
@@ -103,7 +103,7 @@ export class DebugConfigurator {
     private resolveOpenOcd(config) {
         const dc = DeviceContext.getIntance();
         if (!config.debugServerPath) {
-            config.debugServerPath = platform.findFile(this.getTargetExecutalbeFileName("openocd"),
+            config.debugServerPath = platform.findFile(this.getExecutableFileName("openocd"),
                 path.join(this._arduinoSettings.packagePath, "packages",
                     this._boardManager.currentBoard.getPackageName()));
         }
@@ -128,7 +128,7 @@ export class DebugConfigurator {
         }
     }
 
-    private getTargetExecutalbeFileName(fileName: string): string {
+    private getExecutableFileName(fileName: string): string {
         if (platform.isWindows) {
             return `${fileName}.exe`;
         }

@@ -119,7 +119,10 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(registerCommand("arduino.verify", async () => {
         if (!status.compile) {
             status.compile = "verify";
-            await arduinoApp.verify();
+            try {
+                await arduinoApp.verify();
+            } catch (ex) {
+            }
             delete status.compile;
         }
     }, () => {
@@ -129,7 +132,10 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(registerCommand("arduino.upload", async () => {
         if (!status.compile) {
             status.compile = "upload";
-            await arduinoApp.upload();
+            try {
+                await arduinoApp.upload();
+            } catch (ex) {
+            }
             delete status.compile;
         }
     },
@@ -142,7 +148,14 @@ export async function activate(context: vscode.ExtensionContext) {
     const arduinoConfigurator = new DebugConfigurator(context.extensionPath, arduinoApp, arduinoSettings, boardManager);
     //  Arduino debugger
     context.subscriptions.push(registerCommand("arduino.debug.startSession", async (config) => {
-        await arduinoConfigurator.run(config);
+        if (status.debug) {
+            status.debug = "debug";
+            try {
+                await arduinoConfigurator.run(config);
+            } catch (ex) {
+            }
+            delete status.debug;
+        }
     }));
 
     // serial monitor commands
