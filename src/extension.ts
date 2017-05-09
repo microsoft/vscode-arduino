@@ -13,6 +13,7 @@ import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI } from "./common/constants";
+import { DebugConfigurator } from "./debug/configurator";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
@@ -118,7 +119,10 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(registerCommand("arduino.verify", async () => {
         if (!status.compile) {
             status.compile = "verify";
-            await arduinoApp.verify();
+            try {
+                await arduinoApp.verify();
+            } catch (ex) {
+            }
             delete status.compile;
         }
     }, () => {
@@ -128,7 +132,10 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(registerCommand("arduino.upload", async () => {
         if (!status.compile) {
             status.compile = "upload";
-            await arduinoApp.upload();
+            try {
+                await arduinoApp.upload();
+            } catch (ex) {
+            }
             delete status.compile;
         }
     },
@@ -137,6 +144,19 @@ export async function activate(context: vscode.ExtensionContext) {
         }));
 
     context.subscriptions.push(registerCommand("arduino.addLibPath", (path) => arduinoApp.addLibPath(path)));
+
+    const arduinoConfigurator = new DebugConfigurator(context.extensionPath, arduinoApp, arduinoSettings, boardManager);
+    //  Arduino debugger
+    context.subscriptions.push(registerCommand("arduino.debug.startSession", async (config) => {
+        if (status.debug) {
+            status.debug = "debug";
+            try {
+                await arduinoConfigurator.run(config);
+            } catch (ex) {
+            }
+            delete status.debug;
+        }
+    }));
 
     // serial monitor commands
     const serialMonitor = SerialMonitor.getIntance();

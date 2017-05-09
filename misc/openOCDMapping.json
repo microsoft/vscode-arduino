@@ -1,0 +1,12 @@
+[
+    {
+        "board": "arduino:samd:mzero_pro_bl_dbg",
+        "interface": "interface/cmsis-dap.cfg",
+        "target": "target/at91samdXX.cfg"
+    },
+    {
+        "board": "arduino:samd:mzero_bl",
+        "interface": "interface/cmsis-dap.cfg",
+        "target": "target/at91samdXX.cfg"
+    }
+]

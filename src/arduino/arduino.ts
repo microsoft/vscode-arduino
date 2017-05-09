@@ -146,6 +146,11 @@ export class ArduinoApp {
         if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
+        if (dc.output) {
+            const outputPath = path.join(vscode.workspace.rootPath, dc.output);
+            args.push("--pref", `build.path=${outputPath}`);
+        }
+
         arduinoChannel.show();
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then((result) => {
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
