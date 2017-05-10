@@ -5,6 +5,13 @@
 
 import * as vscode from "vscode";
 
+const configKeys = {
+    ARDUINO_PATH: "arduino.path",
+    ADDITIONAL_URLS: "arduino.additionalUrls",
+    LOG_LEVEL: "arduino.logLevel",
+    AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
+};
+
 export interface IVscodeSettings {
     arduinoPath: string;
     additionalUrls: string | string[];
@@ -26,27 +33,32 @@ export class VscodeSettings implements IVscodeSettings {
     }
 
     public get arduinoPath(): string {
-        const workspaceConfig = vscode.workspace.getConfiguration();
-        return workspaceConfig.get<string>("arduino.path");
+        return this.getConfigValue<string>(configKeys.ARDUINO_PATH);
     }
 
-    public get additionalUrls(): string {
-        const workspaceConfig = vscode.workspace.getConfiguration();
-        return workspaceConfig.get<string>("arduino.additionalUrls");
-    }
-
-    public async updateAdditionalUrls(value) {
-        const workspaceConfig = vscode.workspace.getConfiguration();
-        await workspaceConfig.update("arduino.additionalUrls", value, true);
+    public get additionalUrls(): string | string[] {
+        return this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
     }
 
     public get autoUpdateIndexFiles(): boolean {
-        const workspaceConfig = vscode.workspace.getConfiguration();
-        return workspaceConfig.get<boolean>("arduino.autoUpdateIndexFiles");
+        return this.getConfigValue<boolean>(configKeys.AUTO_UPDATE_INDEX_FILES);
     }
 
     public get logLevel(): string {
+        return this.getConfigValue<string>(configKeys.LOG_LEVEL) || "info";
+    }
+
+    public async updateAdditionalUrls(value) {
+        await this.setConfigValue(configKeys.ADDITIONAL_URLS, value, true);
+    }
+
+    private getConfigValue<T>(key: string): T {
         const workspaceConfig = vscode.workspace.getConfiguration();
-        return workspaceConfig.get<string>("arduino.logLevel") || "info";
+        return workspaceConfig.get<T>(key);
+    }
+
+    private async setConfigValue(key: string, value, global: boolean = true) {
+        const workspaceConfig = vscode.workspace.getConfiguration();
+        await workspaceConfig.update(key, value, global);
     }
 }
