@@ -40,9 +40,9 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public async initialize() {
         const platform = os.platform();
-        await this._resolveArduinoPath();
+        await this.tryResolveArduinoPath();
         if (platform === "win32") {
-            await this._updateWindowsPath();
+            await this.updateWindowsPath();
         } else if (platform === "linux") {
             this._packagePath = path.join(process.env.HOME, ".arduino15");
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
@@ -119,7 +119,7 @@ export class ArduinoSettings implements IArduinoSettings {
      *  - User change the location of the default *Documents* folder.
      *  - Use the windows store Arduino app.
      */
-    private async _updateWindowsPath(): Promise<void> {
+    private async updateWindowsPath(): Promise<void> {
         let folder;
         try {
             folder = await util.getRegistryValues(WinReg.HKCU,
@@ -143,7 +143,7 @@ export class ArduinoSettings implements IArduinoSettings {
         this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(folder, "Arduino");
     }
 
-    private async _resolveArduinoPath(): Promise<void> {
+    private async tryResolveArduinoPath(): Promise<void> {
         // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
         // "usual software installation directory for each os".
         // 1. Search vscode user settings first.
