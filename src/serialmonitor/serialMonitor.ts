@@ -94,7 +94,7 @@ export class SerialMonitor implements vscode.Disposable {
                 }
                 return false;
             });
-            if (foundPort) {
+            if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {
                 this.updatePortListStatus(foundPort.comName);
             }
         } else {

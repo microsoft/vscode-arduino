@@ -23,17 +23,7 @@
     "C++"
   ],
   "activationEvents": [
-    "onLanguage:c",
-    "onLanguage:cpp",
-    "workspaceContains:.vscode/arduino.json",
-    "onCommand:arduino.initialize",
-    "onCommand:arduino.verify",
-    "onCommand:arduino.upload",
-    "onCommand:arduino.selectSerialPort",
-    "onCommand:arduino.changeBoardType",
-    "onCommand:arduino.showBoardManager",
-    "onCommand:arduino.showLibraryManager",
-    "onCommand:arduino.showExamples"
+    "*"
   ],
   "main": "./out/src/extension",
   "contributes": {
