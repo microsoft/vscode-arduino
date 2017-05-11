@@ -107,7 +107,7 @@ export class BoardManager {
 
     public async updatePackageIndex(indexUri: string): Promise<boolean> {
         const indexFileName = this.getIndexFileName(indexUri);
-       
+
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
