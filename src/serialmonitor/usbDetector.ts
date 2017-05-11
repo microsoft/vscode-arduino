@@ -35,6 +35,22 @@ export class UsbDetector {
             return;
         }
 
+        const switchBoards = (bd, vid, pid, changeBoardType = false) => {
+            if (changeBoardType) {
+                this._boardManager.doChangeBoardType(bd);
+                const monitor = SerialMonitor.getIntance();
+                monitor.selectSerialPort(vid, pid);
+            }
+            if (this._boardManager.currentBoard) {
+                const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
+                if (util.fileExistsSync(readme)) {
+                    vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
+                }
+                vscode.commands.executeCommand("arduino.reloadExample");
+                vscode.commands.executeCommand("arduino.showExamples");
+            }
+        };
+
         this._usbDector.on("add", (device) => {
             if (device.vendorId && device.productId) {
                 const deviceDescriptor = this.getUsbDeviceDescriptor(
@@ -61,15 +77,8 @@ export class UsbDetector {
                                         }
                                         this._boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
                                         bd = this._boardManager.installedBoards.get(boardKey);
-                                        this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
-
-                                        if (this._boardManager.currentBoard) {
-                                            const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
-                                            if (util.fileExistsSync(readme)) {
-                                                vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
-                                            }
-                                            vscode.commands.executeCommand("arduino.showExamples");
-                                        }
+                                        // this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
+                                        switchBoards(bd, deviceDescriptor.vid, deviceDescriptor.pid, true);
                                     });
                             }
                         });
@@ -83,12 +92,15 @@ export class UsbDetector {
                             "Yes", "No")
                             .then((ans) => {
                                 if (ans === "Yes") {
-                                    return this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
+                                    switchBoards(bd, deviceDescriptor.vid, deviceDescriptor.pid, true);
+                                    return;
                                 }
                             });
+                    } else {
+                        switchBoards(bd, deviceDescriptor.vid, deviceDescriptor.pid);
                     }
                 } else {
-                    this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
+                    switchBoards(bd, deviceDescriptor.vid, deviceDescriptor.pid, true);
                 }
             }
         });
@@ -100,11 +112,6 @@ export class UsbDetector {
         }
     }
 
-    private switchBoard(bd, vid, pid) {
-        this._boardManager.doChangeBoardType(bd);
-        const monitor = SerialMonitor.getIntance();
-        monitor.selectSerialPort(vid, pid);
-    }
 
     private getUsbDeviceDescriptor(vendorId: string, productId: string, extensionRoot: string): any {
         if (!this._boardDescriptors) {
@@ -117,7 +124,7 @@ export class UsbDetector {
             });
         }
         return this._boardDescriptors.find((obj) => {
-            return obj.vid === vendorId && obj.pid === productId;
+            return obj.vid === vendorId && (obj.pid === "*" || obj.pid === productId);
         });
     }
 }

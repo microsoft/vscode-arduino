@@ -7,9 +7,27 @@ import * as childProcess from "child_process";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
+import * as Registry from "winreg";
 import { directoryExistsSync, fileExistsSync } from "./util";
-
-export function resolveArduinoPath(): string {
+function _listRegKey(key, subkey, itemName): Promise<string> {
+    const regKey = new Registry({ hive: key, key: subkey });
+    return new Promise((resolve, reject) => {
+        regKey.values((err, items) => {
+            if (err) {
+                // console.log(err);
+                resolve(undefined);
+            } else {
+                for (const item of items) {
+                    if (item.name === itemName) {
+                        resolve(item.value);
+                        break;
+                    }
+                }
+            }
+        });
+    });
+};
+export async function resolveArduinoPath(): Promise<string> {
     let result;
     const plat = os.platform();
     try {
@@ -54,7 +72,14 @@ export function resolveArduinoPath(): string {
             }
         }
     }
-
+    if (!result) {
+        const win64 = (os.platform() === "win32" && (process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")));
+        const arduinoRegistryPath = await _listRegKey(Registry.HKLM,
+            win64 ? "\\SOFTWARE\\WOW6432Node\\Arduino" : "\\SOFTWARE\\Arduino", "Install_Dir");
+        if (directoryExistsSync(arduinoRegistryPath)) {
+            result = arduinoRegistryPath;
+        }
+    }
     return result || "";
 }
 

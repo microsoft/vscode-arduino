@@ -113,7 +113,7 @@ export class ArduinoApp {
         await vscode.workspace.saveAll(false);
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--pref", "compiler.warning_level=none",  appPath];
         if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
@@ -142,7 +142,7 @@ export class ArduinoApp {
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["--verify", "--board", boardDescriptor, appPath];
+        const args = ["--verify", "--board", boardDescriptor, "--pref", "compiler.warning_level=none",  appPath];
         if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
@@ -156,6 +156,9 @@ export class ArduinoApp {
 
     // Add selected library path to the intellisense search path.
     public addLibPath(libraryPath: string) {
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         let libPaths;
         if (libraryPath) {
             libPaths = [libraryPath];
