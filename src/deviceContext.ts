@@ -191,6 +191,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             vscode.window.showInformationMessage("Arduino.json is already generated.");
             return;
         } else {
+            if (!vscode.workspace.rootPath) {
+                vscode.window.showInformationMessage("Please open an folder first.");
+                return;
+            }
             await this.resolveMainSketch();
             if (this.sketch) {
                 await vscode.commands.executeCommand("arduino.changeBoardType");
