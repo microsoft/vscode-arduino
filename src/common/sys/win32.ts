@@ -5,10 +5,18 @@
 
 import * as childProcess from "child_process";
 import * as path from "path";
-import { fileExistsSync } from "../util";
+import * as WinReg from "winreg";
+import { directoryExistsSync, fileExistsSync, getRegistryValues } from "../util";
 
-export function resolveArduinoPath() {
-    let pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
+export async function resolveArduinoPath() {
+    const isWin64 = process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432");
+    let pathString = await getRegistryValues(WinReg.HKLM,
+        isWin64 ? "\\SOFTWARE\\WOW6432Node\\Arduino" : "\\SOFTWARE\\Arduino",
+        "Install_Dir");
+    if (directoryExistsSync(pathString)) {
+        return pathString;
+    }
+    pathString = childProcess.execSync("where arduino", {encoding: "utf8"});
     pathString = path.resolve(pathString).trim();
     if (fileExistsSync(pathString)) {
         pathString = path.dirname(path.resolve(pathString));
@@ -24,7 +32,7 @@ export function findFile(fileName: string, cwd: string): string {
     let result;
     try {
         let pathString;
-        pathString = childProcess.execSync(`dir ${fileName} /S /B`, { encoding: "utf8", cwd });
+        pathString = childProcess.execSync(`dir ${fileName} /S /B`, {encoding: "utf8", cwd});
         pathString = path.resolve(pathString).trim();
 
         if (fileExistsSync(pathString)) {

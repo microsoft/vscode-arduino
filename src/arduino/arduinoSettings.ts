@@ -3,15 +3,13 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
-import * as constants from "../common/constants";
 import * as util from "../common/util";
 
-import { getRegistryValues, resolveArduinoPath, validateArduinoPath } from "../common/platform";
+import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
 
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -44,7 +42,7 @@ export class ArduinoSettings implements IArduinoSettings {
         const platform = os.platform();
         await this._resolveArduinoPath();
         if (platform === "win32") {
-            await this.updateWindowsPath();
+            await this._updateWindowsPath();
         } else if (platform === "linux") {
             this._packagePath = path.join(process.env.HOME, ".arduino15");
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
@@ -56,29 +54,6 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get arduinoPath(): string {
         return this._arduinoPath;
-    }
-
-    public async _resolveArduinoPath(): Promise<void> {
-        // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
-        // "usual software installation directory for each os".
-        // 1. Search vscode user settings first.
-        const configValue = VscodeSettings.getIntance().arduinoPath;
-        if (!configValue || !configValue.trim()) {
-            // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
-            this._arduinoPath = await resolveArduinoPath();
-        } else {
-            this._arduinoPath = configValue;
-        }
-
-        if (!this._arduinoPath) { // Pop up vscode User Settings page when cannot resolve arduino path.
-            vscode.window.showErrorMessage(`Cannot find the arduino installation path. Please specify the "arduino.path" in the User Settings.` +
-                " Requires a restart after change.");
-            vscode.commands.executeCommand("workbench.action.openGlobalSettings");
-        } else if (!validateArduinoPath(this._arduinoPath)) { // Validate if arduino path is the correct path.
-            vscode.window.showErrorMessage(`Cannot find arduino executable program under directory "${this._arduinoPath}". ` +
-                `Please set the correct "arduino.path" in the User Settings. Requires a restart after change.`);
-            vscode.commands.executeCommand("workbench.action.openGlobalSettings");
-        }
     }
 
     public get defaultExamplePath(): string {
@@ -144,10 +119,10 @@ export class ArduinoSettings implements IArduinoSettings {
      *  - User change the location of the default *Documents* folder.
      *  - Use the windows store Arduino app.
      */
-    private async updateWindowsPath(): Promise<void> {
+    private async _updateWindowsPath(): Promise<void> {
         let folder;
         try {
-            folder = await getRegistryValues(WinReg.HKCU,
+            folder = await util.getRegistryValues(WinReg.HKCU,
                 "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
                 "Personal");
         } catch (ex) {
@@ -166,5 +141,28 @@ export class ArduinoSettings implements IArduinoSettings {
             this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
         }
         this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(folder, "Arduino");
+    }
+
+    private async _resolveArduinoPath(): Promise<void> {
+        // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
+        // "usual software installation directory for each os".
+        // 1. Search vscode user settings first.
+        const configValue = VscodeSettings.getIntance().arduinoPath;
+        if (!configValue || !configValue.trim()) {
+            // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
+            this._arduinoPath = await Promise.resolve(resolveArduinoPath());
+        } else {
+            this._arduinoPath = configValue;
+        }
+
+        if (!this._arduinoPath) { // Pop up vscode User Settings page when cannot resolve arduino path.
+            vscode.window.showErrorMessage(`Cannot find the arduino installation path. Please specify the "arduino.path" in the User Settings.` +
+                " Requires a restart after change.");
+            vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+        } else if (!validateArduinoPath(this._arduinoPath)) { // Validate if arduino path is the correct path.
+            vscode.window.showErrorMessage(`Cannot find arduino executable program under directory "${this._arduinoPath}". ` +
+                `Please set the correct "arduino.path" in the User Settings. Requires a restart after change.`);
+            vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+        }
     }
 }
