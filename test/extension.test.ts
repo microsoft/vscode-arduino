@@ -44,6 +44,7 @@ suite("Arduino Extension Tests", () => {
                     "arduino.changeBaudRate",
                     "arduino.sendMessageToSerialPort",
                     "arduino.closeSerialMonitor",
+                    "arduino.reloadExample",
                 ];
 
                 const foundArduinoCommands = commands.filter((value) => {
