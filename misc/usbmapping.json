@@ -63,4 +63,14 @@
         "architecture": "samd",
         "id": "adafruit_feather_m0"
     }]
+}, {
+    "index_file": "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json",
+    "boards": [{
+        "vid": "0483",
+        "pid": "374b",
+        "name": "MXCHIP AZ3166",
+        "package": "AZ3166",
+        "architecture": "stm32f4",
+        "id": "MXCHIP_AZ3166"
+    }]
 }]

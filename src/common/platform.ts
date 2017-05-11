@@ -6,16 +6,24 @@
 import * as childProcess from "child_process";
 import * as os from "os";
 import * as path from "path";
-import * as vscode from "vscode";
+import * as WinReg from "winreg";
 import { directoryExistsSync, fileExistsSync } from "./util";
 
-export function resolveArduinoPath(): string {
+export async function resolveArduinoPath(): Promise<string> {
     let result;
     const plat = os.platform();
     try {
         // Resolve arduino path from system environment variables.
         if (plat === "win32") {
-            let pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
+            const isWin64 = process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432");
+
+            let pathString = await getRegistryValues(WinReg.HKLM,
+                isWin64 ? "\\SOFTWARE\\WOW6432Node\\Arduino" : "\\SOFTWARE\\Arduino",
+                "Install_Dir");
+            if (directoryExistsSync(pathString)) {
+                return pathString;
+            }
+            pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
             pathString = path.resolve(pathString).trim();
             if (fileExistsSync(pathString)) {
                 result = path.dirname(path.resolve(pathString));
@@ -84,4 +92,34 @@ export function validateArduinoPath(arduinoPath: string): boolean {
         arduinoExe = path.join(arduinoPath, "arduino_debug.exe");
     }
     return fileExistsSync(arduinoExe);
+}
+
+export function getRegistryValues(hive: string, key: string, name: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        try {
+            const regKey = new WinReg({
+                hive,
+                key,
+            });
+
+            regKey.valueExists(name, (e, exists) => {
+                if (e) {
+                    return reject(e);
+                }
+                if (exists) {
+                    regKey.get(name, (err, result) => {
+                        if (!err) {
+                            resolve(result ? result.value : "");
+                        } else {
+                            reject(err);
+                        }
+                    });
+                } else {
+                    resolve("");
+                }
+            });
+        } catch (ex) {
+            reject(ex);
+        }
+    });
 }

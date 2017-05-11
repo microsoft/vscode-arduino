@@ -162,7 +162,9 @@ export class ArduinoApp {
         } else {
             libPaths = this.getDefaultPackageLibPaths();
         }
-
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         const configFilePath = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
         let deviceContext = null;
         if (!util.fileExistsSync(configFilePath)) {
