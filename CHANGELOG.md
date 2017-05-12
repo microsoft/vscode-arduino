@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## Version 0.1.3
 - Release date: May 12, 2017
 ### Added
-- Support AZ3166 board pid/vid
+- Support auto-discovery of AZ3166 board
 
 ### Changed
 - Make activation condition to activate always for keeping USB auto-detection work background
