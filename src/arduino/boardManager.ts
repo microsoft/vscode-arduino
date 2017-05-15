@@ -78,6 +78,11 @@ export class BoardManager {
         this.loadInstalledBoards();
         this.updateStatusBar();
         this._boardStatusBar.show();
+
+        const dc = DeviceContext.getIntance();
+        dc.onDidChange(() => {
+            this.updateStatusBar();
+        });
     }
 
     public async changeBoardType() {
