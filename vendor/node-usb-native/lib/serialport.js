@@ -216,7 +216,7 @@ SerialPort.prototype.isOpen = function() {
   return this.fd !== null && !this.closing;
 };
 
-SerialPort.prototype.write = (buffer, callback) => {
+SerialPort.prototype.write = function(buffer, callback) {
   if (!this.isOpen()) {
     debug('write attempted, but port is not open');
     return this._error(new Error('Port is not open'), callback);
@@ -403,7 +403,7 @@ SerialPort.prototype.close = function(callback) {
   });
 };
 
-SerialPort.prototype.flush = (callback) => {
+SerialPort.prototype.flush = function(callback) {
   if (!this.isOpen()) {
     debug('flush attempted, but port is not open');
     return this._error(new Error('Port is not open'), callback);
@@ -420,7 +420,7 @@ SerialPort.prototype.flush = (callback) => {
   });
 };
 
-SerialPort.prototype.set = (options, callback) => {
+SerialPort.prototype.set = function(options, callback) {
   if (!this.isOpen()) {
     debug('set attempted, but port is not open');
     return this._error(new Error('Port is not open'), callback);
