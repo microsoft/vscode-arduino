@@ -1,13 +1,9 @@
 {
-  "name": "usb-detection",
-  "version": "1.4.0",
-  "description": "Listen to USB devices and detect changes on them.",
+  "name": "usb-native",
+  "version": "0.0.1",
+  "description": "node-usb && node-serialport combined.",
   "main": "lib/index.js",
   "gypfile": true,
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/MadLittleMods/node-usb-detection.git"
-  },
   "keywords": [
     "usb",
     "device",
@@ -21,10 +17,6 @@
     "unplug",
     "notification"
   ],
-  "homepage": "https://github.com/MadLittleMods/node-usb-detection",
-  "bugs": {
-    "url": "https://github.com/MadLittleMods/node-usb-detection/issues"
-  },
   "license": "MIT",
   "dependencies": {
     "eventemitter2": "^4.1.0"

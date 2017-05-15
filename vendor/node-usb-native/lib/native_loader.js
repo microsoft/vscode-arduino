@@ -13,10 +13,12 @@ const loadLibrary = function (parentFolder, libraryName) {
             var _temp = require(file);
             binding = _temp;
             console.log('using', file);
-        } catch (e) {}
+        } catch (e) {
+            console.log(e);
+        }
     });
     if (!binding) {
-        console.log('[Warn]', 'no library available after trying files', files)
+        console.log('[Warn]', 'no library available after trying files', nodegypFiles.concat(nodepregypFiles))
     }
     return binding;
 };

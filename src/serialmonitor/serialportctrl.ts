@@ -26,7 +26,7 @@ export class SerialPortCtrl {
         });
     }
 
-    private static serialport = require("../../../vendor/serialport-native");
+    private static serialport = require("../../../vendor/node-usb-native").SerialPort;
 
     private _currentPort: string;
     private _currentBaudRate: number;
