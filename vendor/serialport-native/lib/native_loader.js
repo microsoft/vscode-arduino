@@ -13,7 +13,7 @@ const loadLibrary = function(parentFolder, libraryName) {
         }
     });
     if (!binding) {
-        console.log('[Warn]', 'no library available after trying files', files)
+        console.log('[Warn]', 'no library available after trying files', nodegypFiles.concat(nodepregypFiles))
     }
     return binding;
 };
