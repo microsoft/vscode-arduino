@@ -14,7 +14,6 @@ const loadLibrary = function(parentFolder, libraryName) {
       binding = _temp;
       console.log('using', file);
     } catch (e) {
-      console.log(e);
     }
   });
   if (!binding) {
