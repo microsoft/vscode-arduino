@@ -47,6 +47,9 @@ detector.find = (vid, pid, callback) => {
     detection.find.apply(detection, args);
   });
 };
+if (!detection.registerAdded) {
+  return;
+}
 
 detection.registerAdded((device) => {
   detector.emit(`add:${device.vendorId}:${device.productId}`, device);
