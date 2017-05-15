@@ -20,7 +20,7 @@ module.exports = {
       // Split collected data by delimiter
       var parts = data.split(delimiter);
       data = parts.pop();
-      parts.forEach(function(part) {
+      parts.forEach((part) => {
         emitter.emit('data', part);
       });
     };
@@ -28,7 +28,7 @@ module.exports = {
 
   // Emit a data event every `length` bytes
   byteLength: function(length) {
-    var data = new Buffer(0);
+    var data = Buffer.alloc(0);
     return function(emitter, buffer) {
       data = Buffer.concat([data, buffer]);
       while (data.length >= length) {

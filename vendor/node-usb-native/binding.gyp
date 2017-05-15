@@ -7,7 +7,7 @@
         "src/detection.h",
         "src/deviceList.cpp",
         "src/combined.cpp",
-	      "src/serialport.cpp"
+	    "src/serialport.cpp"
       ],
       "include_dirs" : [
         "<!(node -e \"require('nan')\")"
@@ -46,9 +46,9 @@
         ['OS=="linux"',
           {
             'sources': [
-              "src/detection_linux.cpp",
-	      "src/serialport_unix.cpp",
-	      "src/serialport_poller.cpp"
+               "src/detection_linux.cpp",
+	           "src/serialport_unix.cpp",
+	           "src/serialport_poller.cpp"
             ],
             'link_settings': {
               'libraries': [

@@ -18,6 +18,9 @@
     "notification"
   ],
   "license": "MIT",
+  "scripts": {
+    "install": "node-gyp rebuild --target=1.6.6 --arch=x64 --dist-url=https://atom.io/download/electron"
+  },
   "dependencies": {
     "eventemitter2": "^4.1.0"
   },
