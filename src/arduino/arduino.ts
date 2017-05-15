@@ -96,6 +96,12 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
+
+        if (!vscode.workspace.rootPath) {
+            vscode.window.showWarningMessage("Cannot find the sketch file.");
+            return;
+        }
+
         if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
@@ -134,6 +140,11 @@ export class ArduinoApp {
             return;
         }
 
+        if (!vscode.workspace.rootPath) {
+            vscode.window.showWarningMessage("Cannot find the sketch file.");
+            return;
+        }
+
         if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
@@ -167,7 +178,9 @@ export class ArduinoApp {
         } else {
             libPaths = this.getDefaultPackageLibPaths();
         }
-
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         const configFilePath = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
         let deviceContext = null;
         if (!util.fileExistsSync(configFilePath)) {
@@ -218,6 +231,9 @@ export class ArduinoApp {
 
     // Include the *.h header files from selected library to the arduino sketch.
     public async includeLibrary(libraryPath: string) {
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         const dc = DeviceContext.getIntance();
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         if (util.fileExistsSync(appPath)) {

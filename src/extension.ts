@@ -107,8 +107,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // change board type
     context.subscriptions.push(registerCommand("arduino.changeBoardType", async () => {
-        await boardManager.changeBoardType();
+        try {
+            await boardManager.changeBoardType();
+        } catch (exception) {
+            Logger.error(exception.message);
+        }
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
+        arduinoManagerProvider.update(EXAMPLES_URI);
+    }, () => {
+        return { board: boardManager.currentBoard.name };
+    }));
+
+    context.subscriptions.push(registerCommand("arduino.reloadExample", () => {
         arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
         return { board: boardManager.currentBoard.name };
@@ -174,19 +184,9 @@ export async function activate(context: vscode.ExtensionContext) {
     usbDetector.startListening();
 
     const updateStatusBar = () => {
-        const activeEditor = vscode.window.activeTextEditor;
-        if (!activeEditor || (activeEditor.document.languageId !== "cpp"
-            && activeEditor.document.languageId !== "c"
-            && !activeEditor.document.fileName.endsWith("arduino.json"))) {
-            boardManager.updateStatusBar(false);
-        } else {
-            boardManager.updateStatusBar(true);
-        }
+        boardManager.updateStatusBar(true);
     };
 
-    vscode.window.onDidChangeActiveTextEditor((e: vscode.TextEditor) => {
-        updateStatusBar();
-    });
     updateStatusBar();
 
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });

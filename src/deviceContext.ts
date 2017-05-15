@@ -138,6 +138,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public saveContext() {
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         const deviceConfigFile = path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE);
         let deviceConfigJson: any = {};
         if (util.fileExistsSync(deviceConfigFile)) {
@@ -203,10 +206,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public async initialize() {
-        if (util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))) {
+        if (vscode.workspace.rootPath && util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))) {
             vscode.window.showInformationMessage("Arduino.json is already generated.");
             return;
         } else {
+            if (!vscode.workspace.rootPath) {
+                vscode.window.showInformationMessage("Please open an folder first.");
+                return;
+            }
             await this.resolveMainSketch();
             if (this.sketch) {
                 await vscode.commands.executeCommand("arduino.changeBoardType");
