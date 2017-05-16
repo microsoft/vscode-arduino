@@ -47,51 +47,49 @@ detector.find = (vid, pid, callback) => {
     detection.find.apply(detection, args);
   });
 };
-if (!detection.registerAdded) {
-  return;
+if (detection.registerAdded) {
+  detection.registerAdded((device) => {
+    detector.emit(`add:${device.vendorId}:${device.productId}`, device);
+    detector.emit(`insert:${device.vendorId}:${device.productId}`, device);
+    detector.emit(`add:${device.vendorId}`, device);
+    detector.emit(`insert:${device.vendorId}`, device);
+    detector.emit('add', device);
+    detector.emit('insert', device);
+
+    detector.emit(`change:${device.vendorId}:${device.productId}`, device);
+    detector.emit(`change:${device.vendorId}`, device);
+    detector.emit('change', device);
+  });
+
+  detection.registerRemoved((device) => {
+    detector.emit(`remove:${device.vendorId}:${device.productId}`, device);
+    detector.emit(`remove:${device.vendorId}`, device);
+    detector.emit('remove', device);
+
+    detector.emit(`change:${device.vendorId}:${device.productId}`, device);
+    detector.emit(`change:${device.vendorId}`, device);
+    detector.emit('change', device);
+  });
+
+  var started = true;
+
+  detector.startMonitoring = () => {
+    if (started) {
+      return;
+    }
+
+    started = true;
+    detection.startMonitoring();
+  };
+
+  detector.stopMonitoring = () => {
+    if (!started) {
+      return;
+    }
+
+    started = false;
+    detection.stopMonitoring();
+  };
 }
-
-detection.registerAdded((device) => {
-  detector.emit(`add:${device.vendorId}:${device.productId}`, device);
-  detector.emit(`insert:${device.vendorId}:${device.productId}`, device);
-  detector.emit(`add:${device.vendorId}`, device);
-  detector.emit(`insert:${device.vendorId}`, device);
-  detector.emit('add', device);
-  detector.emit('insert', device);
-
-  detector.emit(`change:${device.vendorId}:${device.productId}`, device);
-  detector.emit(`change:${device.vendorId}`, device);
-  detector.emit('change', device);
-});
-
-detection.registerRemoved((device) => {
-  detector.emit(`remove:${device.vendorId}:${device.productId}`, device);
-  detector.emit(`remove:${device.vendorId}`, device);
-  detector.emit('remove', device);
-
-  detector.emit(`change:${device.vendorId}:${device.productId}`, device);
-  detector.emit(`change:${device.vendorId}`, device);
-  detector.emit('change', device);
-});
-
-var started = true;
-
-detector.startMonitoring = () => {
-  if (started) {
-    return;
-  }
-
-  started = true;
-  detection.startMonitoring();
-};
-
-detector.stopMonitoring = () => {
-  if (!started) {
-    return;
-  }
-
-  started = false;
-  detection.stopMonitoring();
-};
 
 module.exports = detector;
