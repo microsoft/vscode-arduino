@@ -26,16 +26,17 @@ export function validateArduinoPath(arduinoPath: string): boolean {
 }
 
 export function findFile(fileName: string, cwd: string): string {
-    let result;
+    let pathString;
     try {
-        result = childProcess.execSync("find ${cwd} -name ${fileName} -type f", { encoding: "utf8" });
-        result = path.resolve(result).trim();
+        pathString = childProcess.execSync(`find ${cwd} -name ${fileName} -type f`, { encoding: "utf8" }).split("\n");        
 
-        if (fileExistsSync(result)) {
-            result = path.normalize(result);
+        if (pathString && pathString[0] && fileExistsSync(pathString[0].trim())) {
+            pathString = path.normalize(pathString[0].trim());
+        } else {
+            pathString = null;
         }
     } catch (ex) {
         // Ignore the errors.
     }
-    return result;
+    return pathString;
 }

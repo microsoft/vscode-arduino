@@ -110,6 +110,7 @@ export class DebugConfigurator {
         if (!util.fileExistsSync(config.debugServerPath)) {
             vscode.window.showErrorMessage("Cannot find the OpenOCD from the launch.json debugServerPath property." +
                 "Please input the right path of OpenOCD");
+            return;
         }
         this.resolveOpenOcdOptions(config);
     }
