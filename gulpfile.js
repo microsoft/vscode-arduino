@@ -1,4 +1,5 @@
 const gulp = require("gulp");
+const eslint = require('gulp-eslint');
 const tslint = require("gulp-tslint");
 const gutil = require("gulp-util");
 const ts = require("gulp-typescript");
@@ -16,6 +17,13 @@ gulp.task("tslint", () => {
     return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./html/node_modules/**"])
         .pipe(tslint())
         .pipe(tslint.report());
+});
+
+gulp.task("eslint", () => {
+    return gulp.src(["./vendor/**/*.js","!**/node_modules/**"])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
 });
 
 gulp.task("html-webpack", (done) => {

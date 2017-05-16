@@ -30,7 +30,7 @@ export class UsbDetector {
         if (os.platform() === "linux") {
             return;
         }
-        this._usbDector = require("../../../vendor/node-usb-detection");
+        this._usbDector = require("../../../vendor/node-usb-native").detector;
 
         if (!this._usbDector) {
             return;
