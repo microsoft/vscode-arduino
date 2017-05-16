@@ -77,9 +77,8 @@ export class DebugConfigurator {
         if (!config.program || config.program === "${file}") {
             dc.output = dc.output || "output";
             config.program = path.join(vscode.workspace.rootPath, dc.output, `${path.basename(dc.sketch)}.elf`);
-            if (!util.fileExistsSync(config.program)) {
-                await this._arduinoApp.verify();
-            }
+            // always compile elf to make sure debug the right elf
+            await this._arduinoApp.verify();
 
             config.program = config.program.replace(/\\/g, "/");
 
