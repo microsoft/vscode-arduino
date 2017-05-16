@@ -9,7 +9,7 @@ module.exports = {
         `${__dirname}/app/index.tsx`
     ],
     output: {
-        path: `${__dirname}/../out/html`,
+        path: `${__dirname}/../../out/views`,
         filename: "app.js"
     },
     resolve: {
