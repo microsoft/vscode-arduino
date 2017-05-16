@@ -75,10 +75,10 @@ export class DebugConfigurator {
         const dc = DeviceContext.getIntance();
 
         if (!config.program || config.program === "${file}") {
-            config.program = path.join(vscode.workspace.rootPath, dc.output || "output", `${path.basename(dc.sketch)}.elf`);
-            if (!util.fileExistsSync(config.program)) {
-                await this._arduinoApp.verify();
-            }
+            dc.output = dc.output || "output";
+            config.program = path.join(vscode.workspace.rootPath, dc.output, `${path.basename(dc.sketch)}.elf`);
+            // always compile elf to make sure debug the right elf
+            await this._arduinoApp.verify();
 
             config.program = config.program.replace(/\\/g, "/");
 
@@ -110,6 +110,7 @@ export class DebugConfigurator {
         if (!util.fileExistsSync(config.debugServerPath)) {
             vscode.window.showErrorMessage("Cannot find the OpenOCD from the launch.json debugServerPath property." +
                 "Please input the right path of OpenOCD");
+            return;
         }
         this.resolveOpenOcdOptions(config);
     }
@@ -121,9 +122,13 @@ export class DebugConfigurator {
             const boardOpenOcdConfig = baordSettings.find((board) => board.board === this._boardManager.currentBoard.key);
             if (boardOpenOcdConfig) {
                 const debugServerPath = config.debugServerPath;
-                const scriptsFolder = path.join(path.dirname(debugServerPath), "../share/openocd/scripts/");
+                let scriptsFolder = path.join(path.dirname(debugServerPath), "../scripts/");
+                if (!util.directoryExistsSync(scriptsFolder)) {
+                    scriptsFolder = path.join(path.dirname(debugServerPath), "../share/openocd/scripts/");
+                }
+
                 /* tslint:disable:max-line-length*/
-                config.debugServerArgs = `-s ${scriptsFolder} -f ${path.join(scriptsFolder, boardOpenOcdConfig.interface)} -f ${path.join(scriptsFolder, boardOpenOcdConfig.target)}`;
+                config.debugServerArgs = `-s ${scriptsFolder} -f ${boardOpenOcdConfig.interface} -f ${boardOpenOcdConfig.target}`;
             }
         }
     }
