@@ -6,7 +6,7 @@
     },
     {
         "board": "arduino:samd:mzero_bl",
-        "interface": "interface/cmsis-2.cfg",
+        "interface": "interface/cmsis-dap.cfg",
         "target": "target/at91samdXX.cfg"
     },
     {
