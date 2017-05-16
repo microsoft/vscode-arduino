@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.1.3
 - Release date: May 12, 2017
+
 ### Added
 - Support auto-discovery of AZ3166 board
 
