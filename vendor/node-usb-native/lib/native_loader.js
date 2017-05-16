@@ -4,6 +4,7 @@ const loadLibrary = function(parentFolder, libraryName) {
   const nodegypFiles = glob(path.join(__dirname, `../build/+(Release|Debug)/${libraryName}.node`), {
     sync: true
   });
+  console.log(`${parentFolder.replace(/\\/g, '/')}/${libraryName}*${process.platform}*.node`);
   const nodepregypFiles = glob(`${parentFolder.replace(/\\/g, '/')}/${libraryName}*${process.platform}*.node`, {
     sync: true
   });
