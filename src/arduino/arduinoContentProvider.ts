@@ -104,7 +104,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public getHtmlView(req, res) {
-        return res.sendFile(path.join(this._extensionPath, "./out/html/index.html"));
+        return res.sendFile(path.join(this._extensionPath, "./out/views/index.html"));
     }
 
     public async getBoardPackages(req, res) {

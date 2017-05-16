@@ -14,21 +14,21 @@ const childProcess = require("child_process");
 
 //...
 gulp.task("tslint", () => {
-    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./html/node_modules/**"])
+    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./src/views/node_modules/**"])
         .pipe(tslint())
         .pipe(tslint.report());
 });
 
 gulp.task("eslint", () => {
-    return gulp.src(["./vendor/**/*.js","!**/node_modules/**"])
+    return gulp.src(["./vendor/**/*.js", "!**/node_modules/**"])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
 });
 
 gulp.task("html-webpack", (done) => {
-    const config = require("./html/webpack.config.js");
-    config.context = `${__dirname}/html`;
+    const config = require("./src/views/webpack.config.js");
+    config.context = `${__dirname}/src/views`;
     return webpack(config, (err, stats) => {
         const statsJson = stats.toJson();
         if (err || (statsJson.errors && statsJson.errors.length)) {
@@ -91,7 +91,7 @@ gulp.task("test", (done) => {
     }
 
     // When using cli command "npm test" to exec test, the depended extensions (cpptools) are not available so that
-    // the extension cannot be activated. As a workaround, remove extensionDependencies from package.json before running test 
+    // the extension cannot be activated. As a workaround, remove extensionDependencies from package.json before running test
     // and restore extensionDependencies after test exited.
     removeExtensionDependencies();
 
@@ -127,6 +127,6 @@ gulp.task("build", (done) => {
 });
 
 gulp.task("watch", () => {
-    gulp.watch(["./src/**/*", "./test/**/*"], ["ts-compile"]);
-    gulp.watch(["./html/**/*", "!./html/node_modules/**"], ["html-webpack"]);
+    gulp.watch(["./src/**/*", "./test/**/*", "!./src/views/**/*"], ["ts-compile"]);
+    gulp.watch(["./src/views/**/*", "!./src/views/node_modules/**"], ["html-webpack"]);
 });

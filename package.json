@@ -472,7 +472,7 @@
   },
   "scripts": {
     "vscode:prepublish": "gulp build",
-    "postinstall": "node ./node_modules/vscode/bin/install && cd ./html && npm install",
+    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install",
     "test": "gulp test"
   },
   "extensionDependencies": [
