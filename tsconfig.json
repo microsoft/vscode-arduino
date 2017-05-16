@@ -13,6 +13,6 @@
     "exclude": [
         "node_modules",
         ".vscode-test",
-        "html"
+        "src/views"
     ]
 }
