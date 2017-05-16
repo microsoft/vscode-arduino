@@ -15,6 +15,13 @@
         "architecture": "samd",
         "id": "edison"
     }, {
+        "vid": "03eb",
+        "pid": "2111",
+        "name": "Arduino M0 Pro (Programming USB Port)",
+        "package": "arduino",
+        "architecture": "samd",
+        "id": "mzero_pro_bl_dbg"
+    }, {
         "vid": "2a03",
         "pid": "804f",
         "name": "Arduino M0 Pro (Native USB Port)",

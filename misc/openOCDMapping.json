@@ -6,7 +6,13 @@
     },
     {
         "board": "arduino:samd:mzero_bl",
-        "interface": "interface/cmsis-dap.cfg",
+        "interface": "interface/cmsis-2.cfg",
         "target": "target/at91samdXX.cfg"
+    },
+    {
+        "board": "AZ3166:stm32f4:MXCHIP_AZ3166",
+        "interface": "interface/stlink-v2-1.cfg",
+        "target": "target/stm32f4x.cfg"
     }
 ]
+
