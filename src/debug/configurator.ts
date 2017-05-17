@@ -6,6 +6,7 @@
 import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "../arduino/arduino";
@@ -14,6 +15,8 @@ import { BoardManager } from "../arduino/boardManager";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
+
+const randomString = Uuid().replace(/\-/g, "").slice(0, 6);
 /**
  * Automatically generate the Arduino board's debug settings.
  */
@@ -35,6 +38,9 @@ export class DebugConfigurator {
                 program: "${file}",
                 cwd: "${workspaceRoot}",
                 MIMode: "gdb",
+                logging: {
+                    engineLogging: true,
+                },
                 targetArchitecture: "arm",
                 customLaunchSetupCommands: [
                     {
@@ -61,10 +67,16 @@ export class DebugConfigurator {
             };
         }
 
-        this.resolveOpenOcd(config);
-        this.resolveDebuggerPath(config);
+        if (!this.resolveOpenOcd(config)) {
+            return;
+        }
+        if (!this.resolveDebuggerPath(config)) {
+            return;
+        }
 
-        await this.resolveProgramPath(config);
+        if (!await this.resolveProgramPath(config)) {
+            return;
+        }
 
         // Use the C++ debugger MIEngine as the real internal debugger
         config.type = "cppdbg";
@@ -75,10 +87,16 @@ export class DebugConfigurator {
         const dc = DeviceContext.getIntance();
 
         if (!config.program || config.program === "${file}") {
-            dc.output = dc.output || "output";
+            // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
+            dc.output = path.join(`.temp_${randomString}`, this._boardManager.currentBoard.key.replace(/\:/g, "_"));
+            util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, dc.output));
             config.program = path.join(vscode.workspace.rootPath, dc.output, `${path.basename(dc.sketch)}.elf`);
+
             // always compile elf to make sure debug the right elf
-            await this._arduinoApp.verify();
+            if (!await this._arduinoApp.verify()) {
+                vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
+                return false;
+            }
 
             config.program = config.program.replace(/\\/g, "/");
 
@@ -88,6 +106,11 @@ export class DebugConfigurator {
                 }
             });
         }
+        if (!util.fileExistsSync(config.program)) {
+            vscode.window.showErrorMessage("Cannot find the elf file.");
+            return false;
+        }
+        return true;
     }
 
     private resolveDebuggerPath(config) {
@@ -96,8 +119,14 @@ export class DebugConfigurator {
                 path.join(this._arduinoSettings.packagePath, "packages", this._boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
-            vscode.window.showErrorMessage("Cannot find the debugger path.");
+            config.miDebuggerPath = platform.findFile(this.getExecutableFileName("arm-none-eabi-gdb"),
+                path.join(this._arduinoSettings.packagePath, "packages"));
         }
+        if (!util.fileExistsSync(config.miDebuggerPath)) {
+            vscode.window.showErrorMessage("Cannot find the debugger path.");
+            return false;
+        }
+        return true;
     }
 
     private resolveOpenOcd(config) {
@@ -108,11 +137,16 @@ export class DebugConfigurator {
                     this._boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.debugServerPath)) {
+            config.debugServerPath = platform.findFile(this.getExecutableFileName("openocd"),
+                path.join(this._arduinoSettings.packagePath, "packages"));
+        }
+        if (!util.fileExistsSync(config.debugServerPath)) {
             vscode.window.showErrorMessage("Cannot find the OpenOCD from the launch.json debugServerPath property." +
                 "Please input the right path of OpenOCD");
-            return;
+            return false;
         }
         this.resolveOpenOcdOptions(config);
+        return true;
     }
 
     private resolveOpenOcdOptions(config) {

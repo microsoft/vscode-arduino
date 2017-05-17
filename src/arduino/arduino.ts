@@ -163,11 +163,16 @@ export class ArduinoApp {
         }
 
         arduinoChannel.show();
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then((result) => {
+        // we need to return the result of verify
+        try {
+            const result = await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
+            return true;
+        } catch (reason) {
             arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
+            return false;
+        }
+
     }
 
     // Add selected library path to the intellisense search path.
