@@ -6,7 +6,6 @@
 import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "../arduino/arduino";
@@ -16,7 +15,6 @@ import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
 
-const randomString = Uuid().replace(/\-/g, "").slice(0, 6);
 /**
  * Automatically generate the Arduino board's debug settings.
  */
@@ -88,7 +86,7 @@ export class DebugConfigurator {
 
         if (!config.program || config.program === "${file}") {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
-            dc.output = path.join(`.temp_${randomString}`, this._boardManager.currentBoard.key.replace(/\:/g, "_"));
+            dc.output = path.join(`.build`, this._boardManager.currentBoard.board);
             util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, dc.output));
             config.program = path.join(vscode.workspace.rootPath, dc.output, `${path.basename(dc.sketch)}.elf`);
 
