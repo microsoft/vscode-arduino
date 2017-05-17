@@ -51,7 +51,7 @@ export class SerialPortCtrl {
   public get currentPort(): string {
     return this._currentPort;
   }
-  
+
   public open(): Promise<any> {
     this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
     return new Promise((resolve, reject) => {
