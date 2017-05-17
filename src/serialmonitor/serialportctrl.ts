@@ -14,11 +14,15 @@ interface ISerialPortDetail {
 }
 
 export class SerialPortCtrl {
+  public static get serialport(): any {
+    if (!SerialPortCtrl._serialport) {
+      SerialPortCtrl._serialport = require("../../../vendor/node-usb-native").SerialPort;
+    }
+    return SerialPortCtrl._serialport;
+  }
+
   public static list(): Promise<ISerialPortDetail[]> {
     return new Promise((resolve, reject) => {
-      if (!SerialPortCtrl.serialport) {
-        SerialPortCtrl.serialport = require("../../../vendor/node-usb-native").SerialPort;
-      }
       SerialPortCtrl.serialport.list((e: any, ports: ISerialPortDetail[]) => {
         if (e) {
           reject(e);
@@ -29,7 +33,7 @@ export class SerialPortCtrl {
     });
   }
 
-  private static serialport: any;
+  private static _serialport: any;
 
   private _currentPort: string;
   private _currentBaudRate: number;
@@ -47,7 +51,7 @@ export class SerialPortCtrl {
   public get currentPort(): string {
     return this._currentPort;
   }
-
+  
   public open(): Promise<any> {
     this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
     return new Promise((resolve, reject) => {
@@ -64,9 +68,6 @@ export class SerialPortCtrl {
           });
         });
       } else {
-        if (!SerialPortCtrl.serialport) {
-          SerialPortCtrl.serialport = require("../../../vendor/node-usb-native").SerialPort;
-        }
         this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
         this._outputChannel.show();
         this._currentSerialPort.on("open", () => {
