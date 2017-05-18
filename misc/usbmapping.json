@@ -60,7 +60,7 @@
     "index_file": "https://www.adafruit.com/package_adafruit_index.json",
     "boards": [
       {
-        "vid": "239A",
+        "vid": "239a",
         "pid": [
           "0010",
           "8010",
