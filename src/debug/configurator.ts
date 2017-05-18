@@ -24,8 +24,7 @@ export class DebugConfigurator {
         private _extensionRoot: string,
         private _arduinoApp: ArduinoApp,
         private _arduinoSettings: ArduinoSettings,
-        private _boardManager: BoardManager,
-        private _debuggerManager: DebuggerManager) {
+        private _boardManager: BoardManager) {
     }
 
     public async run(config) {
