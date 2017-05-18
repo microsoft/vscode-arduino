@@ -165,7 +165,7 @@ export async function activate(context: vscode.ExtensionContext) {
             try {
                 if (!debuggerManager.initialized) {
                     debuggerManager.initialize();
-                }                
+                }
                 await arduinoConfigurator.run(config);
             } catch (ex) {
             }
