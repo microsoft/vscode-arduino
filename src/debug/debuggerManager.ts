@@ -84,7 +84,8 @@ export class DebuggerManager {
     return results;
   }
 
-  public async resolveOpenOcdOptions(config, board: string): Promise<string> {
+  public async resolveOpenOcdOptions(config): Promise<string> {
+    const board = this._boardManager.currentBoard.key;
     const debugConfig = this._debuggerBoardMappings[board];
     const dc = DeviceContext.getIntance();
     const debuggerConfiged: string = dc.debugger_;

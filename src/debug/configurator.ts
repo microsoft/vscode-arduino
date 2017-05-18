@@ -24,7 +24,8 @@ export class DebugConfigurator {
         private _extensionRoot: string,
         private _arduinoApp: ArduinoApp,
         private _arduinoSettings: ArduinoSettings,
-        private _boardManager: BoardManager) {
+        private _boardManager: BoardManager,
+        private _debuggerManager: DebuggerManager) {
     }
 
     public async run(config) {
@@ -154,7 +155,7 @@ export class DebugConfigurator {
 
         if (config.debugServerPath && !config.debugServerArgs) {
             try {
-                config.debugServerArgs = await this._debuggerManager.resolveOpenOcdOptions(config, this._boardManager.currentBoard.key);
+                config.debugServerArgs = await this._debuggerManager.resolveOpenOcdOptions(config);
                 if (!config.debugServerArgs) {
                     return false;
                 }
