@@ -133,7 +133,7 @@ export class ArduinoApp {
         });
     }
 
-    public async verify() {
+    public async verify(output: string = "") {
         const dc = DeviceContext.getIntance();
         const boardDescriptor = this.getBoardBuildString(dc);
         if (!boardDescriptor) {
@@ -157,8 +157,8 @@ export class ArduinoApp {
         if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
-        if (dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, dc.output);
+        if (output) {
+            const outputPath = path.join(vscode.workspace.rootPath, output);
             args.push("--pref", `build.path=${outputPath}`);
         }
 

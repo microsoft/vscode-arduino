@@ -39,8 +39,8 @@ export class UsbDetector {
         this._usbDector.on("add", (device) => {
             if (device.vendorId && device.productId) {
                 const deviceDescriptor = this.getUsbDeviceDescriptor(
-                    util.padStart(device.vendorId.toString(16), 4, "0"), // vid and pid both are 2 bytes long.
-                    util.padStart(device.productId.toString(16), 4, "0"),
+                    util.convertToHex(device.vendorId, 4), // vid and pid both are 2 bytes long.
+                    util.convertToHex(device.productId, 4),
                     this._extensionRoot);
 
                 // Not supported device for discovery.
@@ -79,7 +79,7 @@ export class UsbDetector {
                     const currBoard = this._boardManager.currentBoard;
                     if (currBoard.board !== deviceDescriptor.id
                         || currBoard.platform.architecture !== deviceDescriptor.architecture
-                        || currBoard.platform.package.name !== deviceDescriptor.package) {
+                        || currBoard.getPackageName() !== deviceDescriptor.package) {
                         vscode.window.showInformationMessage(`Detected board ${deviceDescriptor.name}. Would you like to switch to this board type?`,
                             "Yes", "No")
                             .then((ans) => {
@@ -134,7 +134,7 @@ export class UsbDetector {
             });
         }
         return this._boardDescriptors.find((obj) => {
-            return obj.vid === vendorId && obj.pid === productId;
+            return obj.vid === vendorId && (obj.pid === productId || (obj.pid.indexOf && obj.pid.indexOf(productId) >= 0));
         });
     }
 }

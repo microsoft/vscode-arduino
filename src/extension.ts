@@ -165,6 +165,7 @@ export async function activate(context: vscode.ExtensionContext) {
             } catch (ex) {
             }
             delete status.debug;
+
         }
     }));
 
