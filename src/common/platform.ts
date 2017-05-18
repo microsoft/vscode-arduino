@@ -23,3 +23,10 @@ export function validateArduinoPath(arduinoPath: string): boolean {
 export function findFile(fileName: string, cwd: string): string {
     return internalSysLib.findFile(fileName, cwd);
 }
+
+export function getExecutableFileName(fileName: string): string {
+    if (isWindows) {
+        return `${fileName}.exe`;
+    }
+    return fileName;
+}

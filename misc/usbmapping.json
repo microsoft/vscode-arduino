@@ -1,76 +1,147 @@
-[{
+[
+  {
     "index_file": "package_index.json",
-    "boards": [{
+    "boards": [
+      {
         "vid": "2341",
         "pid": "804e",
         "name": "Arduino/Genuino MKR1000",
         "package": "arduino",
         "architecture": "samd",
-        "id": "mkr1000"
-    }, {
+        "id": "mkr1000",
+        "target": "at91samdXX.cfg"
+      },
+      {
         "vid": "8087",
         "pid": "0a9e",
         "name": "Intel Edison",
         "package": "arduino",
         "architecture": "samd",
         "id": "edison"
-    }, {
+      },
+      {
+        "vid": "03eb",
+        "pid": "2111",
+        "name": "Arduino M0 Pro (Programming USB Port)",
+        "package": "arduino",
+        "architecture": "samd",
+        "id": "mzero_pro_bl_dbg",
+        "target": "at91samdXX.cfg",
+        "interface": "cmsis-dap.cfg"
+      },
+      {
+        "vid": "03eb",
+        "pid": "2157",
+        "name": "Arduino/Genuino Zero (Programming Port)",
+        "package": "arduino",
+        "architecture": "samd",
+        "id": "arduino_zero_edbg",
+        "target": "at91samdXX.cfg",
+        "interface": "cmsis-dap.cfg"
+      },
+      {
+        "vid": "2341",
+        "pid": ["804d", "004d", "824d"],
+        "name": "Arduino/Genuino Zero (Native USB Port)",
+        "package": "arduino",
+        "architecture": "samd",
+        "id": "arduino_zero_edbg",
+        "target": "at91samdXX.cfg",
+        "interface": "cmsis-dap.cfg"
+      },
+      {
         "vid": "2a03",
         "pid": "804f",
         "name": "Arduino M0 Pro (Native USB Port)",
         "package": "arduino",
         "architecture": "samd",
-        "id": "mzero_pro_bl"
-    }, {
+        "id": "mzero_pro_bl",
+        "target": "at91samdXX.cfg"
+      },
+      {
         "vid": "2341",
         "pid": "8041",
         "name": "Arduino Yún",
         "package": "arduino",
         "architecture": "avr",
         "id": "yun"
-    }, {
+      },
+      {
         "vid": "2341",
         "pid": "003e",
         "name": "Arduino Due",
         "package": "arduino",
         "architecture": "sam",
         "id": "arduino_due_x"
-    }]
-}, {
+      }
+    ]
+  },
+  {
+    "index_file": "https://www.adafruit.com/package_adafruit_index.json",
+    "boards": [
+      {
+        "vid": "239a",
+        "pid": [
+          "0010",
+          "8010",
+          "0008"
+        ],
+        "name": "Adafruit WICED Feather",
+        "package": "adafruit",
+        "architecture": "wiced",
+        "id": "feather",
+        "target": "stm32f2x.cfg"
+      }
+    ]
+  },
+  {
     "index_file": "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
-    "boards": [{
+    "boards": [
+      {
         "vid": "10c4",
         "pid": "ea60",
         "name": "Adafruit HUZZAH ESP8266",
         "package": "esp8266",
         "architecture": "esp8266",
         "id": "huzzah"
-    }, {
+      },
+      {
         "vid": "0403",
         "pid": "6015",
         "name": "SparkFun ESP8266 Thing Dev",
         "package": "esp8266",
         "architecture": "esp8266",
         "id": "thingdev"
-    }]
-}, {
+      }
+    ]
+  },
+  {
     "index_file": "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
-    "boards": [{
+    "boards": [
+      {
         "vid": "239a",
         "pid": "800b",
         "name": "Adafruit Feather M0",
         "package": "adafruit",
         "architecture": "samd",
-        "id": "adafruit_feather_m0"
-    }]
-}, {
+        "id": "adafruit_feather_m0",
+        "target": "at91samdXX.cfg"
+      }
+    ]
+  },
+  {
     "index_file": "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json",
-    "boards": [{
+    "boards": [
+      {
         "vid": "0483",
         "pid": "374b",
         "name": "MXCHIP AZ3166",
         "package": "AZ3166",
         "architecture": "stm32f4",
-        "id": "MXCHIP_AZ3166"
-    }]
-}]
+        "id": "MXCHIP_AZ3166",
+        "interface": "stlink-v2-1.cfg",
+        "target": "stm32f4x.cfg"
+      }
+    ]
+  }
+]
