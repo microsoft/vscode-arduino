@@ -68,6 +68,11 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = SerialMonitor.DEFAULT_BAUD_RATE.toString();
         this.updatePortListStatus(null);
+
+        const dc = DeviceContext.getIntance();
+        dc.onDidChange(() => {
+            this.updatePortListStatus(null);
+        });
     }
 
     public async dispose() {
@@ -94,7 +99,7 @@ export class SerialMonitor implements vscode.Disposable {
                 }
                 return false;
             });
-            if (foundPort) {
+            if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {
                 this.updatePortListStatus(foundPort.comName);
             }
         } else {
@@ -119,7 +124,7 @@ export class SerialMonitor implements vscode.Disposable {
                 await this.selectSerialPort(null, null);
             }
             if (!this._currentPort) {
-                return ;
+                return;
             }
         }
 
@@ -136,7 +141,7 @@ export class SerialMonitor implements vscode.Disposable {
 
         if (!this._serialPortCtrl.currentPort) {
             Logger.traceError("openSerialMonitorError", new Error(`Failed to open serial port ${this._currentPort}`));
-            return ;
+            return;
         }
 
         try {

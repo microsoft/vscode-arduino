@@ -9,7 +9,9 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
 import { BoardManager } from "../arduino/boardManager";
+import { IBoard } from "../arduino/package";
 import * as util from "../common/util";
+import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
@@ -28,7 +30,7 @@ export class UsbDetector {
         if (os.platform() === "linux") {
             return;
         }
-        this._usbDector = require("../../../vendor/node-usb-detection");
+        this._usbDector = require("../../../vendor/node-usb-native").detector;
 
         if (!this._usbDector) {
             return;
@@ -46,6 +48,7 @@ export class UsbDetector {
                     return;
                 }
                 const boardKey = `${deviceDescriptor.package}:${deviceDescriptor.architecture}:${deviceDescriptor.id}`;
+                Logger.traceUserData("detected a board", { board: boardKey });
 
                 let bd = this._boardManager.installedBoards.get(boardKey);
                 if (!bd) {
@@ -84,6 +87,10 @@ export class UsbDetector {
                                     return this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
                                 }
                             });
+                    } else {
+                        const monitor = SerialMonitor.getIntance();
+                        monitor.selectSerialPort(deviceDescriptor.vid, deviceDescriptor.pid);
+                        this.showReadMeAndExample();
                     }
                 } else {
                     this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
@@ -98,10 +105,22 @@ export class UsbDetector {
         }
     }
 
-    private switchBoard(bd, vid, pid) {
+    private switchBoard(bd: IBoard, vid: string, pid: string) {
         this._boardManager.doChangeBoardType(bd);
         const monitor = SerialMonitor.getIntance();
         monitor.selectSerialPort(vid, pid);
+        this.showReadMeAndExample();
+    }
+
+    private showReadMeAndExample() {
+        if (this._boardManager.currentBoard) {
+            const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
+            if (util.fileExistsSync(readme)) {
+                vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
+            }
+            vscode.commands.executeCommand("arduino.reloadExample");
+            vscode.commands.executeCommand("arduino.showExamples");
+        }
     }
 
     private getUsbDeviceDescriptor(vendorId: string, productId: string, extensionRoot: string): any {

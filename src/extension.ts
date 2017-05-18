@@ -8,10 +8,10 @@ import * as vscode from "vscode";
 
 import { ArduinoApp } from "./arduino/arduino";
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
+import { ArduinoSettings } from "./arduino/arduinoSettings";
 import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
-import { ArduinoSettings } from "./arduino/settings";
 import { ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI } from "./common/constants";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
@@ -20,6 +20,8 @@ import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
 
 let usbDetector: UsbDetector = null;
+
+const status: any = {};
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
@@ -33,7 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const workspaceFolder = (vscode.workspace && vscode.workspace.rootPath) || "";
         if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
             vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
-            "the arduino extension might not work appropriately.");
+                "the arduino extension might not work appropriately.");
         }
     }
 
@@ -104,8 +106,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // change board type
     context.subscriptions.push(registerCommand("arduino.changeBoardType", async () => {
-        await boardManager.changeBoardType();
+        try {
+            await boardManager.changeBoardType();
+        } catch (exception) {
+            Logger.error(exception.message);
+        }
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
+        arduinoManagerProvider.update(EXAMPLES_URI);
+    }, () => {
+        return { board: boardManager.currentBoard.name };
+    }));
+
+    context.subscriptions.push(registerCommand("arduino.reloadExample", () => {
         arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
         return { board: boardManager.currentBoard.name };
@@ -113,11 +125,23 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(registerCommand("arduino.initialize", async () => await deviceContext.initialize()));
 
-    context.subscriptions.push(registerCommand("arduino.verify", () => arduinoApp.verify(), () => {
+    context.subscriptions.push(registerCommand("arduino.verify", async () => {
+        if (!status.compile) {
+            status.compile = "verify";
+            await arduinoApp.verify();
+            delete status.compile;
+        }
+    }, () => {
         return { board: boardManager.currentBoard.name };
     }));
 
-    context.subscriptions.push(registerCommand("arduino.upload", () => arduinoApp.upload(),
+    context.subscriptions.push(registerCommand("arduino.upload", async () => {
+        if (!status.compile) {
+            status.compile = "upload";
+            await arduinoApp.upload();
+            delete status.compile;
+        }
+    },
         () => {
             return { board: boardManager.currentBoard.name };
         }));
@@ -140,19 +164,9 @@ export async function activate(context: vscode.ExtensionContext) {
     usbDetector.startListening();
 
     const updateStatusBar = () => {
-        const activeEditor = vscode.window.activeTextEditor;
-        if (!activeEditor || (activeEditor.document.languageId !== "cpp"
-            && activeEditor.document.languageId !== "c"
-            && !activeEditor.document.fileName.endsWith("arduino.json"))) {
-            boardManager.updateStatusBar(false);
-        } else {
-            boardManager.updateStatusBar(true);
-        }
+        boardManager.updateStatusBar(true);
     };
 
-    vscode.window.onDidChangeActiveTextEditor((e: vscode.TextEditor) => {
-        updateStatusBar();
-    });
     updateStatusBar();
 
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });

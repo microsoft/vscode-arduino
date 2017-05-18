@@ -14,7 +14,7 @@ export default class LocalWebServer {
     private _serverPort: string;
 
     constructor(private _extensionPath: string) {
-        this.app.use("/", express.static(path.join(this._extensionPath, "./out/html")));
+        this.app.use("/", express.static(path.join(this._extensionPath, "./out/views")));
         this.app.use(bodyParser.json());
         this.server = http.createServer(this.app);
     }

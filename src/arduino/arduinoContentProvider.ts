@@ -10,10 +10,11 @@ import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
 import { ArduinoApp } from "./arduino";
+import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { LibraryManager } from "./libraryManager";
 import LocalWebServer from "./localWebServer";
-import { IArduinoSettings } from "./settings";
+import { VscodeSettings } from "./vscodeSettings";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
@@ -77,13 +78,13 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                     console.log('reloaded results window at time ${timeNow}ms');
                     var doc = document.documentElement;
                     var styles = window.getComputedStyle(doc);
-                    var backgroundcolor = styles.getPropertyValue('--background-color');
-                    var color = styles.getPropertyValue('--color');
-                    var theme = document.body.className;
+                    var backgroundcolor = styles.getPropertyValue('--background-color') || '#1e1e1e';
+                    var color = styles.getPropertyValue('--color') || '#d4d4d4';
+                    var theme = document.body.className || 'vscode-dark';
                     var url = "${this._webserver.getEndpointUri(type)}?" +
-                            "theme=" + theme +
-                            "&backgroundcolor=" + backgroundcolor +
-                            "&color=" + color;
+                            "theme=" + encodeURIComponent(theme.trim()) +
+                            "&backgroundcolor=" + encodeURIComponent(backgroundcolor.trim()) +
+                            "&color=" + encodeURIComponent(color.trim());
                     document.getElementById('frame').src = url;
                 };
             </script>
@@ -103,11 +104,11 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public getHtmlView(req, res) {
-        return res.sendFile(path.join(this._extensionPath, "./out/html/index.html"));
+        return res.sendFile(path.join(this._extensionPath, "./out/views/index.html"));
     }
 
     public async getBoardPackages(req, res) {
-        const update = (this._settings.autoUpdateIndexFiles && req.query.update === "true");
+        const update = (VscodeSettings.getIntance().autoUpdateIndexFiles && req.query.update === "true");
         await this._arduinoApp.boardManager.loadPackages(update);
         return res.json({
             platforms: JSONHelper.decycle(this._arduinoApp.boardManager.platforms, undefined),
@@ -167,7 +168,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getLibraries(req, res) {
-        const update = (this._settings.autoUpdateIndexFiles && req.query.update === "true");
+        const update = (VscodeSettings.getIntance().autoUpdateIndexFiles && req.query.update === "true");
         await this._arduinoApp.libraryManager.loadLibraries(update);
         return res.json({
             libraries: this._arduinoApp.libraryManager.libraries,

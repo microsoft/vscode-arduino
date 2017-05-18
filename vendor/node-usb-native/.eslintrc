@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "standard"
+  ],
+  "plugins": [
+    "require-path-exists"
+  ],
+  "env": {
+    "node": true,
+    "mocha": true
+  },
+  "rules": {
+    "arrow-parens": [2, "as-needed", {"requireForBlockBody": true }],
+    "no-unused-vars": [2, { "vars": "all", "args": "after-used" }],
+    "object-curly-spacing": [2, "always"],
+    "prefer-arrow-callback": 2,
+    "prefer-const": 2,
+    "prefer-template": 2,
+    "require-path-exists/exists": 2,
+    "require-path-exists/notEmpty": 2,
+    "require-path-exists/tooManyArguments": 2,
+    "semi": [2, "always", {"omitLastInOneLineBlock": true}],
+    "space-before-function-paren": [2, "never"],
+    "standard/object-curly-even-spacing": 0
+  }
+}

@@ -1,6 +1,45 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.1.3
+- Release date: May 12, 2017
+
+### Added
+- Support auto-discovery of AZ3166 board
+
+### Changed
+- Make activation condition to activate always for keeping USB auto-detection work background
+- Auto-resolve arduino path from Registry on windows
+- Well handle the case when vscode has no workspace
+
+### Fixed
+- Fix the issue of HTML view showing weird background color in vscode 1.12.1
+- Fix arduino board installation failure on Mac after usb detection
+
+
+## Version 0.1.2
+- Release date: April 28, 2017
+
+### Added
+- Support manually imported library in libraries manager
+- Support 3rd-party boards
+- Add more devices (Arduino M0 Pro/Arduino Yún/Arduino Due) for auto discovery
+- Add native binaries version for electron 1.6.6 to unblock VSCode's future upgrade
+- Scaffold an empty sketch under current workspace folder
+
+### Changed
+- Make the arduino.json configurable through UI
+- Refine extension activation events
+- Restore previous active serial monitor after upload is completed
+- Auto-resolve the sketch file path when the file is not existing for verify/upload
+- Search custom libraries and examples in the path of sketchbook.path preference rather than default windows Document path
+
+### Fixed
+- Fix preferences.txt not found issue
+- Fix verify command NPE issue when no serial port is selected
+- Fix the error handling issue when opening serial monitor failed
+- Avoid verify/upload reentry issue
+
 ## Version 0.1.1
 - HotFix: Update display tag. 
 

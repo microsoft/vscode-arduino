@@ -44,6 +44,8 @@ export interface IDeviceContext {
      */
     configuration: string;
 
+    onDidChange: vscode.Event<void>;
+
     initialize(): void;
 }
 
@@ -54,6 +56,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     private static _deviceContext: DeviceContext = new DeviceContext();
+
+    private _onDidChange = new vscode.EventEmitter<void>();
 
     private _port: string;
 
@@ -69,21 +73,30 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _watcher: vscode.FileSystemWatcher;
 
+    private _vscodeWatcher: vscode.FileSystemWatcher;
+
     /**
      * @constructor
      */
     private constructor() {
         if (vscode.workspace && vscode.workspace.rootPath) {
             this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE));
+            // We only care about the deletion arduino.json in the .vscode folder:
+            this._vscodeWatcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, ".vscode"), true, true, false);
+
             this._watcher.onDidCreate(() => this.loadContext());
             this._watcher.onDidChange(() => this.loadContext());
             this._watcher.onDidDelete(() => this.loadContext());
+            this._vscodeWatcher.onDidDelete(() => this.loadContext());
         }
     }
 
     public dispose() {
         if (this._watcher) {
             this._watcher.dispose();
+        }
+        if (this._vscodeWatcher) {
+            this._vscodeWatcher.dispose();
         }
     }
 
@@ -116,19 +129,29 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     const configFile = files[0];
                     deviceConfigJson = util.tryParseJSON(fs.readFileSync(configFile.fsPath, "utf8"));
                     if (deviceConfigJson) {
-                        this._port = deviceConfigJson.port || this._port;
-                        this._board = deviceConfigJson.board || this._board;
-                        this._sketch = deviceConfigJson.sketch || this._sketch;
-                        this._configuration = deviceConfigJson.configuration || this._configuration;
+                        this._port = deviceConfigJson.port;
+                        this._board = deviceConfigJson.board;
+                        this._sketch = deviceConfigJson.sketch;
+                        this._configuration = deviceConfigJson.configuration;
+                        this._onDidChange.fire();
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
+                } else {
+                    this._port = null;
+                    this._board = null;
+                    this._sketch = null;
+                    this._configuration = null;
+                    this._onDidChange.fire();
                 }
                 return this;
             });
     }
 
     public saveContext() {
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         const deviceConfigFile = path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE);
         let deviceConfigJson: any = {};
         if (util.fileExistsSync(deviceConfigFile)) {
@@ -145,6 +168,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
         fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, null, 4));
+    }
+
+    public get onDidChange(): vscode.Event<void> {
+        return this._onDidChange.event;
     }
 
     public get port() {
@@ -184,10 +211,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public async initialize() {
-        if (util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))) {
+        if (vscode.workspace.rootPath && util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))) {
             vscode.window.showInformationMessage("Arduino.json is already generated.");
             return;
         } else {
+            if (!vscode.workspace.rootPath) {
+                vscode.window.showInformationMessage("Please open an folder first.");
+                return;
+            }
             await this.resolveMainSketch();
             if (this.sketch) {
                 await vscode.commands.executeCommand("arduino.changeBoardType");

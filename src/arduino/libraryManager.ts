@@ -9,7 +9,7 @@ import * as path from "path";
 
 import * as util from "../common/util";
 import { ArduinoApp } from "./arduino";
-import { IArduinoSettings } from "./settings";
+import { IArduinoSettings } from "./arduinoSettings";
 
 export interface ILibrary {
     name: string;
@@ -59,7 +59,7 @@ export class LibraryManager {
         // Load default Arduino libraries from Arduino installation package.
         await this.loadInstalledLibraries(this._settings.defaultLibPath, true);
         // Load manually installed libraries.
-        await this.loadInstalledLibraries(this._settings.libPath, false);
+        await this.loadInstalledLibraries(path.join(this._settings.sketchbookPath, "libraries"), false);
         // Load libraries from installed board packages.
         const builtinLibs = await this.loadBoardLibraries();
         this._libraries = Array.from(this._libraryMap.values());

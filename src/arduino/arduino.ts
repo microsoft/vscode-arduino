@@ -12,12 +12,13 @@ import * as vscode from "vscode";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
-import * as settings from "./settings";
 
 import { DeviceContext, IDeviceContext } from "../deviceContext";
+import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
 import { LibraryManager } from "./libraryManager";
+import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
@@ -26,8 +27,6 @@ import { SerialMonitor } from "../serialmonitor/serialMonitor";
  * Represent an Arduino application based on the official Arduino IDE.
  */
 export class ArduinoApp {
-
-    private _preferences: Map<string, string>;
 
     private _boardManager: BoardManager;
 
@@ -38,7 +37,7 @@ export class ArduinoApp {
     /**
      * @param {IArduinoSettings} ArduinoSetting object.
      */
-    constructor(private _settings: settings.IArduinoSettings) {
+    constructor(private _settings: IArduinoSettings) {
     }
 
     /**
@@ -46,10 +45,11 @@ export class ArduinoApp {
      * @param {boolean} force - Whether force initialzie the arduino
      */
     public async initialize(force: boolean = false) {
-        if (!util.fileExistsSync(path.join(this._settings.packagePath, "preferences.txt"))) {
+        if (!util.fileExistsSync(this._settings.preferencePath)) {
             try {
                 // Use empty pref value to initialize preference.txt file
                 await this.setPref("boardsmanager.additional.urls", "");
+                this._settings.loadPreferences(); // reload preferences.
             } catch (ex) {
             }
         }
@@ -96,6 +96,12 @@ export class ArduinoApp {
         if (!boardDescriptor) {
             return;
         }
+
+        if (!vscode.workspace.rootPath) {
+            vscode.window.showWarningMessage("Cannot find the sketch file.");
+            return;
+        }
+
         if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
@@ -114,7 +120,7 @@ export class ArduinoApp {
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (this._settings.logLevel === "verbose") {
+        if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async (result) => {
@@ -134,6 +140,11 @@ export class ArduinoApp {
             return;
         }
 
+        if (!vscode.workspace.rootPath) {
+            vscode.window.showWarningMessage("Cannot find the sketch file.");
+            return;
+        }
+
         if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
@@ -143,7 +154,7 @@ export class ArduinoApp {
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (this._settings.logLevel === "verbose") {
+        if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
         arduinoChannel.show();
@@ -162,7 +173,9 @@ export class ArduinoApp {
         } else {
             libPaths = this.getDefaultPackageLibPaths();
         }
-
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         const configFilePath = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
         let deviceContext = null;
         if (!util.fileExistsSync(configFilePath)) {
@@ -213,6 +226,9 @@ export class ArduinoApp {
 
     // Include the *.h header files from selected library to the arduino sketch.
     public async includeLibrary(libraryPath: string) {
+        if (!vscode.workspace.rootPath) {
+            return;
+        }
         const dc = DeviceContext.getIntance();
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         if (util.fileExistsSync(appPath)) {
@@ -350,7 +366,7 @@ export class ArduinoApp {
         }
 
         // Step 1: Copy the example project to a temporary directory.
-        const sketchPath = this.preferences.get("sketchbook.path") || path.dirname(this._settings.libPath);
+        const sketchPath = path.join(this._settings.sketchbookPath, "generated_examples");
         if (!util.directoryExistsSync(sketchPath)) {
             util.mkdirRecursivelySync(sketchPath);
         }
@@ -404,13 +420,6 @@ export class ArduinoApp {
         return destExample;
     }
 
-    public get preferences() {
-        if (!this._preferences) {
-            this.loadPreferences();
-        }
-        return this._preferences;
-    }
-
     public get settings() {
         return this._settings;
     }
@@ -437,22 +446,6 @@ export class ArduinoApp {
 
     public set exampleManager(value: ExampleManager) {
         this._exampleManager = value;
-    }
-
-    private loadPreferences() {
-        this._preferences = new Map<string, string>();
-        const lineRegex = /(\S+)=(\S+)/;
-
-        const rawText = fs.readFileSync(path.join(this._settings.packagePath, "preferences.txt"), "utf8");
-        const lines = rawText.split("\n");
-        lines.forEach((line) => {
-            if (line) {
-                const match = lineRegex.exec(line);
-                if (match && match.length > 2) {
-                    this._preferences.set(match[1], match[2]);
-                }
-            }
-        });
     }
 
     private getBoardBuildString(deviceContext: IDeviceContext): string {
