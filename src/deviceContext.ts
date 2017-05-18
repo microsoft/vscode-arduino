@@ -38,6 +38,17 @@ export interface IDeviceContext {
      */
     sketch: string;
 
+   /**
+    * Arduino build output path
+    */
+
+    output: string;
+    /**
+     * Arduino debugger
+     */
+
+    debugger_: string;
+
     /**
      * Arduino custom board configuration
      * @property {string}
@@ -64,6 +75,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _board: string;
 
     private _sketch: string;
+
+    private _output: string;
+
+    private _debugger: string;
 
     private _configuration: string;
 
@@ -133,6 +148,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._board = deviceConfigJson.board;
                         this._sketch = deviceConfigJson.sketch;
                         this._configuration = deviceConfigJson.configuration;
+                        this._output = deviceConfigJson.output;
+                        this._debugger = deviceConfigJson._debugger;
                         this._onDidChange.fire();
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
@@ -142,6 +159,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._board = null;
                     this._sketch = null;
                     this._configuration = null;
+                    this._output = null;
+                    this._debugger = null;
                     this._onDidChange.fire();
                 }
                 return this;
@@ -164,6 +183,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.sketch = this.sketch;
         deviceConfigJson.port = this.port;
         deviceConfigJson.board = this.board;
+        deviceConfigJson.output = this.output;
+        deviceConfigJson._debugger = this.debugger_;
         deviceConfigJson.configuration = this.configuration;
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
@@ -198,6 +219,24 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set sketch(value: string) {
         this._sketch = value;
+        this.saveContext();
+    }
+
+    public get output() {
+      return this._output;
+    }
+
+    public set output(value: string) {
+      this._output = value;
+      this.saveContext();
+    }
+
+    public get debugger_() {
+        return this._debugger;
+    }
+
+    public set debugger_(value: string) {
+        this._debugger = value;
         this.saveContext();
     }
 

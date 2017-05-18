@@ -216,4 +216,9 @@ export interface IBoard {
      * Upldate the configuration
      */
     updateConfig(configId: string, optionId: string): boolean;
+
+    /**
+     * Get the board package name
+     */
+    getPackageName();
 }

@@ -132,7 +132,7 @@ export class Board implements IBoard {
         return false;
     }
 
-    private getPackageName() {
+    public getPackageName() {
         return this.platform.packageName ? this.platform.packageName : this.platform.package.name;
     }
 }
