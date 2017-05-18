@@ -90,7 +90,7 @@ export class DebuggerManager {
     const dc = DeviceContext.getIntance();
     const debuggerConfiged: string = dc.debugger_;
     if (!debugConfig) {
-      throw new Error(`Debug for board ${board} is not supported by now.`);
+      throw new Error(`Debug for board ${this._boardManager.currentBoard.name} is not supported by now.`);
     }
     let resolvedDebugger;
     const debuggers = await this.listDebuggers();
@@ -102,6 +102,9 @@ export class DebuggerManager {
       resolvedDebugger = debuggers.find((_debugger) => {
         return _debugger.short_name === debugConfig.interface || _debugger.config_file === debugConfig.interface;
       });
+      if (!resolvedDebugger) {
+        throw new Error(`Debug port for board ${this._boardManager.currentBoard.name} is not connected.`);
+      }
     }
     // rule 2: if there is only one debugger, use the only debugger
     if (!resolvedDebugger && !debuggerConfiged && debuggers.length === 1) {
