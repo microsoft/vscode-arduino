@@ -30,6 +30,26 @@
         "interface": "cmsis-dap.cfg"
       },
       {
+        "vid": "03eb",
+        "pid": "2157",
+        "name": "Arduino/Genuino Zero (Programming Port)",
+        "package": "arduino",
+        "architecture": "samd",
+        "id": "arduino_zero_edbg",
+        "target": "at91samdXX.cfg",
+        "interface": "cmsis-dap.cfg"
+      },
+      {
+        "vid": "2341",
+        "pid": ["804d", "004d", "824d"],
+        "name": "Arduino/Genuino Zero (Native USB Port)",
+        "package": "arduino",
+        "architecture": "samd",
+        "id": "arduino_zero_edbg",
+        "target": "at91samdXX.cfg",
+        "interface": "cmsis-dap.cfg"
+      },
+      {
         "vid": "2a03",
         "pid": "804f",
         "name": "Arduino M0 Pro (Native USB Port)",

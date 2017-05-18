@@ -20,15 +20,20 @@ import { DebuggerManager } from "./debuggerManager";
  * Automatically generate the Arduino board's debug settings.
  */
 export class DebugConfigurator {
+  private _debuggerManager: DebuggerManager;
     constructor(
         private _extensionRoot: string,
         private _arduinoApp: ArduinoApp,
         private _arduinoSettings: ArduinoSettings,
         private _boardManager: BoardManager,
-        private _debuggerManager: DebuggerManager) {
+        ) {
+      this._debuggerManager = new DebuggerManager(_extensionRoot, _arduinoSettings, _boardManager);
     }
 
     public async run(config) {
+        if (!this._debuggerManager.initialized) {
+            this._debuggerManager.initialize();
+        }
         // Default settings:
         if (!config.request) {
             config = {
