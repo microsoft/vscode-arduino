@@ -365,3 +365,7 @@ export function getRegistryValues(hive: string, key: string, name: string): Prom
         }
     });
 }
+
+export function convertToHex(number, width = 0) {
+  return padStart(number.toString(16), width, "0");
+}

@@ -14,6 +14,7 @@ import { BoardManager } from "../arduino/boardManager";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
+import { DebuggerManager } from "./debuggerManager";
 
 /**
  * Automatically generate the Arduino board's debug settings.
@@ -23,7 +24,8 @@ export class DebugConfigurator {
         private _extensionRoot: string,
         private _arduinoApp: ArduinoApp,
         private _arduinoSettings: ArduinoSettings,
-        private _boardManager: BoardManager) {
+        private _boardManager: BoardManager,
+        private _debuggerManager: DebuggerManager) {
     }
 
     public async run(config) {
@@ -68,6 +70,10 @@ export class DebugConfigurator {
         if (!this.resolveOpenOcd(config)) {
             return;
         }
+        if (!await this.resolveOpenOcdOptions(config)) {
+            return;
+        }
+
         if (!this.resolveDebuggerPath(config)) {
             return;
         }
@@ -86,12 +92,12 @@ export class DebugConfigurator {
 
         if (!config.program || config.program === "${file}") {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
-            dc.output = path.join(`.build`, this._boardManager.currentBoard.board);
-            util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, dc.output));
-            config.program = path.join(vscode.workspace.rootPath, dc.output, `${path.basename(dc.sketch)}.elf`);
+            const outputFolder = path.join(dc.output || `.build`, this._boardManager.currentBoard.board);
+            util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, outputFolder));
+            config.program = path.join(vscode.workspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
-            if (!await this._arduinoApp.verify()) {
+            if (!await this._arduinoApp.verify(outputFolder)) {
                 vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
                 return false;
             }
@@ -113,12 +119,11 @@ export class DebugConfigurator {
 
     private resolveDebuggerPath(config) {
         if (!config.miDebuggerPath) {
-            config.miDebuggerPath = platform.findFile(this.getExecutableFileName("arm-none-eabi-gdb"),
+            config.miDebuggerPath = platform.findFile(platform.getExecutableFileName("arm-none-eabi-gdb"),
                 path.join(this._arduinoSettings.packagePath, "packages", this._boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
-            config.miDebuggerPath = platform.findFile(this.getExecutableFileName("arm-none-eabi-gdb"),
-                path.join(this._arduinoSettings.packagePath, "packages"));
+            config.miDebuggerPath = this._debuggerManager.miDebuggerPath;
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
             vscode.window.showErrorMessage("Cannot find the debugger path.");
@@ -130,45 +135,35 @@ export class DebugConfigurator {
     private resolveOpenOcd(config) {
         const dc = DeviceContext.getIntance();
         if (!config.debugServerPath) {
-            config.debugServerPath = platform.findFile(this.getExecutableFileName("openocd"),
+            config.debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
                 path.join(this._arduinoSettings.packagePath, "packages",
                     this._boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.debugServerPath)) {
-            config.debugServerPath = platform.findFile(this.getExecutableFileName("openocd"),
-                path.join(this._arduinoSettings.packagePath, "packages"));
+            config.debugServerPath = this._debuggerManager.debugServerPath;
         }
         if (!util.fileExistsSync(config.debugServerPath)) {
             vscode.window.showErrorMessage("Cannot find the OpenOCD from the launch.json debugServerPath property." +
                 "Please input the right path of OpenOCD");
             return false;
         }
-        this.resolveOpenOcdOptions(config);
+
         return true;
     }
 
-    private resolveOpenOcdOptions(config) {
-        if (config.debugServerPath && !config.debugServerArgs) {
-            const fileContent = fs.readFileSync(path.join(this._extensionRoot, "misc", "openOCDMapping.json"), "utf8");
-            const baordSettings = JSON.parse(fileContent);
-            const boardOpenOcdConfig = baordSettings.find((board) => board.board === this._boardManager.currentBoard.key);
-            if (boardOpenOcdConfig) {
-                const debugServerPath = config.debugServerPath;
-                let scriptsFolder = path.join(path.dirname(debugServerPath), "../scripts/");
-                if (!util.directoryExistsSync(scriptsFolder)) {
-                    scriptsFolder = path.join(path.dirname(debugServerPath), "../share/openocd/scripts/");
-                }
+    private async resolveOpenOcdOptions(config) {
 
-                /* tslint:disable:max-line-length*/
-                config.debugServerArgs = `-s ${scriptsFolder} -f ${boardOpenOcdConfig.interface} -f ${boardOpenOcdConfig.target}`;
+        if (config.debugServerPath && !config.debugServerArgs) {
+            try {
+                config.debugServerArgs = await this._debuggerManager.resolveOpenOcdOptions(config, this._boardManager.currentBoard.key);
+                if (!config.debugServerArgs) {
+                    return false;
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(error.message);
+                return false;
             }
         }
-    }
-
-    private getExecutableFileName(fileName: string): string {
-        if (platform.isWindows) {
-            return `${fileName}.exe`;
-        }
-        return fileName;
+        return true;
     }
 }
