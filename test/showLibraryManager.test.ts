@@ -9,7 +9,7 @@ import * as vscode from "vscode";
 suite("Arduino: Libraries Manager: Explore and manage libraries", () => {
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to run command: arduino.showLibraryManager", function(done) {
-        this.timeout(1 * 60 * 1000);
+        this.timeout(60 * 1000);
         try {
             // run "Arduino: Libraries Manager" command.
             vscode.commands.executeCommand("arduino.showLibraryManager").then((result)  => {

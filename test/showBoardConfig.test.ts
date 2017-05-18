@@ -9,7 +9,7 @@ import * as vscode from "vscode";
 suite("Arduino: Arduino Board Configuration", () => {
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to run command: arduino.showBoardConfig", function(done) {
-        this.timeout(1 * 60 * 1000);
+        this.timeout(60 * 1000);
         try {
             // run "Arduino: Arduino Board Configuration" command.
             vscode.commands.executeCommand("arduino.showBoardConfig").then((result)  => {

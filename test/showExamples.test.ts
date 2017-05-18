@@ -9,7 +9,7 @@ import * as vscode from "vscode";
 suite("Arduino: Examples: Show example list", () => {
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to run command: arduino.showExamples", function(done) {
-        this.timeout(1 * 60 * 1000);
+        this.timeout(60 * 1000);
         try {
             // run "Arduino: Examples" command.
             vscode.commands.executeCommand("arduino.showExamples").then((result)  => {
