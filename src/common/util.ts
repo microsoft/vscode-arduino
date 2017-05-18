@@ -295,7 +295,7 @@ export function padStart(sourceString: string, targetLength: number, padString?:
         return sourceString;
     }
 
-    if (!String.prototype.padStart) {
+    if (!(String.prototype as any).padStart) {
         // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
         padString = String(padString || " ");
         if (sourceString.length > targetLength) {
@@ -308,7 +308,7 @@ export function padStart(sourceString: string, targetLength: number, padString?:
             return padString.slice(0, targetLength) + sourceString;
         }
     } else {
-        return sourceString.padStart(targetLength, padString);
+        return (sourceString as any).padStart(targetLength, padString);
     }
 }
 
@@ -364,4 +364,8 @@ export function getRegistryValues(hive: string, key: string, name: string): Prom
             reject(ex);
         }
     });
+}
+
+export function convertToHex(number, width = 0) {
+  return padStart(number.toString(16), width, "0");
 }
