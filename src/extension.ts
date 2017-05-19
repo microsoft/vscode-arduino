@@ -7,8 +7,10 @@ import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 import { ArduinoApp } from "./arduino/arduino";
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
-import { ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI,
-    BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI } from "./common/constants";
+import {
+    ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI,
+    BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI,
+} from "./common/constants";
 import * as util from "./common/util";
 import { DebugConfigurator } from "./debug/configurator";
 import { DeviceContext } from "./deviceContext";
@@ -17,15 +19,13 @@ import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
 
-let usbDetector: any;
+let usbDetector: UsbDetector;
 const status: any = {};
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
+    Logger.configure(context);
     const activeGuid = Uuid().replace(/\-/g, "");
-    const _initializeLogger = (async () => {
-        Logger.configure(context);
-        Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
-    })();
+    Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
 
     // Show a warning message if the working file is not under the workspace folder.
     // People should know the extension might not work appropriately, they should look for the doc to get started.
@@ -69,7 +69,6 @@ export function activate(context: vscode.ExtensionContext) {
     };
     const registerArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
-            await _initializeLogger;
             if (!ArduinoApp.instance.initialized) {
                 await ArduinoApp.instance.initialize();
             }
@@ -89,7 +88,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     const registerNonArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
-            await _initializeLogger;
             if (!SerialMonitor.getIntance().initialized) {
                 SerialMonitor.getIntance().initialize();
             }
@@ -191,7 +189,7 @@ export function activate(context: vscode.ExtensionContext) {
         })();
     }
 
-     // // serial monitor commands
+    // // serial monitor commands
     const serialMonitor = SerialMonitor.getIntance();
     context.subscriptions.push(serialMonitor);
     registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null));
@@ -200,13 +198,9 @@ export function activate(context: vscode.ExtensionContext) {
     registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
     registerNonArduinoCommand("arduino.closeSerialMonitor", (port) => serialMonitor.closeSerialMonitor(port));
 
-    return (async () => {
-        usbDetector = new UsbDetector(context.extensionPath);
-        usbDetector.startListening();
-        await _initializeLogger;
-        Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
-    })();
-
+    usbDetector = new UsbDetector(context.extensionPath);
+    usbDetector.startListening();
+    Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
 export async function deactivate() {
