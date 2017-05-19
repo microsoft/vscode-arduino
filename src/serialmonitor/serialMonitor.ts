@@ -52,18 +52,18 @@ export class SerialMonitor implements vscode.Disposable {
     private constructor() {
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
-        this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
+        this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
         this._portsStatusBar.tooltip = "Select Serial Port";
         this._portsStatusBar.show();
 
-        this._openPortStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 3);
+        this._openPortStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_PORT);
         this._openPortStatusBar.command = "arduino.openSerialMonitor";
         this._openPortStatusBar.text = `$(plug)`;
         this._openPortStatusBar.tooltip = "Open Serial Monitor";
         this._openPortStatusBar.show();
 
-        this._baudRateStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 4);
+        this._baudRateStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BAUD_RATE);
         this._baudRateStatusBar.command = "arduino.changeBaudRate";
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = SerialMonitor.DEFAULT_BAUD_RATE.toString();
