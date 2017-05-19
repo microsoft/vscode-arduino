@@ -67,4 +67,4 @@ Currently this extension supports the following operatings systems:
   - The extension might work on other Linux distro as some user reported but without gurantee.
 
 ## Contact Us
-If you'd like to help us build the best Arduino experience with VS Code, you can talk directly to the product team in our [gitter chat room](https://gitter.im/Microsoft/vscode-arduino).
+If you'd like to help us build the best Arduino experience with VS Code, you can talk directly to the product team in our [gitter chat room](https://gitter.im/Microsoft/vscode-arduino).() test
