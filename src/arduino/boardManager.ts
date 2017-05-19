@@ -10,6 +10,7 @@ import * as url from "url";
 import * as vscode from "vscode";
 import * as util from "../common/util";
 
+import * as constants from "../common/constants";
 import { arduinoChannel } from "../common/outputChannel";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
@@ -36,11 +37,11 @@ export class BoardManager {
     private _currentBoard: IBoard;
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
-        this._boardStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 5);
+        this._boardStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BOARD);
         this._boardStatusBar.command = "arduino.changeBoardType";
         this._boardStatusBar.tooltip = "Change Board Type";
 
-        this._configStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 4);
+        this._configStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.CONFIG);
         this._configStatusBar.command = "arduino.showBoardConfig";
         this._configStatusBar.text = "Config";
         this._configStatusBar.tooltip = "Config Board";

@@ -29,3 +29,11 @@ export const messages = {
     SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
     SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",
 };
+
+export const statusBarPriority = {
+    PORT: 2,
+    OPEN_PORT: 3,
+    BAUD_RATE: 4,
+    CONFIG: 5,
+    BOARD: 6,
+};
