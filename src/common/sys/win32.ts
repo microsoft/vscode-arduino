@@ -32,11 +32,9 @@ export function findFile(fileName: string, cwd: string): string {
     let result;
     try {
         let pathString;
-        pathString = childProcess.execSync(`dir ${fileName} /S /B`, {encoding: "utf8", cwd});
-        pathString = path.resolve(pathString).trim();
-
-        if (fileExistsSync(pathString)) {
-            result = path.normalize(pathString);
+        pathString = childProcess.execSync(`dir ${fileName} /S /B`, {encoding: "utf8", cwd}).split("\n");
+        if (pathString && pathString[0] && fileExistsSync(pathString[0].trim())) {
+            result = path.normalize(pathString[0].trim());
         }
     } catch (ex) {
         // Ignore the errors.
