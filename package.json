@@ -32,7 +32,6 @@
     "onCommand:arduino.changeBaudRate",
     "onCommand:arduino.addLibPath",
     "onCommand:arduino.openSerialMonitor",
-
     "onCommand:arduino.sendMessageToSerialPort",
     "onCommand:arduino.closeSerialMonitor",
     "onCommand:arduino.changeBoardType",

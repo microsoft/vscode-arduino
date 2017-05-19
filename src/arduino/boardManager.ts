@@ -47,12 +47,7 @@ export class BoardManager {
         this._configStatusBar.tooltip = "Config Board";
     }
 
-    public get initialized(): boolean {
-        return this._initialized;
-    }
-
     public async loadPackages(update: boolean = false) {
-        this._initialized = true;
         this._packages = [];
         this._platforms = [];
         this._installedPlatforms = [];
@@ -70,6 +65,7 @@ export class BoardManager {
                 }
                 if (!util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
                     update = true;
+                    break;
                 }
             }
         }
@@ -133,13 +129,8 @@ export class BoardManager {
     }
 
     public async updatePackageIndex(indexUri: string): Promise<boolean> {
-        if (!this._initialized) {
-            await this.loadPackages();
-        }
-        const indexFileName = this.getIndexFileName(indexUri);
-
         let allUrls = this.getAdditionalUrls();
-        if (!(allUrls.indexOf(indexUri) >= 0)) {
+        if (allUrls.indexOf(indexUri) < 0) {
             allUrls = allUrls.concat(indexUri);
             await VscodeSettings.instance.updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));

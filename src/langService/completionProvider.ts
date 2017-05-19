@@ -28,8 +28,6 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     constructor() {
         if (vscode.workspace && vscode.workspace.rootPath) {
             this._cppConfigFile = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
-            // this.updateLibList();
-
             this._watcher = vscode.workspace.createFileSystemWatcher(this._cppConfigFile);
             this._watcher.onDidCreate(() => this.updateLibList());
             this._watcher.onDidChange(() => this.updateLibList());

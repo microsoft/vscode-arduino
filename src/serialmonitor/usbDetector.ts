@@ -108,12 +108,9 @@ export class UsbDetector {
 
     private async switchBoard(bd: IBoard, vid: string, pid: string) {
         const boardManager = ArduinoApp.instance.boardManager;
-        if (!boardManager.initilized) {
-            await boardManager.loadPackages();
-        }
         boardManager.doChangeBoardType(bd);
         const monitor = SerialMonitor.getIntance();
-        monitor.selectSerialPort(vid, pid);
+        await monitor.selectSerialPort(vid, pid);
         this.showReadMeAndExample();
     }
 
