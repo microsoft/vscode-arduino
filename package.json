@@ -24,7 +24,21 @@
     "C++"
   ],
   "activationEvents": [
-    "*"
+    "*",
+    "onCommand:arduino.debug.startSession",    
+    "onCommand:arduino.verify",
+    "onCommand:arduino.upload",
+    "onCommand:arduino.selectSerialPort",
+    "onCommand:arduino.changeBaudRate",
+    "onCommand:arduino.addLibPath",
+    "onCommand:arduino.openSerialMonitor",
+    "onCommand:arduino.sendMessageToSerialPort",
+    "onCommand:arduino.closeSerialMonitor",
+    "onCommand:arduino.changeBoardType",
+    "onCommand:arduino.showBoardManager",
+    "onCommand:arduino.showLibraryManager",
+    "onCommand:arduino.showExamples",
+    "onCommand:arduino.initialize"
   ],
   "main": "./out/src/extension",
   "contributes": {
