@@ -23,11 +23,8 @@ export class DebugConfigurator {
   private _debuggerManager: DebuggerManager;
     constructor(
         private _extensionRoot: string,
-        private _arduinoApp: ArduinoApp,
-        private _arduinoSettings: ArduinoSettings,
-        private _boardManager: BoardManager,
         ) {
-      this._debuggerManager = new DebuggerManager(_extensionRoot, _arduinoSettings, _boardManager);
+      this._debuggerManager = new DebuggerManager(_extensionRoot);
     }
 
     public async run(config) {
@@ -97,12 +94,12 @@ export class DebugConfigurator {
 
         if (!config.program || config.program === "${file}") {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
-            const outputFolder = path.join(dc.output || `.build`, this._boardManager.currentBoard.board);
+            const outputFolder = path.join(dc.output || `.build`, ArduinoApp.instance.boardManager.currentBoard.board);
             util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, outputFolder));
             config.program = path.join(vscode.workspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
-            if (!await this._arduinoApp.verify(outputFolder)) {
+            if (!await ArduinoApp.instance.verify(outputFolder)) {
                 vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
                 return false;
             }
@@ -125,7 +122,7 @@ export class DebugConfigurator {
     private resolveDebuggerPath(config) {
         if (!config.miDebuggerPath) {
             config.miDebuggerPath = platform.findFile(platform.getExecutableFileName("arm-none-eabi-gdb"),
-                path.join(this._arduinoSettings.packagePath, "packages", this._boardManager.currentBoard.getPackageName()));
+                path.join(ArduinoApp.instance.settings.packagePath, "packages", ArduinoApp.instance.boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
             config.miDebuggerPath = this._debuggerManager.miDebuggerPath;
@@ -141,8 +138,8 @@ export class DebugConfigurator {
         const dc = DeviceContext.getIntance();
         if (!config.debugServerPath) {
             config.debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
-                path.join(this._arduinoSettings.packagePath, "packages",
-                    this._boardManager.currentBoard.getPackageName()));
+                path.join(ArduinoApp.instance.settings.packagePath, "packages",
+                    ArduinoApp.instance.boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.debugServerPath)) {
             config.debugServerPath = this._debuggerManager.debugServerPath;

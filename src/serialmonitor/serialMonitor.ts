@@ -50,6 +50,18 @@ export class SerialMonitor implements vscode.Disposable {
     private _outputChannel: vscode.OutputChannel;
 
     private constructor() {
+        const dc = DeviceContext.getIntance();
+        dc.onDidChange(() => {
+            if (dc.port) {
+                if (!this.initialized) {
+                    this.initialize();
+                }
+                this.updatePortListStatus(null);
+            }
+        });
+    }
+
+    public initialize() {
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
@@ -68,11 +80,9 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = SerialMonitor.DEFAULT_BAUD_RATE.toString();
         this.updatePortListStatus(null);
-
-        const dc = DeviceContext.getIntance();
-        dc.onDidChange(() => {
-            this.updatePortListStatus(null);
-        });
+    }
+    public get initialized(): boolean {
+        return !!this._outputChannel;
     }
 
     public async dispose() {

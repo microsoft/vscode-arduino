@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-
+import { ArduinoApp } from "../arduino/arduino";
 import { ArduinoSettings } from "../arduino/arduinoSettings";
 import { BoardManager } from "../arduino/boardManager";
 import * as platform from "../common/platform";
@@ -9,19 +9,22 @@ import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
 
 export class DebuggerManager {
-  private _initialized: boolean = false;
   private _usbDector;
   private _debugServerPath: string;
   private _miDebuggerPath: string;
   private _debuggerMappings: any = {};
   private _debuggerBoardMappings: any = {};
+  private _arduinoSettings: ArduinoSettings;
+  private _boardManager: BoardManager;
+
   constructor(
-    private _extensionRoot: string,
-    private _arduinoSettings: ArduinoSettings,
-    private _boardManager: BoardManager) {
+      private _extensionRoot: string,
+    ) {
   }
 
   public initialize() {
+    this._arduinoSettings = ArduinoApp.instance.settings;
+    this._boardManager = ArduinoApp.instance.boardManager;
     const debugFileContent = fs.readFileSync(path.join(this._extensionRoot, "misc", "debuggerUsbMapping.json"), "utf8");
     const usbFileContent = fs.readFileSync(path.join(this._extensionRoot, "misc", "usbmapping.json"), "utf8");
 
@@ -53,10 +56,9 @@ export class DebuggerManager {
     if (!util.fileExistsSync(this._miDebuggerPath)) {
       this._miDebuggerPath = "";
     }
-    this._initialized = true;
   }
   public get initialized(): boolean {
-    return this._initialized;
+    return !!this._usbDector;
   }
   public get miDebuggerPath(): string {
     return this._miDebuggerPath;

@@ -21,14 +21,13 @@ export interface IVscodeSettings {
 }
 
 export class VscodeSettings implements IVscodeSettings {
-    public static getIntance(): IVscodeSettings {
+    private static _instance: IVscodeSettings;
+    public static get instance(): IVscodeSettings {
         if (!VscodeSettings._instance) {
             VscodeSettings._instance = new VscodeSettings();
         }
         return VscodeSettings._instance;
     }
-
-    private static _instance: IVscodeSettings;
     private constructor() {
     }
 

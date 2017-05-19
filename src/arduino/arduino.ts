@@ -14,7 +14,7 @@ import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 
 import { DeviceContext, IDeviceContext } from "../deviceContext";
-import { IArduinoSettings } from "./arduinoSettings";
+import { ArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
 import { LibraryManager } from "./libraryManager";
@@ -27,6 +27,9 @@ import { SerialMonitor } from "../serialmonitor/serialMonitor";
  * Represent an Arduino application based on the official Arduino IDE.
  */
 export class ArduinoApp {
+    private static _app: ArduinoApp;
+
+    private _settings: ArduinoSettings;
 
     private _boardManager: BoardManager;
 
@@ -34,17 +37,30 @@ export class ArduinoApp {
 
     private _exampleManager: ExampleManager;
 
-    /**
-     * @param {IArduinoSettings} ArduinoSetting object.
-     */
-    constructor(private _settings: IArduinoSettings) {
+    public static get instance(): ArduinoApp {
+        if (!ArduinoApp._app) {
+            ArduinoApp._app = new ArduinoApp();
+        }
+        return ArduinoApp._app;
     }
 
     /**
-     * Need refresh Arduino IDE's setting when starting up.
-     * @param {boolean} force - Whether force initialzie the arduino
+     * @param {IArduinoSettings} ArduinoSetting object.
      */
-    public async initialize(force: boolean = false) {
+    constructor() {
+    }
+
+    public get initialized(): boolean {
+        return !!this._boardManager;
+    }
+    /**
+     * Need refresh Arduino IDE's setting when starting up.
+     */
+    public async initialize() {
+
+        this._settings = new ArduinoSettings();
+        await this._settings.initialize();
+
         if (!util.fileExistsSync(this._settings.preferencePath)) {
             try {
                 // Use empty pref value to initialize preference.txt file
@@ -53,6 +69,20 @@ export class ArduinoApp {
             } catch (ex) {
             }
         }
+        await this.initializePackageIndex();
+        await DeviceContext.getIntance().loadContext();
+
+        // // Arduino board manager & library manager
+        this._boardManager = new BoardManager(this._settings, this);
+        await this._boardManager.loadPackages();
+
+    }
+
+    /**
+     * Initialize the arduino package.
+     * @param {boolean} force - Whether force initialize the arduino
+     */
+    public async initializePackageIndex(force: boolean = false) {
         if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
                 // Use the dummy package to initialize the Arduino IDE
@@ -120,7 +150,7 @@ export class ArduinoApp {
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (VscodeSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.instance.logLevel === "verbose") {
             args.push("--verbose");
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async (result) => {
@@ -154,7 +184,7 @@ export class ArduinoApp {
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (VscodeSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.instance.logLevel === "verbose") {
             args.push("--verbose");
         }
         if (output) {
@@ -438,24 +468,18 @@ export class ArduinoApp {
         return this._boardManager;
     }
 
-    public set boardManager(value: BoardManager) {
-        this._boardManager = value;
-    }
-
     public get libraryManager() {
+        if (!this._libraryManager) {
+            this._libraryManager = new LibraryManager(this._settings, this);
+        }
         return this._libraryManager;
     }
 
-    public set libraryManager(value: LibraryManager) {
-        this._libraryManager = value;
-    }
-
     public get exampleManager() {
+        if (!this._exampleManager) {
+            this._exampleManager = new ExampleManager(this._settings, this);
+        }
         return this._exampleManager;
-    }
-
-    public set exampleManager(value: ExampleManager) {
-        this._exampleManager = value;
     }
 
     private getBoardBuildString(deviceContext: IDeviceContext): string {
