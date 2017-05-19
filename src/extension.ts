@@ -5,14 +5,12 @@
 import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
-import { ArduinoApp } from "./arduino/arduino";
-import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
+import { ArduinoActivator } from "./arduinoActivator";
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI,
     BOARD_MANAGER_URI, EXAMPLES_URI, LIBRARY_MANAGER_URI,
 } from "./common/constants";
 import * as util from "./common/util";
-import { DebugConfigurator } from "./debug/configurator";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
@@ -44,8 +42,8 @@ export async function activate(context: vscode.ExtensionContext) {
     deviceContext.extensionPath = context.extensionPath;
     context.subscriptions.push(deviceContext);
 
-    const arduinoManagerProvider = new ArduinoContentProvider(context.extensionPath);
-    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
+    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL,
+        ArduinoActivator.instance.arduinoContentProvider));
     const commandExection = async (command: string, commandBody: (...args: any[]) => any, args: any, getUserData?: () => any) => {
         const guid = Uuid().replace(/\-/g, "");
         Logger.traceUserData(`start-command-` + command, { correlationId: guid });
@@ -69,14 +67,11 @@ export async function activate(context: vscode.ExtensionContext) {
     };
     const registerArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
-            if (!ArduinoApp.instance.initialized) {
-                await ArduinoApp.instance.initialize();
-            }
-            if (!arduinoManagerProvider.initialized) {
-                await arduinoManagerProvider.initialize();
+            if (!ArduinoActivator.instance.initialized) {
+                await ArduinoActivator.instance.initialize();
             }
 
-            ArduinoApp.instance.boardManager.showStatusBar();
+            ArduinoActivator.instance.boardManager.showStatusBar();
 
             if (!SerialMonitor.getIntance().initialized) {
                 SerialMonitor.getIntance().initialize();
@@ -114,20 +109,20 @@ export async function activate(context: vscode.ExtensionContext) {
     // change board type
     registerArduinoCommand("arduino.changeBoardType", async () => {
         try {
-            await ArduinoApp.instance.boardManager.changeBoardType();
+            await ArduinoActivator.instance.boardManager.changeBoardType();
         } catch (exception) {
             Logger.error(exception.message);
         }
-        arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
-        arduinoManagerProvider.update(EXAMPLES_URI);
+        ArduinoActivator.instance.arduinoContentProvider.update(LIBRARY_MANAGER_URI);
+        ArduinoActivator.instance.arduinoContentProvider.update(EXAMPLES_URI);
     }, () => {
-        return { board: ArduinoApp.instance.boardManager.currentBoard.name };
+        return { board: ArduinoActivator.instance.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.reloadExample", () => {
-        arduinoManagerProvider.update(EXAMPLES_URI);
+        ArduinoActivator.instance.arduinoContentProvider.update(EXAMPLES_URI);
     }, () => {
-        return { board: ArduinoApp.instance.boardManager.currentBoard.name };
+        return { board: ArduinoActivator.instance.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
@@ -136,37 +131,36 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "verify";
             try {
-                await ArduinoApp.instance.verify();
+                await ArduinoActivator.instance.arduinoApp.verify();
             } catch (ex) {
             }
             delete status.compile;
         }
     }, () => {
-        return { board: ArduinoApp.instance.boardManager.currentBoard.name };
+        return { board: ArduinoActivator.instance.currentBoardName };
     });
 
     registerArduinoCommand("arduino.upload", async () => {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await ArduinoApp.instance.upload();
+                await ArduinoActivator.instance.arduinoApp.upload();
             } catch (ex) {
             }
             delete status.compile;
         }
     }, () => {
-        return { board: ArduinoApp.instance.boardManager.currentBoard.name };
+        return { board: ArduinoActivator.instance.currentBoardName };
     });
 
-    registerArduinoCommand("arduino.addLibPath", (path) => ArduinoApp.instance.addLibPath(path));
+    registerArduinoCommand("arduino.addLibPath", (path) => ArduinoActivator.instance.arduinoApp.addLibPath(path));
 
-    const arduinoConfigurator = new DebugConfigurator(context.extensionPath);
     //  Arduino debugger
     registerArduinoCommand("arduino.debug.startSession", async (config) => {
         if (!status.debug) {
             status.debug = "debug";
             try {
-                await arduinoConfigurator.run(config);
+                await ArduinoActivator.instance.debugConfigurator.run(config);
             } catch (ex) {
             }
             delete status.debug;
@@ -179,10 +173,11 @@ export async function activate(context: vscode.ExtensionContext) {
         util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))
         || (openEditor && openEditor.document.fileName.endsWith(".ino")))) {
         (async () => {
-            if (!ArduinoApp.instance.initialized) {
-                await ArduinoApp.instance.initialize();
+            if (!ArduinoActivator.instance.initialized) {
+                await ArduinoActivator.instance.initialize();
             }
-            ArduinoApp.instance.boardManager.showStatusBar();
+
+            ArduinoActivator.instance.boardManager.showStatusBar();
             if (!SerialMonitor.getIntance().initialized) {
                 SerialMonitor.getIntance().initialize();
             }

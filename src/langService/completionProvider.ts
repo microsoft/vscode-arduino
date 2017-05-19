@@ -3,15 +3,13 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as constants from "../common/constants";
-import * as platform from "../common/platform";
 import * as util from "../common/util";
 
-import { ArduinoApp } from "../arduino/arduino";
+import { ArduinoActivator } from "../arduinoActivator";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
 
@@ -37,8 +35,8 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
         vscode.CompletionItem[] | Thenable<vscode.CompletionItem[]> {
-        if (!ArduinoApp.instance.initialized) {
-            return ArduinoApp.instance.initialize().then(() => {
+        if (!ArduinoActivator.instance.initialized) {
+            return ArduinoActivator.instance.initialize().then(() => {
                 return this.getCompletionItems(document, position);
             });
         } else {
@@ -69,7 +67,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         }
         this._libPaths.clear();
         this._headerFiles.clear();
-        ArduinoApp.instance.getDefaultPackageLibPaths().forEach((defaultPath) => {
+        ArduinoActivator.instance.arduinoApp.getDefaultPackageLibPaths().forEach((defaultPath) => {
             this._libPaths.add(defaultPath);
         });
 

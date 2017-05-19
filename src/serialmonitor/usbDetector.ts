@@ -7,9 +7,8 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ArduinoApp } from "../arduino/arduino";
-import { BoardManager } from "../arduino/boardManager";
 import { IBoard } from "../arduino/package";
+import { ArduinoActivator } from "../arduinoActivator";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
@@ -46,19 +45,21 @@ export class UsbDetector {
                     return;
                 }
                 try {
-                    if (!ArduinoApp.instance.initialized) {
-                        await ArduinoApp.instance.initialize();
+                    if (!ArduinoActivator.instance.initialized) {
+                        await ArduinoActivator.instance.initialize();
                     }
-                    const boardManager = ArduinoApp.instance.boardManager;
+                    const boardManager = ArduinoActivator.instance.boardManager;
                     const boardKey = `${deviceDescriptor.package}:${deviceDescriptor.architecture}:${deviceDescriptor.id}`;
                     Logger.traceUserData("detected a board", { board: boardKey });
 
                     let bd = boardManager.installedBoards.get(boardKey);
                     if (!bd) {
                         const shouldLoadPackgeContent = await boardManager.updatePackageIndex(deviceDescriptor.indexFile);
-                        const ans = await vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No");
+                        const ans = await vscode.window.showInformationMessage(
+                            `Install board package for ${deviceDescriptor.name}`, "Yes", "No");
                         if (ans === "Yes") {
-                            const res = await ArduinoApp.instance.installBoard(deviceDescriptor.package, deviceDescriptor.architecture);
+                            const res = await ArduinoActivator.instance.arduinoApp.installBoard(
+                                deviceDescriptor.package, deviceDescriptor.architecture);
                             if (shouldLoadPackgeContent) {
                                 boardManager.loadPackageContent(deviceDescriptor.indexFile);
                             }
@@ -107,7 +108,7 @@ export class UsbDetector {
     }
 
     private async switchBoard(bd: IBoard, vid: string, pid: string) {
-        const boardManager = ArduinoApp.instance.boardManager;
+        const boardManager = ArduinoActivator.instance.boardManager;
         boardManager.doChangeBoardType(bd);
         const monitor = SerialMonitor.getIntance();
         await monitor.selectSerialPort(vid, pid);
@@ -115,7 +116,7 @@ export class UsbDetector {
     }
 
     private showReadMeAndExample() {
-        const boardManager = ArduinoApp.instance.boardManager;
+        const boardManager = ArduinoActivator.instance.boardManager;
         if (boardManager.currentBoard) {
             const readme = path.join(boardManager.currentBoard.platform.rootBoardPath, "README.md");
             if (util.fileExistsSync(readme)) {

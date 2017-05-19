@@ -1,9 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ArduinoApp } from "../arduino/arduino";
 import { ArduinoSettings } from "../arduino/arduinoSettings";
-import { BoardManager } from "../arduino/boardManager";
+import { ArduinoActivator } from "../arduinoActivator";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
@@ -14,17 +13,14 @@ export class DebuggerManager {
     private _miDebuggerPath: string;
     private _debuggerMappings: any = {};
     private _debuggerBoardMappings: any = {};
-    private _arduinoSettings: ArduinoSettings;
-    private _boardManager: BoardManager;
 
     constructor(
         private _extensionRoot: string,
+        private _arduinoSettings: ArduinoSettings,
     ) {
     }
 
     public initialize() {
-        this._arduinoSettings = ArduinoApp.instance.settings;
-        this._boardManager = ArduinoApp.instance.boardManager;
         const debugFileContent = fs.readFileSync(path.join(this._extensionRoot, "misc", "debuggerUsbMapping.json"), "utf8");
         const usbFileContent = fs.readFileSync(path.join(this._extensionRoot, "misc", "usbmapping.json"), "utf8");
 
@@ -57,9 +53,6 @@ export class DebuggerManager {
             this._miDebuggerPath = "";
         }
     }
-    public get initialized(): boolean {
-        return !!this._usbDector;
-    }
     public get miDebuggerPath(): string {
         return this._miDebuggerPath;
     }
@@ -87,12 +80,12 @@ export class DebuggerManager {
     }
 
     public async resolveOpenOcdOptions(config): Promise<string> {
-        const board = this._boardManager.currentBoard.key;
+        const board = ArduinoActivator.instance.currentBoard.key;
         const debugConfig = this._debuggerBoardMappings[board];
         const dc = DeviceContext.getIntance();
         const debuggerConfiged: string = dc.debugger_;
         if (!debugConfig) {
-            throw new Error(`Debug for board ${this._boardManager.currentBoard.name} is not supported by now.`);
+            throw new Error(`Debug for board ${ArduinoActivator.instance.currentBoard.name} is not supported by now.`);
         }
         let resolvedDebugger;
         const debuggers = await this.listDebuggers();
@@ -105,7 +98,7 @@ export class DebuggerManager {
                 return _debugger.short_name === debugConfig.interface || _debugger.config_file === debugConfig.interface;
             });
             if (!resolvedDebugger) {
-                throw new Error(`Debug port for board ${this._boardManager.currentBoard.name} is not connected.`);
+                throw new Error(`Debug port for board ${ArduinoActivator.instance.currentBoard.name} is not connected.`);
             }
         }
         // rule 2: if there is only one debugger, use the only debugger

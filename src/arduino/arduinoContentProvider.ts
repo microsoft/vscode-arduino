@@ -6,9 +6,11 @@
 import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
+import { ArduinoActivator } from "../arduinoActivator";
 import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
+
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
@@ -95,10 +97,6 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         </html>`;
     }
 
-    get initialized(): boolean {
-        return !!this._webserver;
-    }
-
     get onDidChange(): vscode.Event<vscode.Uri> {
         return this._onDidChange.event;
     }
@@ -113,9 +111,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public async getBoardPackages(req, res) {
         const update = (VscodeSettings.instance.autoUpdateIndexFiles && req.query.update === "true");
-        await ArduinoApp.instance.boardManager.loadPackages(update);
+        await ArduinoActivator.instance.boardManager.loadPackages(update);
         return res.json({
-            platforms: JSONHelper.decycle(ArduinoApp.instance.boardManager.platforms, undefined),
+            platforms: JSONHelper.decycle(ArduinoActivator.instance.boardManager.platforms, undefined),
         });
     }
 
@@ -124,7 +122,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { packageName, arch } parameters!");
         } else {
             try {
-                await ArduinoApp.instance.installBoard(req.body.packageName, req.body.arch, req.body.version);
+                await ArduinoActivator.instance.arduinoApp.installBoard(req.body.packageName, req.body.arch, req.body.version);
                 return res.json({
                     status: "OK",
                 });
@@ -139,7 +137,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { packagePath } parameter!");
         } else {
             try {
-                await ArduinoApp.instance.uninstallBoard(req.body.boardName, req.body.packagePath);
+                await ArduinoActivator.instance.arduinoApp.uninstallBoard(req.body.boardName, req.body.packagePath);
                 return res.json({
                     status: "OK",
                 });
@@ -173,9 +171,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public async getLibraries(req, res) {
         const update = (VscodeSettings.instance.autoUpdateIndexFiles && req.query.update === "true");
-        await ArduinoApp.instance.libraryManager.loadLibraries(update);
+        await ArduinoActivator.instance.libraryManager.loadLibraries(update);
         return res.json({
-            libraries: ArduinoApp.instance.libraryManager.libraries,
+            libraries: ArduinoActivator.instance.libraryManager.libraries,
         });
     }
 
@@ -184,7 +182,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { libraryName } parameters!");
         } else {
             try {
-                await ArduinoApp.instance.installLibrary(req.body.libraryName, req.body.version);
+                await ArduinoActivator.instance.arduinoApp.installLibrary(req.body.libraryName, req.body.version);
                 return res.json({
                     status: "OK",
                 });
@@ -199,7 +197,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { libraryPath } parameters!");
         } else {
             try {
-                await ArduinoApp.instance.uninstallLibrary(req.body.libraryName, req.body.libraryPath);
+                await ArduinoActivator.instance.arduinoApp.uninstallLibrary(req.body.libraryName, req.body.libraryPath);
                 return res.json({
                     status: "OK",
                 });
@@ -214,8 +212,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { libraryPath } parameters!");
         } else {
             try {
-                await ArduinoApp.instance.addLibPath(req.body.libraryPath);
-                await ArduinoApp.instance.includeLibrary(req.body.libraryPath);
+                await ArduinoActivator.instance.arduinoApp.addLibPath(req.body.libraryPath);
+                await ArduinoActivator.instance.arduinoApp.includeLibrary(req.body.libraryPath);
                 return res.json({
                     status: "OK",
                 });
@@ -227,7 +225,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public async getBoardConfig(req, res) {
         return res.json({
-            configitems: ArduinoApp.instance.boardManager.currentBoard.configItems,
+            configitems: ArduinoActivator.instance.boardManager.currentBoard.configItems,
         });
     }
 
@@ -236,7 +234,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing parameters!");
         } else {
             try {
-                ArduinoApp.instance.boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
+                ArduinoActivator.instance.boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
                 return res.json({
                     status: "OK",
                 });
@@ -247,7 +245,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getExamples(req, res) {
-        const examples = await ArduinoApp.instance.exampleManager.loadExamples();
+        const examples = await ArduinoActivator.instance.exampleManager.loadExamples();
         return res.json({
             examples,
         });
@@ -258,7 +256,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { examplePath } parameter!");
         } else {
             try {
-                ArduinoApp.instance.openExample(req.body.examplePath);
+                ArduinoActivator.instance.arduinoApp.openExample(req.body.examplePath);
                 return res.json({
                     status: "OK",
                 });
@@ -268,7 +266,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         }
     }
 
-    private async addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false): Promise<void> {
+    private addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false): void {
         const wrappedHandler = async (req, res) => {
             const guid = Uuid().replace(/\-/g, "");
             let properties = {};

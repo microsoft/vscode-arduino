@@ -8,59 +8,30 @@ import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-
+import { ArduinoActivator } from "../arduinoActivator";
 import * as constants from "../common/constants";
-import * as util from "../common/util";
-import * as Logger from "../logger/logger";
-
-import { DeviceContext, IDeviceContext } from "../deviceContext";
-import { ArduinoSettings } from "./arduinoSettings";
-import { BoardManager } from "./boardManager";
-import { ExampleManager } from "./exampleManager";
-import { LibraryManager } from "./libraryManager";
-import { VscodeSettings } from "./vscodeSettings";
-
 import { arduinoChannel } from "../common/outputChannel";
+import * as util from "../common/util";
+import { DeviceContext, IDeviceContext } from "../deviceContext";
+import * as Logger from "../logger/logger";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
+import { ArduinoSettings } from "./arduinoSettings";
+import { VscodeSettings } from "./vscodeSettings";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
  */
 export class ArduinoApp {
-    private static _app: ArduinoApp;
-
-    private _settings: ArduinoSettings;
-
-    private _boardManager: BoardManager;
-
-    private _libraryManager: LibraryManager;
-
-    private _exampleManager: ExampleManager;
-
-    public static get instance(): ArduinoApp {
-        if (!ArduinoApp._app) {
-            ArduinoApp._app = new ArduinoApp();
-        }
-        return ArduinoApp._app;
-    }
-
     /**
      * @param {IArduinoSettings} ArduinoSetting object.
      */
-    constructor() {
+    constructor(private _settings: ArduinoSettings) {
     }
 
-    public get initialized(): boolean {
-        return !!this._boardManager;
-    }
     /**
      * Need refresh Arduino IDE's setting when starting up.
      */
     public async initialize() {
-
-        this._settings = new ArduinoSettings();
-        await this._settings.initialize();
-
         if (!util.fileExistsSync(this._settings.preferencePath)) {
             try {
                 // Use empty pref value to initialize preference.txt file
@@ -70,12 +41,6 @@ export class ArduinoApp {
             }
         }
         await this.initializePackageIndex();
-        await DeviceContext.getIntance().loadContext();
-
-        // // Arduino board manager & library manager
-        this._boardManager = new BoardManager(this._settings, this);
-        await this._boardManager.loadPackages();
-
     }
 
     /**
@@ -376,7 +341,7 @@ export class ArduinoApp {
 
     public getDefaultPackageLibPaths(): string[] {
         const result = [];
-        const boardDescriptor = this._boardManager.currentBoard;
+        const boardDescriptor = ArduinoActivator.instance.currentBoard;
         if (!boardDescriptor) {
             return result;
         }
@@ -460,30 +425,8 @@ export class ArduinoApp {
         return destExample;
     }
 
-    public get settings() {
-        return this._settings;
-    }
-
-    public get boardManager() {
-        return this._boardManager;
-    }
-
-    public get libraryManager() {
-        if (!this._libraryManager) {
-            this._libraryManager = new LibraryManager(this._settings, this);
-        }
-        return this._libraryManager;
-    }
-
-    public get exampleManager() {
-        if (!this._exampleManager) {
-            this._exampleManager = new ExampleManager(this._settings, this);
-        }
-        return this._exampleManager;
-    }
-
     private getBoardBuildString(deviceContext: IDeviceContext): string {
-        const selectedBoard = this.boardManager.currentBoard;
+        const selectedBoard = ArduinoActivator.instance.currentBoard;
         if (!selectedBoard) {
             Logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
             return;

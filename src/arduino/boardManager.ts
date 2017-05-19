@@ -20,8 +20,6 @@ import { IBoard, IPackage, IPlatform } from "./package";
 import { VscodeSettings } from "./vscodeSettings";
 
 export class BoardManager {
-    private _initialized: boolean = false;
-
     private _packages: IPackage[];
 
     private _platforms: IPlatform[];
@@ -100,10 +98,6 @@ export class BoardManager {
     }
 
     public async changeBoardType() {
-        if (!this._initialized) {
-            await this.loadPackages();
-        }
-
         const supportedBoardTypes = this.listBoards();
         if (supportedBoardTypes.length === 0) {
             vscode.window.showInformationMessage("No supported board is available.");
