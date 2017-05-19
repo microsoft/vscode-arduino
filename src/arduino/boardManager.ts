@@ -93,9 +93,7 @@ export class BoardManager {
         const dc = DeviceContext.getIntance();
         dc.onDidChange(() => {
             this.updateCurrentBoard();
-            if (this._currentBoard) {
-                this.showStatusBar();
-            }
+            this.showStatusBar();
         });
     }
 
@@ -264,6 +262,8 @@ export class BoardManager {
         const selectedBoard = this._boards.get(dc.board);
         if (selectedBoard) {
             this._currentBoard = selectedBoard;
+        } else {
+            this._currentBoard = null;
         }
     }
     public showStatusBar(): void {
