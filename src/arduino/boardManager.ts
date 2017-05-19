@@ -89,11 +89,13 @@ export class BoardManager {
         this.loadInstalledBoards();
 
         this.updateCurrentBoard();
-        // this._boardStatusBar.show();
 
         const dc = DeviceContext.getIntance();
         dc.onDidChange(() => {
             this.updateCurrentBoard();
+            if (this._currentBoard) {
+                this.showStatusBar();
+            }
         });
     }
 
