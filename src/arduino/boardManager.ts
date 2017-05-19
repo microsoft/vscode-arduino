@@ -20,7 +20,7 @@ import { IBoard, IPackage, IPlatform } from "./package";
 import { VscodeSettings } from "./vscodeSettings";
 
 export class BoardManager {
-    private _initilized: boolean = false;
+    private _initialized: boolean = false;
 
     private _packages: IPackage[];
 
@@ -47,20 +47,20 @@ export class BoardManager {
         this._configStatusBar.tooltip = "Config Board";
     }
 
-    public get initilized(): boolean {
-        return this._initilized;
+    public get initialized(): boolean {
+        return this._initialized;
     }
 
     public async loadPackages(update: boolean = false) {
-        this._initilized = true;
+        this._initialized = true;
         this._packages = [];
         this._platforms = [];
         this._installedPlatforms = [];
 
-        const addiontionalUrls = this.getAdditionalUrls();
+        const additionalUrls = this.getAdditionalUrls();
 
         // Parse package index files.
-        const indexFiles = ["package_index.json"].concat(addiontionalUrls);
+        const indexFiles = ["package_index.json"].concat(additionalUrls);
         const rootPackgeFolder = this._settings.packagePath;
         if (!update) {
             for (const indexFile of indexFiles) {
@@ -76,7 +76,7 @@ export class BoardManager {
 
         if (update) {
             // Update index files.
-            await this.setPreferenceUrls(addiontionalUrls);
+            await this.setPreferenceUrls(additionalUrls);
             await this._arduinoApp.initializePackageIndex(true);
         }
 
@@ -104,7 +104,7 @@ export class BoardManager {
     }
 
     public async changeBoardType() {
-        if (!this._initilized) {
+        if (!this._initialized) {
             await this.loadPackages();
         }
 
@@ -133,7 +133,7 @@ export class BoardManager {
     }
 
     public async updatePackageIndex(indexUri: string): Promise<boolean> {
-        if (!this._initilized) {
+        if (!this._initialized) {
             await this.loadPackages();
         }
         const indexFileName = this.getIndexFileName(indexUri);
