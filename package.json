@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.2-rc",
+  "version": "0.2.2",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -24,7 +24,21 @@
     "C++"
   ],
   "activationEvents": [
-    "*"
+    "*",
+    "onCommand:arduino.debug.startSession",    
+    "onCommand:arduino.verify",
+    "onCommand:arduino.upload",
+    "onCommand:arduino.selectSerialPort",
+    "onCommand:arduino.changeBaudRate",
+    "onCommand:arduino.addLibPath",
+    "onCommand:arduino.openSerialMonitor",
+    "onCommand:arduino.sendMessageToSerialPort",
+    "onCommand:arduino.closeSerialMonitor",
+    "onCommand:arduino.changeBoardType",
+    "onCommand:arduino.showBoardManager",
+    "onCommand:arduino.showLibraryManager",
+    "onCommand:arduino.showExamples",
+    "onCommand:arduino.initialize"
   ],
   "main": "./out/src/extension",
   "contributes": {
