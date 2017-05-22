@@ -147,7 +147,7 @@ export class ArduinoSettings implements IArduinoSettings {
         // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
         // "usual software installation directory for each os".
         // 1. Search vscode user settings first.
-        const configValue = VscodeSettings.getIntance().arduinoPath;
+        const configValue = VscodeSettings.instance.arduinoPath;
         if (!configValue || !configValue.trim()) {
             // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
             this._arduinoPath = await Promise.resolve(resolveArduinoPath());

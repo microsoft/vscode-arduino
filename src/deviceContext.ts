@@ -82,8 +82,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _configuration: string;
 
-    private _arduinoApp: ArduinoApp;
-
     private _extensionPath: string;
 
     private _watcher: vscode.FileSystemWatcher;
@@ -113,14 +111,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         if (this._vscodeWatcher) {
             this._vscodeWatcher.dispose();
         }
-    }
-
-    public get arduinoApp(): ArduinoApp {
-        return this._arduinoApp;
-    }
-
-    public set arduinoApp(value: ArduinoApp) {
-        this._arduinoApp = value;
     }
 
     public get extensionPath(): string {
@@ -255,7 +245,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             return;
         } else {
             if (!vscode.workspace.rootPath) {
-                vscode.window.showInformationMessage("Please open an folder first.");
+                vscode.window.showInformationMessage("Please open a folder first.");
                 return;
             }
             await this.resolveMainSketch();

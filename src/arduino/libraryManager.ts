@@ -6,7 +6,7 @@
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-
+import { ArduinoActivator } from "../arduinoActivator";
 import * as util from "../common/util";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
@@ -127,7 +127,7 @@ export class LibraryManager {
     private async loadBoardLibraries() {
         let builtinLibs = [];
         const librarySet = new Set(this._libraryMap.keys());
-        const installedPlatforms = this._arduinoApp.boardManager.getInstalledPlatforms();
+        const installedPlatforms = ArduinoActivator.instance.boardManager.getInstalledPlatforms();
         for (const board of installedPlatforms) {
             const libs = await this.parseBoardLibraries(board.rootBoardPath, board.architecture, librarySet);
             builtinLibs = builtinLibs.concat(libs);
@@ -174,7 +174,7 @@ export class LibraryManager {
     }
 
     private tagSupportedLibraries() {
-        const currentBoard = this._arduinoApp.boardManager.currentBoard;
+        const currentBoard = ArduinoActivator.instance.currentBoard;
         if (!currentBoard) {
             return;
         }

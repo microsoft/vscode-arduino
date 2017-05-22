@@ -20,7 +20,6 @@ import { IBoard, IPackage, IPlatform } from "./package";
 import { VscodeSettings } from "./vscodeSettings";
 
 export class BoardManager {
-
     private _packages: IPackage[];
 
     private _platforms: IPlatform[];
@@ -51,23 +50,34 @@ export class BoardManager {
         this._platforms = [];
         this._installedPlatforms = [];
 
-        const addiontionalUrls = this.getAdditionalUrls();
-        if (update) { // Update index files.
-            await this.setPreferenceUrls(addiontionalUrls);
-            await this._arduinoApp.initialize(true);
-        }
+        const additionalUrls = this.getAdditionalUrls();
 
         // Parse package index files.
-        const indexFiles = ["package_index.json"].concat(addiontionalUrls);
+        const indexFiles = ["package_index.json"].concat(additionalUrls);
         const rootPackgeFolder = this._settings.packagePath;
+        if (!update) {
+            for (const indexFile of indexFiles) {
+                const indexFileName = this.getIndexFileName(indexFile);
+                if (!indexFileName) {
+                    continue;
+                }
+                if (!util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
+                    update = true;
+                    break;
+                }
+            }
+        }
+
+        if (update) {
+            // Update index files.
+            await this.setPreferenceUrls(additionalUrls);
+            await this._arduinoApp.initializePackageIndex(true);
+        }
+
         for (const indexFile of indexFiles) {
             const indexFileName = this.getIndexFileName(indexFile);
             if (!indexFileName) {
                 continue;
-            }
-            if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
-                await this.setPreferenceUrls(addiontionalUrls);
-                await this._arduinoApp.initialize(true);
             }
             this.loadPackageContent(indexFileName);
         }
@@ -77,12 +87,13 @@ export class BoardManager {
 
         // Load all supported boards type.
         this.loadInstalledBoards();
-        this.updateStatusBar();
-        this._boardStatusBar.show();
+
+        this.updateCurrentBoard();
 
         const dc = DeviceContext.getIntance();
         dc.onDidChange(() => {
-            this.updateStatusBar();
+            this.updateCurrentBoard();
+            this.showStatusBar();
         });
     }
 
@@ -112,12 +123,10 @@ export class BoardManager {
     }
 
     public async updatePackageIndex(indexUri: string): Promise<boolean> {
-        const indexFileName = this.getIndexFileName(indexUri);
-
         let allUrls = this.getAdditionalUrls();
-        if (!(allUrls.indexOf(indexUri) >= 0)) {
+        if (allUrls.indexOf(indexUri) < 0) {
             allUrls = allUrls.concat(indexUri);
-            await VscodeSettings.getIntance().updateAdditionalUrls(allUrls);
+            await VscodeSettings.instance.updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
@@ -248,7 +257,18 @@ export class BoardManager {
             }
         }
     }
-
+    public updateCurrentBoard(): void {
+        const dc = DeviceContext.getIntance();
+        const selectedBoard = this._boards.get(dc.board);
+        if (selectedBoard) {
+            this._currentBoard = selectedBoard;
+        } else {
+            this._currentBoard = null;
+        }
+    }
+    public showStatusBar(): void {
+        this.updateStatusBar(true);
+    }
     public updateStatusBar(show: boolean = true): void {
         if (show) {
             this._boardStatusBar.show();
@@ -433,7 +453,7 @@ export class BoardManager {
             return [];
         }
         // For better compatibility, merge urls both in user settings and arduino IDE preferences.
-        const settingsUrls = formatUrls(VscodeSettings.getIntance().additionalUrls);
+        const settingsUrls = formatUrls(VscodeSettings.instance.additionalUrls);
         let preferencesUrls = [];
         const preferences = this._settings.preferences;
         if (preferences && preferences.has("boardsmanager.additional.urls")) {

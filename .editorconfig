@@ -16,3 +16,7 @@ indent_size = 2
 [vendor/**.js]
 indent_style = space
 indent_size = 2
+
+[src/**.ts]
+indent_style = space
+indent_size = 4

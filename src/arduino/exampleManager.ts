@@ -6,9 +6,8 @@
 import * as fs from "fs";
 import * as glob from "glob";
 import * as path from "path";
+import { ArduinoActivator } from "../arduinoActivator";
 import * as util from "../common/util";
-
-import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
 
 export interface IExampleNode {
@@ -20,7 +19,7 @@ export interface IExampleNode {
 
 export class ExampleManager {
 
-    constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
+    constructor(private _settings: IArduinoSettings) {
     }
 
     public async loadExamples() {
@@ -43,8 +42,8 @@ export class ExampleManager {
         }
 
         // load Examples from current board's firmware package directory.
-        if (this._arduinoApp.boardManager.currentBoard) {
-            const currentBoard = this._arduinoApp.boardManager.currentBoard;
+        if (ArduinoActivator.instance.currentBoard) {
+            const currentBoard = ArduinoActivator.instance.currentBoard;
             const currentBoardLibrariesPath = path.join(currentBoard.platform.rootBoardPath, "libraries");
             const examplesFromCurrentBoard = await this.parseExamplesFromLibrary(currentBoardLibrariesPath, false);
             if (examplesFromCurrentBoard.length) {
@@ -169,7 +168,7 @@ export class ExampleManager {
         if (!architectures) {
             return false;
         }
-        const currentBoard = this._arduinoApp.boardManager.currentBoard;
+        const currentBoard = ArduinoActivator.instance.currentBoard;
         if (!currentBoard) {
             return true;
         }

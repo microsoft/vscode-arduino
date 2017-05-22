@@ -8,43 +8,30 @@ import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-
+import { ArduinoActivator } from "../arduinoActivator";
 import * as constants from "../common/constants";
-import * as util from "../common/util";
-import * as Logger from "../logger/logger";
-
-import { DeviceContext, IDeviceContext } from "../deviceContext";
-import { IArduinoSettings } from "./arduinoSettings";
-import { BoardManager } from "./boardManager";
-import { ExampleManager } from "./exampleManager";
-import { LibraryManager } from "./libraryManager";
-import { VscodeSettings } from "./vscodeSettings";
-
 import { arduinoChannel } from "../common/outputChannel";
+import * as util from "../common/util";
+import { DeviceContext, IDeviceContext } from "../deviceContext";
+import * as Logger from "../logger/logger";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
+import { ArduinoSettings } from "./arduinoSettings";
+import { VscodeSettings } from "./vscodeSettings";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
  */
 export class ArduinoApp {
-
-    private _boardManager: BoardManager;
-
-    private _libraryManager: LibraryManager;
-
-    private _exampleManager: ExampleManager;
-
     /**
      * @param {IArduinoSettings} ArduinoSetting object.
      */
-    constructor(private _settings: IArduinoSettings) {
+    constructor(private _settings: ArduinoSettings) {
     }
 
     /**
      * Need refresh Arduino IDE's setting when starting up.
-     * @param {boolean} force - Whether force initialzie the arduino
      */
-    public async initialize(force: boolean = false) {
+    public async initialize() {
         if (!util.fileExistsSync(this._settings.preferencePath)) {
             try {
                 // Use empty pref value to initialize preference.txt file
@@ -53,6 +40,14 @@ export class ArduinoApp {
             } catch (ex) {
             }
         }
+        await this.initializePackageIndex();
+    }
+
+    /**
+     * Initialize the arduino package.
+     * @param {boolean} force - Whether force initialize the arduino
+     */
+    public async initializePackageIndex(force: boolean = false) {
         if (force || !util.fileExistsSync(path.join(this._settings.packagePath, "package_index.json"))) {
             try {
                 // Use the dummy package to initialize the Arduino IDE
@@ -120,7 +115,7 @@ export class ArduinoApp {
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (VscodeSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.instance.logLevel === "verbose") {
             args.push("--verbose");
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async (result) => {
@@ -154,7 +149,7 @@ export class ArduinoApp {
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (VscodeSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.instance.logLevel === "verbose") {
             args.push("--verbose");
         }
         if (output) {
@@ -346,7 +341,7 @@ export class ArduinoApp {
 
     public getDefaultPackageLibPaths(): string[] {
         const result = [];
-        const boardDescriptor = this._boardManager.currentBoard;
+        const boardDescriptor = ArduinoActivator.instance.currentBoard;
         if (!boardDescriptor) {
             return result;
         }
@@ -430,36 +425,8 @@ export class ArduinoApp {
         return destExample;
     }
 
-    public get settings() {
-        return this._settings;
-    }
-
-    public get boardManager() {
-        return this._boardManager;
-    }
-
-    public set boardManager(value: BoardManager) {
-        this._boardManager = value;
-    }
-
-    public get libraryManager() {
-        return this._libraryManager;
-    }
-
-    public set libraryManager(value: LibraryManager) {
-        this._libraryManager = value;
-    }
-
-    public get exampleManager() {
-        return this._exampleManager;
-    }
-
-    public set exampleManager(value: ExampleManager) {
-        this._exampleManager = value;
-    }
-
     private getBoardBuildString(deviceContext: IDeviceContext): string {
-        const selectedBoard = this.boardManager.currentBoard;
+        const selectedBoard = ArduinoActivator.instance.currentBoard;
         if (!selectedBoard) {
             Logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
