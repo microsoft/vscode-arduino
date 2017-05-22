@@ -24,6 +24,8 @@ suite("Arduino Extension Tests", () => {
             }, () => {
                 done("Failed to activate extension");
             });
+        } else {
+            done();
         }
     });
 
