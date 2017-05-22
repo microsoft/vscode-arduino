@@ -7,7 +7,6 @@ import * as Resources from "./resources";
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
 import { BoardManager } from "../src/arduino/BoardManager";
-import { LibraryManager } from "../src/arduino/LibraryManager";
 import { ExampleManager } from "../src/arduino/ExampleManager";
 
 suite("Arduino: Example Manager.", () => {
@@ -15,16 +14,16 @@ suite("Arduino: Example Manager.", () => {
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to load examples", function(done) {
         const arduinoSettings = TypeMoq.Mock.ofType(ArduinoSettings);
-        arduinoSettings.setup(x => x.packagePath).returns(() => Resources.mockedPackagePath);
-        arduinoSettings.setup(x => x.defaultLibPath).returns(() => Resources.mockedIDELibPath);
-        arduinoSettings.setup(x => x.sketchbookPath).returns(() => Resources.mockedSketchbookPath);
-        arduinoSettings.setup(x => x.defaultExamplePath).returns(() => Resources.mockedIDEExamplesPath);
+        arduinoSettings.setup((x) => x.packagePath).returns(() => Resources.mockedPackagePath);
+        arduinoSettings.setup((x) => x.defaultLibPath).returns(() => Resources.mockedIDELibPath);
+        arduinoSettings.setup((x) => x.sketchbookPath).returns(() => Resources.mockedSketchbookPath);
+        arduinoSettings.setup((x) => x.defaultExamplePath).returns(() => Resources.mockedIDEExamplesPath);
 
         const mockedBoardManager = TypeMoq.Mock.ofType(BoardManager);
-        mockedBoardManager.setup(x => x.currentBoard).returns(() => null);
+        mockedBoardManager.setup((x) => x.currentBoard).returns(() => null);
 
         const arduinoApp = TypeMoq.Mock.ofType(ArduinoApp);
-        arduinoApp.setup(x => x.boardManager).returns(() => mockedBoardManager.object);
+        arduinoApp.setup((x) => x.boardManager).returns(() => mockedBoardManager.object);
 
         const exampleManager = new ExampleManager(arduinoSettings.object, arduinoApp.object);
         exampleManager.loadExamples().then((examples) => {
@@ -43,10 +42,9 @@ suite("Arduino: Example Manager.", () => {
             assert.equal(examples[1].children[0].children[0].path, Path.join(Resources.mockedIDELibPath, "Ethernet", "examples", "WebServer"));
 
             done();
-        }).catch(error => {
+        }).catch((error) => {
           done(error);
         });
     });
 
 });
-
