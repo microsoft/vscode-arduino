@@ -107,9 +107,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public async getBoardPackages(req, res) {
         const update = (VscodeSettings.getInstance().autoUpdateIndexFiles && req.query.update === "true");
-        await ArduinoContext.arduinoApp.boardManager.loadPackages(update);
+        await ArduinoContext.boardManager.loadPackages(update);
         return res.json({
-            platforms: JSONHelper.decycle(ArduinoContext.arduinoApp.boardManager.platforms, undefined),
+            platforms: JSONHelper.decycle(ArduinoContext.boardManager.platforms, undefined),
         });
     }
 
@@ -221,7 +221,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public async getBoardConfig(req, res) {
         return res.json({
-            configitems: ArduinoContext.arduinoApp.boardManager.currentBoard.configItems,
+            configitems: ArduinoContext.boardManager.currentBoard.configItems,
         });
     }
 
@@ -230,7 +230,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing parameters!");
         } else {
             try {
-                ArduinoContext.arduinoApp.boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
+                ArduinoContext.boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
                 return res.json({
                     status: "OK",
                 });
