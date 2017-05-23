@@ -114,7 +114,7 @@ export interface IPlatform {
     rootBoardPath: string;
 
     /**
-     * The board desriptor information supported by this platform.
+     * The board descriptor information supported by this platform.
      * @property {IBoard[]}
      */
     boards: any[];
@@ -213,7 +213,7 @@ export interface IBoard {
     loadConfig(configString: string): void;
 
     /**
-     * Upldate the configuration
+     * Update the configuration
      */
     updateConfig(configId: string, optionId: string): boolean;
 

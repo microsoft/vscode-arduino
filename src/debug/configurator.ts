@@ -91,7 +91,7 @@ export class DebugConfigurator {
     }
 
     private async resolveProgramPath(config) {
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
 
         if (!config.program || config.program === "${file}") {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed

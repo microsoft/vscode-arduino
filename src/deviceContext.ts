@@ -59,7 +59,7 @@ export interface IDeviceContext {
 
 export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
-    public static getIntance(): DeviceContext {
+    public static getInstance(): DeviceContext {
         return DeviceContext._deviceContext;
     }
 

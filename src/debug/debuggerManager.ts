@@ -87,8 +87,8 @@ export class DebuggerManager {
   public async resolveOpenOcdOptions(config): Promise<string> {
     const board = this._boardManager.currentBoard.key;
     const debugConfig = this._debuggerBoardMappings[board];
-    const dc = DeviceContext.getIntance();
-    const debuggerConfiged: string = dc.debugger_;
+    const dc = DeviceContext.getInstance();
+    const debuggerConfigured: string = dc.debugger_;
     if (!debugConfig) {
       throw new Error(`Debug for board ${this._boardManager.currentBoard.name} is not supported by now.`);
     }
@@ -107,14 +107,14 @@ export class DebuggerManager {
       }
     }
     // rule 2: if there is only one debugger, use the only debugger
-    if (!resolvedDebugger && !debuggerConfiged && debuggers.length === 1) {
+    if (!resolvedDebugger && !debuggerConfigured && debuggers.length === 1) {
       resolvedDebugger = debuggers[0];
     }
 
     // rule 3: if there is any configuration about debugger, use this configuration
-    if (!resolvedDebugger && debuggerConfiged) {
+    if (!resolvedDebugger && debuggerConfigured) {
       resolvedDebugger = debuggers.find((_debugger) => {
-        return _debugger.short_name === debuggerConfiged || _debugger.config_file === debuggerConfiged;
+        return _debugger.short_name === debuggerConfigured || _debugger.config_file === debuggerConfigured;
       });
     }
     if (!resolvedDebugger) {

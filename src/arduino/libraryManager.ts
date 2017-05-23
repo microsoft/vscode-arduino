@@ -18,7 +18,7 @@ export interface ILibrary {
     srcPath: string;
     version: string;
     versions: string[];
-    aruthor: string;
+    author: string;
     maintainer: string;
     sentence: string;
     paragraph: string;

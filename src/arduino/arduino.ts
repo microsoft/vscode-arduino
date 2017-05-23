@@ -42,7 +42,7 @@ export class ArduinoApp {
 
     /**
      * Need refresh Arduino IDE's setting when starting up.
-     * @param {boolean} force - Whether force initialzie the arduino
+     * @param {boolean} force - Whether force initialize the arduino
      */
     public async initialize(force: boolean = false) {
         if (!util.fileExistsSync(this._settings.preferencePath)) {
@@ -91,7 +91,7 @@ export class ArduinoApp {
     }
 
     public async upload() {
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return;
@@ -113,14 +113,14 @@ export class ArduinoApp {
         arduinoChannel.show();
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
-        const serialMonitor = SerialMonitor.getIntance();
+        const serialMonitor = SerialMonitor.getInstance();
 
         const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
         await vscode.workspace.saveAll(false);
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (VscodeSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
@@ -134,7 +134,7 @@ export class ArduinoApp {
     }
 
     public async verify(output: string = "") {
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return;
@@ -154,7 +154,7 @@ export class ArduinoApp {
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (VscodeSettings.getIntance().logLevel === "verbose") {
+        if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
         if (output || dc.output) {
@@ -239,7 +239,7 @@ export class ArduinoApp {
         if (!vscode.workspace.rootPath) {
             return;
         }
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
         if (util.fileExistsSync(appPath)) {
             const hFiles = glob.sync(`${libraryPath}/*.h`, {
@@ -398,7 +398,7 @@ export class ArduinoApp {
             });
             if (sketchFile) {
                 // Generate arduino.json
-                const dc = DeviceContext.getIntance();
+                const dc = DeviceContext.getInstance();
                 const arduinoJson = {
                     sketch: sketchFile,
                     port: dc.port || "COM1",

@@ -33,7 +33,7 @@ export function decycle(object, replacer) {
 
 //      {"$ref": PATH}
 
-// where the PATH is a JSONPath string that locates the first occurance.
+// where the PATH is a JSONPath string that locates the first occurrence.
 
 // So,
 
@@ -56,7 +56,7 @@ export function decycle(object, replacer) {
 
 // The derez function recurses through the object, producing the deep copy.
 
-            var old_path;   // The path of an earlier occurance of value
+            var old_path;   // The path of an earlier occurrence of value
             var nu;         // The new object or array
 
 // If a replacer function was provided, then call it to get a replacement value.

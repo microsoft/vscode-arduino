@@ -124,7 +124,7 @@ export class Board implements IBoard {
         }
         if (targetConfig.selectedOption !== optionId) {
             targetConfig.selectedOption = optionId;
-            const dc = DeviceContext.getIntance();
+            const dc = DeviceContext.getInstance();
             dc.configuration = this.customConfig;
             return true;
         }

@@ -46,7 +46,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await arduinoApp.initialize();
 
     // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
-    const deviceContext = DeviceContext.getIntance();
+    const deviceContext = DeviceContext.getInstance();
     deviceContext.extensionPath = context.extensionPath;
     await deviceContext.loadContext();
     context.subscriptions.push(deviceContext);
@@ -166,7 +166,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     // serial monitor commands
-    const serialMonitor = SerialMonitor.getIntance();
+    const serialMonitor = SerialMonitor.getInstance();
     context.subscriptions.push(serialMonitor);
     context.subscriptions.push(registerCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null)));
     context.subscriptions.push(registerCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor()));
@@ -190,7 +190,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export async function deactivate() {
-    const monitor = SerialMonitor.getIntance();
+    const monitor = SerialMonitor.getInstance();
     await monitor.closeSerialMonitor(null, false);
     if (usbDetector) {
         usbDetector.stopListening();

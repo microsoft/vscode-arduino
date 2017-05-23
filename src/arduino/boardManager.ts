@@ -58,13 +58,13 @@ export class BoardManager {
 
         // Parse package index files.
         const indexFiles = ["package_index.json"].concat(additionalUrls);
-        const rootPackgeFolder = this._settings.packagePath;
+        const rootPackageFolder = this._settings.packagePath;
         for (const indexFile of indexFiles) {
             const indexFileName = this.getIndexFileName(indexFile);
             if (!indexFileName) {
                 continue;
             }
-            if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
+            if (!update && !util.fileExistsSync(path.join(rootPackageFolder, indexFileName))) {
                 await this.setPreferenceUrls(additionalUrls);
                 await this._arduinoApp.initialize(true);
             }
@@ -79,7 +79,7 @@ export class BoardManager {
         this.updateStatusBar();
         this._boardStatusBar.show();
 
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
         dc.onDidChange(() => {
             this.updateStatusBar();
         });
@@ -114,14 +114,14 @@ export class BoardManager {
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
-            await VscodeSettings.getIntance().updateAdditionalUrls(allUrls);
+            await VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
     }
 
     public doChangeBoardType(targetBoard: IBoard) {
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
         dc.board = targetBoard.key;
         this._currentBoard = targetBoard;
         dc.configuration = this._currentBoard.customConfig;
@@ -249,7 +249,7 @@ export class BoardManager {
     public updateStatusBar(show: boolean = true): void {
         if (show) {
             this._boardStatusBar.show();
-            const dc = DeviceContext.getIntance();
+            const dc = DeviceContext.getInstance();
             const selectedBoard = this._boards.get(dc.board);
             if (selectedBoard) {
                 this._currentBoard = selectedBoard;
@@ -429,7 +429,7 @@ export class BoardManager {
             return [];
         }
         // For better compatibility, merge urls both in user settings and arduino IDE preferences.
-        const settingsUrls = formatUrls(VscodeSettings.getIntance().additionalUrls);
+        const settingsUrls = formatUrls(VscodeSettings.getInstance().additionalUrls);
         let preferencesUrls = [];
         const preferences = this._settings.preferences;
         if (preferences && preferences.has("boardsmanager.additional.urls")) {
@@ -438,8 +438,8 @@ export class BoardManager {
         return util.union(settingsUrls, preferencesUrls);
     }
 
-    private async setPreferenceUrls(addiontionalUrls: string[]) {
-        const settingsUrls = addiontionalUrls.join(",");
+    private async setPreferenceUrls(additionalUrls: string[]) {
+        const settingsUrls = additionalUrls.join(",");
         if (this._settings.preferences.get("boardsmanager.additional.urls") !== settingsUrls) {
             await this._arduinoApp.setPref("boardsmanager.additional.urls", settingsUrls);
         }
