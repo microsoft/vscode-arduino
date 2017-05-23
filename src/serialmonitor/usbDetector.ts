@@ -49,6 +49,9 @@ export class UsbDetector {
                 if (!ArduinoContext.initialized) {
                     await ArduinoActivator.activate();
                 }
+                if (!SerialMonitor.getInstance().initialized) {
+                    SerialMonitor.getInstance().initialize();
+                }
                 let bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
                 if (!bd) {
                     ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackgeContent) => {
