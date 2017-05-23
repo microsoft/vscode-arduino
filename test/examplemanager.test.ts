@@ -6,8 +6,8 @@ import * as Resources from "./resources";
 
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
-import { BoardManager } from "../src/arduino/BoardManager";
-import { ExampleManager } from "../src/arduino/ExampleManager";
+import { BoardManager } from "../src/arduino/boardManager";
+import { ExampleManager } from "../src/arduino/exampleManager";
 
 suite("Arduino: Example Manager.", () => {
 

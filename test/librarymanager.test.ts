@@ -6,8 +6,8 @@ import * as Resources from "./resources";
 
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
-import { BoardManager } from "../src/arduino/BoardManager";
-import { LibraryManager } from "../src/arduino/LibraryManager";
+import { BoardManager } from "../src/arduino/boardManager";
+import { LibraryManager } from "../src/arduino/libraryManager";
 
 suite("Arduino: Library Manager.", () => {
 
