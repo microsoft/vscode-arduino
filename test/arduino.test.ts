@@ -14,6 +14,7 @@ suite("Arduino: App Initialization", () => {
 
     // tslint:disable-next-line: only-arrow-functions
     setup(function(done) {
+        this.timeout(60 * 1000);
         try {
             arduinoSettings.initialize().then(() => {
                 done();
@@ -42,14 +43,12 @@ suite("Arduino: App Initialization", () => {
         assert.equal(util.directoryExistsSync(arduinoSettings.defaultExamplePath), true,
         "should resolve arduino IDE built-in example directory correctly");
 
-        assert.equal(util.directoryExistsSync(arduinoSettings.packagePath), true,
-        "should resolve user installed package directory correctly");
-
         done();
     });
 
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to download necessary package_index and preferences.txt", function(done) {
+        this.timeout(60 * 1000);
         try {
             arduinoApp.initialize(false).then(() => {
                 assert.equal(util.fileExistsSync(arduinoSettings.preferencePath), true,
@@ -71,6 +70,7 @@ suite("Arduino: App Initialization", () => {
 
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to download necessary library_index", function(done) {
+        this.timeout(60 * 1000);
         try {
             arduinoApp.initializeLibrary(false).then(() => {
                 assert.equal(util.fileExistsSync(Path.join(arduinoSettings.packagePath, "library_index.json")), true,
