@@ -46,7 +46,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const arduinoManagerProvider = new ArduinoContentProvider(context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
 
-    const commandExection = async (command: string, commandBody: (...args: any[]) => any, args: any, getUserData?: () => any) => {
+    const commandExecution = async (command: string, commandBody: (...args: any[]) => any, args: any, getUserData?: () => any) => {
         const guid = Uuid().replace(/\-/g, "");
         Logger.traceUserData(`start-command-` + command, { correlationId: guid });
         const timer1 = new Logger.Timer();
@@ -77,7 +77,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 SerialMonitor.getInstance().initialize();
             }
 
-            await commandExection(command, commandBody, args, getUserData);
+            await commandExecution(command, commandBody, args, getUserData);
         }));
     };
 
@@ -86,7 +86,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            await commandExection(command, commandBody, args, getUserData);
+            await commandExecution(command, commandBody, args, getUserData);
         }));
     };
 
@@ -184,9 +184,6 @@ export async function activate(context: vscode.ExtensionContext) {
     usbDetector = new UsbDetector(context.extensionPath);
     usbDetector.startListening();
 
-    const updateStatusBar = () => {
-        ArduinoContext.boardManager.updateStatusBar(true);
-    };
     if (vscode.workspace.rootPath && (
         util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))
         || (openEditor && openEditor.document.fileName.endsWith(".ino")))) {
@@ -198,9 +195,22 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            updateStatusBar();
+            ArduinoContext.boardManager.updateStatusBar(true);
         })();
     }
+    vscode.window.onDidChangeActiveTextEditor(async () => {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor && (activeEditor.document.languageId === "cpp"
+            || activeEditor.document.languageId === "c"
+            || path.basename(activeEditor.document.fileName) === "arduino.json"
+            || activeEditor.document.fileName.endsWith(".ino")
+        )) {
+            if (!ArduinoContext.initialized) {
+                await ArduinoActivator.activate();
+            }
+            ArduinoContext.boardManager.updateStatusBar(true);
+        }
+    });
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
