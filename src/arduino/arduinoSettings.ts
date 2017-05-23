@@ -23,7 +23,7 @@ export interface IArduinoSettings {
     sketchbookPath: string;
     preferencePath: string;
     preferences: Map<string, string>;
-    loadPreferences(): void;
+    reloadPreferences(): void;
 }
 
 export class ArduinoSettings implements IArduinoSettings {
@@ -105,13 +105,14 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get preferences() {
         if (!this._preferences) {
-            this.loadPreferences();
+            this._preferences = util.parseConfigFile(this.preferencePath);
         }
         return this._preferences;
     }
 
-    public loadPreferences() {
+    public reloadPreferences() {
         this._preferences = util.parseConfigFile(this.preferencePath);
+        this._sketchbookPath = this._preferences.get("sketchbook.path") || this._sketchbookPath;
     }
 
     /**
