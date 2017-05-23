@@ -75,9 +75,9 @@ export class SerialMonitor implements vscode.Disposable {
         });
     }
 
-    public async dispose() {
+    public dispose() {
         if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
-            await this._serialPortCtrl.stop();
+            return this._serialPortCtrl.stop();
         }
     }
 

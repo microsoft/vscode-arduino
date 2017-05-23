@@ -10,9 +10,6 @@ import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
 import { ArduinoApp } from "./arduino";
-import { IArduinoSettings } from "./arduinoSettings";
-import { BoardManager } from "./boardManager";
-import { LibraryManager } from "./libraryManager";
 import LocalWebServer from "./localWebServer";
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -21,7 +18,6 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
     constructor(
-        private _settings: IArduinoSettings,
         private _arduinoApp: ArduinoApp,
         private _extensionPath: string) {
         this.initialize();
@@ -57,7 +53,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this._webserver.start();
     }
 
-    public provideTextDocumentContent(uri: vscode.Uri) {
+    public provideTextDocumentContent(uri: vscode.Uri): string {
         let type = "";
         if (uri.toString() === Constants.BOARD_MANAGER_URI.toString()) {
             type = "boardmanager";
@@ -74,7 +70,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         <html>
         <head>
             <script type="text/javascript">
-                window.onload = function(event) {
+                window.onload = function() {
                     console.log('reloaded results window at time ${timeNow}ms');
                     var doc = document.documentElement;
                     var styles = window.getComputedStyle(doc);
@@ -264,9 +260,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         }
     }
 
-    private async addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false): Promise<void> {
+    private addHandlerWithLogger(handlerName: string, url: string, handler: (req, res) => void, post: boolean = false): void {
         const wrappedHandler = async (req, res) => {
-            const guid = Uuid().replace(/\-/g, "");
+            const guid = Uuid().replace(/-/g, "");
             let properties = {};
             if (post) {
                 properties = { ...req.body };

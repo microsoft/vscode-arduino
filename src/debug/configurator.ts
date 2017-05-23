@@ -3,8 +3,6 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-import * as childProcess from "child_process";
-import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
@@ -138,7 +136,6 @@ export class DebugConfigurator {
     }
 
     private resolveOpenOcd(config) {
-        const dc = DeviceContext.getIntance();
         if (!config.debugServerPath) {
             config.debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
                 path.join(this._arduinoSettings.packagePath, "packages",

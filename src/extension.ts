@@ -26,7 +26,7 @@ const status: any = {};
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
-    const activeGuid = Uuid().replace(/\-/g, "");
+    const activeGuid = Uuid().replace(/-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     // Show a warning message if the working file is not under the workspace folder.
     // People should know the extension might not work appropriately, they should look for the doc to get started.
@@ -47,7 +47,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
     const deviceContext = DeviceContext.getIntance();
-    deviceContext.arduinoApp = arduinoApp;
     deviceContext.extensionPath = context.extensionPath;
     await deviceContext.loadContext();
     context.subscriptions.push(deviceContext);
@@ -56,18 +55,15 @@ export async function activate(context: vscode.ExtensionContext) {
     const boardManager = new BoardManager(arduinoSettings, arduinoApp);
     arduinoApp.boardManager = boardManager;
     await boardManager.loadPackages();
-    const libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
-    arduinoApp.libraryManager = libraryManager;
+    arduinoApp.libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
+    arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
 
-    const exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
-    arduinoApp.exampleManager = exampleManager;
-
-    const arduinoManagerProvider = new ArduinoContentProvider(arduinoSettings, arduinoApp, context.extensionPath);
+    const arduinoManagerProvider = new ArduinoContentProvider(arduinoApp, context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
 
     const registerCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): vscode.Disposable => {
         return vscode.commands.registerCommand(command, async (...args: any[]) => {
-            const guid = Uuid().replace(/\-/g, "");
+            const guid = Uuid().replace(/-/g, "");
             Logger.traceUserData(`start-command-` + command, { correlationId: guid });
             const timer1 = new Logger.Timer();
             let telemetryResult;

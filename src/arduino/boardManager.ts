@@ -4,7 +4,6 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as url from "url";
 import * as vscode from "vscode";
@@ -15,7 +14,7 @@ import { arduinoChannel } from "../common/outputChannel";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
-import { Board, parseBoardDescriptor } from "./board";
+import { parseBoardDescriptor } from "./board";
 import { IBoard, IPackage, IPlatform } from "./package";
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -51,14 +50,14 @@ export class BoardManager {
         this._platforms = [];
         this._installedPlatforms = [];
 
-        const addiontionalUrls = this.getAdditionalUrls();
+        const additionalUrls = this.getAdditionalUrls();
         if (update) { // Update index files.
-            await this.setPreferenceUrls(addiontionalUrls);
+            await this.setPreferenceUrls(additionalUrls);
             await this._arduinoApp.initialize(true);
         }
 
         // Parse package index files.
-        const indexFiles = ["package_index.json"].concat(addiontionalUrls);
+        const indexFiles = ["package_index.json"].concat(additionalUrls);
         const rootPackgeFolder = this._settings.packagePath;
         for (const indexFile of indexFiles) {
             const indexFileName = this.getIndexFileName(indexFile);
@@ -66,7 +65,7 @@ export class BoardManager {
                 continue;
             }
             if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
-                await this.setPreferenceUrls(addiontionalUrls);
+                await this.setPreferenceUrls(additionalUrls);
                 await this._arduinoApp.initialize(true);
             }
             this.loadPackageContent(indexFileName);
@@ -112,8 +111,6 @@ export class BoardManager {
     }
 
     public async updatePackageIndex(indexUri: string): Promise<boolean> {
-        const indexFileName = this.getIndexFileName(indexUri);
-
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
@@ -198,7 +195,7 @@ export class BoardManager {
             return;
         }
 
-        this._packages.concat(rawModel.packages);
+        this._packages = this._packages.concat(rawModel.packages);
 
         rawModel.packages.forEach((pkg) => {
             pkg.platforms.forEach((plat) => {
@@ -393,7 +390,6 @@ export class BoardManager {
     }
 
     private loadInstalledBoardsFromPlatform(plat: IPlatform) {
-        const dir = plat.rootBoardPath;
         if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
             const boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
             const res = parseBoardDescriptor(boardContent, plat);

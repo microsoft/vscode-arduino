@@ -4,15 +4,12 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as constants from "./common/constants";
 import * as util from "./common/util";
 import * as Logger from "./logger/logger";
 
-import { ArduinoApp } from "./arduino/arduino";
-import { IBoard } from "./arduino/package";
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
 
 /**
@@ -82,8 +79,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _configuration: string;
 
-    private _arduinoApp: ArduinoApp;
-
     private _extensionPath: string;
 
     private _watcher: vscode.FileSystemWatcher;
@@ -113,14 +108,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         if (this._vscodeWatcher) {
             this._vscodeWatcher.dispose();
         }
-    }
-
-    public get arduinoApp(): ArduinoApp {
-        return this._arduinoApp;
-    }
-
-    public set arduinoApp(value: ArduinoApp) {
-        this._arduinoApp = value;
     }
 
     public get extensionPath(): string {

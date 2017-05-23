@@ -13,7 +13,7 @@ import * as constants from "../common/constants";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 
-import { DeviceContext, IDeviceContext } from "../deviceContext";
+import { DeviceContext } from "../deviceContext";
 import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
@@ -35,7 +35,7 @@ export class ArduinoApp {
     private _exampleManager: ExampleManager;
 
     /**
-     * @param {IArduinoSettings} ArduinoSetting object.
+     * @param {IArduinoSettings} _settings ArduinoSetting object.
      */
     constructor(private _settings: IArduinoSettings) {
     }
@@ -92,7 +92,7 @@ export class ArduinoApp {
 
     public async upload() {
         const dc = DeviceContext.getIntance();
-        const boardDescriptor = this.getBoardBuildString(dc);
+        const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return;
         }
@@ -123,7 +123,7 @@ export class ArduinoApp {
         if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async (result) => {
+        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
             if (needRestore) {
                 await serialMonitor.openSerialMonitor();
             }
@@ -135,7 +135,7 @@ export class ArduinoApp {
 
     public async verify(output: string = "") {
         const dc = DeviceContext.getIntance();
-        const boardDescriptor = this.getBoardBuildString(dc);
+        const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return;
         }
@@ -157,15 +157,15 @@ export class ArduinoApp {
         if (VscodeSettings.getIntance().logLevel === "verbose") {
             args.push("--verbose");
         }
-        if (output) {
-            const outputPath = path.join(vscode.workspace.rootPath, output);
+        if (output || dc.output) {
+            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         }
 
         arduinoChannel.show();
         // we need to return the result of verify
         try {
-            const result = await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
+            await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
             return true;
         } catch (reason) {
@@ -458,14 +458,13 @@ export class ArduinoApp {
         this._exampleManager = value;
     }
 
-    private getBoardBuildString(deviceContext: IDeviceContext): string {
+    private getBoardBuildString(): string {
         const selectedBoard = this.boardManager.currentBoard;
         if (!selectedBoard) {
             Logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
         }
-        const boardString = selectedBoard.getBuildConfig();
-        return boardString;
+        return selectedBoard.getBuildConfig();
     }
 
     private async getMainSketch(dc: DeviceContext) {

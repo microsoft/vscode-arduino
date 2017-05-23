@@ -10,7 +10,7 @@ import { DeviceContext } from "../deviceContext";
 
 export class DebuggerManager {
   private _initialized: boolean = false;
-  private _usbDector;
+  private _usbDetector;
   private _debugServerPath: string;
   private _miDebuggerPath: string;
   private _debuggerMappings: any = {};
@@ -41,7 +41,7 @@ export class DebuggerManager {
         }
       }
     }
-    this._usbDector = require("../../../vendor/node-usb-native").detector;
+    this._usbDetector = require("../../../vendor/node-usb-native").detector;
     this._debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
       path.join(this._arduinoSettings.packagePath, "packages"));
     if (!util.fileExistsSync(this._debugServerPath)) {
@@ -67,7 +67,7 @@ export class DebuggerManager {
   }
 
   public async listDebuggers(): Promise<any[]> {
-    const usbDeviceList = await this._usbDector.find();
+    const usbDeviceList = await this._usbDetector.find();
     const keys = [];
     const results = [];
     usbDeviceList.forEach((device) => {

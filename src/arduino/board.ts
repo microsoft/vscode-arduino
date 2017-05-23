@@ -28,7 +28,7 @@ export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): 
 
             let boardObject = result.get(match[1]);
             if (!boardObject) {
-                boardObject = new Board(match[1], plat, new Map<string, string>(), menuMap);
+                boardObject = new Board(match[1], plat, menuMap);
                 result.set(boardObject.board, boardObject);
             }
             if (match[2] === "name") {
@@ -44,19 +44,22 @@ export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): 
 const MENU_REGEX = /menu\.([^\.]+)\.([^\.]+)(\.?(\S+)?)/;
 
 export class Board implements IBoard {
-
-    public board: string;
-
     public name?: string;
-
-    public platform: IPlatform;
 
     private _configItems: IBoardConfigItem[];
 
-    constructor(_board: string, _platform: IPlatform, _parameters: Map<string, string>, private _menuMap: Map<string, string>) {
-        this.platform = _platform;
-        this.board = _board;
+    constructor(private _board: string,
+                private _platform: IPlatform,
+                private _menuMap: Map<string, string>) {
         this._configItems = [];
+    }
+
+    public get board(): string {
+        return this._board;
+    }
+
+    public get platform(): IPlatform {
+        return this._platform;
     }
 
     public addParameter(key: string, value: string): void {
@@ -83,9 +86,7 @@ export class Board implements IBoard {
     }
 
     public getBuildConfig(): string {
-        const config = this.customConfig;
-        const res = `${this.getPackageName()}:${this.platform.architecture}:${this.board}${config ? ":" + config : ""}`;
-        return res;
+        return `${this.getPackageName()}:${this.platform.architecture}:${this.board}${this.customConfig ? ":" + this.customConfig : ""}`;
     }
 
     /**
@@ -96,11 +97,9 @@ export class Board implements IBoard {
     }
 
     public get customConfig(): string {
-        let res;
         if (this._configItems && this._configItems.length > 0) {
-            res = this._configItems.map((configItem) => `${configItem.id}=${configItem.selectedOption}`).join(",");
+            return this._configItems.map((configItem) => `${configItem.id}=${configItem.selectedOption}`).join(",");
         }
-        return res;
     }
 
     public get configItems(): IBoardConfigItem[] {

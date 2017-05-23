@@ -56,7 +56,7 @@ export class UsbDetector {
                         vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No").then((ans) => {
                             if (ans === "Yes") {
                                 this._arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
-                                    .then((res) => {
+                                    .then(() => {
                                         if (shouldLoadPackgeContent) {
                                             this._boardManager.loadPackageContent(deviceDescriptor.indexFile);
                                         }
