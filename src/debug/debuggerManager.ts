@@ -9,7 +9,6 @@ import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
 
 export class DebuggerManager {
-  private _initialized: boolean = false;
   private _usbDetector;
   private _debugServerPath: string;
   private _miDebuggerPath: string;
@@ -53,11 +52,8 @@ export class DebuggerManager {
     if (!util.fileExistsSync(this._miDebuggerPath)) {
       this._miDebuggerPath = "";
     }
-    this._initialized = true;
   }
-  public get initialized(): boolean {
-    return this._initialized;
-  }
+
   public get miDebuggerPath(): string {
     return this._miDebuggerPath;
   }

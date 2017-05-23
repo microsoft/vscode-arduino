@@ -9,6 +9,7 @@ import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
 import { DebugConfigurator } from "./debug/configurator";
 import { DeviceContext } from "./deviceContext";
+import { DebuggerManager } from "./debug/debuggerManager";
 
 export class ArduinoActivator {
     public static async activate() {
@@ -32,6 +33,12 @@ export class ArduinoActivator {
             await arduinoApp.boardManager.loadPackages();
             arduinoApp.libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
             arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
+            const debuggerManager = new DebuggerManager(DeviceContext.getInstance().extensionPath, arduinoSettings,
+                arduinoApp.boardManager);
+            await debuggerManager.initialize();
+            ArduinoContext.arduinoConfigurator = new DebugConfigurator(
+                arduinoApp, arduinoSettings, arduinoApp.boardManager, debuggerManager);
+
             ArduinoContext.arduinoApp = arduinoApp;
         })();
         await ArduinoActivator._initializePromise;
@@ -55,12 +62,17 @@ export class ArduinoContext {
     public static get boardManager() {
         return ArduinoContext._boardManager;
     }
+
     public static set boardManager(value: BoardManager) {
         ArduinoContext._boardManager = value;
     }
 
     public static get arduinoConfigurator(): DebugConfigurator {
         return ArduinoContext._arduinoConfigurator;
+    }
+
+    public static set arduinoConfigurator(value: DebugConfigurator) {
+        ArduinoContext._arduinoConfigurator = value;
     }
 
     private static _arduinoApp: ArduinoApp = null;
