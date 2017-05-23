@@ -25,7 +25,7 @@ suite("vscode-arduino extension commands test", () => {
 
     // Arduino: Boards Manager : Manage packages for boards
     test("should be able to run command: arduino.showBoardManager", (done) => {
-        // this.timeout(3 * 60 * 1000);
+        this.timeout(10 * 1000);
         try {
             // run "Arduino: Boards Manager" command.
             vscode.commands.executeCommand("arduino.showBoardManager").then((result)  => {
@@ -39,6 +39,7 @@ suite("vscode-arduino extension commands test", () => {
 
     // Arduino: Libraries Manager: Explore and manage libraries
     test("should be able to run command: arduino.showLibraryManager", (done) => {
+        this.timeout(10 * 1000);
         try {
             // run "Arduino: Libraries Manager" command.
             vscode.commands.executeCommand("arduino.showLibraryManager").then((result)  => {
@@ -52,6 +53,7 @@ suite("vscode-arduino extension commands test", () => {
 
     // rduino: Arduino Board Configuration
     test("should be able to run command: arduino.showBoardConfig", (done) => {
+        this.timeout(10 * 1000);
         try {
             // run "Arduino: Arduino Board Configuration" command.
             vscode.commands.executeCommand("arduino.showBoardConfig").then((result)  => {
@@ -65,6 +67,7 @@ suite("vscode-arduino extension commands test", () => {
 
     // Arduino: Examples: Show example list
     test("should be able to run command: arduino.showExamples", (done) => {
+        this.timeout(10 * 1000);
         try {
             // run "Arduino: Examples" command.
             vscode.commands.executeCommand("arduino.showExamples").then((result)  => {
