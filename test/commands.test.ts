@@ -24,7 +24,8 @@ suite("vscode-arduino extension commands test", () => {
     });
 
     // Arduino: Boards Manager : Manage packages for boards
-    test("should be able to run command: arduino.showBoardManager", (done) => {
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showBoardManager", function(done) {
         this.timeout(10 * 1000);
         try {
             // run "Arduino: Boards Manager" command.
@@ -38,7 +39,8 @@ suite("vscode-arduino extension commands test", () => {
     });
 
     // Arduino: Libraries Manager: Explore and manage libraries
-    test("should be able to run command: arduino.showLibraryManager", (done) => {
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showLibraryManager", function(done) {
         this.timeout(10 * 1000);
         try {
             // run "Arduino: Libraries Manager" command.
@@ -51,8 +53,9 @@ suite("vscode-arduino extension commands test", () => {
         }
     });
 
-    // rduino: Arduino Board Configuration
-    test("should be able to run command: arduino.showBoardConfig", (done) => {
+    // Arduino: Arduino Board Configuration
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showBoardConfig", function(done) {
         this.timeout(10 * 1000);
         try {
             // run "Arduino: Arduino Board Configuration" command.
@@ -66,7 +69,8 @@ suite("vscode-arduino extension commands test", () => {
     });
 
     // Arduino: Examples: Show example list
-    test("should be able to run command: arduino.showExamples", (done) => {
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showExamples", function(done) {
         this.timeout(10 * 1000);
         try {
             // run "Arduino: Examples" command.
