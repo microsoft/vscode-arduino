@@ -11,9 +11,5 @@
         "**/.git/objects/**": true,
         "**/out/*": true,
         "**/node_modules/**": true
-    },
-    "files.associations": {
-        "*.ino": "cpp",
-        "istream": "cpp"
     }
 }
