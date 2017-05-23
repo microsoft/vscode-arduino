@@ -16,7 +16,7 @@ import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
-    private _usbDector;
+    private _usbDetector;
 
     private _boardDescriptors = null;
 
@@ -30,13 +30,13 @@ export class UsbDetector {
         if (os.platform() === "linux") {
             return;
         }
-        this._usbDector = require("../../../vendor/node-usb-native").detector;
+        this._usbDetector = require("../../../vendor/node-usb-native").detector;
 
-        if (!this._usbDector) {
+        if (!this._usbDetector) {
             return;
         }
 
-        this._usbDector.on("add", (device) => {
+        this._usbDetector.on("add", (device) => {
             if (device.vendorId && device.productId) {
                 const deviceDescriptor = this.getUsbDeviceDescriptor(
                     util.convertToHex(device.vendorId, 4), // vid and pid both are 2 bytes long.
@@ -56,7 +56,7 @@ export class UsbDetector {
                         vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No").then((ans) => {
                             if (ans === "Yes") {
                                 this._arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
-                                    .then((res) => {
+                                    .then(() => {
                                         if (shouldLoadPackgeContent) {
                                             this._boardManager.loadPackageContent(deviceDescriptor.indexFile);
                                         }
@@ -88,7 +88,7 @@ export class UsbDetector {
                                 }
                             });
                     } else {
-                        const monitor = SerialMonitor.getIntance();
+                        const monitor = SerialMonitor.getInstance();
                         monitor.selectSerialPort(deviceDescriptor.vid, deviceDescriptor.pid);
                         this.showReadMeAndExample();
                     }
@@ -100,14 +100,14 @@ export class UsbDetector {
     }
 
     public stopListening() {
-        if (this._usbDector) {
-            this._usbDector.stopMonitoring();
+        if (this._usbDetector) {
+            this._usbDetector.stopMonitoring();
         }
     }
 
     private switchBoard(bd: IBoard, vid: string, pid: string) {
         this._boardManager.doChangeBoardType(bd);
-        const monitor = SerialMonitor.getIntance();
+        const monitor = SerialMonitor.getInstance();
         monitor.selectSerialPort(vid, pid);
         this.showReadMeAndExample();
     }

@@ -4,7 +4,6 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as url from "url";
 import * as vscode from "vscode";
@@ -15,7 +14,7 @@ import { arduinoChannel } from "../common/outputChannel";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
-import { Board, parseBoardDescriptor } from "./board";
+import { parseBoardDescriptor } from "./board";
 import { IBoard, IPackage, IPlatform } from "./package";
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -51,22 +50,22 @@ export class BoardManager {
         this._platforms = [];
         this._installedPlatforms = [];
 
-        const addiontionalUrls = this.getAdditionalUrls();
+        const additionalUrls = this.getAdditionalUrls();
         if (update) { // Update index files.
-            await this.setPreferenceUrls(addiontionalUrls);
+            await this.setPreferenceUrls(additionalUrls);
             await this._arduinoApp.initialize(true);
         }
 
         // Parse package index files.
-        const indexFiles = ["package_index.json"].concat(addiontionalUrls);
-        const rootPackgeFolder = this._settings.packagePath;
+        const indexFiles = ["package_index.json"].concat(additionalUrls);
+        const rootPackageFolder = this._settings.packagePath;
         for (const indexFile of indexFiles) {
             const indexFileName = this.getIndexFileName(indexFile);
             if (!indexFileName) {
                 continue;
             }
-            if (!update && !util.fileExistsSync(path.join(rootPackgeFolder, indexFileName))) {
-                await this.setPreferenceUrls(addiontionalUrls);
+            if (!update && !util.fileExistsSync(path.join(rootPackageFolder, indexFileName))) {
+                await this.setPreferenceUrls(additionalUrls);
                 await this._arduinoApp.initialize(true);
             }
             this.loadPackageContent(indexFileName);
@@ -80,7 +79,7 @@ export class BoardManager {
         this.updateStatusBar();
         this._boardStatusBar.show();
 
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
         dc.onDidChange(() => {
             this.updateStatusBar();
         });
@@ -112,19 +111,17 @@ export class BoardManager {
     }
 
     public async updatePackageIndex(indexUri: string): Promise<boolean> {
-        const indexFileName = this.getIndexFileName(indexUri);
-
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
-            await VscodeSettings.getIntance().updateAdditionalUrls(allUrls);
+            await VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
     }
 
     public doChangeBoardType(targetBoard: IBoard) {
-        const dc = DeviceContext.getIntance();
+        const dc = DeviceContext.getInstance();
         dc.board = targetBoard.key;
         this._currentBoard = targetBoard;
         dc.configuration = this._currentBoard.customConfig;
@@ -198,7 +195,7 @@ export class BoardManager {
             return;
         }
 
-        this._packages.concat(rawModel.packages);
+        this._packages = this._packages.concat(rawModel.packages);
 
         rawModel.packages.forEach((pkg) => {
             pkg.platforms.forEach((plat) => {
@@ -252,7 +249,7 @@ export class BoardManager {
     public updateStatusBar(show: boolean = true): void {
         if (show) {
             this._boardStatusBar.show();
-            const dc = DeviceContext.getIntance();
+            const dc = DeviceContext.getInstance();
             const selectedBoard = this._boards.get(dc.board);
             if (selectedBoard) {
                 this._currentBoard = selectedBoard;
@@ -393,7 +390,6 @@ export class BoardManager {
     }
 
     private loadInstalledBoardsFromPlatform(plat: IPlatform) {
-        const dir = plat.rootBoardPath;
         if (util.fileExistsSync(path.join(plat.rootBoardPath, "boards.txt"))) {
             const boardContent = fs.readFileSync(path.join(plat.rootBoardPath, "boards.txt"), "utf8");
             const res = parseBoardDescriptor(boardContent, plat);
@@ -433,7 +429,7 @@ export class BoardManager {
             return [];
         }
         // For better compatibility, merge urls both in user settings and arduino IDE preferences.
-        const settingsUrls = formatUrls(VscodeSettings.getIntance().additionalUrls);
+        const settingsUrls = formatUrls(VscodeSettings.getInstance().additionalUrls);
         let preferencesUrls = [];
         const preferences = this._settings.preferences;
         if (preferences && preferences.has("boardsmanager.additional.urls")) {
@@ -442,8 +438,8 @@ export class BoardManager {
         return util.union(settingsUrls, preferencesUrls);
     }
 
-    private async setPreferenceUrls(addiontionalUrls: string[]) {
-        const settingsUrls = addiontionalUrls.join(",");
+    private async setPreferenceUrls(additionalUrls: string[]) {
+        const settingsUrls = additionalUrls.join(",");
         if (this._settings.preferences.get("boardsmanager.additional.urls") !== settingsUrls) {
             await this._arduinoApp.setPref("boardsmanager.additional.urls", settingsUrls);
         }

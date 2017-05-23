@@ -21,7 +21,7 @@ export interface IVscodeSettings {
 }
 
 export class VscodeSettings implements IVscodeSettings {
-    public static getIntance(): IVscodeSettings {
+    public static getInstance(): IVscodeSettings {
         if (!VscodeSettings._instance) {
             VscodeSettings._instance = new VscodeSettings();
         }

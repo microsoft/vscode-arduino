@@ -4,7 +4,6 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 
 import * as util from "../common/util";
@@ -19,7 +18,7 @@ export interface ILibrary {
     srcPath: string;
     version: string;
     versions: string[];
-    aruthor: string;
+    author: string;
     maintainer: string;
     sentence: string;
     paragraph: string;

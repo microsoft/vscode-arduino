@@ -3,12 +3,10 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as constants from "../common/constants";
-import * as platform from "../common/platform";
 import * as util from "../common/util";
 
 import { ArduinoApp } from "../arduino/arduino";
@@ -35,7 +33,7 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         }
     }
 
-    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
+    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position):
         vscode.CompletionItem[] | Thenable<vscode.CompletionItem[]> {
         // Check if we are currently inside an include statement.
         const text = document.lineAt(position.line).text.substr(0, position.character);
