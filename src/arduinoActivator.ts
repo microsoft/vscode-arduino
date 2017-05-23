@@ -8,8 +8,8 @@ import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
 import { DebugConfigurator } from "./debug/configurator";
-import { DeviceContext } from "./deviceContext";
 import { DebuggerManager } from "./debug/debuggerManager";
+import { DeviceContext } from "./deviceContext";
 
 export class ArduinoActivator {
     public static async activate() {
