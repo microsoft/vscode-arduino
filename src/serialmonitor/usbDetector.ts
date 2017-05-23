@@ -7,9 +7,8 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ArduinoApp } from "../arduino/arduino";
-import { BoardManager } from "../arduino/boardManager";
 import { IBoard } from "../arduino/package";
+import { ArduinoActivator, ArduinoContext } from "../arduinoActivator";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
@@ -21,8 +20,6 @@ export class UsbDetector {
     private _boardDescriptors = null;
 
     constructor(
-        private _arduinoApp: ArduinoApp,
-        private _boardManager: BoardManager,
         private _extensionRoot: string) {
     }
 
@@ -36,7 +33,7 @@ export class UsbDetector {
             return;
         }
 
-        this._usbDetector.on("add", (device) => {
+        this._usbDetector.on("add", async (device) => {
             if (device.vendorId && device.productId) {
                 const deviceDescriptor = this.getUsbDeviceDescriptor(
                     util.convertToHex(device.vendorId, 4), // vid and pid both are 2 bytes long.
@@ -49,23 +46,25 @@ export class UsbDetector {
                 }
                 const boardKey = `${deviceDescriptor.package}:${deviceDescriptor.architecture}:${deviceDescriptor.id}`;
                 Logger.traceUserData("detected a board", { board: boardKey });
-
-                let bd = this._boardManager.installedBoards.get(boardKey);
+                if (!ArduinoContext.initialized) {
+                    await ArduinoActivator.activate();
+                }
+                let bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
                 if (!bd) {
-                    this._boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackgeContent) => {
+                    ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackgeContent) => {
                         vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No").then((ans) => {
                             if (ans === "Yes") {
-                                this._arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
+                                ArduinoContext.arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
                                     .then(() => {
                                         if (shouldLoadPackgeContent) {
-                                            this._boardManager.loadPackageContent(deviceDescriptor.indexFile);
+                                            ArduinoContext.boardManager.loadPackageContent(deviceDescriptor.indexFile);
                                         }
-                                        this._boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
-                                        bd = this._boardManager.installedBoards.get(boardKey);
+                                        ArduinoContext.boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
+                                        bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
                                         this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
 
-                                        if (this._boardManager.currentBoard) {
-                                            const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
+                                        if (ArduinoContext.boardManager.currentBoard) {
+                                            const readme = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
                                             if (util.fileExistsSync(readme)) {
                                                 vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
                                             }
@@ -75,8 +74,8 @@ export class UsbDetector {
                             }
                         });
                     });
-                } else if (this._boardManager.currentBoard) {
-                    const currBoard = this._boardManager.currentBoard;
+                } else if (ArduinoContext.boardManager.currentBoard) {
+                    const currBoard = ArduinoContext.boardManager.currentBoard;
                     if (currBoard.board !== deviceDescriptor.id
                         || currBoard.platform.architecture !== deviceDescriptor.architecture
                         || currBoard.getPackageName() !== deviceDescriptor.package) {
@@ -106,15 +105,15 @@ export class UsbDetector {
     }
 
     private switchBoard(bd: IBoard, vid: string, pid: string) {
-        this._boardManager.doChangeBoardType(bd);
+        ArduinoContext.boardManager.doChangeBoardType(bd);
         const monitor = SerialMonitor.getInstance();
         monitor.selectSerialPort(vid, pid);
         this.showReadMeAndExample();
     }
 
     private showReadMeAndExample() {
-        if (this._boardManager.currentBoard) {
-            const readme = path.join(this._boardManager.currentBoard.platform.rootBoardPath, "README.md");
+        if (ArduinoContext.boardManager.currentBoard) {
+            const readme = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
             if (util.fileExistsSync(readme)) {
                 vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
             }
