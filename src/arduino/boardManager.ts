@@ -261,6 +261,7 @@ export class BoardManager {
                     this._configStatusBar.hide();
                 }
             } else {
+                this._currentBoard = null;
                 this._boardStatusBar.text = "<Select Board Type>";
                 this._configStatusBar.hide();
             }
