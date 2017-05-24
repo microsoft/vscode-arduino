@@ -1,5 +1,8 @@
 {
     "sketch": "blink.ino",
     "port": "COM4",
-    "board": "arduino:avr:yun"
+    "board": "arduino:avr:diecimila",
+    "output": null,
+    "_debugger": null,
+    "configuration": "cpu=atmega328"
 }
