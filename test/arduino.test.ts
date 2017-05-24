@@ -21,7 +21,7 @@ suite("Arduino: App Initialization", () => {
                 done();
             }
         } catch (error) {
-            done(`Failed to init arduino settings: ${error}` );
+            done(`Failed to activate extension: ${error}` );
         }
     });
 
