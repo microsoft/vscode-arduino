@@ -1,26 +1,25 @@
 import * as assert from "assert";
 import * as Path from "path";
-import * as TypeMoq from "typemoq";
 import * as util from "../src/common/util";
 
-import * as Resources from "./resources";
-
-import { ArduinoApp } from "../src/arduino/arduino";
-import { ArduinoSettings } from "../src/arduino/arduinoSettings";
+import ArduinoActivator from "../src/arduinoActivator";
+import ArduinoContext from "../src/arduinoContext";
 
 suite("Arduino: App Initialization", () => {
-    const arduinoSettings = new ArduinoSettings();
-    const arduinoApp = new ArduinoApp(arduinoSettings);
 
     // tslint:disable-next-line: only-arrow-functions
     setup(function(done) {
-        this.timeout(60 * 1000);
+        this.timeout(2 * 60 * 1000);
         try {
-            arduinoSettings.initialize().then(() => {
+            if (!ArduinoContext.initialized) {
+                ArduinoActivator.activate().then(() => {
+                    done();
+                }).catch((error) => {
+                    done(`Failed to activate extension: ${error}`);
+                });
+            } else {
                 done();
-            }).catch((error) => {
-                done(`Failed to init arduino settings: ${error}`);
-            });
+            }
         } catch (error) {
             done(`Failed to init arduino settings: ${error}` );
         }
@@ -28,6 +27,7 @@ suite("Arduino: App Initialization", () => {
 
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to resolve arduino settings correctly", function(done) {
+        const arduinoSettings = ArduinoContext.arduinoApp.settings;
         assert.equal(util.directoryExistsSync(arduinoSettings.arduinoPath), true,
         "should resolve arduino installation directory automatically");
 
@@ -48,29 +48,24 @@ suite("Arduino: App Initialization", () => {
 
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to download necessary package_index and preferences.txt", function(done) {
-        this.timeout(60 * 1000);
-        try {
-            arduinoApp.initialize(false).then(() => {
-                assert.equal(util.fileExistsSync(arduinoSettings.preferencePath), true,
-                "should be able to init preferences.txt file if not found");
+        const arduinoSettings = ArduinoContext.arduinoApp.settings;
+        assert.equal(util.fileExistsSync(arduinoSettings.preferencePath), true,
+        "should be able to init preferences.txt file if not found");
 
-                assert.equal(arduinoSettings.preferences.get("sketchbook.path"), arduinoSettings.sketchbookPath);
+        assert.equal(arduinoSettings.preferences.get("sketchbook.path"), arduinoSettings.sketchbookPath);
 
-                assert.equal(util.fileExistsSync(Path.join(arduinoSettings.packagePath, "package_index.json")), true,
-                "should be able to download package_index.json file if not found");
+        assert.equal(util.fileExistsSync(Path.join(arduinoSettings.packagePath, "package_index.json")), true,
+        "should be able to download package_index.json file if not found");
 
-                done();
-            }).catch((error) => {
-                done(`Failed to init arduino app: ${error}`);
-            });
-        } catch (error) {
-            done(`Failed to init arduino app: ${error}`);
-        }
+        done();
     });
 
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to download necessary library_index", function(done) {
         this.timeout(60 * 1000);
+
+        const arduinoApp = ArduinoContext.arduinoApp;
+        const arduinoSettings = ArduinoContext.arduinoApp.settings;
         try {
             arduinoApp.initializeLibrary(false).then(() => {
                 assert.equal(util.fileExistsSync(Path.join(arduinoSettings.packagePath, "library_index.json")), true,
@@ -78,10 +73,10 @@ suite("Arduino: App Initialization", () => {
 
                 done();
             }).catch((error) => {
-                done(`Failed to init library_index: ${error}`);
+                done(`Failed to init library_index.json file: ${error}`);
             });
         } catch (error) {
-            done(`Failed to init library_index: ${error}`);
+            done(`Failed to init library_index.json file: ${error}`);
         }
     });
 });
