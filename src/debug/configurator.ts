@@ -7,8 +7,9 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "../arduino/arduino";
-import { ArduinoSettings } from "../arduino/arduinoSettings";
+import { IArduinoSettings } from "../arduino/arduinoSettings";
 import { BoardManager } from "../arduino/boardManager";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
@@ -18,20 +19,15 @@ import { DebuggerManager } from "./debuggerManager";
  * Automatically generate the Arduino board's debug settings.
  */
 export class DebugConfigurator {
-  private _debuggerManager: DebuggerManager;
     constructor(
-        private _extensionRoot: string,
         private _arduinoApp: ArduinoApp,
-        private _arduinoSettings: ArduinoSettings,
+        private _arduinoSettings: IArduinoSettings,
         private _boardManager: BoardManager,
-        ) {
-      this._debuggerManager = new DebuggerManager(_extensionRoot, _arduinoSettings, _boardManager);
+        private _debuggerManager: DebuggerManager,
+    ) {
     }
 
     public async run(config) {
-        if (!this._debuggerManager.initialized) {
-            this._debuggerManager.initialize();
-        }
         // Default settings:
         if (!config.request) {
             config = {
@@ -41,9 +37,7 @@ export class DebugConfigurator {
                 program: "${file}",
                 cwd: "${workspaceRoot}",
                 MIMode: "gdb",
-                logging: {
-                    engineLogging: true,
-                },
+
                 targetArchitecture: "arm",
                 customLaunchSetupCommands: [
                     {
@@ -70,9 +64,23 @@ export class DebugConfigurator {
             };
         }
 
+        if (VscodeSettings.getInstance().logLevel === "verbose" && !config.logging) {
+            config = {
+                ...config, logging: {
+                    engineLogging: true,
+                },
+            };
+        }
+
+        if (!this._boardManager.currentBoard) {
+            vscode.window.showErrorMessage("Please select a board.");
+            return;
+        }
+
         if (!this.resolveOpenOcd(config)) {
             return;
         }
+
         if (!await this.resolveOpenOcdOptions(config)) {
             return;
         }
@@ -97,6 +105,19 @@ export class DebugConfigurator {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
             const outputFolder = path.join(dc.output || `.build`, this._boardManager.currentBoard.board);
             util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, outputFolder));
+            if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+                await dc.resolveMainSketch();
+            }
+
+            if (!dc.sketch) {
+                vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
+                return false;
+            }
+
+            if (!util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+                vscode.window.showErrorMessage(`Cannot find ${dc.sketch}, Please specify the sketch in the arduino.json file`);
+                return false;
+            }
             config.program = path.join(vscode.workspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf

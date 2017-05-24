@@ -26,7 +26,7 @@ suite("vscode-arduino extension commands test", () => {
     // Arduino: Boards Manager : Manage packages for boards
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to run command: arduino.showBoardManager", function(done) {
-        this.timeout(10 * 1000);
+        this.timeout(60 * 1000);
         try {
             // run "Arduino: Boards Manager" command.
             vscode.commands.executeCommand("arduino.showBoardManager").then((result)  => {
