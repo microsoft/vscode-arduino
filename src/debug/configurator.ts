@@ -9,6 +9,7 @@ import * as vscode from "vscode";
 import { ArduinoApp } from "../arduino/arduino";
 import { IArduinoSettings } from "../arduino/arduinoSettings";
 import { BoardManager } from "../arduino/boardManager";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
@@ -36,9 +37,7 @@ export class DebugConfigurator {
                 program: "${file}",
                 cwd: "${workspaceRoot}",
                 MIMode: "gdb",
-                logging: {
-                    engineLogging: true,
-                },
+
                 targetArchitecture: "arm",
                 customLaunchSetupCommands: [
                     {
@@ -62,6 +61,14 @@ export class DebugConfigurator {
                 launchCompleteCommand: "exec-continue",
                 filterStderr: true,
                 args: [],
+            };
+        }
+
+        if (VscodeSettings.getInstance().logLevel === "verbose" && !config.logging) {
+            config = {
+                ...config, logging: {
+                    engineLogging: true,
+                },
             };
         }
 
