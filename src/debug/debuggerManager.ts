@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { ArduinoSettings } from "../arduino/arduinoSettings";
+import { IArduinoSettings } from "../arduino/arduinoSettings";
 import { BoardManager } from "../arduino/boardManager";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
@@ -16,7 +16,7 @@ export class DebuggerManager {
   private _debuggerBoardMappings: any = {};
   constructor(
     private _extensionRoot: string,
-    private _arduinoSettings: ArduinoSettings,
+    private _arduinoSettings: IArduinoSettings,
     private _boardManager: BoardManager) {
   }
 

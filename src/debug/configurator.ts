@@ -7,7 +7,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "../arduino/arduino";
-import { ArduinoSettings } from "../arduino/arduinoSettings";
+import { IArduinoSettings } from "../arduino/arduinoSettings";
 import { BoardManager } from "../arduino/boardManager";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
@@ -20,7 +20,7 @@ import { DebuggerManager } from "./debuggerManager";
 export class DebugConfigurator {
     constructor(
         private _arduinoApp: ArduinoApp,
-        private _arduinoSettings: ArduinoSettings,
+        private _arduinoSettings: IArduinoSettings,
         private _boardManager: BoardManager,
         private _debuggerManager: DebuggerManager,
         ) {
@@ -63,6 +63,11 @@ export class DebugConfigurator {
                 filterStderr: true,
                 args: [],
             };
+        }
+
+        if (!this._boardManager.currentBoard) {
+            vscode.window.showErrorMessage("Please select a board.");
+            return;
         }
 
         if (!this.resolveOpenOcd(config)) {

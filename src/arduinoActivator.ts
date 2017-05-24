@@ -33,12 +33,6 @@ export class ArduinoActivator {
             await arduinoApp.boardManager.loadPackages();
             arduinoApp.libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
             arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
-            const debuggerManager = new DebuggerManager(DeviceContext.getInstance().extensionPath, arduinoSettings,
-                arduinoApp.boardManager);
-            await debuggerManager.initialize();
-            ArduinoContext.arduinoConfigurator = new DebugConfigurator(
-                arduinoApp, arduinoSettings, arduinoApp.boardManager, debuggerManager);
-
             ArduinoContext.arduinoApp = arduinoApp;
         })();
         await ArduinoActivator._initializePromise;
@@ -68,6 +62,16 @@ export class ArduinoContext {
     }
 
     public static get arduinoConfigurator(): DebugConfigurator {
+        if (ArduinoContext._arduinoConfigurator === null) {
+            const debuggerManager = new DebuggerManager(
+                DeviceContext.getInstance().extensionPath,
+                ArduinoContext.arduinoApp.settings,
+                ArduinoContext.boardManager);
+            debuggerManager.initialize();
+            ArduinoContext._arduinoConfigurator = new DebugConfigurator(
+                ArduinoContext.arduinoApp, ArduinoContext.arduinoApp.settings
+                , ArduinoContext.boardManager, debuggerManager);
+        }
         return ArduinoContext._arduinoConfigurator;
     }
 
