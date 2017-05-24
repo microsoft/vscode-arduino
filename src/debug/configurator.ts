@@ -23,7 +23,7 @@ export class DebugConfigurator {
         private _arduinoSettings: IArduinoSettings,
         private _boardManager: BoardManager,
         private _debuggerManager: DebuggerManager,
-        ) {
+    ) {
     }
 
     public async run(config) {
@@ -73,6 +73,7 @@ export class DebugConfigurator {
         if (!this.resolveOpenOcd(config)) {
             return;
         }
+
         if (!await this.resolveOpenOcdOptions(config)) {
             return;
         }
@@ -97,6 +98,19 @@ export class DebugConfigurator {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
             const outputFolder = path.join(dc.output || `.build`, this._boardManager.currentBoard.board);
             util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, outputFolder));
+            if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+                await dc.resolveMainSketch();
+            }
+
+            if (!dc.sketch) {
+                vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
+                return false;
+            }
+
+            if (!util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+                vscode.window.showErrorMessage(`Cannot find ${dc.sketch}, Please specify the sketch in the arduino.json file`);
+                return false;
+            }
             config.program = path.join(vscode.workspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
