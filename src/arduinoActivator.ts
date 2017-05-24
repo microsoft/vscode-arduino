@@ -8,17 +8,18 @@ import { ArduinoSettings } from "./arduino/arduinoSettings";
 import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { LibraryManager } from "./arduino/libraryManager";
-import { ArduinoContext } from "./arduinoContext";
+import ArduinoContext from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
 
-export class ArduinoActivator {
-    public static async activate() {
-        if (ArduinoActivator._initializePromise) {
-            await ArduinoActivator._initializePromise;
+class ArduinoActivator {
+    private _initializePromise: Promise<void>;
+    public async activate() {
+        if (this._initializePromise) {
+            await this._initializePromise;
             return;
         }
 
-        ArduinoActivator._initializePromise = (async () => {
+        this._initializePromise = (async () => {
             const arduinoSettings = new ArduinoSettings();
             await arduinoSettings.initialize();
             const arduinoApp = new ArduinoApp(arduinoSettings);
@@ -35,7 +36,7 @@ export class ArduinoActivator {
             arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
             ArduinoContext.arduinoApp = arduinoApp;
         })();
-        await ArduinoActivator._initializePromise;
+        await this._initializePromise;
     }
-    private static _initializePromise: Promise<void>;
 }
+export default new ArduinoActivator();

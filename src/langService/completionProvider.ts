@@ -9,8 +9,8 @@ import * as vscode from "vscode";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 
-import { ArduinoActivator } from "../arduinoActivator";
-import { ArduinoContext } from "../arduinoContext";
+import ArduinoActivator from "../arduinoActivator";
+import ArduinoContext from "../arduinoContext";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
 

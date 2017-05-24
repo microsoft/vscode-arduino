@@ -7,8 +7,8 @@ import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
-import { ArduinoActivator } from "./arduinoActivator";
-import { ArduinoContext } from "./arduinoContext";
+import ArduinoActivator from "./arduinoActivator";
+import ArduinoContext from "./arduinoContext";
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
     LIBRARY_MANAGER_URI,

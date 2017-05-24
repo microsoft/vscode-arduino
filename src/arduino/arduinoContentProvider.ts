@@ -6,8 +6,8 @@
 import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
-import { ArduinoActivator } from "../arduinoActivator";
-import { ArduinoContext } from "../arduinoContext";
+import ArduinoActivator from "../arduinoActivator";
+import ArduinoContext from "../arduinoContext";
 import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";

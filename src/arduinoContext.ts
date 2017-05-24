@@ -3,54 +3,53 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 import { ArduinoApp } from "./arduino/arduino";
-import { ArduinoSettings } from "./arduino/arduinoSettings";
 import { BoardManager } from "./arduino/boardManager";
-import { ExampleManager } from "./arduino/exampleManager";
-import { LibraryManager } from "./arduino/libraryManager";
 import { DebugConfigurator } from "./debug/configurator";
 import { DebuggerManager } from "./debug/debuggerManager";
 import { DeviceContext } from "./deviceContext";
 
-export class ArduinoContext {
-    public static get initialized(): boolean {
-        return !!ArduinoContext._arduinoApp;
+class ArduinoContext {
+    public get initialized(): boolean {
+        return !!this._arduinoApp;
     }
 
-    public static get arduinoApp(): ArduinoApp {
-        return ArduinoContext._arduinoApp;
+    public get arduinoApp(): ArduinoApp {
+        return this._arduinoApp;
     }
 
-    public static set arduinoApp(value: ArduinoApp) {
-        ArduinoContext._arduinoApp = value;
+    public set arduinoApp(value: ArduinoApp) {
+        this._arduinoApp = value;
     }
 
-    public static get boardManager() {
-        return ArduinoContext._boardManager;
+    public get boardManager() {
+        return this._boardManager;
     }
 
-    public static set boardManager(value: BoardManager) {
-        ArduinoContext._boardManager = value;
+    public set boardManager(value: BoardManager) {
+        this._boardManager = value;
     }
 
-    public static get arduinoConfigurator(): DebugConfigurator {
-        if (ArduinoContext._arduinoConfigurator === null) {
+    public get arduinoConfigurator(): DebugConfigurator {
+        if (this._arduinoConfigurator === null) {
             const debuggerManager = new DebuggerManager(
                 DeviceContext.getInstance().extensionPath,
-                ArduinoContext.arduinoApp.settings,
-                ArduinoContext.boardManager);
+                this.arduinoApp.settings,
+                this.boardManager);
             debuggerManager.initialize();
-            ArduinoContext._arduinoConfigurator = new DebugConfigurator(
-                ArduinoContext.arduinoApp, ArduinoContext.arduinoApp.settings
-                , ArduinoContext.boardManager, debuggerManager);
+            this._arduinoConfigurator = new DebugConfigurator(
+                this.arduinoApp, this.arduinoApp.settings
+                , this.boardManager, debuggerManager);
         }
-        return ArduinoContext._arduinoConfigurator;
+        return this._arduinoConfigurator;
     }
 
-    public static set arduinoConfigurator(value: DebugConfigurator) {
-        ArduinoContext._arduinoConfigurator = value;
+    public set arduinoConfigurator(value: DebugConfigurator) {
+        this._arduinoConfigurator = value;
     }
 
-    private static _arduinoApp: ArduinoApp = null;
-    private static _arduinoConfigurator: DebugConfigurator = null;
-    private static _boardManager: BoardManager = null;
+    private _arduinoApp: ArduinoApp = null;
+    private _arduinoConfigurator: DebugConfigurator = null;
+    private _boardManager: BoardManager = null;
 }
+
+export default new ArduinoContext();

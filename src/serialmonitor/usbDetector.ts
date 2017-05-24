@@ -8,8 +8,8 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { IBoard } from "../arduino/package";
-import { ArduinoActivator } from "../arduinoActivator";
-import { ArduinoContext } from "../arduinoContext";
+import ArduinoActivator from "../arduinoActivator";
+import ArduinoContext from "../arduinoContext";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
@@ -55,12 +55,12 @@ export class UsbDetector {
                 }
                 let bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
                 if (!bd) {
-                    ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackgeContent) => {
+                    ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackageContent) => {
                         vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No").then((ans) => {
                             if (ans === "Yes") {
                                 ArduinoContext.arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
                                     .then(() => {
-                                        if (shouldLoadPackgeContent) {
+                                        if (shouldLoadPackageContent) {
                                             ArduinoContext.boardManager.loadPackageContent(deviceDescriptor.indexFile);
                                         }
                                         ArduinoContext.boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
