@@ -28,7 +28,7 @@ suite("Arduino: Example Manager.", () => {
         const exampleManager = new ExampleManager(arduinoSettings.object, arduinoApp.object);
         exampleManager.loadExamples().then((examples) => {
             // console.log(examples);
-            assert.equal(examples.length, 2);
+            assert.equal(examples.length, 3);
             assert.equal(examples[0].name, "Built-in Examples", "Verify Built-in Examples");
             assert.equal(examples[0].children.length, 1);
             assert.equal(examples[0].children[0].name, "01.Basics");
@@ -40,6 +40,14 @@ suite("Arduino: Example Manager.", () => {
             assert.equal(examples[1].children[0].children.length, 1);
             assert.equal(examples[1].children[0].children[0].name, "WebServer");
             assert.equal(examples[1].children[0].children[0].path, Path.join(Resources.mockedIDELibPath, "Ethernet", "examples", "WebServer"));
+
+            assert.equal(examples[2].name, "Examples from Custom Libraries", "Verify Examples from Custom Libraries");
+            assert.equal(examples[2].children.length, 1);
+            assert.equal(examples[2].children[0].name, "AzureIoTHub");
+            assert.equal(examples[2].children[0].children.length, 1);
+            assert.equal(examples[2].children[0].children[0].name, "simplesample_http");
+            assert.equal(examples[2].children[0].children[0].path,
+                Path.join(Resources.mockedSketchbookPath, "libraries", "AzureIoTHub", "examples", "simplesample_http"));
 
             done();
         }).catch((error) => {

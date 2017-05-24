@@ -47,11 +47,16 @@ suite("Arduino: Board Manager.", () => {
         assert.equal(platforms[0].installedVersion, "1.6.18", "Arduino IDE built-in AVR board package version should be 1.6.18");
         assert.equal(platforms[0].rootBoardPath, Path.join(Resources.mockedIDEPackagePath, "arduino", "avr"),
         "Should be able to index root board path for installed boards");
+    });
 
-        const installedPlatforms = platforms.filter((platform) => {
+    test("should be able to load installed platforms", () => {
+        const installedPlatforms = boardManager.platforms.filter((platform) => {
             return !!platform.installedVersion;
         });
-        assert.equal(installedPlatforms.length, 1, "Board Manager should display installed board packages.");
+        assert.equal(installedPlatforms.length, 1, "should display installed platforms via board manager.");
+
+        const totalInstalledPlatforms = boardManager.getInstalledPlatforms();
+        assert.equal(totalInstalledPlatforms.length, 2, "should parse installed platforms from board manager and manaually downloaded packages");
     });
 
     test("should be able to load installed boards", () => {
