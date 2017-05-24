@@ -314,21 +314,23 @@ export function padStart(sourceString: string, targetLength: number, padString?:
 
 export function parseConfigFile(fullFileName, filterComment: boolean = true): Map<string, string> {
     const result = new Map<string, string>();
-    const lineRegex = /(\S+)=(\S+)/;
 
     if (fileExistsSync(fullFileName)) {
         const rawText = fs.readFileSync(fullFileName, "utf8");
         const lines = rawText.split("\n");
         lines.forEach((line) => {
             if (line) {
+                line = line.trim();
                 if (filterComment) {
                     if (line.trim() && line.startsWith("#")) {
                         return;
                     }
                 }
-                const match = lineRegex.exec(line);
-                if (match && match.length > 2) {
-                    result.set(match[1], match[2]);
+                const separator = line.indexOf("=");
+                if (separator > 0) {
+                    const key = line.substring(0, separator).trim();
+                    const value = line.substring(separator + 1, line.length).trim();
+                    result.set(key, value);
                 }
             }
         });
