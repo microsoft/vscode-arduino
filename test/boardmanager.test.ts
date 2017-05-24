@@ -6,7 +6,7 @@ import * as Resources from "./resources";
 
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
-import { BoardManager } from "../src/arduino/BoardManager";
+import { BoardManager } from "../src/arduino/boardManager";
 
 suite("Arduino: Board Manager.", () => {
 

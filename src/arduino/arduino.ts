@@ -49,7 +49,7 @@ export class ArduinoApp {
             try {
                 // Use empty pref value to initialize preference.txt file
                 await this.setPref("boardsmanager.additional.urls", "");
-                this._settings.loadPreferences(); // reload preferences.
+                this._settings.reloadPreferences(); // reload preferences.
             } catch (ex) {
             }
         }
