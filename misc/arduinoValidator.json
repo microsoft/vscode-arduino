@@ -27,6 +27,11 @@
             "description": "Intermediate folder for Arduino building output",
             "type": "string",
             "minLength": 1
+        },
+        "debugger": {
+            "description": "Arduino Debugger Settings",
+            "type": "string",
+            "minLength": 1
         }
     }
 }

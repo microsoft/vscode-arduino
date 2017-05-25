@@ -225,10 +225,11 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     public async getInstalledBoards(req, res) {
         const installedBoards = [];
         ArduinoContext.boardManager.installedBoards.forEach((b) => {
+            const isSelected = ArduinoContext.boardManager.currentBoard ? b.key === ArduinoContext.boardManager.currentBoard.key : false;
             installedBoards.push({
                 key: b.key,
                 name: b.name,
-                isSelected: b.key === ArduinoContext.boardManager.currentBoard.key,
+                isSelected,
             });
         });
         return res.json({

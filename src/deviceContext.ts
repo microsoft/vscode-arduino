@@ -136,7 +136,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._sketch = deviceConfigJson.sketch;
                         this._configuration = deviceConfigJson.configuration;
                         this._output = deviceConfigJson.output;
-                        this._debugger = deviceConfigJson._debugger;
+                        this._debugger = deviceConfigJson["debugger"];
                         this._onDidChange.fire();
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
@@ -171,7 +171,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.port = this.port;
         deviceConfigJson.board = this.board;
         deviceConfigJson.output = this.output;
-        deviceConfigJson._debugger = this.debugger_;
+        deviceConfigJson["debugger"] = this.debugger_;
         deviceConfigJson.configuration = this.configuration;
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));

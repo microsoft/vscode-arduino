@@ -95,11 +95,11 @@ export async function activate(context: vscode.ExtensionContext) {
     };
 
     registerArduinoCommand("arduino.showBoardManager", () => {
-        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Boards Manager");
+        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Board Manager");
     });
 
     registerArduinoCommand("arduino.showLibraryManager", () => {
-        return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Libraries Manager");
+        return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Library Manager");
     });
 
     registerArduinoCommand("arduino.showBoardConfig", () => {
