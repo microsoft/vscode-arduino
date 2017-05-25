@@ -28,21 +28,14 @@ export class BoardManager {
 
     private _boards: Map<string, IBoard>;
 
-    private _boardStatusBar: vscode.StatusBarItem;
-
-    private _configStatusBar: vscode.StatusBarItem;
+    private _boardConfigStatusBar: vscode.StatusBarItem;
 
     private _currentBoard: IBoard;
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
-        this._boardStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BOARD);
-        this._boardStatusBar.command = "arduino.changeBoardType";
-        this._boardStatusBar.tooltip = "Change Board Type";
-
-        this._configStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.CONFIG);
-        this._configStatusBar.command = "arduino.showBoardConfig";
-        this._configStatusBar.text = "Config";
-        this._configStatusBar.tooltip = "Config Board";
+        this._boardConfigStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BOARD);
+        this._boardConfigStatusBar.command = "arduino.showBoardConfig";
+        this._boardConfigStatusBar.tooltip = "Show Board Config";
     }
 
     public async loadPackages(update: boolean = false) {
@@ -77,7 +70,7 @@ export class BoardManager {
         // Load all supported boards type.
         this.loadInstalledBoards();
         this.updateStatusBar();
-        this._boardStatusBar.show();
+        this._boardConfigStatusBar.show();
 
         const dc = DeviceContext.getInstance();
         dc.onDidChange(() => {
@@ -125,12 +118,7 @@ export class BoardManager {
         dc.board = targetBoard.key;
         this._currentBoard = targetBoard;
         dc.configuration = this._currentBoard.customConfig;
-        if (dc.configuration) {
-            this._configStatusBar.show();
-        } else {
-            this._configStatusBar.hide();
-        }
-        this._boardStatusBar.text = targetBoard.name;
+        this._boardConfigStatusBar.text = targetBoard.name;
         this._arduinoApp.addLibPath(null);
     }
 
@@ -248,26 +236,21 @@ export class BoardManager {
 
     public updateStatusBar(show: boolean = true): void {
         if (show) {
-            this._boardStatusBar.show();
+            this._boardConfigStatusBar.show();
             const dc = DeviceContext.getInstance();
             const selectedBoard = this._boards.get(dc.board);
             if (selectedBoard) {
                 this._currentBoard = selectedBoard;
-                this._boardStatusBar.text = selectedBoard.name;
+                this._boardConfigStatusBar.text = selectedBoard.name;
                 if (dc.configuration) {
-                    this._configStatusBar.show();
                     this._currentBoard.loadConfig(dc.configuration);
-                } else {
-                    this._configStatusBar.hide();
                 }
             } else {
                 this._currentBoard = null;
-                this._boardStatusBar.text = "<Select Board Type>";
-                this._configStatusBar.hide();
+                this._boardConfigStatusBar.text = "<Select Board Type>";
             }
         } else {
-            this._boardStatusBar.hide();
-            this._configStatusBar.hide();
+            this._boardConfigStatusBar.hide();
         }
     }
 

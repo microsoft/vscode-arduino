@@ -42,7 +42,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
         // Arduino Board Config
         this.addHandlerWithLogger("show-boardconfig", "/boardconfig", (req, res) => this.getHtmlView(req, res));
+        this.addHandlerWithLogger("load-installedboards", "/api/installedboards", (req, res) => this.getInstalledBoards(req, res));
         this.addHandlerWithLogger("load-configitems", "/api/configitems", async (req, res) => await this.getBoardConfig(req, res));
+        this.addHandlerWithLogger("update-selectedboard", "/api/updateselectedboard", (req, res) => this.updateSelectedBoard(req, res), true);
         this.addHandlerWithLogger("update-config", "/api/updateconfig", async (req, res) => await this.updateConfig(req, res), true);
 
         // Arduino Examples TreeView
@@ -220,10 +222,40 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         }
     }
 
+    public async getInstalledBoards(req, res) {
+        const installedBoards = [];
+        ArduinoContext.boardManager.installedBoards.forEach((b) => {
+            installedBoards.push({
+                key: b.key,
+                name: b.name,
+                isSelected: b.key === ArduinoContext.boardManager.currentBoard.key,
+            });
+        });
+        return res.json({
+            installedBoards: JSONHelper.decycle(installedBoards, undefined),
+        });
+    }
+
     public async getBoardConfig(req, res) {
         return res.json({
             configitems: ArduinoContext.boardManager.currentBoard.configItems,
         });
+    }
+
+    public updateSelectedBoard(req, res) {
+        if (!req.body.boardId) {
+            return res.status(400).send("BAD Request! Missing parameters!");
+        } else {
+            try {
+                const bd = ArduinoContext.boardManager.installedBoards.get(req.body.boardId);
+                ArduinoContext.boardManager.doChangeBoardType(bd);
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Update board config failed with message "code:${error.code}, err:${error.stderr}"`);
+            }
+        }
     }
 
     public async updateConfig(req, res) {

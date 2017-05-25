@@ -67,6 +67,16 @@ export function addLibPath(libraryPath) {
     }).then((response) => response.json());
 }
 
+export function getInstalledBoards() {
+    return window.fetch(`/api/installedboards`).then((response) => response.json());
+}
+
+export function updateSelectedBoard(boardId) {
+    return postHTTP("/api/updateselectedboard", {
+        boardId,
+    }).then((response) => response.json());
+}
+
 export function getConfigItems() {
     return window.fetch(`/api/configitems`).then((response) => response.json());
 }

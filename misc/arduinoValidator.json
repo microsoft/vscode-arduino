@@ -22,6 +22,11 @@
             "description": "Custom Arduino board configuration",
             "type": "string",
             "minLength": 1
+        },
+        "output": {
+            "description": "Intermediate folder for Arduino building output",
+            "type": "string",
+            "minLength": 1
         }
     }
 }

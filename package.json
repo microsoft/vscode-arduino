@@ -35,6 +35,7 @@
     "onCommand:arduino.sendMessageToSerialPort",
     "onCommand:arduino.closeSerialMonitor",
     "onCommand:arduino.changeBoardType",
+    "onCommand:arduino.showBoardConfig",
     "onCommand:arduino.showBoardManager",
     "onCommand:arduino.showLibraryManager",
     "onCommand:arduino.showExamples",
@@ -90,12 +91,16 @@
         "title": "Arduino: Change Board Type"
       },
       {
+        "command": "arduino.showBoardConfig",
+        "title": "Arduino: Board Config"
+      },
+      {
         "command": "arduino.showBoardManager",
-        "title": "Arduino: Boards Manager"
+        "title": "Arduino: Board Manager"
       },
       {
         "command": "arduino.showLibraryManager",
-        "title": "Arduino: Libraries Manager"
+        "title": "Arduino: Library Manager"
       },
       {
         "command": "arduino.showExamples",

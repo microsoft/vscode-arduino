@@ -30,13 +30,13 @@ ext install vscode-arduino
 ## Commands
 This extension provides several commands in the Command Palette (**F1** or **Ctrl+Shift+P**) for working with `*.ino` files:
 
-- **Arduino: Boards Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in board manager.
+- **Arduino: Board Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in board manager.
 - **Arduino: Change Baud Rate**: Change the baud rate of selected serial port.
 - **Arduino: Change Board Type**: Change board type or platform.
 - **Arduino: Close Serial Monitor**: Stop serial monitor and release the serial port.
 - **Arduino: Examples**: Show example list.
 - **Arduino: Initialize**：Scaffold a VS Code project with an Arduino sketch.
-- **Arduino: Libraries Manager**: Explore and manage libraries.
+- **Arduino: Library Manager**: Explore and manage libraries.
 - **Arduino: Open Serial Monitor**: Open serial monitor in the intergrated output window.
 - **Arduino: Select Serial Port**: Change the current serial port.
 - **Arduino: Send Text to Serial Port**: Send a line of text via the current serial port.

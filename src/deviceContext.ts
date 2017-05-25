@@ -35,9 +35,9 @@ export interface IDeviceContext {
      */
     sketch: string;
 
-   /**
-    * Arduino build output path
-    */
+    /**
+     * Arduino build output path
+     */
 
     output: string;
     /**
@@ -175,7 +175,12 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.configuration = this.configuration;
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
-        fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, null, 4));
+        fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, (key, value) => {
+            if (value === null) {
+                return undefined;
+            }
+            return value;
+        }, 4));
     }
 
     public get onDidChange(): vscode.Event<void> {
@@ -210,12 +215,12 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public get output() {
-      return this._output;
+        return this._output;
     }
 
     public set output(value: string) {
-      this._output = value;
-      this.saveContext();
+        this._output = value;
+        this.saveContext();
     }
 
     public get debugger_() {
