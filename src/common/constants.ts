@@ -34,6 +34,5 @@ export const statusBarPriority = {
     PORT: 2,
     OPEN_PORT: 3,
     BAUD_RATE: 4,
-    CONFIG: 5,
     BOARD: 6,
 };

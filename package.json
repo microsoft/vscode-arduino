@@ -35,6 +35,7 @@
     "onCommand:arduino.sendMessageToSerialPort",
     "onCommand:arduino.closeSerialMonitor",
     "onCommand:arduino.changeBoardType",
+    "onCommand:arduino.showBoardConfig",
     "onCommand:arduino.showBoardManager",
     "onCommand:arduino.showLibraryManager",
     "onCommand:arduino.showExamples",
@@ -90,12 +91,16 @@
         "title": "Arduino: Change Board Type"
       },
       {
+        "command": "arduino.showBoardConfig",
+        "title": "Arduino: Board Config"
+      },
+      {
         "command": "arduino.showBoardManager",
-        "title": "Arduino: Boards Manager"
+        "title": "Arduino: Board Manager"
       },
       {
         "command": "arduino.showLibraryManager",
-        "title": "Arduino: Libraries Manager"
+        "title": "Arduino: Library Manager"
       },
       {
         "command": "arduino.showExamples",
@@ -445,7 +450,7 @@
         "arduino.autoUpdateIndexFiles": {
           "type": "boolean",
           "default": false,
-          "description": "Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Boards Manager/Libraries Manager, download latest index files first. Otherwise, using index files cached on local disk for Boards Manager/Libraries Manager."
+          "description": "Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Board Manager/Library Manager, download latest index files first. Otherwise, using index files cached on local disk for Board Manager/Library Manager."
         }
       }
     },
