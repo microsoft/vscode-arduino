@@ -34,7 +34,7 @@ export default class BoardConfigItemView extends React.Component<IBoardSelectorP
         const options = this.props.installedBoards.map((b) => {
             return {
                 value: b.key,
-                label: b.name,
+                label: `${b.name} (${b.platform})`,
             };
         });
 

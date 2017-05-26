@@ -229,6 +229,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             installedBoards.push({
                 key: b.key,
                 name: b.name,
+                platform: b.platform.name,
                 isSelected,
             });
         });
