@@ -1,8 +1,19 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.3
+- Release date: May 27, 2017
+
+### Changed
+- Use a new configuration page for switching arduino boards
+- Lazy load the arduino extension on start up, only usb detection works in background, when it detects an arduino board, the extension will fully activate
+- Update unit test to somme basic arduino commands
+- Fix some typos in code
+- Fix issue #289 #324 #327
+
 ## Version 0.2.2
 - Release date: May 19, 2017
+
 ### Added
 - Support debug for a few boards: arduino zero/M0 Pro, AZ3166, Adafruit Feather M0, Adafruit WICED Feather
 - Support debug for stlink, jlink
