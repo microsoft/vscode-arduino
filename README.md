@@ -61,9 +61,9 @@ The following Visual Studio Code settings are available for the Arduino extensio
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
 
 ## Debugging Arduino Code <sup>preview</sup>
-Before you start debug your Arduino code, read [this doc](https://code.visualstudio.com/docs/editor/debugging) and get to know the basic mechanism about debugging in Visual Studio Code.
+Before you start debug your Arduino code, read [this doc](https://code.visualstudio.com/docs/editor/debugging) and get to know the basic mechanism about debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for your reference.
 
-Make sure your Arduino board can work with [STLink](http://www.st.com/en/development-tools/st-link-v2.html) or [Jlink](https://www.segger.com/jlink-debug-probes.html). The debugging support currently is fully tested with the following boards.
+Make sure your Arduino board can work with [STLink](http://www.st.com/en/development-tools/st-link-v2.html), [Jlink](https://www.segger.com/jlink-debug-probes.html) or [EDBG](http://www.atmel.com/webdoc/protocoldocs/ch01s01.html). The debugging support currently is fully tested with the following boards.
 - [MXChip IoT Developer Kit - AZ3166](https://microsoft.github.io/azure-iot-developer-kit/)
 - [Arduino Zero Pro](http://www.arduino.org/products/boards/arduino-zero-pro)
 - [Arduino M0 PRO](http://www.arduino.org/products/boards/arduino-m0-pro)
@@ -75,6 +75,8 @@ Steps to start debugging:
 2. Go to **Debug View** (Ctrl+Shift+D). Set breakpoints in your source files.
 3. Press **F5** to select debugging environment. 
 4. When your breakpoint is hit, you can see variables and add expression to watch on the Debug Side Bar.
+
+> To learn more about how to debug Ardino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
 
 ## Supported Operating Systems
 Currently this extension supports the following operatings systems:
