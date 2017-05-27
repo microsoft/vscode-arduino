@@ -3,7 +3,7 @@
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/Microsoft/vscode-arduino)
 [![Travis CI](https://travis-ci.com/Microsoft/vscode-arduino.svg?token=V7ScpxJzPHHeGqGFPZEp&branch=master)](https://travis-ci.com/Microsoft/vscode-arduino)
 
-Welcome to **Arduino** <sup>preview</sup> for Visual Studio Code! The Arduino extension makes it easy to code, build and deploy your Arduino sketches in Visual Studio Code.
+Welcome to **Arduino** <sup>preview</sup> for Visual Studio Code! The Arduino extension makes it easy to code, build, deploy and debug your Arduino sketches in Visual Studio Code.
 
 * IntelliSense and syntax highlighting for Arduino sketches
 * Verify and upload your sketches in Visual Studio Code
@@ -13,6 +13,7 @@ Welcome to **Arduino** <sup>preview</sup> for Visual Studio Code! The Arduino ex
 * Snippets for sketches
 * Automatic Arduino project scaffolding
 * Command Palette (F1) integration of frequently used commands (e.g. Verify, Upload...)
+* Integrated Arduino Debugging <sup>New</sup> 
 
 ## Prerequisites
 Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software#download).
@@ -58,6 +59,24 @@ The following Visual Studio Code settings are available for the Arduino extensio
 - `arduino.additionalUrls` - Additional URLs for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
 - `arduino.autoUpdateIndexFiles` - Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Boards Manager/Libraries Manager, download latest index files first. Otherwise, using index files cached on local disk for Boards Manager/Libraries Manager. The default value is `false`.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
+
+## Debugging Arduino Code <sup>preview</sup>
+Before you start debug your Arduino code, read [this doc](https://code.visualstudio.com/docs/editor/debugging) and get to know the basic mechanism about debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for your reference.
+
+Make sure your Arduino board can work with [STLink](http://www.st.com/en/development-tools/st-link-v2.html), [Jlink](https://www.segger.com/jlink-debug-probes.html) or [EDBG](http://www.atmel.com/webdoc/protocoldocs/ch01s01.html). The debugging support currently is fully tested with the following boards.
+- [MXChip IoT Developer Kit - AZ3166](https://microsoft.github.io/azure-iot-developer-kit/)
+- [Arduino Zero Pro](http://www.arduino.org/products/boards/arduino-zero-pro)
+- [Arduino M0 PRO](http://www.arduino.org/products/boards/arduino-m0-pro)
+- [Adafruit WICED WiFi Feather](https://www.adafruit.com/product/3056)
+- [Adafruit Feather M0](https://www.adafruit.com/product/3010)
+
+Steps to start debugging:
+1. Plugin your board to your development machine properly. For those boards don't have on-board debugging chip, you need use STLink or JLink connector.
+2. Go to **Debug View** (Ctrl+Shift+D). Set breakpoints in your source files.
+3. Press **F5** to select debugging environment. 
+4. When your breakpoint is hit, you can see variables and add expression to watch on the Debug Side Bar.
+
+> To learn more about how to debug Ardino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
 
 ## Supported Operating Systems
 Currently this extension supports the following operatings systems:
