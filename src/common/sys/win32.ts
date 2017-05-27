@@ -16,11 +16,16 @@ export async function resolveArduinoPath() {
     if (directoryExistsSync(pathString)) {
         return pathString;
     }
-    pathString = childProcess.execSync("where arduino", {encoding: "utf8"});
-    pathString = path.resolve(pathString).trim();
-    if (fileExistsSync(pathString)) {
-        pathString = path.dirname(path.resolve(pathString));
+    try {
+        pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
+        pathString = path.resolve(pathString).trim();
+        if (fileExistsSync(pathString)) {
+            pathString = path.dirname(path.resolve(pathString));
+        }
+    } catch (error) {
+        // when "where arduino"" execution fails, the childProcess.execSync will throw error, just ignore it
     }
+
     return pathString;
 }
 
@@ -32,7 +37,7 @@ export function findFile(fileName: string, cwd: string): string {
     let result;
     try {
         let pathString;
-        pathString = childProcess.execSync(`dir ${fileName} /S /B`, {encoding: "utf8", cwd}).split("\n");
+        pathString = childProcess.execSync(`dir ${fileName} /S /B`, { encoding: "utf8", cwd }).split("\n");
         if (pathString && pathString[0] && fileExistsSync(pathString[0].trim())) {
             result = path.normalize(pathString[0].trim());
         }
