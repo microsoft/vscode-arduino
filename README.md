@@ -76,7 +76,7 @@ Steps to start debugging:
 3. Press **F5** to select debugging environment. 
 4. When your breakpoint is hit, you can see variables and add expression to watch on the Debug Side Bar.
 
-> To learn more about how to debug Ardino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
+> To learn more about how to debug Arduino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
 
 ## Supported Operating Systems
 Currently this extension supports the following operatings systems:
