@@ -65,10 +65,10 @@ Before you start debug your Arduino code, read [this doc](https://code.visualstu
 
 Make sure your Arduino board can work with [STLink](http://www.st.com/en/development-tools/st-link-v2.html), [Jlink](https://www.segger.com/jlink-debug-probes.html) or [EDBG](http://www.atmel.com/webdoc/protocoldocs/ch01s01.html). The debugging support currently is fully tested with the following boards.
 - [MXChip IoT Developer Kit - AZ3166](https://microsoft.github.io/azure-iot-developer-kit/)
-- [Arduino Zero Pro](http://www.arduino.org/products/boards/arduino-zero-pro)
-- [Arduino M0 PRO](http://www.arduino.org/products/boards/arduino-m0-pro)
+- [Arduino M0 PRO](https://www.arduino.cc/en/Main/ArduinoBoardM0PRO)
 - [Adafruit WICED WiFi Feather](https://www.adafruit.com/product/3056)
 - [Adafruit Feather M0](https://www.adafruit.com/product/3010)
+- Arduino Zero Pro
 
 Steps to start debugging:
 1. Plugin your board to your development machine properly. For those boards don't have on-board debugging chip, you need use STLink or JLink connector.
