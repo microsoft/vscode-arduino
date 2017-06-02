@@ -4,15 +4,12 @@
  *-------------------------------------------------------------------------------------------*/
 
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as constants from "./common/constants";
 import * as util from "./common/util";
 import * as Logger from "./logger/logger";
 
-import { ArduinoApp } from "./arduino/arduino";
-import { IBoard } from "./arduino/package";
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
 
 /**
@@ -38,9 +35,9 @@ export interface IDeviceContext {
      */
     sketch: string;
 
-   /**
-    * Arduino build output path
-    */
+    /**
+     * Arduino build output path
+     */
 
     output: string;
     /**
@@ -62,7 +59,7 @@ export interface IDeviceContext {
 
 export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
-    public static getIntance(): DeviceContext {
+    public static getInstance(): DeviceContext {
         return DeviceContext._deviceContext;
     }
 
@@ -81,8 +78,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _debugger: string;
 
     private _configuration: string;
-
-    private _arduinoApp: ArduinoApp;
 
     private _extensionPath: string;
 
@@ -115,14 +110,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         }
     }
 
-    public get arduinoApp(): ArduinoApp {
-        return this._arduinoApp;
-    }
-
-    public set arduinoApp(value: ArduinoApp) {
-        this._arduinoApp = value;
-    }
-
     public get extensionPath(): string {
         return this._extensionPath;
     }
@@ -149,7 +136,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._sketch = deviceConfigJson.sketch;
                         this._configuration = deviceConfigJson.configuration;
                         this._output = deviceConfigJson.output;
-                        this._debugger = deviceConfigJson._debugger;
+                        this._debugger = deviceConfigJson["debugger"];
                         this._onDidChange.fire();
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
@@ -184,11 +171,16 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.port = this.port;
         deviceConfigJson.board = this.board;
         deviceConfigJson.output = this.output;
-        deviceConfigJson._debugger = this.debugger_;
+        deviceConfigJson["debugger"] = this.debugger_;
         deviceConfigJson.configuration = this.configuration;
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
-        fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, null, 4));
+        fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, (key, value) => {
+            if (value === null) {
+                return undefined;
+            }
+            return value;
+        }, 4));
     }
 
     public get onDidChange(): vscode.Event<void> {
@@ -223,12 +215,12 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public get output() {
-      return this._output;
+        return this._output;
     }
 
     public set output(value: string) {
-      this._output = value;
-      this.saveContext();
+        this._output = value;
+        this.saveContext();
     }
 
     public get debugger_() {

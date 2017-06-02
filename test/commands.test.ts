@@ -24,8 +24,9 @@ suite("vscode-arduino extension commands test", () => {
     });
 
     // Arduino: Boards Manager : Manage packages for boards
-    test("should be able to run command: arduino.showBoardManager", (done) => {
-        // this.timeout(3 * 60 * 1000);
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showBoardManager", function(done) {
+        this.timeout(60 * 1000);
         try {
             // run "Arduino: Boards Manager" command.
             vscode.commands.executeCommand("arduino.showBoardManager").then((result)  => {
@@ -38,7 +39,9 @@ suite("vscode-arduino extension commands test", () => {
     });
 
     // Arduino: Libraries Manager: Explore and manage libraries
-    test("should be able to run command: arduino.showLibraryManager", (done) => {
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showLibraryManager", function(done) {
+        this.timeout(10 * 1000);
         try {
             // run "Arduino: Libraries Manager" command.
             vscode.commands.executeCommand("arduino.showLibraryManager").then((result)  => {
@@ -50,8 +53,10 @@ suite("vscode-arduino extension commands test", () => {
         }
     });
 
-    // rduino: Arduino Board Configuration
-    test("should be able to run command: arduino.showBoardConfig", (done) => {
+    // Arduino: Arduino Board Configuration
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showBoardConfig", function(done) {
+        this.timeout(10 * 1000);
         try {
             // run "Arduino: Arduino Board Configuration" command.
             vscode.commands.executeCommand("arduino.showBoardConfig").then((result)  => {
@@ -64,7 +69,9 @@ suite("vscode-arduino extension commands test", () => {
     });
 
     // Arduino: Examples: Show example list
-    test("should be able to run command: arduino.showExamples", (done) => {
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.showExamples", function(done) {
+        this.timeout(10 * 1000);
         try {
             // run "Arduino: Examples" command.
             vscode.commands.executeCommand("arduino.showExamples").then((result)  => {

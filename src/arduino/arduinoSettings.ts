@@ -23,7 +23,7 @@ export interface IArduinoSettings {
     sketchbookPath: string;
     preferencePath: string;
     preferences: Map<string, string>;
-    loadPreferences(): void;
+    reloadPreferences(): void;
 }
 
 export class ArduinoSettings implements IArduinoSettings {
@@ -105,13 +105,14 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get preferences() {
         if (!this._preferences) {
-            this.loadPreferences();
+            this._preferences = util.parseConfigFile(this.preferencePath);
         }
         return this._preferences;
     }
 
-    public loadPreferences() {
+    public reloadPreferences() {
         this._preferences = util.parseConfigFile(this.preferencePath);
+        this._sketchbookPath = this._preferences.get("sketchbook.path") || this._sketchbookPath;
     }
 
     /**
@@ -147,9 +148,9 @@ export class ArduinoSettings implements IArduinoSettings {
         // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
         // "usual software installation directory for each os".
         // 1. Search vscode user settings first.
-        const configValue = VscodeSettings.getIntance().arduinoPath;
+        const configValue = VscodeSettings.getInstance().arduinoPath;
         if (!configValue || !configValue.trim()) {
-            // 2 & 3. Resolve arduino path from system environment varialbes and usual software installation directory.
+            // 2 & 3. Resolve arduino path from system environment variables and usual software installation directory.
             this._arduinoPath = await Promise.resolve(resolveArduinoPath());
         } else {
             this._arduinoPath = configValue;

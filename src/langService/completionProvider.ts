@@ -3,15 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  *-------------------------------------------------------------------------------------------*/
 
-import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as constants from "../common/constants";
-import * as platform from "../common/platform";
 import * as util from "../common/util";
 
-import { ArduinoApp } from "../arduino/arduino";
+import ArduinoActivator from "../arduinoActivator";
+import ArduinoContext from "../arduinoContext";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
 
@@ -23,11 +22,11 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
     private _cppConfigFile: string;
 
-    constructor(private _arduinoApp: ArduinoApp) {
+    private _activated: boolean = false;
+
+    constructor() {
         if (vscode.workspace && vscode.workspace.rootPath) {
             this._cppConfigFile = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
-            this.updateLibList();
-
             this._watcher = vscode.workspace.createFileSystemWatcher(this._cppConfigFile);
             this._watcher.onDidCreate(() => this.updateLibList());
             this._watcher.onDidChange(() => this.updateLibList());
@@ -35,8 +34,15 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         }
     }
 
-    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
-        vscode.CompletionItem[] | Thenable<vscode.CompletionItem[]> {
+    public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position):
+         Promise<vscode.CompletionItem[]> {
+        if (!ArduinoContext.initialized) {
+            await ArduinoActivator.activate();
+        }
+        if (!this._activated) {
+            this._activated = true;
+            this.updateLibList();
+        }
         // Check if we are currently inside an include statement.
         const text = document.lineAt(position.line).text.substr(0, position.character);
         const match = text.match(/^\s*#\s*include\s*(<[^>]*|"[^"]*)$/);
@@ -51,9 +57,12 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     }
 
     private updateLibList(): void {
+        if (!this._activated) {
+            return;
+        }
         this._libPaths.clear();
         this._headerFiles.clear();
-        this._arduinoApp.getDefaultPackageLibPaths().forEach((defaultPath) => {
+        ArduinoContext.arduinoApp.getDefaultPackageLibPaths().forEach((defaultPath) => {
             this._libPaths.add(defaultPath);
         });
 
