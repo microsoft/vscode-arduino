@@ -13,6 +13,7 @@ import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
+import * as Logger from "../logger/logger";
 import { DebuggerManager } from "./debuggerManager";
 
 /**
@@ -96,6 +97,8 @@ export class DebugConfigurator {
         // Use the C++ debugger MIEngine as the real internal debugger
         config.type = "cppdbg";
         vscode.commands.executeCommand("vscode.startDebug", config);
+        const dc = DeviceContext.getInstance();
+        Logger.traceUserData("start-cppdbg", { board: dc.board });
     }
 
     private async resolveProgramPath(config) {
