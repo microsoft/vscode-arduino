@@ -1,7 +1,5 @@
-/*--------------------------------------------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- *-------------------------------------------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
 
 import * as path from "path";
 import * as vscode from "vscode";
@@ -13,6 +11,7 @@ import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
+import * as Logger from "../logger/logger";
 import { DebuggerManager } from "./debuggerManager";
 
 /**
@@ -96,6 +95,8 @@ export class DebugConfigurator {
         // Use the C++ debugger MIEngine as the real internal debugger
         config.type = "cppdbg";
         vscode.commands.executeCommand("vscode.startDebug", config);
+        const dc = DeviceContext.getInstance();
+        Logger.traceUserData("start-cppdbg", { board: dc.board });
     }
 
     private async resolveProgramPath(config) {
