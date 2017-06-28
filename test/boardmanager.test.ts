@@ -1,10 +1,12 @@
 import * as assert from "assert";
 import * as fs from "fs";
+import * as os from "os";
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
 import * as Resources from "./resources";
 
+import ArduinoContext from "..//src/arduinoContext";
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
 import { parseBoardDescriptor } from "../src/arduino/board";
@@ -95,5 +97,35 @@ suite("Arduino: Board Manager.", () => {
         const platformConfig = util.parseConfigFile(Path.join(Resources.mockedSketchbookPath, "hardware/esp8266/esp8266/platform.txt"));
         assert.equal(platformConfig.get("name"), "ESP8266 Modules");
         assert.equal(platformConfig.get("version"), "2.2.0");
+    });
+
+    // Arduino: Board Manager: Manage packages for boards.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to install boards packages", function(done) {
+        this.timeout(4 * 60 * 1000);
+        try {
+            // Board Manager: install boards packages.
+            ArduinoContext.arduinoApp.installBoard ("esp8266", "esp8266", "2.3.0", true).then(done, done);
+
+        } catch (error) {
+            done(new Error(error));
+        }
+    });
+
+    // Arduino: Board Manager: remove boards packages.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to remove boards packages", () => {
+        try {
+            // Board Manager: remove boards packages.
+            let packagePath = "/Users/$USER/Library/Arduino15/packages/esp8266";
+            if (os.platform() === "linux") {
+                packagePath = "//home//$USER//.Arduino15//packages//esp8266";
+            }
+
+            ArduinoContext.arduinoApp.uninstallBoard("esp8266", packagePath);
+
+        } catch (error) {
+            assert.fail(true, false, new Error(error).message, new Error(error).name);
+        }
     });
 });
