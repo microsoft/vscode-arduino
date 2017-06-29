@@ -9,7 +9,7 @@
   "engines": {
     "vscode": "^1.7.0"
   },
-  "icon": "images/arduino.svg",
+  "icon": "images/arduino.png",
   "categories": [
     "Languages",
     "Debuggers",
