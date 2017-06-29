@@ -1,4 +1,5 @@
 import * as assert from "assert";
+import * as os from "os";
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
@@ -9,6 +10,7 @@ import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
 import { BoardManager } from "../src/arduino/boardManager";
 import { LibraryManager } from "../src/arduino/libraryManager";
+import * as util from "../src/common/util";
 
 suite("Arduino: Library Manager.", () => {
 
@@ -69,10 +71,43 @@ suite("Arduino: Library Manager.", () => {
         this.timeout(3 * 60 * 1000);
         try {
             // Library Manager: Install extenal libarary.
-            ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.35", true).then(done, done);
+            ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.35", true).then((result) => {
+                // check if the installation succeeds or not
+                const arduinoSettings = ArduinoContext.arduinoApp.settings;
+                let libPath = Path.join(arduinoSettings.defaultLibPath, "AzureIoTHub");
+                if (os.platform() === "win32") {
+                    libPath = Path.join(process.env.USERPROFILE, "Documents", "Arduino", "libraries", "AzureIoTHub");
+                }
+
+                if (util.directoryExistsSync(libPath)) {
+                    done();
+                } else {
+                    done(new Error("AzureIoTHub library install failure, can't find library path :" + libPath));
+                }
+            });
 
         } catch (error) {
             done(new Error(error));
+        }
+    });
+
+    // Arduino: Library Manager: remove extenal libarary.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to remove libraries", () => {
+        try {
+            // Library Manager: remove extenal libarary.
+            const arduinoSettings = ArduinoContext.arduinoApp.settings;
+            let libPath = Path.join(arduinoSettings.defaultLibPath, "AzureIoTHub");
+            if (os.platform() === "win32") {
+                libPath = Path.join(process.env.USERPROFILE, "Documents", "Arduino", "libraries", "AzureIoTHub");
+            }
+
+            if (util.directoryExistsSync(libPath)) {
+                ArduinoContext.arduinoApp.uninstallLibrary("AzureIoTHub", libPath);
+            }
+
+        } catch (error) {
+            assert.fail(true, false, new Error(error).message, new Error(error).name);
         }
     });
 
