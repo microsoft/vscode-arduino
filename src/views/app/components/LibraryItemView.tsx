@@ -12,7 +12,7 @@ interface ILibraryProps extends React.Props<any> {
     uninstallLibrary: (libraryName, libraryPath, callback) => void;
 }
 
-interface ILibraryState extends React.Props<any> {
+interface ILibraryState {
     version: string;
     isInstalling: boolean;
     isUninstalling: boolean;
