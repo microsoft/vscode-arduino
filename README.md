@@ -104,7 +104,7 @@ Coming soon: See the [developer documentation] for details
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.
 
 ## Privacy Statement
-The [Microsft Enterprise and Developer Privacy Statement](https://www.microsoft.coim/en-us/privacystatement/EnterpriseDev/default.aspx) describes the privacy statement of this software.
+The [Microsft Enterprise and Developer Privacy Statement](https://www.microsoft.com/en-us/privacystatement/EnterpriseDev/default.aspx) describes the privacy statement of this software.
 
 ## License
 This extension is licensed under [MIT License](https://github.com/Microsoft/vscode-arduino/blob/master/LICENSE.txt). Please see the [Third Party Notice](https://github.com/Microsoft/vscode-arduino/blob/master/ThirdPartyNotices.txt) file for additional copyright notices and terms.
