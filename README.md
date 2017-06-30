@@ -1,9 +1,9 @@
-# Arduino for Visual Studio Code
+# Visual Studio Code extension for Arduino
 
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/Microsoft/vscode-arduino)
 [![Travis CI](https://travis-ci.com/Microsoft/vscode-arduino.svg?token=V7ScpxJzPHHeGqGFPZEp&branch=master)](https://travis-ci.com/Microsoft/vscode-arduino)
 
-Welcome to **Arduino** <sup>preview</sup> for Visual Studio Code! The Arduino extension makes it easy to code, build, deploy and debug your Arduino sketches in Visual Studio Code.
+Welcome to Visual Studio Code extension for **Arduino** <sup>preview</sup> ! The Arduino extension makes it easy to code, build, deploy and debug your Arduino sketches in Visual Studio Code, with a rich set of functionalities:
 
 * IntelliSense and syntax highlighting for Arduino sketches
 * Verify and upload your sketches in Visual Studio Code
@@ -27,6 +27,11 @@ Or launch VS Code Quick Open (`Ctrl + P`), paste the following command, and pres
 ```bash
 ext install vscode-arduino
 ```
+You can also install directly from Marketplace within Visual Studio Code, searching `Arduino`
+
+## Get Started
+You can find code samples and tutorials each time you connect a supported device.
+Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://aka.ms/azureiotgetstarted)
 
 ## Commands
 This extension provides several commands in the Command Palette (**F1** or **Ctrl+Shift+P**) for working with `*.ino` files:
@@ -78,6 +83,9 @@ Steps to start debugging:
 
 > To learn more about how to debug Arduino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
 
+## Change Log
+See the [Change log](https://github.com/Microsoft/vscode-arduino/blob/master/CHANGELOG.md) for the details of changes for each version.
+
 ## Supported Operating Systems
 Currently this extension supports the following operatings systems:
 
@@ -86,5 +94,20 @@ Currently this extension supports the following operatings systems:
 - Ubuntu 16.04
   - The extension might work on other Linux distro as some user reported but without gurantee.
 
+## Support
+You can find the full list of issues at [Issue Tracker](https://github.com/Microsoft/vscode-arduino/issues). You can submit a [bug or feature suggestion](https://github.com/Microsoft/vscode-arduino/issues/new), and participate community driven [discussions](https://gitter.im/Microsoft/vscode-arduino)
+
+## Contributing to the Arduino Extension
+Coming soon: See the [developer documentation] for details
+
+## Code of Conduct
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.
+
+## Privacy Statement
+The [Microsft Enterprise and Developer Privacy Statement](https://www.microsoft.com/en-us/privacystatement/EnterpriseDev/default.aspx) describes the privacy statement of this software.
+
+## License
+This extension is licensed under [MIT License](https://github.com/Microsoft/vscode-arduino/blob/master/LICENSE.txt). Please see the [Third Party Notice](https://github.com/Microsoft/vscode-arduino/blob/master/ThirdPartyNotices.txt) file for additional copyright notices and terms.
+
 ## Contact Us
-If you'd like to help us build the best Arduino experience with VS Code, you can talk directly to the product team in our [gitter chat room](https://gitter.im/Microsoft/vscode-arduino).
+If you would like to help build the best Arduino experience with VS Code, you can reach us directly at [gitter chat room](https://gitter.im/Microsoft/vscode-arduino).
