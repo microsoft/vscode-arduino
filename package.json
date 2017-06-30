@@ -10,6 +10,15 @@
     "vscode": "^1.7.0"
   },
   "icon": "images/arduino.png",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/vscode-arduino.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Microsoft/vscode-arduino/issues"
+  },
+  "homepage": "https://github.com/Microsoft/vscode-arduino/blob/master/README.md",
   "categories": [
     "Languages",
     "Debuggers",
