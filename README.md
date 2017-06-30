@@ -97,8 +97,21 @@ Currently this extension supports the following operatings systems:
 ## Support
 You can find the full list of issues at [Issue Tracker](https://github.com/Microsoft/vscode-arduino/issues). You can submit a [bug or feature suggestion](https://github.com/Microsoft/vscode-arduino/issues/new), and participate community driven [discussions](https://gitter.im/Microsoft/vscode-arduino)
 
-## Contributing to the Arduino Extension
-Coming soon: See the [developer documentation] for details
+## Development
+
+First install:
+
+- Node.js (newer than 6.5.0)
+- Npm (newer 3.10.3)
+
+To *run and develop* do the following:
+
+- Run npm i
+- Run npm i -g gulp
+- Open in Visual Studio Code (code .)
+- Press F5 to debug
+
+To *test do the following*: F5 in VS Code with the "Launch Tests" debug configuration.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.
