@@ -99,19 +99,21 @@ You can find the full list of issues at [Issue Tracker](https://github.com/Micro
 
 ## Development
 
-First install:
+Installing Prerequisites:
 
-- Node.js (newer than 6.5.0)
-- Npm (newer 3.10.3)
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/) (>= 6.5.0)
+- [Npm](https://www.npmjs.com/) (>= 3.10.3)
 
-To *run and develop* do the following:
+To *run and develop*, do the following:
+- `git clone https://github.com/microsoft/vscode-arduino`
+- `cd vscode-arduino`
+- Run `npm i`
+- Run `npm i -g gulp`
+- Open in Visual Studio Code (`code .`)
+- Press **F5** to debug
 
-- Run npm i
-- Run npm i -g gulp
-- Open in Visual Studio Code (code .)
-- Press F5 to debug
-
-To *test do the following*: F5 in VS Code with the "Launch Tests" debug configuration.
+To *test do the following*: **F5** in VS Code with the "Launch Tests" debug configuration.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.
