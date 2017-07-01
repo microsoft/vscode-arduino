@@ -126,6 +126,10 @@ gulp.task("build", (done) => {
     return runSequence("clean", "ts-compile", "html-webpack", done);
 });
 
+gulp.task("build_without_view", (done) => {
+    return runSequence("clean", "ts-compile", done);
+});
+
 gulp.task("watch", () => {
     gulp.watch(["./src/**/*", "./test/**/*", "!./src/views/**/*"], ["ts-compile"]);
     gulp.watch(["./src/views/**/*", "!./src/views/node_modules/**"], ["html-webpack"]);

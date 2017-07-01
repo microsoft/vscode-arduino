@@ -18,7 +18,7 @@ interface ILibraryManagerProps extends React.Props<any> {
     errorMessage: string;
     installingLibraryName: string;
     uninstallingLibraryName: string;
-    loadLibraries: () => void;
+    loadLibraries: (update: boolean) => void;
     installLibrary: (libraryName, version, callback) => void;
     uninstallLibrary: (libraryName, libraryPath, callback) => void;
 }
@@ -44,7 +44,7 @@ const mapStateToProps = (store) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        loadLibraries: () => actions.getLibraries(dispatch, true),
+        loadLibraries: (update: boolean = false) => actions.getLibraries(dispatch, update),
         installLibrary: (libraryName, version, callback) => actions.installLibrary(dispatch, libraryName, version, (error) => {
             if (!error) {
                 // Refresh library manager view
@@ -81,7 +81,7 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
     }
 
     public componentWillMount() {
-        this.props.loadLibraries();
+        this.props.loadLibraries(false);
     }
 
     public render() {
@@ -168,6 +168,9 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
                 </div>
                 <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
                 <Checkbox className="supported-checkbox" onChange={this.handleCheck}>Only show libraries supported by current board</Checkbox>
+                <Button className="operation-btn" bsStyle="link" onClick={() => this.props.loadLibraries(true)}>
+                        Refresh Library Index
+                </Button>
             </div>
             <div className="arduinomanager-container">
                 <ReactList itemRenderer={itemRenderer} itemSizeEstimator={itemSizeEstimator} length={filteredLibraries.length} type="variable"/>

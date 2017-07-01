@@ -19,7 +19,7 @@ interface IBoardManagerProps extends React.Props<any> {
     installErrorMessage: string;
     uninstallingBoardName: string;
     uninstallErrorMessage: string;
-    loadBoardPackages: () => void;
+    loadBoardPackages: (update: boolean) => void;
     installBoard: (boardName, packageName, arch, version) => void;
     uninstallBoard: (boardName, packagePath) => void;
 }
@@ -44,7 +44,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        loadBoardPackages: () => actions.getBoardPackages(dispatch, true),
+        loadBoardPackages: (update: boolean = false) => actions.getBoardPackages(dispatch, update),
         installBoard: (boardName, packageName, arch, version) => actions.installBoard(dispatch, boardName, packageName, arch, version, () => {
             actions.getBoardPackages(dispatch, false);
         }),
@@ -67,7 +67,7 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
     }
 
     public componentWillMount() {
-        this.props.loadBoardPackages();
+        this.props.loadBoardPackages(false);
     }
 
     public render() {
@@ -111,36 +111,40 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
 
         const isOperating = this.props.installingBoardName || this.props.uninstallingBoardName;
         return (
-        <div className={"boardmanager " + (!!isOperating ? "disabled" : "")}>
-            {
-                this.props.requesting && (
-                    <div className="mask theme-bgcolor">Loading...</div>
-                )
-            }
-            <div className="arduinomanager-toolbar theme-bgcolor">
-                <div className="dropdown-filter">
-                    <span className="dropdown-label">Type</span>
-                    <DropdownButton id="typeselector" title={this.state.category} onSelect={this.typeUpdate}>
-                        { this.props.categories.map((c, index) => {
-                            return (<MenuItem key={index} eventKey={c} active={c === this.state.category}>{c}</MenuItem>);
-                        })}
-                    </DropdownButton>
-                </div>
-                <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
-            </div>
-            <div className="arduinomanager-container">
+            <div className={"boardmanager " + (!!isOperating ? "disabled" : "")}>
                 {
-                    filteredPlatforms.map((p, index) => {
-                        return (<BoardItemView key={p.name} platform={p} {...boardProps} />);
-                    })
+                    this.props.requesting && (
+                        <div className="mask theme-bgcolor">Loading...</div>
+                    )
                 }
-            </div>
-            <div className="arduinomanager-footer theme-bgcolor">
-                <span>{totalCountTips}</span>
-                <a className="help-link right-side" title="Configure Additional Boards Manager URLs"
-                   onClick={() => API.openSettings()}>Additional URLs</a>
-            </div>
-        </div>);
+                <div className="arduinomanager-toolbar theme-bgcolor">
+                    <div className="dropdown-filter">
+                        <span className="dropdown-label">Type</span>
+                        <DropdownButton id="typeselector" title={this.state.category} onSelect={this.typeUpdate}>
+                            {this.props.categories.map((c, index) => {
+                                return (<MenuItem key={index} eventKey={c} active={c === this.state.category}>{c}</MenuItem>);
+                            })}
+                        </DropdownButton>
+                    </div>
+                    <SearchInput className="search-input" placeholder="Filter your search..." onChange={this.searchUpdate} />
+                    <Button className="operation-btn" bsStyle="link" onClick={() => this.props.loadBoardPackages(true)}>
+                        Refresh Package Indexes
+                    </Button>
+                </div>
+                <div className="arduinomanager-container">
+                    {
+                        filteredPlatforms.map((p, index) => {
+                            return (<BoardItemView key={p.name} platform={p} {...boardProps} />);
+                        })
+                    }
+                </div>
+                <div className="arduinomanager-footer theme-bgcolor">
+                    <span>{totalCountTips}</span>
+                    <a className="help-link right-side" title="Configure Additional Boards Manager URLs"
+                        onClick={() => API.openSettings()}>Additional URLs</a>
+                </div>
+
+            </div>);
     }
 
     private typeUpdate(eventKey: any, event?: React.SyntheticEvent<{}>): void {
