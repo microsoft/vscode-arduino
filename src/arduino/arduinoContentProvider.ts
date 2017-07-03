@@ -107,8 +107,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getBoardPackages(req, res) {
-        const update = (VscodeSettings.getInstance().autoUpdateIndexFiles && req.query.update === "true");
-        await ArduinoContext.boardManager.loadPackages(update);
+        await ArduinoContext.boardManager.loadPackages(req.query.update === "true");
         return res.json({
             platforms: JSONHelper.decycle(ArduinoContext.boardManager.platforms, undefined),
         });
@@ -167,8 +166,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     }
 
     public async getLibraries(req, res) {
-        const update = (VscodeSettings.getInstance().autoUpdateIndexFiles && req.query.update === "true");
-        await ArduinoContext.arduinoApp.libraryManager.loadLibraries(update);
+        await ArduinoContext.arduinoApp.libraryManager.loadLibraries(req.query.update === "true");
         return res.json({
             libraries: ArduinoContext.arduinoApp.libraryManager.libraries,
         });

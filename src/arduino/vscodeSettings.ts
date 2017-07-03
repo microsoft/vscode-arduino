@@ -13,7 +13,6 @@ const configKeys = {
 export interface IVscodeSettings {
     arduinoPath: string;
     additionalUrls: string | string[];
-    autoUpdateIndexFiles: boolean;
     logLevel: string;
     updateAdditionalUrls(urls: string | string[]): void;
 }
@@ -36,10 +35,6 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get additionalUrls(): string | string[] {
         return this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
-    }
-
-    public get autoUpdateIndexFiles(): boolean {
-        return this.getConfigValue<boolean>(configKeys.AUTO_UPDATE_INDEX_FILES);
     }
 
     public get logLevel(): string {

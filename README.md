@@ -56,13 +56,11 @@ The following Visual Studio Code settings are available for the Arduino extensio
 {
     "arduino.path": "C:/Program Files (x86)/Arduino",
     "arduino.additionalUrls": "",
-    "arduino.autoUpdateIndexFiles": false,
     "arduino.logLevel": "info"
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
 - `arduino.additionalUrls` - Additional URLs for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
-- `arduino.autoUpdateIndexFiles` - Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Boards Manager/Libraries Manager, download latest index files first. Otherwise, using index files cached on local disk for Boards Manager/Libraries Manager. The default value is `false`.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
 
 ## Debugging Arduino Code <sup>preview</sup>
