@@ -1,7 +1,7 @@
 # Visual Studio Code extension for Arduino
 
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/Microsoft/vscode-arduino)
-[![Travis CI](https://travis-ci.com/Microsoft/vscode-arduino.svg?token=V7ScpxJzPHHeGqGFPZEp&branch=master)](https://travis-ci.com/Microsoft/vscode-arduino)
+[![Travis CI](https://travis-ci.org/Microsoft/vscode-arduino.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-arduino)
 
 Welcome to Visual Studio Code extension for **Arduino** <sup>preview</sup> ! The Arduino extension makes it easy to code, build, deploy and debug your Arduino sketches in Visual Studio Code, with a rich set of functionalities:
 
@@ -56,13 +56,11 @@ The following Visual Studio Code settings are available for the Arduino extensio
 {
     "arduino.path": "C:/Program Files (x86)/Arduino",
     "arduino.additionalUrls": "",
-    "arduino.autoUpdateIndexFiles": false,
     "arduino.logLevel": "info"
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
 - `arduino.additionalUrls` - Additional URLs for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
-- `arduino.autoUpdateIndexFiles` - Controls auto update of package_index.json and library_index.json index files. If enabled, each time when you open Boards Manager/Libraries Manager, download latest index files first. Otherwise, using index files cached on local disk for Boards Manager/Libraries Manager. The default value is `false`.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
 
 ## Debugging Arduino Code <sup>preview</sup>
@@ -97,8 +95,23 @@ Currently this extension supports the following operatings systems:
 ## Support
 You can find the full list of issues at [Issue Tracker](https://github.com/Microsoft/vscode-arduino/issues). You can submit a [bug or feature suggestion](https://github.com/Microsoft/vscode-arduino/issues/new), and participate community driven [discussions](https://gitter.im/Microsoft/vscode-arduino)
 
-## Contributing to the Arduino Extension
-Coming soon: See the [developer documentation] for details
+## Development
+
+Installing Prerequisites:
+
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/) (>= 6.5.0)
+- [Npm](https://www.npmjs.com/) (>= 3.10.3)
+
+To *run and develop*, do the following:
+- `git clone https://github.com/microsoft/vscode-arduino`
+- `cd vscode-arduino`
+- Run `npm i`
+- Run `npm i -g gulp`
+- Open in Visual Studio Code (`code .`)
+- Press **F5** to debug
+
+To *test do the following*: **F5** in VS Code with the "Launch Tests" debug configuration.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.

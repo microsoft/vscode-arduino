@@ -5,18 +5,26 @@
 // ${fileDirname}: the current opened file's dirname
 // ${fileExtname}: the current opened file's extension
 // ${cwd}: the current working directory of the spawned process
-
 // A task runner that calls a custom npm script that compiles the extension.
 {
     "version": "0.1.0",
     "command": "gulp",
     "isShellCommand": true,
-    "args":[
+    "args": [
         "--no-color"
     ],
     "tasks": [
         {
             "taskName": "build",
+            "args": [],
+            "isBuildCommand": true,
+            "isBackground": false,
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
+        {
+            "taskName": "build_without_view",
             "args": [],
             "isBuildCommand": true,
             "isBackground": false,
