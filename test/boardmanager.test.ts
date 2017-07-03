@@ -110,7 +110,7 @@ suite("Arduino: Board Manager.", () => {
                 const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
                 // check if the installation succeeds or not
                 if (util.directoryExistsSync(packagePath)) {
-                    done();                     
+                    done();
                 } else {
                     done(new Error("esp8266 board package install failure, can't find package path :" + packagePath));
                 }
