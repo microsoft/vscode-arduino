@@ -23,6 +23,36 @@ suite("vscode-arduino extension commands test", () => {
         }
     });
 
+    // Arduino: Initialize：Scaffold a VS Code project with an Arduino sketch.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: Arduino.initialize", function(done) {
+        this.timeout(60 * 1000);
+        try {
+            // run "Arduino: Boards Manager" command.
+            vscode.commands.executeCommand("arduino.initialize").then((result)  => {
+                done();
+            });
+
+        } catch (error) {
+            done(new Error(error));
+        }
+    });
+
+    // Arduino: Library Manager: Add library to include path.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino.addLibPath", function(done) {
+        this.timeout(60 * 1000);
+        try {
+            // Library Manager: Add library to include path.
+            vscode.commands.executeCommand("arduino.addLibPath", "#include <AzureIoTHub.h>").then((result)  => {
+                done();
+            });
+
+        } catch (error) {
+            done(new Error(error));
+        }
+    });
+
     // Arduino: Boards Manager : Manage packages for boards
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to run command: arduino.showBoardManager", function(done) {
