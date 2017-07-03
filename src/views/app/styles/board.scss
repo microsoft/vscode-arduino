@@ -19,12 +19,17 @@
 
 .arduinomanager-toolbar {
     min-height: 60px;
-    padding: 10px 10px;
+    padding: 10px 10px 0px 10px;
+    position: fixed;
     width: 100%;
     z-index: 100;
+    .btn-link {
+        padding: 5px 5px;
+    }
 }
 
 .arduinomanager-container {
+    padding-top: 90px;
     padding-bottom: 40px;
 }
 
@@ -152,7 +157,9 @@ a {
         margin-left: 195px;
         color: #333;
     }
-
+    .arduinomanager-container {		
+        padding-top: 90px;		
+    }
 }
 
 .librarymanager {
@@ -182,15 +189,24 @@ a {
         .search-input {
             margin-left: 400px;
         }
+       .arduinomanager-container {		
+            padding-top: 115px;		
+        }
     }
     @media only screen and (max-width: 559px) {
         .dropdown-filter {
             display: inline-block;
         }
+        .arduinomanager-container {		
+            padding-top: 160px;		
+        }
     }
     @media only screen and (max-width: 405px) {
         .dropdown-filter {
             display: block;
+        }
+        .arduinomanager-container {		
+            padding-top: 205px;		
         }
     }
 }
