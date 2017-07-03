@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.4
+- Release date: July 3, 2017
+
+### Added
+- Add refresh button on boardmanager/librarymanager view to refresh index files manually
+
+### Changed
+- Update license and legal compliance fixes for open source
+- The extension is ready for opening issue on github
+
 ## Version 0.2.3
 - Release date: May 27, 2017
 
