@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as fs from "fs";
-import * as os from "os";
+
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
@@ -112,7 +112,7 @@ suite("Arduino: Board Manager.", () => {
                 if (util.directoryExistsSync(packagePath)) {
                     done();
                 } else {
-                    done(new Error("esp8266 board package install failure, can't find package path :" + packagePath));
+                    done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
                 }
             });
 
@@ -130,7 +130,9 @@ suite("Arduino: Board Manager.", () => {
             const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
             if (util.directoryExistsSync(packagePath)) {
                 ArduinoContext.arduinoApp.uninstallBoard("Microsoft", packagePath);
-
+                if (util.directoryExistsSync(packagePath)) {
+                    assert.fail(true, false, "Package path still exist after calling uninstall package,remove the board package failure", "");
+                }
             }
         } catch (error) {
             assert.fail(true, false, new Error(error).message, new Error(error).name);
