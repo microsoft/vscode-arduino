@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import * as os from "os";
+
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
@@ -67,7 +67,7 @@ suite("Arduino: Library Manager.", () => {
 
     // Arduino: Library Manager: Install extenal libarary.
     // tslint:disable-next-line: only-arrow-functions
-    test("should be able to Install libraries", function(done) {
+    test("should be able to install libraries", function(done) {
         this.timeout(3 * 60 * 1000);
         try {
             // Library Manager: Install extenal libarary.

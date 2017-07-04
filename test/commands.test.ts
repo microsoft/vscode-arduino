@@ -6,7 +6,7 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 
 // Defines a Mocha test suite to group tests of similar kind together
-suite("vscode-arduino extension commands test", () => {
+suite("Arduino: Commands Tests", () => {
     // tslint:disable-next-line: only-arrow-functions
     setup(function(done) {
         // Ensure that extension is activate while testing
@@ -25,7 +25,7 @@ suite("vscode-arduino extension commands test", () => {
 
     // Arduino: Initialize：Scaffold a VS Code project with an Arduino sketch.
     // tslint:disable-next-line: only-arrow-functions
-    test("should be able to run command: Arduino.initialize", function(done) {
+    test("should be able to run command: arduino.initialize", function(done) {
         this.timeout(60 * 1000);
         try {
             // run "Arduino: Boards Manager" command.

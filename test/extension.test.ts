@@ -7,7 +7,7 @@ import * as os from "os";
 import * as vscode from "vscode";
 
 // Defines a Mocha test suite to group tests of similar kind together
-suite("Arduino Extension Tests", () => {
+suite("Arduino: Extension Tests", () => {
     test("should be present", () => {
         assert.ok(vscode.extensions.getExtension("vsciot-vscode.vscode-arduino"));
     });
@@ -29,7 +29,7 @@ suite("Arduino Extension Tests", () => {
         }
     });
 
-    test("should be able to register Arduino commands", () => {
+    test("should be able to register arduino commands", () => {
             return vscode.commands.getCommands(true).then((commands) => {
                 const ARDUINO_COMMANDS = [
                     "arduino.verify",
