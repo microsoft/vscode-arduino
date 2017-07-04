@@ -1,13 +1,16 @@
 import * as assert from "assert";
+
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
 import * as Resources from "./resources";
 
+import ArduinoContext from "..//src/arduinoContext";
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
 import { BoardManager } from "../src/arduino/boardManager";
 import { LibraryManager } from "../src/arduino/libraryManager";
+import * as util from "../src/common/util";
 
 suite("Arduino: Library Manager.", () => {
 
@@ -46,7 +49,7 @@ suite("Arduino: Library Manager.", () => {
             assert.equal(installedLibraries[0].name, "Ethernet");
             assert.equal(installedLibraries[0].builtIn, true);
             assert.equal(installedLibraries[0].srcPath, Path.join(Resources.mockedIDELibPath, "Ethernet", "src"),
-            "Should be able to find src path of install library");
+                "Should be able to find src path of install library");
 
             assert.equal(installedLibraries[1].name, "AzureIoTHub");
             assert.equal(installedLibraries[1].builtIn, false);
@@ -58,8 +61,50 @@ suite("Arduino: Library Manager.", () => {
 
             done();
         }).catch((error) => {
-          done(error);
+            done(error);
         });
+    });
+
+    // Arduino: Library Manager: Install extenal libarary.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to install libraries", function(done) {
+        this.timeout(3 * 60 * 1000);
+        try {
+            // Library Manager: Install extenal libarary.
+            ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.35", true).then((result) => {
+                // check if the installation succeeds or not
+                const arduinoSettings = ArduinoContext.arduinoApp.settings;
+                const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
+
+                if (util.directoryExistsSync(libPath)) {
+                    done();
+                } else {
+                    done(new Error("AzureIoTHub library install failure, can't find library path :" + libPath));
+                }
+            });
+
+        } catch (error) {
+            done(new Error(error));
+        }
+    });
+
+    // Arduino: Library Manager: remove extenal libarary.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to remove libraries", () => {
+        try {
+            // Library Manager: remove extenal libarary.
+            const arduinoSettings = ArduinoContext.arduinoApp.settings;
+            const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
+
+            if (util.directoryExistsSync(libPath)) {
+                ArduinoContext.arduinoApp.uninstallLibrary("AzureIoTHub", libPath);
+                assert.equal(util.directoryExistsSync(libPath), false,
+                 "Library path still exist after calling uninstall library,remove the library failure");
+            }
+
+        } catch (error) {
+            assert.fail(true, false, new Error(error).message, new Error(error).name);
+        }
     });
 
 });

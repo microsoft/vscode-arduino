@@ -1,10 +1,12 @@
 import * as assert from "assert";
 import * as fs from "fs";
+
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
 import * as Resources from "./resources";
 
+import ArduinoContext from "..//src/arduinoContext";
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
 import { parseBoardDescriptor } from "../src/arduino/board";
@@ -46,7 +48,7 @@ suite("Arduino: Board Manager.", () => {
         assert.equal(platforms[0].name, "Arduino AVR Boards", "Board Manager should display built Arduino AVR Boards");
         assert.equal(platforms[0].installedVersion, "1.6.18", "Arduino IDE built-in AVR board package version should be 1.6.18");
         assert.equal(platforms[0].rootBoardPath, Path.join(Resources.mockedIDEPackagePath, "arduino", "avr"),
-        "Should be able to index root board path for installed boards");
+            "Should be able to index root board path for installed boards");
     });
 
     test("should be able to load installed platforms", () => {
@@ -63,7 +65,7 @@ suite("Arduino: Board Manager.", () => {
         assert.equal(boardManager.installedBoards.size, 46, "Arduino IDE should contains built-in AVR boards");
         assert.equal(boardManager.installedBoards.has("arduino:avr:yun"), true, "should parse installed boards from Arduino IDE built-in packages");
         assert.equal(boardManager.installedBoards.has("esp8266:esp8266:huzzah"), true,
-        "should parse installed boards from custom packages ($sketchbook/hardware directory)");
+            "should parse installed boards from custom packages ($sketchbook/hardware directory)");
     });
 
     test("should parse boards.txt correctly", () => {
@@ -96,4 +98,44 @@ suite("Arduino: Board Manager.", () => {
         assert.equal(platformConfig.get("name"), "ESP8266 Modules");
         assert.equal(platformConfig.get("version"), "2.2.0");
     });
+
+    // Arduino: Board Manager: Manage packages for boards.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to install boards packages", function(done) {
+        this.timeout(4 * 60 * 1000);
+        try {
+            // Board Manager: install boards packages.
+            ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
+                const arduinoSettings = ArduinoContext.arduinoApp.settings;
+                const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+                // check if the installation succeeds or not
+                if (util.directoryExistsSync(packagePath)) {
+                    done();
+                } else {
+                    done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
+                }
+            });
+
+        } catch (error) {
+            done(new Error(error));
+        }
+    });
+
+    // Arduino: Board Manager: remove boards packages.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to remove boards packages", () => {
+        try {
+            // Board Manager: remove boards packages.
+            const arduinoSettings = ArduinoContext.arduinoApp.settings;
+            const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+            if (util.directoryExistsSync(packagePath)) {
+                ArduinoContext.arduinoApp.uninstallBoard("Microsoft", packagePath);
+                assert.equal(util.directoryExistsSync(packagePath), false,
+                 "Package path still exist after calling uninstall package,remove the board package failure");
+            }
+        } catch (error) {
+            assert.fail(true, false, new Error(error).message, new Error(error).name);
+        }
+    });
+
 });
