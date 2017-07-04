@@ -98,9 +98,8 @@ suite("Arduino: Library Manager.", () => {
 
             if (util.directoryExistsSync(libPath)) {
                 ArduinoContext.arduinoApp.uninstallLibrary("AzureIoTHub", libPath);
-                if (util.directoryExistsSync(libPath)) {
-                    assert.fail(true, false, "Library path still exist after calling uninstall library,remove the library failure", "");
-                }
+                assert.equal(util.directoryExistsSync(libPath), false,
+                 "Library path still exist after calling uninstall library,remove the library failure");
             }
 
         } catch (error) {

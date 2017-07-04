@@ -130,9 +130,8 @@ suite("Arduino: Board Manager.", () => {
             const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
             if (util.directoryExistsSync(packagePath)) {
                 ArduinoContext.arduinoApp.uninstallBoard("Microsoft", packagePath);
-                if (util.directoryExistsSync(packagePath)) {
-                    assert.fail(true, false, "Package path still exist after calling uninstall package,remove the board package failure", "");
-                }
+                assert.equal(util.directoryExistsSync(packagePath), false,
+                 "Package path still exist after calling uninstall package,remove the board package failure");
             }
         } catch (error) {
             assert.fail(true, false, new Error(error).message, new Error(error).name);
