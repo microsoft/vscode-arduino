@@ -27,11 +27,11 @@ Or launch VS Code Quick Open (`Ctrl + P`), paste the following command, and pres
 ```bash
 ext install vscode-arduino
 ```
-You can also install directly from Marketplace within Visual Studio Code, searching `Arduino`
+You can also install directly from Marketplace within Visual Studio Code, searching `Arduino`.
 
 ## Get Started
 You can find code samples and tutorials each time you connect a supported device.
-Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://aka.ms/azureiotgetstarted)
+Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://aka.ms/azureiotgetstarted).
 
 ## Commands
 This extension provides several commands in the Command Palette (**F1** or **Ctrl+Shift+P**) for working with `*.ino` files:
@@ -93,7 +93,7 @@ Currently this extension supports the following operatings systems:
   - The extension might work on other Linux distro as some user reported but without gurantee.
 
 ## Support
-You can find the full list of issues at [Issue Tracker](https://github.com/Microsoft/vscode-arduino/issues). You can submit a [bug or feature suggestion](https://github.com/Microsoft/vscode-arduino/issues/new), and participate community driven [discussions](https://gitter.im/Microsoft/vscode-arduino)
+You can find the full list of issues at [Issue Tracker](https://github.com/Microsoft/vscode-arduino/issues). You can submit a [bug or feature suggestion](https://github.com/Microsoft/vscode-arduino/issues/new), and participate community driven [discussions](https://gitter.im/Microsoft/vscode-arduino).
 
 ## Development
 
