@@ -138,7 +138,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     deviceConfigJson = util.tryParseJSON(fs.readFileSync(configFile.fsPath, "utf8"));
                     if (deviceConfigJson) {
                         this._port = deviceConfigJson.port;
-                        this._uploadPort = deviceConfigJson.uploadPort;
+                        this._uploadPort = deviceConfigJson.uploadPort || deviceConfigJson.port;
                         this._board = deviceConfigJson.board;
                         this._sketch = deviceConfigJson.sketch;
                         this._configuration = deviceConfigJson.configuration;
@@ -206,7 +206,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public get uploadPort() {
-        return this._uploadPort || this.port;
+        return this._uploadPort;
     }
 
     public set uploadPort(value: string) {

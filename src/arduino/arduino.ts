@@ -104,7 +104,7 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
         if (!dc.uploadPort) {
-            vscode.window.showErrorMessage("Please specify the upload serial port.");
+            vscode.window.showErrorMessage("Please specify the upload port.");
             return;
         }
 
