@@ -41,7 +41,7 @@ This extension provides several commands in the Command Palette (**F1** or **Ctr
 - **Arduino: Change Board Type**: Change board type or platform.
 - **Arduino: Close Serial Monitor**: Stop serial monitor and release the serial port.
 - **Arduino: Examples**: Show example list.
-- **Arduino: Initialize**：Scaffold a VS Code project with an Arduino sketch.
+- **Arduino: Initialize**: Scaffold a VS Code project with an Arduino sketch.
 - **Arduino: Library Manager**: Explore and manage libraries.
 - **Arduino: Open Serial Monitor**: Open serial monitor in the intergrated output window.
 - **Arduino: Select Serial Port**: Change the current serial port.
