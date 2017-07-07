@@ -455,6 +455,26 @@
             "info",
             "verbose"
           ]
+        },
+        "arduino.builder": {
+          "type": "string",
+          "default": "arduinoIDE",
+          "enum":[
+            "arduinoIDE",
+            "arduino-builder",
+            "command"
+          ],
+          "description": "The build method that the plugin will use."
+        },
+        "arduino.verifyCommand": {
+          "type": "string",
+          "default": "make",
+          "description": "The command used to verify when build method is command."
+        },
+        "arduino.uploadCommand": {
+          "type": "string",
+          "default": "make upload",
+          "description": "The command used to upload when build method is command."
         }
       }
     },
