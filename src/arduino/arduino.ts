@@ -108,27 +108,50 @@ export class ArduinoApp {
             return;
         }
 
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+        // TODO: rework the branch later
+        if (VscodeSettings.getInstance().builder === "command") {
+            arduinoChannel.show();
+            arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
-        const serialMonitor = SerialMonitor.getInstance();
+            const serialMonitor = SerialMonitor.getInstance();
 
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-        await vscode.workspace.saveAll(false);
+            const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+            await vscode.workspace.saveAll(false);
 
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
+            const args = VscodeSettings.getInstance().uploadCommand.split(' ');
+            await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
+                if (needRestore) {
+                    await serialMonitor.openSerialMonitor();
+                }
+                arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+            }, (reason) => {
+                arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            });
+        } else if (VscodeSettings.getInstance().builder === "arduino-builder") {
+            vscode.window.showErrorMessage("To be implemented.");
+        } else {
+            arduinoChannel.show();
+            arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+
+            const serialMonitor = SerialMonitor.getInstance();
+
+            const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+            await vscode.workspace.saveAll(false);
+
+            const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+            const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+            if (VscodeSettings.getInstance().logLevel === "verbose") {
+                args.push("--verbose");
             }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
+            await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+                if (needRestore) {
+                    await serialMonitor.openSerialMonitor();
+                }
+                arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+            }, (reason) => {
+                arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            });
+        }
     }
 
     public async verify(output: string = "") {
@@ -149,28 +172,45 @@ export class ArduinoApp {
 
         await vscode.workspace.saveAll(false);
 
-        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        if (output || dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
-            args.push("--pref", `build.path=${outputPath}`);
-        }
+        // TODO: rework the branch later
+        if (VscodeSettings.getInstance().builder === "command") {
+            arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+            arduinoChannel.show();
+            // we need to return the result of verify
+            try {
+                const args = VscodeSettings.getInstance().verifyCommand.split(' ');
+                await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath });
+                arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+                return true;
+            } catch (reason) {
+                arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+                return false;
+            }
+        } else if (VscodeSettings.getInstance().builder === "arduino-builder") {
+            vscode.window.showErrorMessage("To be implemented.");
+        } else {
+            arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+            const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+            const args = ["--verify", "--board", boardDescriptor, appPath];
+            if (VscodeSettings.getInstance().logLevel === "verbose") {
+                args.push("--verbose");
+            }
+            if (output || dc.output) {
+                const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
+                args.push("--pref", `build.path=${outputPath}`);
+            }
 
-        arduinoChannel.show();
-        // we need to return the result of verify
-        try {
-            await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
-            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
-            return true;
-        } catch (reason) {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-            return false;
+            arduinoChannel.show();
+            // we need to return the result of verify
+            try {
+                await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
+                arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+                return true;
+            } catch (reason) {
+                arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+                return false;
+            }
         }
-
     }
 
     // Add selected library path to the intellisense search path.

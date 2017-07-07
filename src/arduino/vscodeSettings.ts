@@ -8,6 +8,9 @@ const configKeys = {
     ADDITIONAL_URLS: "arduino.additionalUrls",
     LOG_LEVEL: "arduino.logLevel",
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
+    BUILDER: "arduino.builder",
+    VERIFY_COMMAND: "arduino.verifyCommand",
+    UPLOAD_COMMAND: "arduino.uploadCommand"
 };
 
 export interface IVscodeSettings {
@@ -15,6 +18,9 @@ export interface IVscodeSettings {
     additionalUrls: string | string[];
     logLevel: string;
     updateAdditionalUrls(urls: string | string[]): void;
+    builder: string;
+    verifyCommand: string;
+    uploadCommand: string;
 }
 
 export class VscodeSettings implements IVscodeSettings {
@@ -43,6 +49,18 @@ export class VscodeSettings implements IVscodeSettings {
 
     public async updateAdditionalUrls(value) {
         await this.setConfigValue(configKeys.ADDITIONAL_URLS, value, true);
+    }
+
+    public get builder(): string {
+        return this.getConfigValue(configKeys.BUILDER) || "arduinoIDE";
+    }
+
+    public get verifyCommand(): string {
+        return this.getConfigValue(configKeys.VERIFY_COMMAND) || "make";
+    }
+
+    public get uploadCommand(): string {
+        return this.getConfigValue(configKeys.UPLOAD_COMMAND) || "make upload";
     }
 
     private getConfigValue<T>(key: string): T {
