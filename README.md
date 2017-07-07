@@ -12,8 +12,8 @@ Welcome to Visual Studio Code extension for **Arduino** <sup>preview</sup> ! The
 * Built-in serial monitor
 * Snippets for sketches
 * Automatic Arduino project scaffolding
-* Command Palette (F1) integration of frequently used commands (e.g. Verify, Upload...)
-* Integrated Arduino Debugging <sup>New</sup> 
+* Command Palette (`F1`) integration of frequently used commands (e.g. Verify, Upload...)
+* Integrated Arduino Debugging <sup>New</sup>
 
 ## Prerequisites
 Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software#download).
@@ -34,7 +34,7 @@ You can find code samples and tutorials each time you connect a supported device
 Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://aka.ms/azureiotgetstarted).
 
 ## Commands
-This extension provides several commands in the Command Palette (**F1** or **Ctrl+Shift+P**) for working with `*.ino` files:
+This extension provides several commands in the Command Palette (`F1` or `Ctrl + Shift + P`) for working with `*.ino` files:
 
 - **Arduino: Board Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in board manager.
 - **Arduino: Change Baud Rate**: Change the baud rate of selected serial port.
@@ -75,8 +75,8 @@ Make sure your Arduino board can work with [STLink](http://www.st.com/en/develop
 
 Steps to start debugging:
 1. Plugin your board to your development machine properly. For those boards don't have on-board debugging chip, you need use STLink or JLink connector.
-2. Go to **Debug View** (Ctrl+Shift+D). Set breakpoints in your source files.
-3. Press **F5** to select debugging environment. 
+2. Go to **Debug View** (`Ctrl + Shift + D`). Set breakpoints in your source files.
+3. Press `F5` to select debugging environment.
 4. When your breakpoint is hit, you can see variables and add expression to watch on the Debug Side Bar.
 
 > To learn more about how to debug Arduino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
@@ -109,9 +109,9 @@ To *run and develop*, do the following:
 - Run `npm i`
 - Run `npm i -g gulp`
 - Open in Visual Studio Code (`code .`)
-- Press **F5** to debug
+- Press `F5` to debug
 
-To *test do the following*: **F5** in VS Code with the "Launch Tests" debug configuration.
+To *test do the following*: `F5` in VS Code with the "Launch Tests" debug configuration.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.
