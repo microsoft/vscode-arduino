@@ -13,6 +13,11 @@
             "type": "string",
             "minLength": 1
         },
+        "uploadPort": {
+            "description": "Upload port",
+            "type": "string",
+            "minLength": 1
+        },
         "board": {
             "description": "Arduino board type",
             "type": "string",
