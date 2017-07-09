@@ -3,12 +3,12 @@
 
 import * as childProcess from "child_process";
 import * as fs from "fs";
+import * as iconv from "iconv-lite";
 import * as os from "os";
 import * as path from "path";
 import * as properties from "properties";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
-import * as iconv from "iconv-lite";
 
 /**
  * This function will return the VSCode C/C++ extesnion compatible platform literals.
@@ -206,7 +206,7 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
 
         let codepage = "65001";
         if (os.platform() === "win32") {
-            codepage = childProcess.execSync('chcp').toString().split(':').pop().trim();
+            codepage = childProcess.execSync("chcp").toString().split(":").pop().trim();
         }
 
         if (outputChannel) {
