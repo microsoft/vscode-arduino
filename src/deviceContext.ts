@@ -22,7 +22,7 @@ export interface IDeviceContext {
     port: string;
 
     /**
-     * Port used for uploading the skecth. 
+     * Port used for uploading the skecth.
      * It can be a COM port or an IP address (OTA)
      * If undefined, it uses port value.
      * @property {string}
