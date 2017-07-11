@@ -14,6 +14,7 @@ import { VscodeSettings } from "./vscodeSettings";
 export interface IArduinoSettings {
     arduinoPath: string;
     commandPath: string;
+    builderPath: string;
     defaultExamplePath: string;
     packagePath: string;
     defaultPackagePath: string;
@@ -90,6 +91,17 @@ export class ArduinoSettings implements IArduinoSettings {
             return path.join(this._arduinoPath, "arduino");
         } else if (platform === "win32") {
             return path.join(this._arduinoPath, "arduino_debug.exe");
+        }
+    }
+
+    public get builderPath(): string {
+        const platform = os.platform();
+        if (platform === "darwin") {
+            return path.join(this._arduinoPath, path.normalize("Arduino.app/Contents/Java/arduino-builder"));
+        } else if (platform === "linux") {
+            return path.join(this._arduinoPath, "arduino-builder");
+        } else if (platform === "win32") {
+            return path.join(this._arduinoPath, "arduino-builder.exe");
         }
     }
 

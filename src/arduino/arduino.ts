@@ -187,7 +187,52 @@ export class ArduinoApp {
                 return false;
             }
         } else if (VscodeSettings.getInstance().builder === "arduino-builder") {
-            vscode.window.showErrorMessage("To be implemented.");
+            arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+            const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+            const args = ["-compile"];
+
+            [this._settings.defaultPackagePath, path.join(this._settings.packagePath, "packages"), path.join(this._settings.sketchbookPath, "packages")].forEach(p => {
+                if (util.directoryExistsSync(p)) {
+                    args.push("-hardware", p);
+                }
+            });
+
+            [path.join(this._settings.arduinoPath, "tools-builder"), path.join(this._settings.defaultPackagePath, "tools", "avr"), path.join(this._settings.packagePath, "packages")].forEach(p => {
+                if (util.directoryExistsSync(p)) {
+                    args.push("-tools", p);
+                }
+            });
+
+            args.push("-built-in-libraries", path.join(this._settings.arduinoPath, "libraries"));
+            const p = path.join(this._settings.sketchbookPath, "libraries");
+            if (util.directoryExistsSync(p)) {
+                args.push("-libraries", p);
+            }
+
+            args.push("-fqbn", boardDescriptor);
+            if (output || dc.output) {
+                const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
+                util.mkdirRecursivelySync(outputPath);
+                args.push("-build-path", outputPath);
+            } else {
+                vscode.window.showWarningMessage("No output folder specified. Output to a temporary folder.");
+            }
+            if (VscodeSettings.getInstance().logLevel === "verbose") {
+                args.push("-verbose");
+            }
+            args.push('-logger', 'humantags')
+            args.push(appPath);
+
+            arduinoChannel.show();
+            // we need to return the result of verify
+            try {
+                await util.spawn(this._settings.builderPath, arduinoChannel.channel, args);
+                arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+                return true;
+            } catch (reason) {
+                arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+                return false;
+            }
         } else {
             arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
             const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
