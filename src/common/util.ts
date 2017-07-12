@@ -3,6 +3,7 @@
 
 import * as childProcess from "child_process";
 import * as fs from "fs";
+import * as iconv from "iconv-lite";
 import * as os from "os";
 import * as path from "path";
 import * as properties from "properties";
@@ -203,9 +204,38 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
         const child = childProcess.spawn(command, args, options);
 
+        let codepage = "65001";
+        if (os.platform() === "win32") {
+            codepage = childProcess.execSync("chcp").toString().split(":").pop().trim();
+        }
+
         if (outputChannel) {
-            child.stdout.on("data", (data) => { outputChannel.append(data.toString()); });
-            child.stderr.on("data", (data) => { outputChannel.append(data.toString()); });
+            child.stdout.on("data", (data: Buffer) => {
+                switch (codepage) {
+                    case "932":
+                        outputChannel.append(iconv.decode(data, "Shift_JIS"));
+                        break;
+                    case "936":
+                        outputChannel.append(iconv.decode(data, "GBK"));
+                        break;
+                    default:
+                        outputChannel.append(data.toString());
+                        break;
+                }
+            });
+            child.stderr.on("data", (data: Buffer) => {
+                switch (codepage) {
+                    case "932":
+                        outputChannel.append(iconv.decode(data, "Shift_JIS"));
+                        break;
+                    case "936":
+                        outputChannel.append(iconv.decode(data, "GBK"));
+                        break;
+                    default:
+                        outputChannel.append(data.toString());
+                        break;
+                }
+            });
         }
 
         child.on("error", (error) => reject({ error, stderr, stdout }));
