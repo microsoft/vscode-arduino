@@ -20,6 +20,7 @@ import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
+import { SerialPortCtrl } from "../serialmonitor/SerialPortCtrl"
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -128,7 +129,17 @@ export class ArduinoApp {
                 arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
             });
         } else if (VscodeSettings.getInstance().builder === "arduino-builder") {
-            vscode.window.showErrorMessage("To be implemented.");
+            const serialMonitor = SerialMonitor.getInstance();
+
+            const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+            const originPorts = await SerialPortCtrl.list();
+            try {
+                const port = new SerialPortCtrl(dc.port, 1200, arduinoChannel.channel);
+                await port.open();
+                await port.stop();
+            } catch (err) {
+                vscode.window.showErrorMessage("To be implemented." + err);
+            }
         } else {
             arduinoChannel.show();
             arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
