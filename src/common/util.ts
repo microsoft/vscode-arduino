@@ -369,3 +369,41 @@ export function getRegistryValues(hive: string, key: string, name: string): Prom
 export function convertToHex(number, width = 0) {
   return padStart(number.toString(16), width, "0");
 }
+
+export function splitArgs(line: string): string[] {
+    const quoteChars = "\"'";
+    const res = [];
+    let escapedArg: string | null = null;
+    let escapingChar: string | null = null;
+    for (let i of line.split(" ")) {
+        if (escapingChar == null) {
+            let first: string | null;
+            if (i.length > 0) {
+                first = i[0];
+            }
+            if (first === null || quoteChars.search(first) < 0) {
+                if (i.trim().length > 0) {
+                    res.push(i);
+                }
+                continue;
+            }
+
+            escapingChar = first;
+            i = i.substr(1);
+            escapedArg = "";
+        }
+
+        if (!i.endsWith(escapingChar)) {
+            escapedArg += i + " ";
+            continue;
+        }
+
+        escapedArg += i.substr(0, i.length - 1);
+        if (escapedArg.trim().length > 0) {
+            res.push(escapedArg)
+        }
+        escapingChar = null;
+    }
+
+    return res;
+}

@@ -119,7 +119,7 @@ export class ArduinoApp {
             const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
             await vscode.workspace.saveAll(false);
 
-            const args = VscodeSettings.getInstance().uploadCommand.split(' ');
+            const args = util.splitArgs(VscodeSettings.getInstance().uploadCommand);
             await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
                 if (needRestore) {
                     await serialMonitor.openSerialMonitor();
@@ -189,7 +189,7 @@ export class ArduinoApp {
             arduinoChannel.show();
             // we need to return the result of verify
             try {
-                const args = VscodeSettings.getInstance().verifyCommand.split(' ');
+                const args = util.splitArgs(VscodeSettings.getInstance().verifyCommand);
                 await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath });
                 arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
                 return true;
