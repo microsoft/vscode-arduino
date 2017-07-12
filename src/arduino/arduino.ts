@@ -11,6 +11,8 @@ import * as constants from "../common/constants";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 
+import { Properties } from "../common/Properties";
+
 import { DeviceContext } from "../deviceContext";
 import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
@@ -129,6 +131,62 @@ export class ArduinoApp {
                 arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
             });
         } else if (VscodeSettings.getInstance().builder === "arduino-builder") {
+            let packageDir = null;
+
+            // first try built-in platforms
+            const packager = this._boardManager.currentBoard.getPackageName();
+            const arch = this._boardManager.currentBoard.platform.architecture;
+            const builtInPath = path.join(this._settings.defaultPackagePath, packager, arch);
+            try {
+                const stat = fs.lstatSync(builtInPath);
+                if (stat.isDirectory) {
+                    packageDir = builtInPath;
+                }
+            } catch (err) {
+                // built-in platform not found
+            }
+
+            if (packageDir === null) {
+                // external platforms?
+                const externalPath = path.join(this._settings.packagePath, 'packages', packager, 'hardware', arch);
+                try {
+                    const files = fs.readdirSync(externalPath);
+                    if (files.length > 0) {
+                        const version = files[0];
+                        packageDir = path.join(externalPath, version);
+                    }
+                } catch (err) {
+                    console.log(err);
+                    // can not resolve
+                }
+            }
+
+            if (packageDir === null) {
+                vscode.window.showErrorMessage("Cannot found properties for upload.");
+                return;
+            }
+
+            const uploadProperties = new Properties();
+            uploadProperties.loadFile(path.join(packageDir, 'platform.txt'));
+            const boardPref = new Properties();
+            boardPref.loadFile(path.join(packageDir, 'boards.txt'));
+            uploadProperties.merge(boardPref.extractWithPrefix(this._boardManager.currentBoard.board));
+            uploadProperties.merge(this._settings.toolProperties);
+            if (dc.output) {
+                const outputPath = path.join(vscode.workspace.rootPath, dc.output);
+                uploadProperties.set('build.path', outputPath);
+            } else {
+                vscode.window.showWarningMessage("No output folder specified.");
+            }
+            uploadProperties.set('build.project_name', path.basename(dc.sketch));
+            const tool = uploadProperties.get('upload.tool');
+            const verbose = true;
+            if (verbose) {
+                uploadProperties.set("upload.verbose", uploadProperties.get("tools." + tool + ".upload.params.verbose"));
+            } else {
+                uploadProperties.set("upload.verbose", uploadProperties.get("tools." + tool + ".upload.params.quiet"));
+            }
+
             const serialMonitor = SerialMonitor.getInstance();
 
             const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
@@ -140,6 +198,33 @@ export class ArduinoApp {
             } catch (err) {
                 vscode.window.showErrorMessage("To be implemented." + err);
             }
+            let port = null;
+            while (true) {
+                await util.delay(250);
+                const ports = await SerialPortCtrl.list();
+                for (let p of ports) {
+                    vscode.window.showErrorMessage(p.comName);
+                    if (originPorts.indexOf(p) < 0) {
+                        port = p;
+                    }
+                }
+                if (port) break;
+            }
+
+            if (port) {
+                uploadProperties.set('serial.port.file', port.comName);
+                const cmd = uploadProperties.get('tools.' + tool + '.upload.pattern');
+                const args = util.splitArgs(cmd);
+                await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
+                    if (needRestore) {
+                        await serialMonitor.openSerialMonitor();
+                    }
+                    arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+                }, (reason) => {
+                    arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+                });
+            }
+
         } else {
             arduinoChannel.show();
             arduinoChannel.start(`Upload sketch - ${dc.sketch}`);

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import * as os from "os";
+import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
@@ -10,6 +11,8 @@ import * as util from "../common/util";
 import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
 
 import { VscodeSettings } from "./vscodeSettings";
+
+import { Properties } from "../common/Properties";
 
 export interface IArduinoSettings {
     arduinoPath: string;
@@ -22,6 +25,7 @@ export interface IArduinoSettings {
     sketchbookPath: string;
     preferencePath: string;
     preferences: Map<string, string>;
+    toolProperties: Properties;
     reloadPreferences(): void;
 }
 
@@ -33,6 +37,8 @@ export class ArduinoSettings implements IArduinoSettings {
     private _sketchbookPath: string;
 
     private _preferences: Map<string, string>;
+
+    private _toolProperties: Properties;
 
     public constructor() {
     }
@@ -120,6 +126,13 @@ export class ArduinoSettings implements IArduinoSettings {
         return this._preferences;
     }
 
+    public get toolProperties() {
+        if (!this._toolProperties) {
+            this.scanTools();
+        }
+        return this._toolProperties;
+    }
+
     public reloadPreferences() {
         this._preferences = util.parseConfigFile(this.preferencePath);
         this._sketchbookPath = this._preferences.get("sketchbook.path") || this._sketchbookPath;
@@ -174,6 +187,49 @@ export class ArduinoSettings implements IArduinoSettings {
             vscode.window.showErrorMessage(`Cannot find arduino executable program under directory "${this._arduinoPath}". ` +
                 `Please set the correct "arduino.path" in the User Settings. Requires a restart after change.`);
             vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+        }
+    }
+
+    private runtime_tool(name: string, version: string, p: string): void {
+        const prefix = 'runtime.tools.';
+        this._toolProperties.set(prefix + name + '.path', p);
+        this._toolProperties.set(prefix + name + '-' + version + '.path', p);
+    }
+
+    private scanTools() {
+        this._toolProperties = new Properties();
+
+        const builtInToolsDir = path.join(this.defaultPackagePath, 'tools', 'avr');
+        const content = fs.readFileSync(path.join(builtInToolsDir, 'builtin_tools_versions.txt')).toString();
+
+        // unify newline
+        content.replace(/\r\n/g, '\n');
+        content.replace(/\r/g, '\n');
+
+        const lines = content.split('\n');
+        lines.forEach(line => {
+            const pos1 = line.indexOf('.');
+            const pos2 = line.indexOf('=');
+            const pack = line.substr(0, pos1).trim();
+            const name = line.substr(pos1 + 1, pos2 - pos1 - 1).trim();
+            const ver = line.substr(pos2 + 1).trim();
+            this.runtime_tool(name, ver, builtInToolsDir);
+        });
+
+        const packagers = fs.readdirSync(path.join(this.packagePath, 'packages'));
+        for (let pack of packagers) {
+            try {
+                const names = fs.readdirSync(path.join(this.packagePath, 'packages', pack, 'tools'));
+                for (let name of names) {
+                    const versions = fs.readdirSync(path.join(this.packagePath, 'packages', pack, 'tools', name));
+                    for (let ver of versions) {
+                        const p = path.join(this.packagePath, 'packages', pack, 'tools', name, ver);
+                        this.runtime_tool(name, ver, p);
+                    }
+                }
+            } catch (err) {
+                // this package contains no tool
+            }
         }
     }
 }

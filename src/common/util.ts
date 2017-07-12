@@ -407,3 +407,9 @@ export function splitArgs(line: string): string[] {
 
     return res;
 }
+
+export async function delay(time: number) {
+    return new Promise(resolve => {
+        setTimeout(resolve, time);
+    });
+}
