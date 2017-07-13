@@ -180,7 +180,7 @@ export class ArduinoApp {
             }
             uploadProperties.set('build.project_name', path.basename(dc.sketch));
             const tool = uploadProperties.get('upload.tool');
-            const verbose = true;
+            const verbose = VscodeSettings.getInstance().logLevel === "verbose";
             if (verbose) {
                 uploadProperties.set("upload.verbose", uploadProperties.get("tools." + tool + ".upload.params.verbose"));
             } else {
@@ -190,41 +190,52 @@ export class ArduinoApp {
             const serialMonitor = SerialMonitor.getInstance();
 
             const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-            const originPorts = await SerialPortCtrl.list();
-            try {
-                const port = new SerialPortCtrl(dc.port, 1200, arduinoChannel.channel);
-                await port.open();
-                await port.stop();
-            } catch (err) {
-                vscode.window.showErrorMessage("To be implemented." + err);
-            }
-            let port = null;
-            while (true) {
-                await util.delay(250);
-                const ports = await SerialPortCtrl.list();
-                for (let p of ports) {
-                    vscode.window.showErrorMessage(p.comName);
-                    if (originPorts.indexOf(p) < 0) {
-                        port = p;
+
+            const doTouch = uploadProperties.get("upload.use_1200bps_touch") === "true";
+            const waitForUploadPort = uploadProperties.get("upload.wait_for_upload_port") === "true";
+            let actualUploadPort: string | null = null;
+
+            if (doTouch) {
+                const before = await SerialPortCtrl.list();
+                if (before.some(p => p.comName === dc.port)) {
+                    if (verbose) {
+                        arduinoChannel.info("Forcing reset using 1200bps open/close on port " + dc.port);
+                    }
+                    const p = new SerialPortCtrl(dc.port, 1200, arduinoChannel.channel);
+                    try {
+                        await p.open();
+                    } finally {
+                        await p.stop();
                     }
                 }
-                if (port) break;
+                await util.delay(400);
+                if (waitForUploadPort) {
+                    actualUploadPort = await this.waitForUploadPort(dc.port, before);
+                    await util.delay(250);
+                }
+            }
+            await util.delay(400);
+
+            if (actualUploadPort === null) {
+                actualUploadPort = dc.port;
             }
 
-            if (port) {
-                uploadProperties.set('serial.port.file', port.comName);
-                const cmd = uploadProperties.get('tools.' + tool + '.upload.pattern');
-                const args = util.splitArgs(cmd);
-                await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
-                    if (needRestore) {
-                        await serialMonitor.openSerialMonitor();
-                    }
-                    arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-                }, (reason) => {
-                    arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-                });
+            uploadProperties.set("serial.port", actualUploadPort);
+            if (actualUploadPort.startsWith("/dev/")) {
+                uploadProperties.set("serial.port.file", actualUploadPort.substr(5));
+            } else {
+                uploadProperties.set('serial.port.file', actualUploadPort);
             }
-
+            const cmd = uploadProperties.get('tools.' + tool + '.upload.pattern');
+            const args = util.splitArgs(cmd);
+            await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
+                if (needRestore) {
+                    await serialMonitor.openSerialMonitor();
+                }
+                arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+            }, (reason) => {
+                arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            });
         } else {
             arduinoChannel.show();
             arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
@@ -651,6 +662,25 @@ export class ArduinoApp {
         if (!dc.sketch) {
             vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
             throw new Error("No sketch file was found.");
+        }
+    }
+
+    private async waitForUploadPort(uploadPort: string, before): Promise<string> {
+        let elapsed = 0;
+        while (elapsed < 10000) {
+            const now = await SerialPortCtrl.list();
+            for (let p of now) {
+                if (!before.some(b => b.comName === p.comName)) {
+                    return p.comName;
+                }
+            }
+            before = now;
+            await util.delay(250);
+            elapsed += 250;
+
+            if (elapsed >= 5000 && now.some(p => p.comName === uploadPort)) {
+                return uploadPort;
+            }
         }
     }
 }
