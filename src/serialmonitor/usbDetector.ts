@@ -18,7 +18,17 @@ export class UsbDetector {
 
     private _boardDescriptors = null;
 
-    constructor(
+    public static extensonRoot: string;
+
+    public static getInstance(): UsbDetector {
+        if (!UsbDetector._instance) {
+            UsbDetector._instance = new UsbDetector(this.extensonRoot);
+        }
+        return UsbDetector._instance;
+    }
+
+    private static _instance: UsbDetector;
+    private constructor(
         private _extensionRoot: string) {
     }
 
