@@ -10,6 +10,8 @@ import * as properties from "properties";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
 
+const encodingMapping: object = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../misc", "codepageMapping.json"), "utf8"));
+
 /**
  * This function will return the VSCode C/C++ extesnion compatible platform literals.
  * @function getCppConfigPlatform
@@ -211,30 +213,10 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
 
         if (outputChannel) {
             child.stdout.on("data", (data: Buffer) => {
-                switch (codepage) {
-                    case "932":
-                        outputChannel.append(iconv.decode(data, "Shift_JIS"));
-                        break;
-                    case "936":
-                        outputChannel.append(iconv.decode(data, "GBK"));
-                        break;
-                    default:
-                        outputChannel.append(data.toString());
-                        break;
-                }
+                outputChannel.append(decodeData(data, codepage));
             });
             child.stderr.on("data", (data: Buffer) => {
-                switch (codepage) {
-                    case "932":
-                        outputChannel.append(iconv.decode(data, "Shift_JIS"));
-                        break;
-                    case "936":
-                        outputChannel.append(iconv.decode(data, "GBK"));
-                        break;
-                    default:
-                        outputChannel.append(data.toString());
-                        break;
-                }
+                outputChannel.append(decodeData(data, codepage));
             });
         }
 
@@ -248,6 +230,13 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
             }
         });
     });
+}
+
+export function decodeData(data: Buffer, codepage: string): string {
+    if (encodingMapping.hasOwnProperty(codepage)) {
+        return iconv.decode(data, encodingMapping[codepage]);
+    }
+    return data.toString();
 }
 
 export function tryParseJSON(jsonString: string) {
@@ -397,5 +386,5 @@ export function getRegistryValues(hive: string, key: string, name: string): Prom
 }
 
 export function convertToHex(number, width = 0) {
-  return padStart(number.toString(16), width, "0");
+    return padStart(number.toString(16), width, "0");
 }
