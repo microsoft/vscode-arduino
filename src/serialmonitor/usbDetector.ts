@@ -22,7 +22,7 @@ export class UsbDetector {
 
     public static getInstance(): UsbDetector {
         if (!UsbDetector._instance) {
-            UsbDetector._instance = new UsbDetector(this.extensonRoot);
+            UsbDetector._instance = new UsbDetector(UsbDetector.extensonRoot);
         }
         return UsbDetector._instance;
     }
@@ -108,6 +108,20 @@ export class UsbDetector {
                 }
             }
         });
+    }
+
+    public pauseListening() {
+        if (this._usbDetector) {
+            this._usbDetector.stopMonitoring();
+        }
+    }
+
+    public resumeListening() {
+        if (this._usbDetector) {
+            this._usbDetector.startMonitoring();
+        } else {
+            this.startListening();
+        }
     }
 
     public stopListening() {
