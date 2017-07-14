@@ -22,7 +22,8 @@ import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
-import { SerialPortCtrl } from "../serialmonitor/SerialPortCtrl"
+import { SerialPortCtrl } from "../serialmonitor/serialPortCtrl";
+import { UsbDetector } from "../serialmonitor/usbDetector";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -119,10 +120,12 @@ export class ArduinoApp {
             const serialMonitor = SerialMonitor.getInstance();
 
             const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+            UsbDetector.getInstance().pauseListening();
             await vscode.workspace.saveAll(false);
 
             const args = util.splitArgs(VscodeSettings.getInstance().uploadCommand);
             await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
+                UsbDetector.getInstance().resumeListening();
                 if (needRestore) {
                     await serialMonitor.openSerialMonitor();
                 }
@@ -176,7 +179,8 @@ export class ArduinoApp {
                 const outputPath = path.join(vscode.workspace.rootPath, dc.output);
                 uploadProperties.set('build.path', outputPath);
             } else {
-                vscode.window.showWarningMessage("No output folder specified.");
+                vscode.window.showWarningMessage("No output folder specified. Cannot find binary.");
+                return;
             }
             uploadProperties.set('build.project_name', path.basename(dc.sketch));
             const tool = uploadProperties.get('upload.tool');
@@ -190,6 +194,7 @@ export class ArduinoApp {
             const serialMonitor = SerialMonitor.getInstance();
 
             const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+            UsbDetector.getInstance().pauseListening();
 
             const doTouch = uploadProperties.get("upload.use_1200bps_touch") === "true";
             const waitForUploadPort = uploadProperties.get("upload.wait_for_upload_port") === "true";
@@ -229,11 +234,23 @@ export class ArduinoApp {
             const cmd = uploadProperties.get('tools.' + tool + '.upload.pattern');
             const args = util.splitArgs(cmd);
             await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
+                await util.delay(1000);
+                let elapsed = 0;
+                while (elapsed < 2000) {
+                    const ports = await SerialPortCtrl.list();
+                    if (ports.some(p => p.comName === dc.port)) {
+                        break;
+                    }
+                    await util.delay(250);
+                    elapsed += 250;
+                }
+                UsbDetector.getInstance().resumeListening();
                 if (needRestore) {
                     await serialMonitor.openSerialMonitor();
                 }
                 arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
             }, (reason) => {
+                UsbDetector.getInstance().resumeListening();
                 arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
             });
         } else {
@@ -243,6 +260,7 @@ export class ArduinoApp {
             const serialMonitor = SerialMonitor.getInstance();
 
             const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+            UsbDetector.getInstance().pauseListening();
             await vscode.workspace.saveAll(false);
 
             const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
@@ -251,6 +269,7 @@ export class ArduinoApp {
                 args.push("--verbose");
             }
             await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+                UsbDetector.getInstance().resumeListening();
                 if (needRestore) {
                     await serialMonitor.openSerialMonitor();
                 }
