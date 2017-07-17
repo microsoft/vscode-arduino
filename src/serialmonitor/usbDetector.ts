@@ -14,11 +14,22 @@ import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
+    public static extensionRoot: string;
+
+    public static getInstance(): UsbDetector {
+        if (!UsbDetector._instance) {
+            UsbDetector._instance = new UsbDetector(UsbDetector.extensionRoot);
+        }
+        return UsbDetector._instance;
+    }
+
+    private static _instance: UsbDetector;
+
     private _usbDetector;
 
     private _boardDescriptors = null;
 
-    constructor(
+    private constructor(
         private _extensionRoot: string) {
     }
 
