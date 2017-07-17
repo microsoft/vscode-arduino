@@ -117,6 +117,20 @@ export class UsbDetector {
         }
     }
 
+    public pauseListening() {
+        if (this._usbDetector) {
+            this._usbDetector.stopMonitoring();
+        }
+    }
+
+    public resumeListening() {
+        if (this._usbDetector) {
+            this._usbDetector.startMonitoring();
+        } else {
+            this.startListening();
+        }
+    }
+
     private switchBoard(bd: IBoard, vid: string, pid: string) {
         ArduinoContext.boardManager.doChangeBoardType(bd);
         const monitor = SerialMonitor.getInstance();
