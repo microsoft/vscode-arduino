@@ -20,6 +20,7 @@ import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
+import { UsbDetector } from "../serialmonitor/usbDetector";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -114,6 +115,7 @@ export class ArduinoApp {
         const serialMonitor = SerialMonitor.getInstance();
 
         const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+        UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
@@ -122,6 +124,7 @@ export class ArduinoApp {
             args.push("--verbose");
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+            UsbDetector.getInstance().resumeListening();
             if (needRestore) {
                 await serialMonitor.openSerialMonitor();
             }
