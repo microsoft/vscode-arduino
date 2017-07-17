@@ -92,178 +92,6 @@ export class ArduinoApp {
         }
     }
 
-    private async uploadByCommand(dc: DeviceContext, boardDescriptor: string): Promise<void> {
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
-
-        const serialMonitor = SerialMonitor.getInstance();
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-
-        await vscode.workspace.saveAll(false);
-
-        const args = util.splitArgs(VscodeSettings.getInstance().uploadCommand);
-        await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
-    }
-
-    private async waitForPort(port: string): Promise<void> {
-        await util.delay(1000);
-        let elapsed = 0;
-        while (elapsed < 2000) {
-            const ports = await SerialPortCtrl.list();
-            if (ports.some(p => p.comName === port)) {
-                break;
-            }
-            await util.delay(250);
-            elapsed += 250;
-        }
-    }
-
-    private async prepareUploadPort(uploadProperties: Properties, dc: DeviceContext, verbose: boolean): Promise<string> {
-        const doTouch = uploadProperties.get("upload.use_1200bps_touch") === "true";
-        const waitForUploadPort = uploadProperties.get("upload.wait_for_upload_port") === "true";
-        let actualUploadPort: string | null = null;
-
-        if (doTouch) {
-            const before = await SerialPortCtrl.list();
-            if (before.some(p => p.comName === dc.port)) {
-                if (verbose) {
-                    arduinoChannel.info("Forcing reset using 1200bps open/close on port " + dc.port);
-                }
-                const p = new SerialPortCtrl(dc.port, 1200, arduinoChannel.channel);
-                try {
-                    await p.open();
-                } finally {
-                    await p.stop();
-                }
-            }
-            await util.delay(400);
-            if (waitForUploadPort) {
-                actualUploadPort = await this.waitForUploadPort(dc.port, before);
-                await util.delay(250);
-            }
-        }
-        await util.delay(400);
-
-        if (actualUploadPort === null) {
-            actualUploadPort = dc.port;
-        }
-
-        return actualUploadPort;
-    }
-
-    private resolvePackagePath(): string | null {
-        // first try built-in platforms
-        const packager = this._boardManager.currentBoard.getPackageName();
-        const arch = this._boardManager.currentBoard.platform.architecture;
-        const builtInPath = path.join(this._settings.defaultPackagePath, packager, arch);
-        try {
-            const stat = fs.lstatSync(builtInPath);
-            if (stat.isDirectory) {
-                return builtInPath;
-            }
-        } catch (err) {
-            // built-in platform not found
-        }
-
-        // external platforms?
-        const externalPath = path.join(this._settings.packagePath, 'packages', packager, 'hardware', arch);
-        try {
-            const files = fs.readdirSync(externalPath);
-            if (files.length > 0) {
-                const version = files[0];
-                return path.join(externalPath, version);
-            }
-        } catch (err) {
-            // can not resolve
-        }
-
-        return null;
-    }
-
-    private async uploadByPattern(dc: DeviceContext, boardDescriptor: string): Promise<void> {
-        let packageDir = this.resolvePackagePath();
-        if (packageDir === null) {
-            vscode.window.showErrorMessage("Cannot found properties for upload.");
-            return;
-        }
-
-        const uploadProperties = new Properties();
-        uploadProperties.loadFile(path.join(packageDir, 'platform.txt'));
-        const boardPref = new Properties();
-        boardPref.loadFile(path.join(packageDir, 'boards.txt'));
-        uploadProperties.merge(boardPref.extractWithPrefix(this._boardManager.currentBoard.board));
-        uploadProperties.merge(this._settings.toolProperties);
-
-        if (!dc.output) {
-            vscode.window.showErrorMessage("No output folder specified. Cannot find binary.");
-            return;
-        }
-
-        const outputPath = path.join(vscode.workspace.rootPath, dc.output);
-        uploadProperties.set('build.path', outputPath);
-        uploadProperties.set('build.project_name', path.basename(dc.sketch));
-        const tool = uploadProperties.get('upload.tool');
-        const verbose = VscodeSettings.getInstance().logLevel === "verbose";
-        if (verbose) {
-            uploadProperties.set("upload.verbose", uploadProperties.get("tools." + tool + ".upload.params.verbose"));
-        } else {
-            uploadProperties.set("upload.verbose", uploadProperties.get("tools." + tool + ".upload.params.quiet"));
-        }
-
-        const serialMonitor = SerialMonitor.getInstance();
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-
-        const actualUploadPort = await this.prepareUploadPort(uploadProperties, dc, verbose);
-        uploadProperties.set("serial.port", actualUploadPort);
-        if (actualUploadPort.startsWith("/dev/")) {
-            uploadProperties.set("serial.port.file", actualUploadPort.substr(5));
-        } else {
-            uploadProperties.set('serial.port.file', actualUploadPort);
-        }
-        const cmd = uploadProperties.get('tools.' + tool + '.upload.pattern');
-        const args = util.splitArgs(cmd);
-        await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
-            await this.waitForPort(dc.port);
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
-    }
-
-    private async uploadByArduinoIde(dc: DeviceContext, boardDescriptor: string): Promise<void> {
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
-
-        const serialMonitor = SerialMonitor.getInstance();
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-
-        await vscode.workspace.saveAll(false);
-
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
-    }
-
     public async upload() {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
@@ -293,95 +121,6 @@ export class ArduinoApp {
             await this.uploadByArduinoIde(dc, boardDescriptor);
         }
         UsbDetector.getInstance().resumeListening();
-    }
-
-    private async verifyByCommand(dc: DeviceContext, boardDescriptor: string, output: string): Promise<boolean> {
-        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
-        arduinoChannel.show();
-
-        // we need to return the result of verify
-        try {
-            const args = util.splitArgs(VscodeSettings.getInstance().verifyCommand);
-            await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath });
-            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
-            return true;
-        } catch (reason) {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-            return false;
-        }
-    }
-
-    private async verifyByArduinoBuilder(dc: DeviceContext, boardDescriptor: string, output: string): Promise<boolean> {
-        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["-compile"];
-
-        [this._settings.defaultPackagePath, path.join(this._settings.packagePath, "packages"), path.join(this._settings.sketchbookPath, "packages")].forEach(p => {
-            if (util.directoryExistsSync(p)) {
-                args.push("-hardware", p);
-            }
-        });
-
-        [path.join(this._settings.arduinoPath, "tools-builder"), path.join(this._settings.defaultPackagePath, "tools", "avr"), path.join(this._settings.packagePath, "packages")].forEach(p => {
-            if (util.directoryExistsSync(p)) {
-                args.push("-tools", p);
-            }
-        });
-
-        args.push("-built-in-libraries", path.join(this._settings.arduinoPath, "libraries"));
-        const p = path.join(this._settings.sketchbookPath, "libraries");
-        if (util.directoryExistsSync(p)) {
-            args.push("-libraries", p);
-        }
-
-        args.push("-fqbn", boardDescriptor);
-        if (output || dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
-            util.mkdirRecursivelySync(outputPath);
-            args.push("-build-path", outputPath);
-        } else {
-            vscode.window.showWarningMessage("No output folder specified. Output to a temporary folder.");
-        }
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("-verbose");
-        }
-        args.push('-logger', 'humantags')
-        args.push(appPath);
-
-        arduinoChannel.show();
-        // we need to return the result of verify
-        try {
-            await util.spawn(this._settings.builderPath, arduinoChannel.channel, args);
-            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
-            return true;
-        } catch (reason) {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-            return false;
-        }
-    }
-
-    private async verifyByArduinoIde(dc: DeviceContext, boardDescriptor: string, output: string): Promise<boolean> {
-        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
-        const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        if (output || dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
-            args.push("--pref", `build.path=${outputPath}`);
-        }
-
-        arduinoChannel.show();
-        // we need to return the result of verify
-        try {
-            await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
-            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
-            return true;
-        } catch (reason) {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-            return false;
-        }
     }
 
     public async verify(output: string = "") {
@@ -715,8 +454,8 @@ export class ArduinoApp {
         let elapsed = 0;
         while (elapsed < 10000) {
             const now = await SerialPortCtrl.list();
-            for (let p of now) {
-                if (!before.some(b => b.comName === p.comName)) {
+            for (const p of now) {
+                if (!before.some((b) => b.comName === p.comName)) {
                     return p.comName;
                 }
             }
@@ -724,9 +463,272 @@ export class ArduinoApp {
             await util.delay(250);
             elapsed += 250;
 
-            if (elapsed >= 5000 && now.some(p => p.comName === uploadPort)) {
+            if (elapsed >= 5000 && now.some((p) => p.comName === uploadPort)) {
                 return uploadPort;
             }
+        }
+    }
+
+    private async waitForPort(port: string): Promise<void> {
+        await util.delay(1000);
+        let elapsed = 0;
+        while (elapsed < 2000) {
+            const ports = await SerialPortCtrl.list();
+            if (ports.some((p) => p.comName === port)) {
+                break;
+            }
+            await util.delay(250);
+            elapsed += 250;
+        }
+    }
+
+    private async prepareUploadPort(uploadProperties: Properties, dc: DeviceContext, verbose: boolean): Promise<string> {
+        const doTouch = uploadProperties.get("upload.use_1200bps_touch") === "true";
+        const waitForUploadPort = uploadProperties.get("upload.wait_for_upload_port") === "true";
+        let actualUploadPort: string | null = null;
+
+        if (doTouch) {
+            const before = await SerialPortCtrl.list();
+            if (before.some((p) => p.comName === dc.port)) {
+                if (verbose) {
+                    arduinoChannel.info("Forcing reset using 1200bps open/close on port " + dc.port);
+                }
+                const p = new SerialPortCtrl(dc.port, 1200, arduinoChannel.channel);
+                try {
+                    await p.open();
+                } finally {
+                    await p.stop();
+                }
+            }
+            await util.delay(400);
+            if (waitForUploadPort) {
+                actualUploadPort = await this.waitForUploadPort(dc.port, before);
+                await util.delay(250);
+            }
+        }
+        await util.delay(400);
+
+        if (actualUploadPort === null) {
+            actualUploadPort = dc.port;
+        }
+
+        return actualUploadPort;
+    }
+
+    private resolvePackagePath(): string | null {
+        // first try built-in platforms
+        const packager = this._boardManager.currentBoard.getPackageName();
+        const arch = this._boardManager.currentBoard.platform.architecture;
+        const builtInPath = path.join(this._settings.defaultPackagePath, packager, arch);
+        try {
+            const stat = fs.lstatSync(builtInPath);
+            if (stat.isDirectory) {
+                return builtInPath;
+            }
+        } catch (err) {
+            // built-in platform not found
+        }
+
+        // external platforms?
+        const externalPath = path.join(this._settings.packagePath, "packages", packager, "hardware", arch);
+        try {
+            const files = fs.readdirSync(externalPath);
+            if (files.length > 0) {
+                const version = files[0];
+                return path.join(externalPath, version);
+            }
+        } catch (err) {
+            // can not resolve
+        }
+
+        return null;
+    }
+
+    private async uploadByCommand(dc: DeviceContext, boardDescriptor: string): Promise<void> {
+        arduinoChannel.show();
+        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+
+        const serialMonitor = SerialMonitor.getInstance();
+        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+
+        await vscode.workspace.saveAll(false);
+
+        const args = util.splitArgs(VscodeSettings.getInstance().uploadCommand);
+        await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
+            if (needRestore) {
+                await serialMonitor.openSerialMonitor();
+            }
+            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+        }, (reason) => {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+        });
+    }
+
+    private async uploadByPattern(dc: DeviceContext, boardDescriptor: string): Promise<void> {
+        const packageDir = this.resolvePackagePath();
+        if (packageDir === null) {
+            vscode.window.showErrorMessage("Cannot found properties for upload.");
+            return;
+        }
+
+        const uploadProperties = new Properties();
+        uploadProperties.loadFile(path.join(packageDir, "platform.txt"));
+        const boardPref = new Properties();
+        boardPref.loadFile(path.join(packageDir, "boards.txt"));
+        uploadProperties.merge(boardPref.extractWithPrefix(this._boardManager.currentBoard.board));
+        uploadProperties.merge(this._settings.toolProperties);
+
+        if (!dc.output) {
+            vscode.window.showErrorMessage("No output folder specified. Cannot find binary.");
+            return;
+        }
+
+        const outputPath = path.join(vscode.workspace.rootPath, dc.output);
+        uploadProperties.set("build.path", outputPath);
+        uploadProperties.set("build.project_name", path.basename(dc.sketch));
+        const tool = uploadProperties.get("upload.tool");
+        const verbose = VscodeSettings.getInstance().logLevel === "verbose";
+        if (verbose) {
+            uploadProperties.set("upload.verbose", uploadProperties.get("tools." + tool + ".upload.params.verbose"));
+        } else {
+            uploadProperties.set("upload.verbose", uploadProperties.get("tools." + tool + ".upload.params.quiet"));
+        }
+
+        const serialMonitor = SerialMonitor.getInstance();
+        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+
+        const actualUploadPort = await this.prepareUploadPort(uploadProperties, dc, verbose);
+        uploadProperties.set("serial.port", actualUploadPort);
+        if (actualUploadPort.startsWith("/dev/")) {
+            uploadProperties.set("serial.port.file", actualUploadPort.substr(5));
+        } else {
+            uploadProperties.set("serial.port.file", actualUploadPort);
+        }
+        const cmd = uploadProperties.get("tools." + tool + ".upload.pattern");
+        const args = util.splitArgs(cmd);
+        await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath }).then(async () => {
+            await this.waitForPort(dc.port);
+            if (needRestore) {
+                await serialMonitor.openSerialMonitor();
+            }
+            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+        }, (reason) => {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+        });
+    }
+
+    private async uploadByArduinoIde(dc: DeviceContext, boardDescriptor: string): Promise<void> {
+        arduinoChannel.show();
+        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+
+        const serialMonitor = SerialMonitor.getInstance();
+        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+
+        await vscode.workspace.saveAll(false);
+
+        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+        if (VscodeSettings.getInstance().logLevel === "verbose") {
+            args.push("--verbose");
+        }
+        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+            if (needRestore) {
+                await serialMonitor.openSerialMonitor();
+            }
+            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+        }, (reason) => {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+        });
+    }
+
+    private async verifyByCommand(dc: DeviceContext, boardDescriptor: string, output: string): Promise<boolean> {
+        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+        arduinoChannel.show();
+
+        // we need to return the result of verify
+        try {
+            const args = util.splitArgs(VscodeSettings.getInstance().verifyCommand);
+            await util.spawn(args[0], arduinoChannel.channel, args.slice(1), { cwd: vscode.workspace.rootPath });
+            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+            return true;
+        } catch (reason) {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            return false;
+        }
+    }
+
+    private async verifyByArduinoBuilder(dc: DeviceContext, boardDescriptor: string, output: string): Promise<boolean> {
+        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const args = ["-compile"];
+
+        [this._settings.defaultPackagePath, path.join(this._settings.packagePath, "packages"),
+            path.join(this._settings.sketchbookPath, "packages")].forEach((p) => {
+            if (util.directoryExistsSync(p)) {
+                args.push("-hardware", p);
+            }
+        });
+
+        [path.join(this._settings.arduinoPath, "tools-builder"), path.join(this._settings.defaultPackagePath, "tools", "avr"),
+            path.join(this._settings.packagePath, "packages")].forEach((p) => {
+            if (util.directoryExistsSync(p)) {
+                args.push("-tools", p);
+            }
+        });
+
+        args.push("-built-in-libraries", path.join(this._settings.arduinoPath, "libraries"));
+        const p = path.join(this._settings.sketchbookPath, "libraries");
+        if (util.directoryExistsSync(p)) {
+            args.push("-libraries", p);
+        }
+
+        args.push("-fqbn", boardDescriptor);
+        if (output || dc.output) {
+            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
+            util.mkdirRecursivelySync(outputPath);
+            args.push("-build-path", outputPath);
+        } else {
+            vscode.window.showWarningMessage("No output folder specified. Output to a temporary folder.");
+        }
+        if (VscodeSettings.getInstance().logLevel === "verbose") {
+            args.push("-verbose");
+        }
+        args.push("-logger", "humantags");
+        args.push(appPath);
+
+        arduinoChannel.show();
+        // we need to return the result of verify
+        try {
+            await util.spawn(this._settings.builderPath, arduinoChannel.channel, args);
+            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+            return true;
+        } catch (reason) {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            return false;
+        }
+    }
+
+    private async verifyByArduinoIde(dc: DeviceContext, boardDescriptor: string, output: string): Promise<boolean> {
+        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const args = ["--verify", "--board", boardDescriptor, appPath];
+        if (VscodeSettings.getInstance().logLevel === "verbose") {
+            args.push("--verbose");
+        }
+        if (output || dc.output) {
+            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
+            args.push("--pref", `build.path=${outputPath}`);
+        }
+
+        arduinoChannel.show();
+        // we need to return the result of verify
+        try {
+            await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
+            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+            return true;
+        } catch (reason) {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            return false;
         }
     }
 }

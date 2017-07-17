@@ -10,17 +10,17 @@ const configKeys = {
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
     BUILDER: "arduino.builder",
     VERIFY_COMMAND: "arduino.verifyCommand",
-    UPLOAD_COMMAND: "arduino.uploadCommand"
+    UPLOAD_COMMAND: "arduino.uploadCommand",
 };
 
 export interface IVscodeSettings {
     arduinoPath: string;
     additionalUrls: string | string[];
     logLevel: string;
-    updateAdditionalUrls(urls: string | string[]): void;
     builder: string;
     verifyCommand: string;
     uploadCommand: string;
+    updateAdditionalUrls(urls: string | string[]): void;
 }
 
 export class VscodeSettings implements IVscodeSettings {

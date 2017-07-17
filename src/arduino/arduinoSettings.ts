@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as os from "os";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
@@ -191,39 +191,39 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     private runtime_tool(name: string, version: string, p: string): void {
-        const prefix = 'runtime.tools.';
-        this._toolProperties.set(prefix + name + '.path', p);
-        this._toolProperties.set(prefix + name + '-' + version + '.path', p);
+        const prefix = "runtime.tools.";
+        this._toolProperties.set(prefix + name + ".path", p);
+        this._toolProperties.set(prefix + name + "-" + version + ".path", p);
     }
 
     private scanTools() {
         this._toolProperties = new Properties();
 
-        const builtInToolsDir = path.join(this.defaultPackagePath, 'tools', 'avr');
-        const content = fs.readFileSync(path.join(builtInToolsDir, 'builtin_tools_versions.txt')).toString();
+        const builtInToolsDir = path.join(this.defaultPackagePath, "tools", "avr");
+        const content = fs.readFileSync(path.join(builtInToolsDir, "builtin_tools_versions.txt")).toString();
 
         // unify newline
-        content.replace(/\r\n/g, '\n');
-        content.replace(/\r/g, '\n');
+        content.replace(/\r\n/g, "\n");
+        content.replace(/\r/g, "\n");
 
-        const lines = content.split('\n');
-        lines.forEach(line => {
-            const pos1 = line.indexOf('.');
-            const pos2 = line.indexOf('=');
+        const lines = content.split("\n");
+        lines.forEach((line) => {
+            const pos1 = line.indexOf(".");
+            const pos2 = line.indexOf("=");
             const pack = line.substr(0, pos1).trim();
             const name = line.substr(pos1 + 1, pos2 - pos1 - 1).trim();
             const ver = line.substr(pos2 + 1).trim();
             this.runtime_tool(name, ver, builtInToolsDir);
         });
 
-        const packagers = fs.readdirSync(path.join(this.packagePath, 'packages'));
-        for (let pack of packagers) {
+        const packagers = fs.readdirSync(path.join(this.packagePath, "packages"));
+        for (const pack of packagers) {
             try {
-                const names = fs.readdirSync(path.join(this.packagePath, 'packages', pack, 'tools'));
-                for (let name of names) {
-                    const versions = fs.readdirSync(path.join(this.packagePath, 'packages', pack, 'tools', name));
-                    for (let ver of versions) {
-                        const p = path.join(this.packagePath, 'packages', pack, 'tools', name, ver);
+                const names = fs.readdirSync(path.join(this.packagePath, "packages", pack, "tools"));
+                for (const name of names) {
+                    const versions = fs.readdirSync(path.join(this.packagePath, "packages", pack, "tools", name));
+                    for (const ver of versions) {
+                        const p = path.join(this.packagePath, "packages", pack, "tools", name, ver);
                         this.runtime_tool(name, ver, p);
                     }
                 }

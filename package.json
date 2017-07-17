@@ -459,7 +459,7 @@
         "arduino.builder": {
           "type": "string",
           "default": "arduinoIDE",
-          "enum":[
+          "enum": [
             "arduinoIDE",
             "arduino-builder",
             "command"

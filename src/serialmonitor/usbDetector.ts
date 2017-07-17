@@ -14,10 +14,6 @@ import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
-    private _usbDetector;
-
-    private _boardDescriptors = null;
-
     public static extensonRoot: string;
 
     public static getInstance(): UsbDetector {
@@ -28,6 +24,11 @@ export class UsbDetector {
     }
 
     private static _instance: UsbDetector;
+
+    private _usbDetector;
+
+    private _boardDescriptors = null;
+
     private constructor(
         private _extensionRoot: string) {
     }

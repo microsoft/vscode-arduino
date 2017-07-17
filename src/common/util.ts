@@ -376,7 +376,7 @@ export function splitArgs(line: string): string[] {
     let escapedArg: string | null = null;
     let escapingChar: string | null = null;
     for (let i of line.split(" ")) {
-        if (escapingChar == null) {
+        if (escapingChar === null) {
             let first: string | null;
             if (i.length > 0) {
                 first = i[0];
@@ -400,7 +400,7 @@ export function splitArgs(line: string): string[] {
 
         escapedArg += i.substr(0, i.length - 1);
         if (escapedArg.trim().length > 0) {
-            res.push(escapedArg)
+            res.push(escapedArg);
         }
         escapingChar = null;
     }
@@ -409,7 +409,7 @@ export function splitArgs(line: string): string[] {
 }
 
 export async function delay(time: number) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(resolve, time);
     });
 }
