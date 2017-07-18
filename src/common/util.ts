@@ -3,11 +3,14 @@
 
 import * as childProcess from "child_process";
 import * as fs from "fs";
+import * as iconv from "iconv-lite";
 import * as os from "os";
 import * as path from "path";
 import * as properties from "properties";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
+
+const encodingMapping: object = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../misc", "codepageMapping.json"), "utf8"));
 
 /**
  * This function will return the VSCode C/C++ extesnion compatible platform literals.
@@ -203,9 +206,18 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
         const child = childProcess.spawn(command, args, options);
 
+        let codepage = "65001";
+        if (os.platform() === "win32") {
+            codepage = childProcess.execSync("chcp").toString().split(":").pop().trim();
+        }
+
         if (outputChannel) {
-            child.stdout.on("data", (data) => { outputChannel.append(data.toString()); });
-            child.stderr.on("data", (data) => { outputChannel.append(data.toString()); });
+            child.stdout.on("data", (data: Buffer) => {
+                outputChannel.append(decodeData(data, codepage));
+            });
+            child.stderr.on("data", (data: Buffer) => {
+                outputChannel.append(decodeData(data, codepage));
+            });
         }
 
         child.on("error", (error) => reject({ error, stderr, stdout }));
@@ -218,6 +230,13 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
             }
         });
     });
+}
+
+export function decodeData(data: Buffer, codepage: string): string {
+    if (encodingMapping.hasOwnProperty(codepage)) {
+        return iconv.decode(data, encodingMapping[codepage]);
+    }
+    return data.toString();
 }
 
 export function tryParseJSON(jsonString: string) {
@@ -367,5 +386,5 @@ export function getRegistryValues(hive: string, key: string, name: string): Prom
 }
 
 export function convertToHex(number, width = 0) {
-  return padStart(number.toString(16), width, "0");
+    return padStart(number.toString(16), width, "0");
 }
