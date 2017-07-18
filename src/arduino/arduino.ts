@@ -121,6 +121,13 @@ export class ArduinoApp {
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
+        if (dc.output) {
+            const outputPath = path.join(vscode.workspace.rootPath, dc.output);
+            args.push("--pref", `build.path=${outputPath}`);
+        } else {
+            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
+            vscode.window.showWarningMessage(msg);
+        }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
             if (needRestore) {
                 await serialMonitor.openSerialMonitor();
@@ -158,6 +165,9 @@ export class ArduinoApp {
         if (output || dc.output) {
             const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
             args.push("--pref", `build.path=${outputPath}`);
+        } else {
+            const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
+            vscode.window.showWarningMessage(msg);
         }
 
         arduinoChannel.show();
