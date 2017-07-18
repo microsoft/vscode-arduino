@@ -19,7 +19,11 @@ export function resolveArduinoPath(): string {
 }
 
 export function validateArduinoPath(arduinoPath: string): boolean {
-    return fileExistsSync(path.join(arduinoPath, "Arduino.app/Contents/MacOS/Arduino"));
+    if (arduinoPath.match(/Arduino.*\.app/)){
+        return fileExistsSync(path.join(arduinoPath, "/Contents/MacOS/Arduino"));
+    }else{
+        return fileExistsSync(path.join(arduinoPath, "Arduino.app/Contents/MacOS/Arduino"));
+    }
 }
 
 export function findFile(fileName: string, cwd: string): string {

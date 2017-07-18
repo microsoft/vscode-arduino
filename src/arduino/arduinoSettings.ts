@@ -56,7 +56,11 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultExamplePath(): string {
         if (os.platform() === "darwin") {
-            return path.join(this._arduinoPath, "Arduino.app/Contents/Java/examples");
+            if (this._arduinoPath.match(/Arduino.*\.app/)){
+                return path.join(this._arduinoPath, "/Contents/Java/examples");
+            }else{
+                return path.join(this._arduinoPath, "Arduino.app/Contents/Java/examples");
+            }
         } else {
             return path.join(this._arduinoPath, "examples");
         }
@@ -68,7 +72,11 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultPackagePath(): string {
         if (os.platform() === "darwin") {
-            return path.join(this._arduinoPath, "Arduino.app/Contents/Java/hardware");
+            if (this._arduinoPath.match(/Arduino.*\.app/)){
+                return path.join(this._arduinoPath, "/Contents/Java/hardware");
+            }else{
+                return path.join(this._arduinoPath, "Arduino.app/Contents/Java/hardware");
+            } 
         } else { // linux and win32.
             return path.join(this._arduinoPath, "hardware");
         }
@@ -76,7 +84,11 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultLibPath(): string {
         if (os.platform() === "darwin") {
-            return path.join(this._arduinoPath, "Arduino.app/Contents/Java/libraries");
+            if (this._arduinoPath.match(/Arduino.*\.app/)){
+                return path.join(this._arduinoPath, "/Contents/Java/libraries");
+            }else{
+                return path.join(this._arduinoPath, "Arduino.app/Contents/Java/libraries");
+            }
         } else { // linux and win32
             return path.join(this._arduinoPath, "libraries");
         }
@@ -85,7 +97,11 @@ export class ArduinoSettings implements IArduinoSettings {
     public get commandPath(): string {
         const platform = os.platform();
         if (platform === "darwin") {
-            return path.join(this._arduinoPath, path.normalize("Arduino.app/Contents/MacOS/Arduino"));
+            if (this._arduinoPath.match(/Arduino.*\.app/)){
+                return path.join(this._arduinoPath, path.normalize("/Contents/MacOS/Arduino"));
+            }else{
+                return path.join(this._arduinoPath, path.normalize("Arduino.app/Contents/MacOS/Arduino"));
+            }
         } else if (platform === "linux") {
             return path.join(this._arduinoPath, "arduino");
         } else if (platform === "win32") {
