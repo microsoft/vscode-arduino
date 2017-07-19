@@ -388,3 +388,16 @@ export function getRegistryValues(hive: string, key: string, name: string): Prom
 export function convertToHex(number, width = 0) {
     return padStart(number.toString(16), width, "0");
 }
+
+/**
+ * This will accept any Arduino*.app on Mac OS,
+ * in case you named Arduino with a version number
+ * @argument {string} arduinoPath
+ */
+export function resolveMacArduinoAppPath(arduinoPath: string): string {
+    if (/Arduino.*\.app/.test(arduinoPath)) {
+        return arduinoPath;
+    } else {
+        return path.join(arduinoPath, "Arduino.app");
+    }
+}

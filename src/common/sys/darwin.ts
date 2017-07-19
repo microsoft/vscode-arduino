@@ -3,7 +3,7 @@
 
 import * as childProcess from "child_process";
 import * as path from "path";
-import { directoryExistsSync, fileExistsSync } from "../util";
+import { directoryExistsSync, fileExistsSync, resolveMacArduinoAppPath } from "../util";
 
 export function resolveArduinoPath(): string {
     let result;
@@ -19,7 +19,7 @@ export function resolveArduinoPath(): string {
 }
 
 export function validateArduinoPath(arduinoPath: string): boolean {
-    return fileExistsSync(path.join(arduinoPath, "Arduino.app/Contents/MacOS/Arduino"));
+    return fileExistsSync(path.join(resolveMacArduinoAppPath(arduinoPath), "/Contents/MacOS/Arduino"));
 }
 
 export function findFile(fileName: string, cwd: string): string {
