@@ -183,7 +183,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const completionProvider = new CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
 
-    UsbDetector.extensionRoot = context.extensionPath;
+    UsbDetector.getInstance().initialize(context.extensionPath);
     UsbDetector.getInstance().startListening();
 
     if (vscode.workspace.rootPath && (
