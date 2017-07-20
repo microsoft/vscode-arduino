@@ -232,6 +232,20 @@ export class ArduinoApp {
             configSection.includePath.push(childLibPath);
         });
 
+        libPaths.forEach((childLibPath) => {
+            childLibPath = path.resolve(path.normalize(childLibPath));
+            if (configSection.browse.path && configSection.browse.path.length) {
+                for (const existingPath of configSection.browse.path) {
+                    if (childLibPath === path.resolve(path.normalize(existingPath))) {
+                        return;
+                    }
+                }
+            } else {
+                configSection.browse.path = [];
+            }
+            configSection.browse.path.push(childLibPath);
+        });
+
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
     }
 
