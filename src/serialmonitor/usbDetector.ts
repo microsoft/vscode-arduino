@@ -14,12 +14,26 @@ import { SerialMonitor } from "./serialMonitor";
 
 export class UsbDetector {
 
+    public static getInstance(): UsbDetector {
+        if (!UsbDetector._instance) {
+            UsbDetector._instance = new UsbDetector();
+        }
+        return UsbDetector._instance;
+    }
+
+    private static _instance: UsbDetector;
+
     private _usbDetector;
 
     private _boardDescriptors = null;
 
-    constructor(
-        private _extensionRoot: string) {
+    private _extensionRoot = null;
+
+    private constructor() {
+    }
+
+    public initialize(extensionRoot: string) {
+        this._extensionRoot = extensionRoot;
     }
 
     public async startListening() {
@@ -30,6 +44,10 @@ export class UsbDetector {
 
         if (!this._usbDetector) {
             return;
+        }
+
+        if (this._extensionRoot === null) {
+            throw new Error("UsbDetector should be initialized before using.");
         }
 
         this._usbDetector.on("add", async (device) => {
@@ -103,6 +121,20 @@ export class UsbDetector {
     public stopListening() {
         if (this._usbDetector) {
             this._usbDetector.stopMonitoring();
+        }
+    }
+
+    public pauseListening() {
+        if (this._usbDetector) {
+            this._usbDetector.stopMonitoring();
+        }
+    }
+
+    public resumeListening() {
+        if (this._usbDetector) {
+            this._usbDetector.startMonitoring();
+        } else {
+            this.startListening();
         }
     }
 

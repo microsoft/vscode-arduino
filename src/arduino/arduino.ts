@@ -20,6 +20,7 @@ import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
+import { UsbDetector } from "../serialmonitor/usbDetector";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -114,6 +115,7 @@ export class ArduinoApp {
         const serialMonitor = SerialMonitor.getInstance();
 
         const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+        UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
         const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
@@ -129,6 +131,7 @@ export class ArduinoApp {
             vscode.window.showWarningMessage(msg);
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+            UsbDetector.getInstance().resumeListening();
             if (needRestore) {
                 await serialMonitor.openSerialMonitor();
             }
@@ -237,6 +240,20 @@ export class ArduinoApp {
                 configSection.includePath = [];
             }
             configSection.includePath.push(childLibPath);
+        });
+
+        libPaths.forEach((childLibPath) => {
+            childLibPath = path.resolve(path.normalize(childLibPath));
+            if (configSection.browse.path && configSection.browse.path.length) {
+                for (const existingPath of configSection.browse.path) {
+                    if (childLibPath === path.resolve(path.normalize(existingPath))) {
+                        return;
+                    }
+                }
+            } else {
+                configSection.browse.path = [];
+            }
+            configSection.browse.path.push(childLibPath);
         });
 
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
