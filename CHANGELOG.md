@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Use a new configuration page for switching arduino boards
 - Lazy load the arduino extension on start up, only usb detection works in background, when it detects an arduino board, the extension will fully activate
-- Update unit test to somme basic arduino commands
+- Update unit test to some basic arduino commands
 - Fix some typos in code
 - Fix issue #289 #324 #327
 
