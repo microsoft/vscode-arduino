@@ -48,6 +48,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.closeSerialMonitor",
                     "arduino.reloadExample",
                     "arduino.debug.startSession",
+                    "arduino.showExampleExplorer",
                 ];
 
                 const foundArduinoCommands = commands.filter((value) => {

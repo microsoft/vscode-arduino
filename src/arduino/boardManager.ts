@@ -30,6 +30,8 @@ export class BoardManager {
 
     private _currentBoard: IBoard;
 
+    private _onBoardTypeChanged = new vscode.EventEmitter<void>();
+
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._boardConfigStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BOARD);
         this._boardConfigStatusBar.command = "arduino.showBoardConfig";
@@ -111,6 +113,10 @@ export class BoardManager {
         return true;
     }
 
+    public get onBoardTypeChanged(): vscode.Event<void> {
+        return this._onBoardTypeChanged.event;
+    }
+
     public doChangeBoardType(targetBoard: IBoard) {
         const dc = DeviceContext.getInstance();
         dc.board = targetBoard.key;
@@ -118,6 +124,8 @@ export class BoardManager {
         dc.configuration = this._currentBoard.customConfig;
         this._boardConfigStatusBar.text = targetBoard.name;
         this._arduinoApp.addLibPath(null);
+
+        this._onBoardTypeChanged.fire();
     }
 
     public get packages(): IPackage[] {
