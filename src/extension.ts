@@ -157,6 +157,7 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
+    registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
 
     //  Arduino debugger
     registerArduinoCommand("arduino.debug.startSession", async (config) => {
@@ -198,6 +199,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 SerialMonitor.getInstance().initialize();
             }
             ArduinoContext.boardManager.updateStatusBar(true);
+            vscode.commands.executeCommand("setContext",  "vscode-arduino:showExampleExplorer", true);
         })();
     }
     vscode.window.onDidChangeActiveTextEditor(async () => {
@@ -213,6 +215,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 SerialMonitor.getInstance().initialize();
             }
             ArduinoContext.boardManager.updateStatusBar(true);
+            vscode.commands.executeCommand("setContext",  "vscode-arduino:showExampleExplorer", true);
         }
     });
     Logger.traceUserData("end-activate-extension", {correlationId: activeGuid});

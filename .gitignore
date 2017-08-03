@@ -4,3 +4,5 @@ node_modules
 .vscode-test
 .idea
 src/views/app/sprites-generated
+**/package-lock.json
+test/**/c_cpp_properties.json
