@@ -150,9 +150,8 @@ export class UsbDetector {
             const readme = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
             if (util.fileExistsSync(readme)) {
                 vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
+                vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
             }
-            vscode.commands.executeCommand("arduino.reloadExample");
-            vscode.commands.executeCommand("arduino.showExamples");
         }
     }
 
