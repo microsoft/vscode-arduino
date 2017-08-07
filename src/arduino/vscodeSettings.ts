@@ -8,12 +8,14 @@ const configKeys = {
     ADDITIONAL_URLS: "arduino.additionalUrls",
     LOG_LEVEL: "arduino.logLevel",
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
+    ENABLE_USB_DETECTOIN: "arduino.enableUSBDetection",
 };
 
 export interface IVscodeSettings {
     arduinoPath: string;
     additionalUrls: string | string[];
     logLevel: string;
+    enableUSBDetection: boolean;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -39,6 +41,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get logLevel(): string {
         return this.getConfigValue<string>(configKeys.LOG_LEVEL) || "info";
+    }
+
+    public get enableUSBDetection(): boolean {
+        return this.getConfigValue<boolean>(configKeys.ENABLE_USB_DETECTOIN);
     }
 
     public async updateAdditionalUrls(value) {
