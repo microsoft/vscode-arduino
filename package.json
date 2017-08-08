@@ -464,6 +464,10 @@
             "info",
             "verbose"
           ]
+        },
+        "arduino.enableUSBDetection": {
+          "type": "boolean",
+          "default": true
         }
       }
     },

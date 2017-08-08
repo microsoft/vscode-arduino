@@ -6,8 +6,10 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { IBoard } from "../arduino/package";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
+
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
@@ -37,7 +39,8 @@ export class UsbDetector {
     }
 
     public async startListening() {
-        if (os.platform() === "linux") {
+        const enableUSBDetection = VscodeSettings.getInstance().enableUSBDetection;
+        if (os.platform() === "linux" || !enableUSBDetection) {
             return;
         }
         this._usbDetector = require("../../../vendor/node-usb-native").detector;
