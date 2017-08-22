@@ -31,7 +31,7 @@ You can also install directly from Marketplace within Visual Studio Code, search
 
 ## Get Started
 You can find code samples and tutorials each time you connect a supported device.
-Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://aka.ms/azureiotgetstarted).
+Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://docs.microsoft.com/azure/iot-hub/iot-hub-arduino-iot-devkit-az3166-get-started).
 
 ## Commands
 This extension provides several commands in the Command Palette (`F1` or `Ctrl + Shift + P`) for working with `*.ino` files:
