@@ -140,7 +140,8 @@
         "architecture": "stm32f4",
         "id": "MXCHIP_AZ3166",
         "interface": "stlink-v2-1.cfg",
-        "target": "stm32f4x.cfg"
+        "target": "stm32f4x.cfg", 
+        "readme": "ReleaseNotes.html"
       }
     ]
   },
