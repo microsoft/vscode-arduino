@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.5
+- Release date: August 24, 2017
+
+### Added 
+- Add settings for enabled/disable USB detection
+- Add Arduino Example tree explorer viewlet
+- Contribution from (DeqingSun)[https://github.com/DeqingSun]: Support multiple versions of Arduino on Mac [#375](https://github.com/Microsoft/vscode-arduino/pull/375)
+- Contribution from (DeqingSun)[https://github.com/DeqingSun]: Add board support for STM32F1 with Arudino_STM32 [#377](https://github.com/Microsoft/vscode-arduino/pull/377)
+
+### Changed 
+- Leverage the ouput path config to speedup upload/verify
+- Fix USB detection issue during uploading [#371](https://github.com/Microsoft/vscode-arduino/pull/371), [372](https://github.com/Microsoft/vscode-arduino/pull/372)
+- Contribution from [lialosiu](https://github.com/lialosiu): Fix encoding issue for non UTF-8 [#364](https://github.com/Microsoft/vscode-arduino/pull/364)
+- Update the documents withe the helps of 
+    - [eduherminio](https://github.com/Microsoft/vscode-arduino/pull/361)
+    - [Atalanttore](https://github.com/Microsoft/vscode-arduino/pull/381), 
+
 ## Version 0.2.4
 - Release date: July 3, 2017
 
