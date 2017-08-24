@@ -105,6 +105,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.showExamples", () => {
+        vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         return vscode.commands.executeCommand("vscode.previewHtml", EXAMPLES_URI, vscode.ViewColumn.Two, "Arduino Examples");
     });
 
