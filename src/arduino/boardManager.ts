@@ -189,6 +189,10 @@ export class BoardManager {
             return;
         }
 
+        if (!rawModel || !rawModel.packages || !rawModel.packages.length) {
+            return;
+        }
+
         this._packages = this._packages.concat(rawModel.packages);
 
         rawModel.packages.forEach((pkg) => {
