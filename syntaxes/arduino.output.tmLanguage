@@ -63,7 +63,26 @@
                 <key>match</key>
                 <string>(\[Error\])(.+)</string>
                 <key>name</key>
-                <string>arduino-output.done</string>
+                <string>arduino-output.errro</string>
+            </dict>
+            <dict>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>token.info-token</string>
+                    </dict>
+                    <key>2</key>
+                    <dict>
+                        <key>name</key>
+                        <string>token.warning-token</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>(\[Warning\])(.+)</string>
+                <key>name</key>
+                <string>arduino-output.warning</string>
             </dict>
         </array>
     </dict>

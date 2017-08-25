@@ -128,7 +128,7 @@ export class ArduinoApp {
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            vscode.window.showWarningMessage(msg);
+            arduinoChannel.warning(msg);
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
             UsbDetector.getInstance().resumeListening();
@@ -170,7 +170,7 @@ export class ArduinoApp {
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
-            vscode.window.showWarningMessage(msg);
+            arduinoChannel.warning(msg);
         }
 
         arduinoChannel.show();

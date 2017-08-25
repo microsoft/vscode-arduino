@@ -14,6 +14,10 @@ export const arduinoChannel = {
         this.channel.appendLine(`[Done] ${message}`);
     },
 
+    warning(message: string) {
+        this.channel.appendLine(`[Warning] ${message}`);
+    },
+
     error(message: string) {
         this.channel.appendLine(`[Error] ${message}`);
     },
