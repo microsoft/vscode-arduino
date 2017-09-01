@@ -14,8 +14,10 @@ import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
 
-export class UsbDetector {
+const HTML_EXT = ".html";
+const MARKDOWN_EXT = ".md";
 
+export class UsbDetector {
     public static getInstance(): UsbDetector {
         if (!UsbDetector._instance) {
             UsbDetector._instance = new UsbDetector();
@@ -150,7 +152,11 @@ export class UsbDetector {
             }
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
             if (util.fileExistsSync(readmeFilePath)) {
-                vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readmeFilePath));
+                if (readmeFilePath.endsWith(MARKDOWN_EXT)) {
+                    vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readmeFilePath));
+                } else if (readmeFilePath.endsWith(HTML_EXT)) {
+                    vscode.commands.executeCommand("vscode.previewHtml", vscode.Uri.file(readmeFilePath));
+                }
             }
         }
     }
