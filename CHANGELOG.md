@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.6
+- Release date: September 1, 2017
+
+### Added
+- Add usb native binaries for electron 1.7.3 to unblock vscode insider August version
+
+### Fixed
+- Fix html/md preview issue
+
 ## Version 0.2.5
 - Release date: August 24, 2017
 
