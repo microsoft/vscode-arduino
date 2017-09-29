@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.7
+- Release date: September 29, 2017
+
+### Changed
+- Default baud rate from 9600 to 115200
+
 ## Version 0.2.6
 - Release date: September 1, 2017
 
