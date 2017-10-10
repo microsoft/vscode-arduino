@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.8
+- Release date: October 10, 2017
+
+### Changed
+- Thanks to [Matthew Simms](https://github.com/brndmg) that fixes the regression from the usage react-select control in the [PR#421](https://github.com/Microsoft/vscode-arduino/pull/421)
+
 ## Version 0.2.7
 - Release date: September 29, 2017
 
