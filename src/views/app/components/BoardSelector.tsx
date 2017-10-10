@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { Col, DropdownButton, Grid, Row } from "react-bootstrap";
-import * as Select from "react-select";
+import Select from "react-select";
 import * as API from "../actions/api";
 
 interface IBoardSelectorProps extends React.Props<any> {
@@ -14,7 +14,7 @@ interface IBoardSelectorProps extends React.Props<any> {
 interface IBoardSelectorState extends React.Props<any> {
     selectedBoard: any;
 }
-export default class BoardConfigItemView extends React.Component<IBoardSelectorProps, IBoardSelectorState> {
+export default class BoardSelector extends React.Component<IBoardSelectorProps, IBoardSelectorState> {
     constructor(props) {
         super(props);
         this.state = {
