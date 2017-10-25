@@ -105,8 +105,11 @@ export async function activate(context: vscode.ExtensionContext) {
         return vscode.commands.executeCommand("vscode.previewHtml", BOARD_CONFIG_URI, vscode.ViewColumn.Two, "Arduino Board Configuration");
     });
 
-    registerArduinoCommand("arduino.showExamples", () => {
+    registerArduinoCommand("arduino.showExamples", (forceRefresh: boolean = false) => {
         vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
+        if (forceRefresh) {
+            vscode.commands.executeCommand("arduino.reloadExample");
+        }
         return vscode.commands.executeCommand("vscode.previewHtml", EXAMPLES_URI, vscode.ViewColumn.Two, "Arduino Examples");
     });
 
