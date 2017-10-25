@@ -47,7 +47,6 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.sendMessageToSerialPort",
                     "arduino.closeSerialMonitor",
                     "arduino.reloadExample",
-                    "arduino.debug.startSession",
                     "arduino.showExampleExplorer",
                 ];
 

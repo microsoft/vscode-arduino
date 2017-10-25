@@ -13,6 +13,7 @@ import {
     LIBRARY_MANAGER_URI,
 } from "./common/constants";
 import * as util from "./common/util";
+import { ArduinoDebugConfigurationProvider } from "./debug/configurationProvider";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
@@ -24,7 +25,7 @@ const status: any = {};
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = Uuid().replace(/-/g, "");
-    Logger.traceUserData("start-activate-extension", {correlationId: activeGuid});
+    Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     // Show a warning message if the working file is not under the workspace folder.
     // People should know the extension might not work appropriately, they should look for the doc to get started.
     const openEditor = vscode.window.activeTextEditor;
@@ -46,7 +47,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const commandExecution = async (command: string, commandBody: (...args: any[]) => any, args: any, getUserData?: () => any) => {
         const guid = Uuid().replace(/\-/g, "");
-        Logger.traceUserData(`start-command-` + command, {correlationId: guid});
+        Logger.traceUserData(`start-command-` + command, { correlationId: guid });
         const timer1 = new Logger.Timer();
         let telemetryResult;
         try {
@@ -60,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 telemetryResult = getUserData();
             }
         } catch (error) {
-            Logger.traceError("executeCommandError", error, {correlationId: guid, command});
+            Logger.traceError("executeCommandError", error, { correlationId: guid, command });
         }
 
         Logger.traceUserData(`end-command-` + command, {
@@ -122,13 +123,13 @@ export async function activate(context: vscode.ExtensionContext) {
         arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
         arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
-        return {board: ArduinoContext.boardManager.currentBoard.name};
+        return { board: ArduinoContext.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.reloadExample", () => {
         arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
-        return {board: ArduinoContext.boardManager.currentBoard.name};
+        return { board: ArduinoContext.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
@@ -143,38 +144,25 @@ export async function activate(context: vscode.ExtensionContext) {
             delete status.compile;
         }
     }, () => {
-        return {board: ArduinoContext.boardManager.currentBoard.name};
+        return { board: ArduinoContext.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.upload", async () => {
-            if (!status.compile) {
-                status.compile = "upload";
-                try {
-                    await ArduinoContext.arduinoApp.upload();
-                } catch (ex) {
-                }
-                delete status.compile;
+        if (!status.compile) {
+            status.compile = "upload";
+            try {
+                await ArduinoContext.arduinoApp.upload();
+            } catch (ex) {
             }
-        },
+            delete status.compile;
+        }
+    },
         () => {
-            return {board: ArduinoContext.boardManager.currentBoard.name};
+            return { board: ArduinoContext.boardManager.currentBoard.name };
         });
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
-
-    //  Arduino debugger
-    registerArduinoCommand("arduino.debug.startSession", async (config) => {
-        if (!status.debug) {
-            status.debug = "debug";
-            try {
-                await ArduinoContext.arduinoConfigurator.run(config);
-            } catch (ex) {
-            }
-            delete status.debug;
-
-        }
-    });
 
     // serial monitor commands
     const serialMonitor = SerialMonitor.getInstance();
@@ -187,6 +175,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const completionProvider = new CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
+    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("arduino", new ArduinoDebugConfigurationProvider()));
 
     UsbDetector.getInstance().initialize(context.extensionPath);
     UsbDetector.getInstance().startListening();
@@ -203,15 +192,15 @@ export async function activate(context: vscode.ExtensionContext) {
                 SerialMonitor.getInstance().initialize();
             }
             ArduinoContext.boardManager.updateStatusBar(true);
-            vscode.commands.executeCommand("setContext",  "vscode-arduino:showExampleExplorer", true);
+            vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
     }
     vscode.window.onDidChangeActiveTextEditor(async () => {
         const activeEditor = vscode.window.activeTextEditor;
         if (activeEditor && ((path.basename(activeEditor.document.fileName) === "arduino.json"
-                && path.basename(path.dirname(activeEditor.document.fileName)) === ".vscode")
-                || activeEditor.document.fileName.endsWith(".ino")
-            )) {
+            && path.basename(path.dirname(activeEditor.document.fileName)) === ".vscode")
+            || activeEditor.document.fileName.endsWith(".ino")
+        )) {
             if (!ArduinoContext.initialized) {
                 await ArduinoActivator.activate();
             }
@@ -219,10 +208,10 @@ export async function activate(context: vscode.ExtensionContext) {
                 SerialMonitor.getInstance().initialize();
             }
             ArduinoContext.boardManager.updateStatusBar(true);
-            vscode.commands.executeCommand("setContext",  "vscode-arduino:showExampleExplorer", true);
+            vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         }
     });
-    Logger.traceUserData("end-activate-extension", {correlationId: activeGuid});
+    Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
 export async function deactivate() {
