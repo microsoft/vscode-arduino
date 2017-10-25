@@ -5,62 +5,69 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "../arduino/arduino";
-import { IArduinoSettings } from "../arduino/arduinoSettings";
-import { BoardManager } from "../arduino/boardManager";
+import ArduinoActivator from "../arduinoActivator";
+import ArduinoContext from "../arduinoContext";
+
 import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
-import { DebuggerManager } from "./debuggerManager";
 
-/**
- * Automatically generate the Arduino board's debug settings.
- */
-export class DebugConfigurator {
-    constructor(
-        private _arduinoApp: ArduinoApp,
-        private _arduinoSettings: IArduinoSettings,
-        private _boardManager: BoardManager,
-        private _debuggerManager: DebuggerManager,
-    ) {
+export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
+
+    constructor() { }
+
+    public provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken):
+        vscode.ProviderResult<vscode.DebugConfiguration[]> {
+        return [{
+            name: "Arduino",
+            type: "arduino",
+            request: "launch",
+            program: "${file}",
+            cwd: folder,
+            MIMode: "gdb",
+            targetArchitecture: "arm",
+            miDebuggerPath: "",
+            debugServerPath: "",
+            debugServerArgs: "",
+            customLaunchSetupCommands: [
+                {
+                    text: "target remote localhost:3333",
+                },
+                {
+                    text: "file ${file}",
+                },
+                {
+                    text: "load",
+                },
+                {
+                    text: "monitor reset halt",
+                },
+                {
+                    text: "monitor reset init",
+                },
+            ],
+            stopAtEntry: true,
+            serverStarted: "Info\\ :\\ [\\w\\d\\.]*:\\ hardware",
+            launchCompleteCommand: "exec-continue",
+            filterStderr: true,
+            args: [],
+        }];
     }
 
-    public async run(config) {
-        // Default settings:
-        if (!config.request) {
-            config = {
-                name: "Arduino",
-                type: "arduino",
-                request: "launch",
-                program: "${file}",
-                cwd: "${workspaceRoot}",
-                MIMode: "gdb",
+    // Try to add all missing attributes to the debug configuration being launched.
+    public resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
+        vscode.ProviderResult<vscode.DebugConfiguration> {
+        if (config && !config.cwd) {
+            config.cwd = folder;
+        }
+        return this.resolveDebugConfigurationAsync(config);
+    }
 
-                targetArchitecture: "arm",
-                customLaunchSetupCommands: [
-                    {
-                        text: "target remote localhost:3333",
-                    },
-                    {
-                        text: "file ${file}",
-                    },
-                    {
-                        text: "load",
-                    },
-                    {
-                        text: "monitor reset halt",
-                    },
-                    {
-                        text: "monitor reset init",
-                    },
-                ],
-                stopAtEntry: true,
-                serverStarted: "Info\\ :\\ [\\w\\d\\.]*:\\ hardware",
-                launchCompleteCommand: "exec-continue",
-                filterStderr: true,
-                args: [],
-            };
+    private async resolveDebugConfigurationAsync(config: vscode.DebugConfiguration) {
+        if (!ArduinoContext.initialized) {
+            await ArduinoActivator.activate();
         }
 
         if (VscodeSettings.getInstance().logLevel === "verbose" && !config.logging) {
@@ -71,32 +78,32 @@ export class DebugConfigurator {
             };
         }
 
-        if (!this._boardManager.currentBoard) {
+        if (!ArduinoContext.boardManager.currentBoard) {
             vscode.window.showErrorMessage("Please select a board.");
-            return;
+            return undefined;
         }
 
         if (!this.resolveOpenOcd(config)) {
-            return;
+            return undefined;
         }
 
         if (!await this.resolveOpenOcdOptions(config)) {
-            return;
+            return undefined;
         }
 
         if (!this.resolveDebuggerPath(config)) {
-            return;
+            return undefined;
         }
 
         if (!await this.resolveProgramPath(config)) {
-            return;
+            return undefined;
         }
 
         // Use the C++ debugger MIEngine as the real internal debugger
         config.type = "cppdbg";
-        vscode.commands.executeCommand("vscode.startDebug", config);
         const dc = DeviceContext.getInstance();
         Logger.traceUserData("start-cppdbg", { board: dc.board });
+        return config;
     }
 
     private async resolveProgramPath(config) {
@@ -104,7 +111,7 @@ export class DebugConfigurator {
 
         if (!config.program || config.program === "${file}") {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
-            const outputFolder = path.join(dc.output || `.build`, this._boardManager.currentBoard.board);
+            const outputFolder = path.join(dc.output || `.build`, ArduinoContext.boardManager.currentBoard.board);
             util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, outputFolder));
             if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
                 await dc.resolveMainSketch();
@@ -122,7 +129,7 @@ export class DebugConfigurator {
             config.program = path.join(vscode.workspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
-            if (!await this._arduinoApp.verify(outputFolder)) {
+            if (!await ArduinoContext.arduinoApp.verify(outputFolder)) {
                 vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
                 return false;
             }
@@ -145,10 +152,10 @@ export class DebugConfigurator {
     private resolveDebuggerPath(config) {
         if (!config.miDebuggerPath) {
             config.miDebuggerPath = platform.findFile(platform.getExecutableFileName("arm-none-eabi-gdb"),
-                path.join(this._arduinoSettings.packagePath, "packages", this._boardManager.currentBoard.getPackageName()));
+                path.join(ArduinoContext.arduinoApp.settings.packagePath, "packages", ArduinoContext.boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
-            config.miDebuggerPath = this._debuggerManager.miDebuggerPath;
+            config.miDebuggerPath = ArduinoContext.debuggerManager.miDebuggerPath;
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
             vscode.window.showErrorMessage("Cannot find the debugger path.");
@@ -160,11 +167,11 @@ export class DebugConfigurator {
     private resolveOpenOcd(config) {
         if (!config.debugServerPath) {
             config.debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
-                path.join(this._arduinoSettings.packagePath, "packages",
-                    this._boardManager.currentBoard.getPackageName()));
+                path.join(ArduinoContext.arduinoApp.settings.packagePath, "packages",
+                    ArduinoContext.boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.debugServerPath)) {
-            config.debugServerPath = this._debuggerManager.debugServerPath;
+            config.debugServerPath = ArduinoContext.debuggerManager.debugServerPath;
         }
         if (!util.fileExistsSync(config.debugServerPath)) {
             vscode.window.showErrorMessage("Cannot find the OpenOCD from the launch.json debugServerPath property." +
@@ -176,10 +183,9 @@ export class DebugConfigurator {
     }
 
     private async resolveOpenOcdOptions(config) {
-
         if (config.debugServerPath && !config.debugServerArgs) {
             try {
-                config.debugServerArgs = await this._debuggerManager.resolveOpenOcdOptions(config);
+                config.debugServerArgs = await ArduinoContext.debuggerManager.resolveOpenOcdOptions(config);
                 if (!config.debugServerArgs) {
                     return false;
                 }

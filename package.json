@@ -7,7 +7,7 @@
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.13.0"
+    "vscode": "^1.17.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -34,7 +34,6 @@
   ],
   "activationEvents": [
     "*",
-    "onCommand:arduino.debug.startSession",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.selectSerialPort",
@@ -48,7 +47,8 @@
     "onCommand:arduino.showBoardManager",
     "onCommand:arduino.showLibraryManager",
     "onCommand:arduino.showExamples",
-    "onCommand:arduino.initialize"
+    "onCommand:arduino.initialize",
+    "onDebug"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -129,7 +129,6 @@
       {
         "type": "arduino",
         "label": "Arduino",
-        "startSessionCommand": "arduino.debug.startSession",
         "enableBreakpointsFor": {
           "languageIds": [
             "c",
@@ -145,7 +144,7 @@
               "type": "arduino",
               "request": "launch",
               "program": "$${{file}}",
-              "cwd": "$${{workspaceRoot}}",
+              "cwd": "$${{workspaceFolder}}",
               "MIMode": "gdb",
               "targetArchitecture": "arm",
               "miDebuggerPath": "",
@@ -176,42 +175,6 @@
             }
           }
         ],
-        "initialConfigurations": [
-          {
-            "name": "Arduino",
-            "type": "arduino",
-            "request": "launch",
-            "program": "${file}",
-            "cwd": "${workspaceRoot}",
-            "MIMode": "gdb",
-            "targetArchitecture": "arm",
-            "miDebuggerPath": "",
-            "debugServerPath": "",
-            "debugServerArgs": "",
-            "customLaunchSetupCommands": [
-              {
-                "text": "target remote localhost:3333"
-              },
-              {
-                "text": "file ${file}"
-              },
-              {
-                "text": "load"
-              },
-              {
-                "text": "monitor reset halt"
-              },
-              {
-                "text": "monitor reset init"
-              }
-            ],
-            "stopAtEntry": true,
-            "serverStarted": "Info\\ :\\ [\\w\\d\\.]*:\\ hardware",
-            "launchCompleteCommand": "exec-continue",
-            "filterStderr": true,
-            "args": []
-          }
-        ],
         "configurationAttributes": {
           "launch": {
             "required": [
@@ -221,7 +184,7 @@
               "program": {
                 "type": "string",
                 "description": "Full path to program executable.",
-                "default": "${workspaceRoot}/arduino.elf"
+                "default": "${workspaceFolder}/arduino.elf"
               },
               "args": {
                 "type": "array",
