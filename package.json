@@ -143,8 +143,8 @@
               "name": "Arduino",
               "type": "arduino",
               "request": "launch",
-              "program": "$${{file}}",
-              "cwd": "$${{workspaceFolder}}",
+              "program": "^\"\\${file}\"",
+              "cwd": "^\"\\${workspaceFolder}\"",
               "MIMode": "gdb",
               "targetArchitecture": "arm",
               "miDebuggerPath": "",
@@ -155,7 +155,7 @@
                   "text": "target remote localhost:3333"
                 },
                 {
-                  "text": "file $${{file}}"
+                  "text": "^\"file \\${file}\""
                 },
                 {
                   "text": "load"
