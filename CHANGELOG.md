@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.10
+- Release date: October 27, 2017
+
+### Changed
+- Adopt the new VSCode Debug API [#432](https://github.com/Microsoft/vscode-arduino/pull/432), [#435](https://github.com/Microsoft/vscode-arduino/pull/435)
+- Popup the example view when detecting new device is connected [#431](https://github.com/Microsoft/vscode-arduino/pull/431)
+
 ## Version 0.2.8
 - Release date: October 10, 2017
 
