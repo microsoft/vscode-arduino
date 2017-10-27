@@ -20,12 +20,27 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
 
     public provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken):
         vscode.ProviderResult<vscode.DebugConfiguration[]> {
-        return [{
+        return [
+            this.getDefaultDebugSettings(folder),
+        ];
+    }
+
+    // Try to add all missing attributes to the debug configuration being launched.
+    public resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
+        vscode.ProviderResult<vscode.DebugConfiguration> {
+        if (!config || !config.request) {
+            config = this.getDefaultDebugSettings(folder);
+        }
+        return this.resolveDebugConfigurationAsync(config);
+    }
+
+    private getDefaultDebugSettings(folder: vscode.WorkspaceFolder | undefined) {
+        return {
             name: "Arduino",
             type: "arduino",
             request: "launch",
             program: "${file}",
-            cwd: folder,
+            cwd: "${workspaceFolder}",
             MIMode: "gdb",
             targetArchitecture: "arm",
             miDebuggerPath: "",
@@ -53,16 +68,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
             launchCompleteCommand: "exec-continue",
             filterStderr: true,
             args: [],
-        }];
-    }
-
-    // Try to add all missing attributes to the debug configuration being launched.
-    public resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
-        vscode.ProviderResult<vscode.DebugConfiguration> {
-        if (config && !config.cwd) {
-            config.cwd = folder;
-        }
-        return this.resolveDebugConfigurationAsync(config);
+        };
     }
 
     private async resolveDebugConfigurationAsync(config: vscode.DebugConfiguration) {
