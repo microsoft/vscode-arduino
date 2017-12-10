@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 
 const configKeys = {
     ARDUINO_PATH: "arduino.path",
+    ARDUINO_COMMAND_PATH: "arduino.commandPath",
     ADDITIONAL_URLS: "arduino.additionalUrls",
     LOG_LEVEL: "arduino.logLevel",
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
@@ -13,6 +14,7 @@ const configKeys = {
 
 export interface IVscodeSettings {
     arduinoPath: string;
+    commandPath: string;
     additionalUrls: string | string[];
     logLevel: string;
     enableUSBDetection: boolean;
@@ -33,6 +35,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get arduinoPath(): string {
         return this.getConfigValue<string>(configKeys.ARDUINO_PATH);
+    }
+
+    public get commandPath(): string {
+        return this.getConfigValue<string>(configKeys.ARDUINO_COMMAND_PATH);
     }
 
     public get additionalUrls(): string | string[] {

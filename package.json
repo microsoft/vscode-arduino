@@ -413,6 +413,11 @@
           "default": "",
           "description": "Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: 'C:\\Program Files\\Arduino' for Windows, '/Applications' for Mac, '/home/$user/Downloads/arduino-1.8.1' for Linux. (Requires a restart after change)"
         },
+        "arduino.commandPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to executable within 'arduino.path', you can use a custom script to run Arduino by modifying this setting to include the relative path. Example: 'run-arduino.bat' for Windows, 'Contents/MacOS/run-arduino.sh' for Mac, 'bin/run-arduino.sh' for Linux. (Requires a restart after change)"
+        },
         "arduino.additionalUrls": {
           "type": [
             "string",
