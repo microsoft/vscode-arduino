@@ -416,7 +416,7 @@
         "arduino.commandPath": {
           "type": "string",
           "default": "",
-          "description": "Path to executable within 'arduino.path', you can use a custom script to run Arduino by modifying this setting to include the relative path. Example: 'run-arduino.bat' for Windows, 'Contents/MacOS/run-arduino.sh' for Mac, 'bin/run-arduino.sh' for Linux. (Requires a restart after change)"
+          "description": "Path to a script relative to 'arduino.path', you can use a custom launch script to run Arduino by modifying this setting. Example: 'run-arduino.bat' for Windows, 'Contents/MacOS/run-arduino.sh' for Mac, 'bin/run-arduino.sh' for Linux. (Requires a restart after change)"
         },
         "arduino.additionalUrls": {
           "type": [
