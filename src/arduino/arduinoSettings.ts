@@ -27,6 +27,8 @@ export interface IArduinoSettings {
 export class ArduinoSettings implements IArduinoSettings {
     private _arduinoPath: string;
 
+    private _commandPath: string;
+
     private _packagePath: string;
 
     private _sketchbookPath: string;
@@ -38,15 +40,25 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public async initialize() {
         const platform = os.platform();
+        this._commandPath = VscodeSettings.getInstance().commandPath;
         await this.tryResolveArduinoPath();
         if (platform === "win32") {
             await this.updateWindowsPath();
+            if (this._commandPath === "") {
+                this._commandPath = "arduino_debug.exe";
+            }
         } else if (platform === "linux") {
             this._packagePath = path.join(process.env.HOME, ".arduino15");
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
+            if (this._commandPath === "") {
+                this._commandPath = "arduino";
+            }
         } else if (platform === "darwin") {
             this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Documents/Arduino");
+            if (this._commandPath === "") {
+                this._commandPath = "/Contents/MacOS/Arduino";
+            }
         }
     }
 
@@ -85,11 +97,9 @@ export class ArduinoSettings implements IArduinoSettings {
     public get commandPath(): string {
         const platform = os.platform();
         if (platform === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), path.normalize("/Contents/MacOS/Arduino"));
-        } else if (platform === "linux") {
-            return path.join(this._arduinoPath, "arduino");
-        } else if (platform === "win32") {
-            return path.join(this._arduinoPath, "arduino_debug.exe");
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), path.normalize(this._commandPath));
+        } else {
+            return path.join(this._arduinoPath, path.normalize(this._commandPath));
         }
     }
 

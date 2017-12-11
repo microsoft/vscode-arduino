@@ -55,12 +55,14 @@ The following Visual Studio Code settings are available for the Arduino extensio
 ```json
 {
     "arduino.path": "C:/Program Files (x86)/Arduino",
+    "arduino.commandPath": "run-arduino.bat",
     "arduino.additionalUrls": "",
-    "arduino.logLevel": "info", 
+    "arduino.logLevel": "info",
     "arduino.enableUSBDetection": true
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
+- `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. You can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac, `bin/run-arduino.sh` for Linux."
 - `arduino.additionalUrls` - Additional URLs for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
 - `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`.
