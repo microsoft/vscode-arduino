@@ -101,7 +101,7 @@ export class ArduinoApp {
             return;
         }
 
-        if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+        if (!dc.sketch || !util.fileExistsSync(path.join(dc.sketchRootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
         if (!dc.port) {
@@ -118,13 +118,13 @@ export class ArduinoApp {
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const appPath = path.join(dc.sketchRootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
         if (dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, dc.output);
+            const outputPath = path.join(dc.sketchRootPath, dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
@@ -153,20 +153,20 @@ export class ArduinoApp {
             return;
         }
 
-        if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+        if (!dc.sketch || !util.fileExistsSync(path.join(dc.sketchRootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
 
         await vscode.workspace.saveAll(false);
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const appPath = path.join(dc.sketchRootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
         if (output || dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
+            const outputPath = path.join(dc.sketchRootPath, output || dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";

@@ -19,6 +19,7 @@ import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
+import { iotStudioInitializer } from "./iotStudioInitializer";
 
 const status: any = {};
 
@@ -172,6 +173,11 @@ export async function activate(context: vscode.ExtensionContext) {
     registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
     registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
     registerNonArduinoCommand("arduino.closeSerialMonitor", (port) => serialMonitor.closeSerialMonitor(port));
+
+    registerNonArduinoCommand("arduino.iotStudioInitialize", (rootPath) => {
+        const iotInitializer = new iotStudioInitializer();
+        iotInitializer.Initialize(rootPath);
+    });
 
     const completionProvider = new CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
