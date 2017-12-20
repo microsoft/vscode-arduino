@@ -48,6 +48,7 @@
     "onCommand:arduino.showLibraryManager",
     "onCommand:arduino.showExamples",
     "onCommand:arduino.initialize",
+    "onCommand:arduino.iotStudioInitialize",
     "onDebug"
   ],
   "main": "./out/src/extension",
