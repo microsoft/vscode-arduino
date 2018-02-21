@@ -3,6 +3,7 @@
 
 import * as os from "os";
 import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
+import * as vscode from 'vscode';
 
 interface ISerialPortDetail {
   comName: string;
@@ -36,10 +37,12 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
+  private _dataEmitter: vscode.EventEmitter<string>;
 
   public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
+    this._dataEmitter = new vscode.EventEmitter();
   }
 
   public get isActive(): boolean {
@@ -48,6 +51,10 @@ export class SerialPortCtrl {
 
   public get currentPort(): string {
     return this._currentPort;
+  }
+
+  public onData(listener: (string) => {}): vscode.Disposable {
+      return this._dataEmitter.event(listener);
   }
 
   public open(): Promise<any> {
@@ -66,7 +73,10 @@ export class SerialPortCtrl {
           });
         });
       } else {
-        this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
+        this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { 
+            baudRate: this._currentBaudRate,
+            parser: SerialPortCtrl.serialport.parsers.readline(/\r?\n/, 'utf8'),
+        });
         this._outputChannel.show();
         this._currentSerialPort.on("open", () => {
           this._currentSerialPort.write("TestingOpen", (err) => {
@@ -81,12 +91,13 @@ export class SerialPortCtrl {
           });
         });
 
-        this._currentSerialPort.on("data", (_event) => {
-          this._outputChannel.append(_event.toString());
+        this._currentSerialPort.on("data", (line) => {
+            this._outputChannel.appendLine(line);
+            this._dataEmitter.fire(line);
         });
 
         this._currentSerialPort.on("error", (_error) => {
-          this._outputChannel.appendLine("[Error]" + _error.toString());
+            this._outputChannel.appendLine("[Error]" + _error.toString());
         });
       }
     });

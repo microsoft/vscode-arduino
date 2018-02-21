@@ -167,8 +167,11 @@ export async function activate(context: vscode.ExtensionContext) {
     // serial monitor commands
     const serialMonitor = SerialMonitor.getInstance();
     context.subscriptions.push(serialMonitor);
+    serialMonitor.serialPlotter.setWebSocketServer(arduinoManagerProvider.getWebSocketServer());
+
     registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null));
     registerNonArduinoCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor());
+    registerNonArduinoCommand("arduino.openSerialPlotter", () => serialMonitor.openSerialPlotter());
     registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
     registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
     registerNonArduinoCommand("arduino.closeSerialMonitor", (port) => serialMonitor.closeSerialMonitor(port));

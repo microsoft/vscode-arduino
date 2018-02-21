@@ -486,6 +486,7 @@
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "@types/winreg": "^1.2.30",
+    "@types/ws": "^4.0.1",
     "del": "^2.2.2",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
@@ -514,10 +515,12 @@
     "express": "^4.14.1",
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
+    "lodash.throttle": "^4.1.1",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.6",
     "winreg": "^1.2.3",
-    "winston": "^2.3.1"
+    "winston": "^2.3.1",
+    "ws": "^4.0.0"
   }
 }

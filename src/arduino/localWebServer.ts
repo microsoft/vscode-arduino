@@ -5,16 +5,19 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as http from "http";
 import * as path from "path";
+import * as WebSocket from "ws";
 
 export default class LocalWebServer {
     private app = express();
     private server;
+    private wss;
     private _serverPort: string;
 
     constructor(private _extensionPath: string) {
         this.app.use("/", express.static(path.join(this._extensionPath, "./out/views")));
         this.app.use(bodyParser.json());
         this.server = http.createServer(this.app);
+        this.wss = new WebSocket.Server({ server: this.server });
     }
 
     public getServerUrl(): string {
@@ -23,6 +26,9 @@ export default class LocalWebServer {
     public getEndpointUri(type: string): string {
         return `http://localhost:${this._serverPort}/${type}`;
     }
+    public getWebSocketUri(): string {
+        return `ws://localhost:${this._serverPort}`;
+    }
 
     public addHandler(url: string, handler: (req, res) => void): void {
         this.app.get(url, handler);
@@ -30,6 +36,10 @@ export default class LocalWebServer {
 
     public addPostHandler(url: string, handler: (req, res) => void): void {
         this.app.post(url, handler);
+    }
+
+    public getWebSocketServer(): WebSocket.Server {
+        return this.wss;
     }
 
     public start(): void {

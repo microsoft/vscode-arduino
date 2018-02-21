@@ -4,9 +4,11 @@
 import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
+import * as WebSocket from "ws";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 import * as Constants from "../common/constants";
+import { SERIAL_PLOTTER_URI } from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
 import LocalWebServer from "./localWebServer";
@@ -50,7 +52,14 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("load-examples", "/api/examples", async (req, res) => await this.getExamples(req, res));
         this.addHandlerWithLogger("open-example", "/api/openexample", (req, res) => this.openExample(req, res), true);
 
+        // Serial Plotter
+        this.addHandlerWithLogger("show-serialplotter", "/serialplotter", (req, res) => this.getHtmlView(req, res));
+
         this._webserver.start();
+    }
+
+    public getWebSocketServer(): WebSocket.Server {
+        return this._webserver.getWebSocketServer();
     }
 
     public async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
@@ -66,6 +75,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             type = "boardConfig";
         } else if (uri.toString() === Constants.EXAMPLES_URI.toString()) {
             type = "examples";
+        } else if (uri.toString() === Constants.SERIAL_PLOTTER_URI.toString()) {
+            type = "serialplotter";
         }
 
         const timeNow = new Date().getTime();
