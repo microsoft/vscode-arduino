@@ -11,8 +11,12 @@ dist: trusty # using Ubuntu 14.04.5 LTS
 # fixing https://github.com/Microsoft/vscode/issues/33998
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test # https://docs.travis-ci.com/user/languages/cpp/#GCC-on-Linux
     packages:
       - libsecret-1-dev
+      - gcc-4.9
+      - g++-4.9
 
 branches:
   only:
