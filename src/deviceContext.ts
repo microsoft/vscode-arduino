@@ -149,6 +149,22 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._onDidChange.fire();
                 }
                 return this;
+            }, (reason) => {
+                // Workaround for change in API.
+                // vscode.workspace.findFiles() for some reason now throws an error ehn path does not exist
+                // vscode.window.showErrorMessage(reason.toString());
+                // Logger.notifyUserError("arduinoFileUnhandleError", new Error(reason.toString()));
+
+                 // Workaround for change in API, populate required props for arduino.json
+                this._port = null;
+                this._board = null;
+                this._sketch = null;
+                this._configuration = null;
+                this._output = null;
+                this._debugger = null;
+                this._onDidChange.fire();
+
+                return this;
             });
     }
 
