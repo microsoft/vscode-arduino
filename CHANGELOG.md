@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fix the issue caused by VSCode breaking change of `workspace.findfiles` [#467](https://github.com/Microsoft/vscode-arduino/pull/467)
 
-Special thanks to [GarethE](https://github.com/keyoke) thank you for your contributions and feedbacks.
+Special thanks to [GarethE](https://github.com/keyoke), thank you for your contributions and feedbacks.
 
 ## Version 0.2.10
 - Release date: October 27, 2017
