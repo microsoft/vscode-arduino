@@ -11,8 +11,12 @@ dist: trusty # using Ubuntu 14.04.5 LTS
 # fixing https://github.com/Microsoft/vscode/issues/33998
 addons:
   apt:
+    sources:
+      # https://docs.travis-ci.com/user/languages/c/#GCC-on-Linux
+      - ubuntu-toolchain-r-test
     packages:
       - libsecret-1-dev
+      - g++-4.9
 
 branches:
   only:
@@ -42,6 +46,8 @@ install:
 - npm install -g typescript
 - npm install -g gulp
 - npm install
+# https://github.com/travis-ci/travis-ci/issues/8813
+- rm -f ./node_modules/.bin/which
 
 script:
 - gulp tslint
