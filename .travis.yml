@@ -29,7 +29,7 @@ env:
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
-    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0 CODE_VERSION=1.17.2;
+    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0 CODE_VERSION=1.20.1;
     sh -e /etc/init.d/xvfb start;
     sleep 3;
     wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER;
