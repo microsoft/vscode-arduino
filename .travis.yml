@@ -69,6 +69,7 @@ deploy:
   # deploy to vscode extension market
   - provider: script  
     script: vsce publish -p $VSCE_TOKEN --packagePath *.vsix
+    skip_cleanup: true
     on:
       tags: true
       all_branches: true
