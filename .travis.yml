@@ -61,6 +61,7 @@ deploy:
     api_key: $GIT_TOKEN
     file_glob: true
     file: "*.vsix"
+    skip_cleanup: true
     on:
       tags: true
       all_branches: true
