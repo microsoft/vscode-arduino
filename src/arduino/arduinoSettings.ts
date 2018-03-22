@@ -60,6 +60,10 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._commandPath = "/Contents/MacOS/Arduino";
             }
         }
+
+        if (!util.directoryExistsSync(this._packagePath) && util.directoryExistsSync(path.join(this._arduinoPath, 'portable'))) {
+            this._packagePath = path.join(this._arduinoPath, 'portable');
+        }
     }
 
     public get arduinoPath(): string {
