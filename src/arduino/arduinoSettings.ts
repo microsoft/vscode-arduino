@@ -61,6 +61,8 @@ export class ArduinoSettings implements IArduinoSettings {
             }
         }
 
+        // Arduino IDE will save all packages into portable folder if it exsits.
+        // https://github.com/Microsoft/vscode-arduino/issues/415
         if (!util.directoryExistsSync(this._packagePath) && util.directoryExistsSync(path.join(this._arduinoPath, 'portable'))) {
             this._packagePath = path.join(this._arduinoPath, 'portable');
         }
