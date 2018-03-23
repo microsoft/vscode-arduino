@@ -48,23 +48,25 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._commandPath = "arduino_debug.exe";
             }
         } else if (platform === "linux") {
-            this._packagePath = path.join(process.env.HOME, ".arduino15");
+            if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
+                this._packagePath = path.join(this._arduinoPath, "portable");
+            } else {
+                this._packagePath = path.join(process.env.HOME, ".arduino15");
+            }
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
             if (this._commandPath === "") {
                 this._commandPath = "arduino";
             }
         } else if (platform === "darwin") {
-            this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
+            if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
+                this._packagePath = path.join(this._arduinoPath, "portable");
+            } else {
+                this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
+            }
             this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Documents/Arduino");
             if (this._commandPath === "") {
                 this._commandPath = "/Contents/MacOS/Arduino";
             }
-        }
-
-        // Arduino IDE will save all packages into portable folder if it exsits.
-        // https://github.com/Microsoft/vscode-arduino/issues/415
-        if (!util.directoryExistsSync(this._packagePath) && util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
-            this._packagePath = path.join(this._arduinoPath, "portable");
         }
     }
 
@@ -150,7 +152,9 @@ export class ArduinoSettings implements IArduinoSettings {
         folder = folder.replace(/%([^%]+)%/g, (match, p1) => {
             return process.env[p1];
         });
-        if (util.fileExistsSync(path.join(this._arduinoPath, "AppxManifest.xml"))) {
+        if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
+            this._packagePath = path.join(this._arduinoPath, "portable");
+        } else if (util.fileExistsSync(path.join(this._arduinoPath, "AppxManifest.xml"))) {
             this._packagePath = path.join(folder, "ArduinoData");
         } else {
             this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
