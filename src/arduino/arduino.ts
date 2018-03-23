@@ -124,7 +124,7 @@ export class ArduinoApp {
             args.push("--verbose");
         }
         if (dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, dc.output);
+            const outputPath = path.resolve(vscode.workspace.rootPath, dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
@@ -166,7 +166,7 @@ export class ArduinoApp {
             args.push("--verbose");
         }
         if (output || dc.output) {
-            const outputPath = path.join(vscode.workspace.rootPath, output || dc.output);
+            const outputPath = path.resolve(vscode.workspace.rootPath, output || dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
