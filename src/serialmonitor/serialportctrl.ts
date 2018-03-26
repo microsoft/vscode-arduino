@@ -11,6 +11,13 @@ interface ISerialPortDetail {
   productId: string;
 }
 
+export enum SerialPortEnding {
+  "No line ending",
+  "Newline",
+  "Carriage return",
+  "Both NL & CR",
+}
+
 export class SerialPortCtrl {
   public static get serialport(): any {
     if (!SerialPortCtrl._serialport) {
@@ -36,10 +43,12 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
+  private _ending: SerialPortEnding;
 
-  public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
+  public constructor(port: string, baudRate: number, ending: SerialPortEnding, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
+    this._ending = ending;
   }
 
   public get isActive(): boolean {
@@ -69,7 +78,7 @@ export class SerialPortCtrl {
         this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
         this._outputChannel.show();
         this._currentSerialPort.on("open", () => {
-          this._currentSerialPort.write("TestingOpen", (err) => {
+          this._currentSerialPort.write("TestingOpen", "Both NL & CR", (err) => {
             // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
             if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
               this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
@@ -99,7 +108,7 @@ export class SerialPortCtrl {
         return;
       }
 
-      this._currentSerialPort.write(text, (error) => {
+      this._currentSerialPort.write(text, SerialPortEnding[this._ending], (error) => {
         if (!error) {
           resolve();
         } else {
@@ -165,5 +174,8 @@ export class SerialPortCtrl {
         }
       });
     });
+  }
+  public changeEnding(newEnding: SerialPortEnding) {
+    this._ending = newEnding;
   }
 }

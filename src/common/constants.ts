@@ -33,4 +33,5 @@ export const statusBarPriority = {
     OPEN_PORT: 30,
     BAUD_RATE: 40,
     BOARD: 60,
+    ENDING: 70,
 };

@@ -216,7 +216,7 @@ SerialPort.prototype.isOpen = function() {
   return this.fd !== null && !this.closing;
 };
 
-SerialPort.prototype.write = function(buffer, callback) {
+SerialPort.prototype.write = function(buffer, ending, callback) {
   if (!this.isOpen()) {
     debug('write attempted, but port is not open');
     return this._error(new Error('Port is not open'), callback);
@@ -224,6 +224,20 @@ SerialPort.prototype.write = function(buffer, callback) {
 
   if (!Buffer.isBuffer(buffer)) {
     buffer = Buffer.from(buffer);
+  }
+
+  switch (ending) {
+    case 'Newline':
+      buffer = Buffer.concat([buffer, Buffer.from('\n')]);
+      break;
+    case 'Carriage return':
+      buffer = Buffer.concat([buffer, Buffer.from('\r')]);
+      break;
+    case 'Both NL & CR':
+      buffer = Buffer.concat([buffer, Buffer.from('\r\n')]);
+      break;
+    default:
+      break;
   }
 
   debug(`write ${buffer.length} bytes of data`);
