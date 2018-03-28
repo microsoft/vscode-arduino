@@ -11,6 +11,7 @@ import ArduinoContext from "../arduinoContext";
 import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
+import { ArduinoWorkspace } from "../common/workspace";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
 
@@ -118,8 +119,8 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
         if (!config.program || config.program === "${file}") {
             // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
             const outputFolder = path.join(dc.output || `.build`, ArduinoContext.boardManager.currentBoard.board);
-            util.mkdirRecursivelySync(path.join(vscode.workspace.rootPath, outputFolder));
-            if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+            util.mkdirRecursivelySync(path.join(ArduinoWorkspace.rootPath, outputFolder));
+            if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
                 await dc.resolveMainSketch();
             }
 
@@ -128,11 +129,11 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
                 return false;
             }
 
-            if (!util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+            if (!util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
                 vscode.window.showErrorMessage(`Cannot find ${dc.sketch}, Please specify the sketch in the arduino.json file`);
                 return false;
             }
-            config.program = path.join(vscode.workspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
+            config.program = path.join(ArduinoWorkspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
             if (!await ArduinoContext.arduinoApp.verify(outputFolder)) {
