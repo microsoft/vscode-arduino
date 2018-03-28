@@ -13,6 +13,7 @@ import {
     LIBRARY_MANAGER_URI,
 } from "./common/constants";
 import * as util from "./common/util";
+import { ArduinoWorkspace } from "./common/workspace";
 import { ArduinoDebugConfigurationProvider } from "./debug/configurationProvider";
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
@@ -31,7 +32,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const openEditor = vscode.window.activeTextEditor;
     if (openEditor && openEditor.document.fileName.endsWith(".ino")) {
         const workingFile = path.normalize(openEditor.document.fileName);
-        const workspaceFolder = (vscode.workspace && vscode.workspace.rootPath) || "";
+        const workspaceFolder = (vscode.workspace && ArduinoWorkspace.rootPath) || "";
         if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
             vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
                 "the arduino extension might not work appropriately.");
@@ -181,8 +182,8 @@ export async function activate(context: vscode.ExtensionContext) {
     UsbDetector.getInstance().initialize(context.extensionPath);
     UsbDetector.getInstance().startListening();
 
-    if (vscode.workspace.rootPath && (
-        util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))
+    if (ArduinoWorkspace.rootPath && (
+        util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))
         || (openEditor && openEditor.document.fileName.endsWith(".ino")))) {
         (async () => {
             if (!ArduinoContext.initialized) {

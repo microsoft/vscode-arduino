@@ -9,6 +9,7 @@ import * as util from "./common/util";
 import * as Logger from "./logger/logger";
 
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
+import { ArduinoWorkspace } from "./common/workspace";
 
 /**
  * Interface that represents the arduino context information.
@@ -87,10 +88,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * @constructor
      */
     private constructor() {
-        if (vscode.workspace && vscode.workspace.rootPath) {
-            this._watcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE));
+        if (vscode.workspace && ArduinoWorkspace.rootPath) {
+            this._watcher = vscode.workspace.createFileSystemWatcher(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE));
             // We only care about the deletion arduino.json in the .vscode folder:
-            this._vscodeWatcher = vscode.workspace.createFileSystemWatcher(path.join(vscode.workspace.rootPath, ".vscode"), true, true, false);
+            this._vscodeWatcher = vscode.workspace.createFileSystemWatcher(path.join(ArduinoWorkspace.rootPath, ".vscode"), true, true, false);
 
             this._watcher.onDidCreate(() => this.loadContext());
             this._watcher.onDidChange(() => this.loadContext());
@@ -169,10 +170,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public saveContext() {
-        if (!vscode.workspace.rootPath) {
+        if (!ArduinoWorkspace.rootPath) {
             return;
         }
-        const deviceConfigFile = path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE);
+        const deviceConfigFile = path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE);
         let deviceConfigJson: any = {};
         if (util.fileExistsSync(deviceConfigFile)) {
             deviceConfigJson = util.tryParseJSON(fs.readFileSync(deviceConfigFile, "utf8"));
@@ -256,11 +257,11 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public async initialize() {
-        if (vscode.workspace.rootPath && util.fileExistsSync(path.join(vscode.workspace.rootPath, ARDUINO_CONFIG_FILE))) {
+        if (ArduinoWorkspace.rootPath && util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))) {
             vscode.window.showInformationMessage("Arduino.json is already generated.");
             return;
         } else {
-            if (!vscode.workspace.rootPath) {
+            if (!ArduinoWorkspace.rootPath) {
                 vscode.window.showInformationMessage("Please open an folder first.");
                 return;
             }
@@ -293,20 +294,20 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     newSketchFileName = (newSketchFileName && newSketchFileName.trim()) || "";
                     if (newSketchFileName) {
                         const snippets = fs.readFileSync(path.join(this.extensionPath, "snippets", "sample.ino"));
-                        fs.writeFileSync(path.join(vscode.workspace.rootPath, newSketchFileName), snippets);
+                        fs.writeFileSync(path.join(ArduinoWorkspace.rootPath, newSketchFileName), snippets);
                         this.sketch = newSketchFileName;
                         // Open the new sketch file.
-                        const textDocument = await vscode.workspace.openTextDocument(path.join(vscode.workspace.rootPath, newSketchFileName));
+                        const textDocument = await vscode.workspace.openTextDocument(path.join(ArduinoWorkspace.rootPath, newSketchFileName));
                         vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);
                     } else {
                         this._sketch = undefined;
                     }
                 } else if (fileUris.length === 1) {
-                    this.sketch = path.relative(vscode.workspace.rootPath, fileUris[0].fsPath);
+                    this.sketch = path.relative(ArduinoWorkspace.rootPath, fileUris[0].fsPath);
                 } else if (fileUris.length > 1) {
                     const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
                         return <vscode.QuickPickItem>{
-                            label: path.relative(vscode.workspace.rootPath, fileUri.fsPath),
+                            label: path.relative(ArduinoWorkspace.rootPath, fileUri.fsPath),
                             description: fileUri.fsPath,
                         };
                     }), { placeHolder: "Select the main sketch file" });
