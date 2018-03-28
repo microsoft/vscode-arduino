@@ -202,10 +202,11 @@ export class BoardManager {
                     .find((_plat) => _plat.architecture === plat.architecture && _plat.package.name === plat.package.name);
                 if (addedPlatform) {
                     // union boards from all versions.
-                    addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
-                        return a.name === b.name;
-                    });
-                    addedPlatform.versions.push(plat.version);
+                    // We should not union boards: https://github.com/Microsoft/vscode-arduino/issues/414
+                    // addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
+                    //     return a.name === b.name;
+                    // });
+                    // addedPlatform.versions.push(plat.version);
                 } else {
                     plat.versions = [plat.version];
                     // Clear the version information since the plat will be used to contain all supported versions.
