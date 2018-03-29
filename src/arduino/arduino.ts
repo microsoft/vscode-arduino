@@ -19,6 +19,7 @@ import { LibraryManager } from "./libraryManager";
 import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
+import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 
@@ -96,12 +97,12 @@ export class ArduinoApp {
             return;
         }
 
-        if (!vscode.workspace.rootPath) {
+        if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Cannot find the sketch file.");
             return;
         }
 
-        if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+        if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
         if (!dc.port) {
@@ -118,13 +119,13 @@ export class ArduinoApp {
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
         if (dc.output) {
-            const outputPath = path.resolve(vscode.workspace.rootPath, dc.output);
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
@@ -148,25 +149,25 @@ export class ArduinoApp {
             return;
         }
 
-        if (!vscode.workspace.rootPath) {
+        if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Cannot find the sketch file.");
             return;
         }
 
-        if (!dc.sketch || !util.fileExistsSync(path.join(vscode.workspace.rootPath, dc.sketch))) {
+        if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
 
         await vscode.workspace.saveAll(false);
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = ["--verify", "--board", boardDescriptor, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
         if (output || dc.output) {
-            const outputPath = path.resolve(vscode.workspace.rootPath, output || dc.output);
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
@@ -194,10 +195,10 @@ export class ArduinoApp {
         } else {
             libPaths = this.getDefaultPackageLibPaths();
         }
-        if (!vscode.workspace.rootPath) {
+        if (!ArduinoWorkspace.rootPath) {
             return;
         }
-        const configFilePath = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
+        const configFilePath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
         let deviceContext = null;
         if (!util.fileExistsSync(configFilePath)) {
             util.mkdirRecursivelySync(path.dirname(configFilePath));
@@ -261,11 +262,11 @@ export class ArduinoApp {
 
     // Include the *.h header files from selected library to the arduino sketch.
     public async includeLibrary(libraryPath: string) {
-        if (!vscode.workspace.rootPath) {
+        if (!ArduinoWorkspace.rootPath) {
             return;
         }
         const dc = DeviceContext.getInstance();
-        const appPath = path.join(vscode.workspace.rootPath, dc.sketch);
+        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         if (util.fileExistsSync(appPath)) {
             const hFiles = glob.sync(`${libraryPath}/*.h`, {
                 nodir: true,
