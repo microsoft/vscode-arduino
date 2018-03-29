@@ -53,7 +53,17 @@ export class ArduinoSettings implements IArduinoSettings {
             } else {
                 this._packagePath = path.join(process.env.HOME, ".arduino15");
             }
-            this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Arduino");
+
+            if (this.preferences.get("sketchbook.path")) {
+                if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
+                    this._sketchbookPath = path.join(this._arduinoPath, "portable", this.preferences.get("sketchbook.path"));
+                } else {
+                    this._sketchbookPath = this.preferences.get("sketchbook.path");
+                }
+            } else {
+                this._sketchbookPath = path.join(process.env.HOME, "Arduino");
+            }
+
             if (this._commandPath === "") {
                 this._commandPath = "arduino";
             }
@@ -63,7 +73,17 @@ export class ArduinoSettings implements IArduinoSettings {
             } else {
                 this._packagePath = path.join(process.env.HOME, "Library/Arduino15");
             }
-            this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(process.env.HOME, "Documents/Arduino");
+
+            if (this.preferences.get("sketchbook.path")) {
+                if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
+                    this._sketchbookPath = path.join(this._arduinoPath, "portable", this.preferences.get("sketchbook.path"));
+                } else {
+                    this._sketchbookPath = this.preferences.get("sketchbook.path");
+                }
+            } else {
+                this._sketchbookPath = path.join(process.env.HOME, "Documents/Arduino");
+            }
+
             if (this._commandPath === "") {
                 this._commandPath = "/Contents/MacOS/Arduino";
             }
@@ -128,7 +148,13 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public reloadPreferences() {
         this._preferences = util.parseConfigFile(this.preferencePath);
-        this._sketchbookPath = this._preferences.get("sketchbook.path") || this._sketchbookPath;
+        if (this.preferences.get("sketchbook.path")) {
+            if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
+                this._sketchbookPath = path.join(this._arduinoPath, "portable", this.preferences.get("sketchbook.path"));
+            } else {
+                this._sketchbookPath = this.preferences.get("sketchbook.path");
+            }
+        }
     }
 
     /**
@@ -159,7 +185,16 @@ export class ArduinoSettings implements IArduinoSettings {
         } else {
             this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
         }
-        this._sketchbookPath = this.preferences.get("sketchbook.path") || path.join(folder, "Arduino");
+
+        if (this.preferences.get("sketchbook.path")) {
+            if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
+                this._sketchbookPath = path.join(this._arduinoPath, "portable", this.preferences.get("sketchbook.path"));
+            } else {
+                this._sketchbookPath = this.preferences.get("sketchbook.path");
+            }
+        } else {
+            this._sketchbookPath = path.join(folder, "Arduino");
+        }
     }
 
     private async tryResolveArduinoPath(): Promise<void> {
