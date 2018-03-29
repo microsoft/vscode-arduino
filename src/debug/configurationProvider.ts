@@ -51,7 +51,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
                     text: "target remote localhost:3333",
                 },
                 {
-                    text: "file ${file}",
+                    text: "file \"${file}\"",
                 },
                 {
                     text: "load",
