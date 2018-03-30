@@ -416,10 +416,15 @@ export class BoardManager {
     private getAdditionalUrls(): string[] {
         function formatUrls(urls): string[] {
             if (urls) {
+                let _urls: string[];
+
                 if (!Array.isArray(urls) && typeof urls === "string") {
-                    return (<string>urls).split(",");
+                    _urls = (<string>urls).split(",");
+                } else {
+                    _urls = <string[]>urls;
                 }
-                return <string[]>urls;
+
+                return util.trim(_urls);
             }
             return [];
         }

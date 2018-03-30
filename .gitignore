@@ -5,3 +5,4 @@ node_modules
 .idea
 src/views/app/sprites-generated
 test/**/c_cpp_properties.json
+*.vsix
