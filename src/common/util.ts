@@ -286,6 +286,17 @@ export function formatVersion(version: string): string {
     return versions.join(".");
 }
 
+export function trim(value: any) {
+    if (Array.isArray(value)) {
+        for (let i = 0; i < value.length; i++) {
+            value[i] = trim(value[i]);
+        }
+    } else if (typeof value === "string") {
+        value = value.trim();
+    }
+    return value;
+}
+
 export function union(a: any[], b: any[], compare?: (item1, item2) => boolean) {
     const result = [].concat(a);
     b.forEach((item) => {
