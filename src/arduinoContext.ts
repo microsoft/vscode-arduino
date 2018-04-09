@@ -3,7 +3,6 @@
 
 import { ArduinoApp } from "./arduino/arduino";
 import { BoardManager } from "./arduino/boardManager";
-import { DebugConfigurator } from "./debug/configurator";
 import { DebuggerManager } from "./debug/debuggerManager";
 import { DeviceContext } from "./deviceContext";
 
@@ -28,26 +27,19 @@ class ArduinoContext {
         this._boardManager = value;
     }
 
-    public get arduinoConfigurator(): DebugConfigurator {
-        if (this._arduinoConfigurator === null) {
-            const debuggerManager = new DebuggerManager(
+    public get debuggerManager(): DebuggerManager {
+        if (this._debuggerManager === null) {
+            this._debuggerManager = new DebuggerManager(
                 DeviceContext.getInstance().extensionPath,
                 this.arduinoApp.settings,
                 this.boardManager);
-            debuggerManager.initialize();
-            this._arduinoConfigurator = new DebugConfigurator(
-                this.arduinoApp, this.arduinoApp.settings
-                , this.boardManager, debuggerManager);
+            this._debuggerManager.initialize();
         }
-        return this._arduinoConfigurator;
-    }
-
-    public set arduinoConfigurator(value: DebugConfigurator) {
-        this._arduinoConfigurator = value;
+        return this._debuggerManager;
     }
 
     private _arduinoApp: ArduinoApp = null;
-    private _arduinoConfigurator: DebugConfigurator = null;
+    private _debuggerManager: DebuggerManager = null;
     private _boardManager: BoardManager = null;
 }
 

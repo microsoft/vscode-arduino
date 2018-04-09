@@ -31,7 +31,7 @@ You can also install directly from Marketplace within Visual Studio Code, search
 
 ## Get Started
 You can find code samples and tutorials each time you connect a supported device.
-Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://aka.ms/azureiotgetstarted).
+Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://docs.microsoft.com/azure/iot-hub/iot-hub-arduino-iot-devkit-az3166-get-started).
 
 ## Commands
 This extension provides several commands in the Command Palette (`F1` or `Ctrl + Shift + P`) for working with `*.ino` files:
@@ -50,18 +50,40 @@ This extension provides several commands in the Command Palette (`F1` or `Ctrl +
 - **Arduino: Verify**: Build sketch.
 
 ## Options
-The following Visual Studio Code settings are available for the Arduino extension. These can user preferences `Ctrl + ,` or workspace settings (.vscode/settings.json). The later overrides the former.
+The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences `Ctrl + ,` or workspace settings (.vscode/settings.json). The later overrides the former.
 
 ```json
 {
     "arduino.path": "C:/Program Files (x86)/Arduino",
+    "arduino.commandPath": "run-arduino.bat",
     "arduino.additionalUrls": "",
-    "arduino.logLevel": "info"
+    "arduino.logLevel": "info",
+    "arduino.enableUSBDetection": true
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
+- `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. You can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac, `bin/run-arduino.sh` for Linux."
 - `arduino.additionalUrls` - Additional URLs for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
+- `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`.
+
+The following settings are per sketch settings of the Arduino extension. You can find them in
+`.vscode/arduino.json` under the workspace.
+
+```json
+{
+    "sketch": "example.ino",
+    "port": "COM5",
+    "board": "adafruit:samd:adafruit_feather_m0",
+    "output": "../build",
+    "debugger": "jlink"
+}
+```
+- `sketch` - The main sketch file name of Arduino.
+- `port` - Name of the serial port connected to the device. Can be set by the `Arduino: Select Serial Port` command.
+- `board` - Current selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
+- `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build, leading to long verify/upload time. So it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set.
+- `debugger` - The short name of the debugger that will be used when the board itself does not have any debugger and there are more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
 
 ## Debugging Arduino Code <sup>preview</sup>
 Before you start debug your Arduino code, read [this doc](https://code.visualstudio.com/docs/editor/debugging) and get to know the basic mechanism about debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for your reference.

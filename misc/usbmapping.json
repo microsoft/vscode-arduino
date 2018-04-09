@@ -140,7 +140,60 @@
         "architecture": "stm32f4",
         "id": "MXCHIP_AZ3166",
         "interface": "stlink-v2-1.cfg",
-        "target": "stm32f4x.cfg"
+        "target": "stm32f4x.cfg", 
+        "readme": "ReleaseNotes.html"
+      }
+    ]
+  },
+  {
+    "boards": [
+      {
+        "name": "genericSTM32F103C",
+        "package": "Arduino_STM32",
+        "architecture": "STM32F1",
+        "id": "genericSTM32F103C",
+        "interface": "stlink-v2.cfg",
+        "target": "stm32f1x.cfg"
+      },
+      {
+        "name": "genericSTM32F103R",
+        "package": "Arduino_STM32",
+        "architecture": "STM32F1",
+        "id": "genericSTM32F103R",
+        "interface": "stlink-v2.cfg",
+        "target": "stm32f1x.cfg"
+      },
+      {
+        "name": "genericSTM32F103T",
+        "package": "Arduino_STM32",
+        "architecture": "STM32F1",
+        "id": "genericSTM32F103T",
+        "interface": "stlink-v2.cfg",
+        "target": "stm32f1x.cfg"
+      },
+      {
+        "name": "genericSTM32F103V",
+        "package": "Arduino_STM32",
+        "architecture": "STM32F1",
+        "id": "genericSTM32F103V",
+        "interface": "stlink-v2.cfg",
+        "target": "stm32f1x.cfg"
+      },
+      {
+        "name": "genericSTM32F103Z",
+        "package": "Arduino_STM32",
+        "architecture": "STM32F1",
+        "id": "genericSTM32F103Z",
+        "interface": "stlink-v2.cfg",
+        "target": "stm32f1x.cfg"
+      },
+      {
+        "name": "genericGD32F103C",
+        "package": "Arduino_STM32",
+        "architecture": "STM32F1",
+        "id": "genericGD32F103C",
+        "interface": "stlink-v2.cfg",
+        "target": "stm32f1x.cfg"
       }
     ]
   }

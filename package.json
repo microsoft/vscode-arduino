@@ -2,12 +2,12 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.4",
+  "version": "0.2.12",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.7.0"
+    "vscode": "^1.17.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -34,7 +34,6 @@
   ],
   "activationEvents": [
     "*",
-    "onCommand:arduino.debug.startSession",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.selectSerialPort",
@@ -48,7 +47,8 @@
     "onCommand:arduino.showBoardManager",
     "onCommand:arduino.showLibraryManager",
     "onCommand:arduino.showExamples",
-    "onCommand:arduino.initialize"
+    "onCommand:arduino.initialize",
+    "onDebug"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -116,11 +116,19 @@
         "title": "Arduino: Examples"
       }
     ],
+    "views": {
+      "explorer": [
+        {
+          "id": "arduinoExampleExplorer",
+          "name": "Arduino Examples",
+          "when": "vscode-arduino:showExampleExplorer"
+        }
+      ]
+    },
     "debuggers": [
       {
         "type": "arduino",
         "label": "Arduino",
-        "startSessionCommand": "arduino.debug.startSession",
         "enableBreakpointsFor": {
           "languageIds": [
             "c",
@@ -135,8 +143,8 @@
               "name": "Arduino",
               "type": "arduino",
               "request": "launch",
-              "program": "$${{file}}",
-              "cwd": "$${{workspaceRoot}}",
+              "program": "^\"\\${file}\"",
+              "cwd": "^\"\\${workspaceFolder}\"",
               "MIMode": "gdb",
               "targetArchitecture": "arm",
               "miDebuggerPath": "",
@@ -147,7 +155,7 @@
                   "text": "target remote localhost:3333"
                 },
                 {
-                  "text": "file $${{file}}"
+                  "text": "^\"file \\\"\\${file}\\\"\""
                 },
                 {
                   "text": "load"
@@ -167,42 +175,6 @@
             }
           }
         ],
-        "initialConfigurations": [
-          {
-            "name": "Arduino",
-            "type": "arduino",
-            "request": "launch",
-            "program": "${file}",
-            "cwd": "${workspaceRoot}",
-            "MIMode": "gdb",
-            "targetArchitecture": "arm",
-            "miDebuggerPath": "",
-            "debugServerPath": "",
-            "debugServerArgs": "",
-            "customLaunchSetupCommands": [
-              {
-                "text": "target remote localhost:3333"
-              },
-              {
-                "text": "file ${file}"
-              },
-              {
-                "text": "load"
-              },
-              {
-                "text": "monitor reset halt"
-              },
-              {
-                "text": "monitor reset init"
-              }
-            ],
-            "stopAtEntry": true,
-            "serverStarted": "Info\\ :\\ [\\w\\d\\.]*:\\ hardware",
-            "launchCompleteCommand": "exec-continue",
-            "filterStderr": true,
-            "args": []
-          }
-        ],
         "configurationAttributes": {
           "launch": {
             "required": [
@@ -212,7 +184,7 @@
               "program": {
                 "type": "string",
                 "description": "Full path to program executable.",
-                "default": "${workspaceRoot}/arduino.elf"
+                "default": "${workspaceFolder}/arduino.elf"
               },
               "args": {
                 "type": "array",
@@ -441,6 +413,11 @@
           "default": "",
           "description": "Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: 'C:\\Program Files\\Arduino' for Windows, '/Applications' for Mac, '/home/$user/Downloads/arduino-1.8.1' for Linux. (Requires a restart after change)"
         },
+        "arduino.commandPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a script relative to 'arduino.path', you can use a custom launch script to run Arduino by modifying this setting. Example: 'run-arduino.bat' for Windows, 'Contents/MacOS/run-arduino.sh' for Mac, 'bin/run-arduino.sh' for Linux. (Requires a restart after change)"
+        },
         "arduino.additionalUrls": {
           "type": [
             "string",
@@ -455,6 +432,10 @@
             "info",
             "verbose"
           ]
+        },
+        "arduino.enableUSBDetection": {
+          "type": "boolean",
+          "default": true
         }
       }
     },
@@ -524,7 +505,7 @@
     "tslint": "^4.2.0",
     "typemoq": "^1.6.0",
     "typescript": "^2.2.1",
-    "vscode": "^1.0.0",
+    "vscode": "^1.1.10",
     "webpack": "^2.2.1"
   },
   "dependencies": {

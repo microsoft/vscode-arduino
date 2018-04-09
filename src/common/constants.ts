@@ -29,8 +29,9 @@ export const messages = {
 };
 
 export const statusBarPriority = {
-    PORT: 2,
-    OPEN_PORT: 3,
-    BAUD_RATE: 4,
-    BOARD: 6,
+    PORT: 20,
+    OPEN_PORT: 30,
+    BAUD_RATE: 40,
+    BOARD: 60,
+    ENDING: 70,
 };

@@ -9,6 +9,7 @@ import * as util from "../common/util";
 
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
+import { ArduinoWorkspace } from "../common/workspace";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
 
@@ -23,8 +24,8 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     private _activated: boolean = false;
 
     constructor() {
-        if (vscode.workspace && vscode.workspace.rootPath) {
-            this._cppConfigFile = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
+        if (vscode.workspace && ArduinoWorkspace.rootPath) {
+            this._cppConfigFile = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
             this._watcher = vscode.workspace.createFileSystemWatcher(this._cppConfigFile);
             this._watcher.onDidCreate(() => this.updateLibList());
             this._watcher.onDidChange(() => this.updateLibList());

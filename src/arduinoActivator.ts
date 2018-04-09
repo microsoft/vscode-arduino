@@ -1,10 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as vscode from "vscode";
+
 import { ArduinoApp } from "./arduino/arduino";
 import { ArduinoSettings } from "./arduino/arduinoSettings";
 import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
+import { ExampleProvider } from "./arduino/exampleProvider";
 import { LibraryManager } from "./arduino/libraryManager";
 import ArduinoContext from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
@@ -33,6 +36,9 @@ class ArduinoActivator {
             arduinoApp.libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
             arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
             ArduinoContext.arduinoApp = arduinoApp;
+
+            const exampleProvider = new ExampleProvider(arduinoApp.exampleManager, arduinoApp.boardManager);
+            vscode.window.registerTreeDataProvider("arduinoExampleExplorer", exampleProvider);
         })();
         await this._initializePromise;
     }

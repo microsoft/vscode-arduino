@@ -30,6 +30,8 @@ export class BoardManager {
 
     private _currentBoard: IBoard;
 
+    private _onBoardTypeChanged = new vscode.EventEmitter<void>();
+
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._boardConfigStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BOARD);
         this._boardConfigStatusBar.command = "arduino.showBoardConfig";
@@ -111,6 +113,10 @@ export class BoardManager {
         return true;
     }
 
+    public get onBoardTypeChanged(): vscode.Event<void> {
+        return this._onBoardTypeChanged.event;
+    }
+
     public doChangeBoardType(targetBoard: IBoard) {
         const dc = DeviceContext.getInstance();
         dc.board = targetBoard.key;
@@ -118,6 +124,8 @@ export class BoardManager {
         dc.configuration = this._currentBoard.customConfig;
         this._boardConfigStatusBar.text = targetBoard.name;
         this._arduinoApp.addLibPath(null);
+
+        this._onBoardTypeChanged.fire();
     }
 
     public get packages(): IPackage[] {
@@ -181,6 +189,10 @@ export class BoardManager {
             return;
         }
 
+        if (!rawModel || !rawModel.packages || !rawModel.packages.length) {
+            return;
+        }
+
         this._packages = this._packages.concat(rawModel.packages);
 
         rawModel.packages.forEach((pkg) => {
@@ -190,10 +202,11 @@ export class BoardManager {
                     .find((_plat) => _plat.architecture === plat.architecture && _plat.package.name === plat.package.name);
                 if (addedPlatform) {
                     // union boards from all versions.
-                    addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
-                        return a.name === b.name;
-                    });
-                    addedPlatform.versions.push(plat.version);
+                    // We should not union boards: https://github.com/Microsoft/vscode-arduino/issues/414
+                    // addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
+                    //     return a.name === b.name;
+                    // });
+                    // addedPlatform.versions.push(plat.version);
                 } else {
                     plat.versions = [plat.version];
                     // Clear the version information since the plat will be used to contain all supported versions.
@@ -403,10 +416,15 @@ export class BoardManager {
     private getAdditionalUrls(): string[] {
         function formatUrls(urls): string[] {
             if (urls) {
+                let _urls: string[];
+
                 if (!Array.isArray(urls) && typeof urls === "string") {
-                    return (<string>urls).split(",");
+                    _urls = (<string>urls).split(",");
+                } else {
+                    _urls = <string[]>urls;
                 }
-                return <string[]>urls;
+
+                return util.trim(_urls);
             }
             return [];
         }

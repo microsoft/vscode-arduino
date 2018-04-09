@@ -6,30 +6,53 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { IBoard } from "../arduino/package";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
+
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
 
+const HTML_EXT = ".html";
+const MARKDOWN_EXT = ".md";
+
 export class UsbDetector {
+    public static getInstance(): UsbDetector {
+        if (!UsbDetector._instance) {
+            UsbDetector._instance = new UsbDetector();
+        }
+        return UsbDetector._instance;
+    }
+
+    private static _instance: UsbDetector;
 
     private _usbDetector;
 
     private _boardDescriptors = null;
 
-    constructor(
-        private _extensionRoot: string) {
+    private _extensionRoot = null;
+
+    private constructor() {
+    }
+
+    public initialize(extensionRoot: string) {
+        this._extensionRoot = extensionRoot;
     }
 
     public async startListening() {
-        if (os.platform() === "linux") {
+        const enableUSBDetection = VscodeSettings.getInstance().enableUSBDetection;
+        if (os.platform() === "linux" || !enableUSBDetection) {
             return;
         }
         this._usbDetector = require("../../../vendor/node-usb-native").detector;
 
         if (!this._usbDetector) {
             return;
+        }
+
+        if (this._extensionRoot === null) {
+            throw new Error("UsbDetector should be initialized before using.");
         }
 
         this._usbDetector.on("add", async (device) => {
@@ -63,15 +86,7 @@ export class UsbDetector {
                                         }
                                         ArduinoContext.boardManager.updateInstalledPlatforms(deviceDescriptor.package, deviceDescriptor.architecture);
                                         bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
-                                        this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
-
-                                        if (ArduinoContext.boardManager.currentBoard) {
-                                            const readme = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
-                                            if (util.fileExistsSync(readme)) {
-                                                vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
-                                            }
-                                            vscode.commands.executeCommand("arduino.showExamples");
-                                        }
+                                        this.switchBoard(bd, deviceDescriptor);
                                     });
                             }
                         });
@@ -85,16 +100,16 @@ export class UsbDetector {
                             "Yes", "No")
                             .then((ans) => {
                                 if (ans === "Yes") {
-                                    return this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
+                                    return this.switchBoard(bd, deviceDescriptor);
                                 }
                             });
                     } else {
                         const monitor = SerialMonitor.getInstance();
                         monitor.selectSerialPort(deviceDescriptor.vid, deviceDescriptor.pid);
-                        this.showReadMeAndExample();
+                        this.showReadMeAndExample(deviceDescriptor.readme);
                     }
                 } else {
-                    this.switchBoard(bd, deviceDescriptor.vid, deviceDescriptor.pid);
+                    this.switchBoard(bd, deviceDescriptor);
                 }
             }
         });
@@ -106,21 +121,43 @@ export class UsbDetector {
         }
     }
 
-    private switchBoard(bd: IBoard, vid: string, pid: string) {
-        ArduinoContext.boardManager.doChangeBoardType(bd);
-        const monitor = SerialMonitor.getInstance();
-        monitor.selectSerialPort(vid, pid);
-        this.showReadMeAndExample();
+    public pauseListening() {
+        if (this._usbDetector) {
+            this._usbDetector.stopMonitoring();
+        }
     }
 
-    private showReadMeAndExample() {
+    public resumeListening() {
+        if (this._usbDetector) {
+            this._usbDetector.startMonitoring();
+        } else {
+            this.startListening();
+        }
+    }
+
+    private switchBoard(bd: IBoard, deviceDescriptor, showReadMe: boolean = true) {
+        ArduinoContext.boardManager.doChangeBoardType(bd);
+        const monitor = SerialMonitor.getInstance();
+        monitor.selectSerialPort(deviceDescriptor.vid, deviceDescriptor.pid);
+        if (showReadMe) {
+            this.showReadMeAndExample(deviceDescriptor.readme);
+        }
+    }
+
+    private showReadMeAndExample(readme: string) {
         if (ArduinoContext.boardManager.currentBoard) {
-            const readme = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
-            if (util.fileExistsSync(readme)) {
-                vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readme));
+            let readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, readme);
+            if (!util.fileExistsSync(readmeFilePath)) {
+                readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
             }
-            vscode.commands.executeCommand("arduino.reloadExample");
-            vscode.commands.executeCommand("arduino.showExamples");
+            vscode.commands.executeCommand("arduino.showExamples", true);
+            if (util.fileExistsSync(readmeFilePath)) {
+                if (readmeFilePath.endsWith(MARKDOWN_EXT)) {
+                    vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readmeFilePath));
+                } else if (readmeFilePath.endsWith(HTML_EXT)) {
+                    vscode.commands.executeCommand("vscode.previewHtml", vscode.Uri.file(readmeFilePath));
+                }
+            }
         }
     }
 

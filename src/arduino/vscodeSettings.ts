@@ -5,15 +5,19 @@ import * as vscode from "vscode";
 
 const configKeys = {
     ARDUINO_PATH: "arduino.path",
+    ARDUINO_COMMAND_PATH: "arduino.commandPath",
     ADDITIONAL_URLS: "arduino.additionalUrls",
     LOG_LEVEL: "arduino.logLevel",
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
+    ENABLE_USB_DETECTOIN: "arduino.enableUSBDetection",
 };
 
 export interface IVscodeSettings {
     arduinoPath: string;
+    commandPath: string;
     additionalUrls: string | string[];
     logLevel: string;
+    enableUSBDetection: boolean;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -33,12 +37,20 @@ export class VscodeSettings implements IVscodeSettings {
         return this.getConfigValue<string>(configKeys.ARDUINO_PATH);
     }
 
+    public get commandPath(): string {
+        return this.getConfigValue<string>(configKeys.ARDUINO_COMMAND_PATH);
+    }
+
     public get additionalUrls(): string | string[] {
         return this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
     }
 
     public get logLevel(): string {
         return this.getConfigValue<string>(configKeys.LOG_LEVEL) || "info";
+    }
+
+    public get enableUSBDetection(): boolean {
+        return this.getConfigValue<boolean>(configKeys.ENABLE_USB_DETECTOIN);
     }
 
     public async updateAdditionalUrls(value) {

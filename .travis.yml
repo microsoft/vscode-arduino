@@ -1,12 +1,22 @@
 language: node_js
 
 node_js:
-- '6'
+- 'node'
 
 os:
 - linux
 - osx
 dist: trusty # using Ubuntu 14.04.5 LTS
+
+# fixing https://github.com/Microsoft/vscode/issues/33998
+addons:
+  apt:
+    sources:
+      # https://docs.travis-ci.com/user/languages/c/#GCC-on-Linux
+      - ubuntu-toolchain-r-test
+    packages:
+      - libsecret-1-dev
+      - g++-4.9
 
 branches:
   only:
@@ -19,7 +29,7 @@ env:
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
-    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
+    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0 CODE_VERSION=1.20.1;
     sh -e /etc/init.d/xvfb start;
     sleep 3;
     wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER;
@@ -36,6 +46,8 @@ install:
 - npm install -g typescript
 - npm install -g gulp
 - npm install
+# https://github.com/travis-ci/travis-ci/issues/8813
+- rm -f ./node_modules/.bin/which
 
 script:
 - gulp tslint
@@ -49,6 +61,7 @@ deploy:
     api_key: $GIT_TOKEN
     file_glob: true
     file: "*.vsix"
+    skip_cleanup: true
     on:
       tags: true
       all_branches: true
@@ -56,6 +69,7 @@ deploy:
   # deploy to vscode extension market
   - provider: script  
     script: vsce publish -p $VSCE_TOKEN --packagePath *.vsix
+    skip_cleanup: true
     on:
       tags: true
       all_branches: true
