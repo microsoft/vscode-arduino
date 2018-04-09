@@ -157,13 +157,15 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             delete status.compile;
         }
-    },
-        () => {
-            return { board: ArduinoContext.boardManager.currentBoard.name };
-        });
+    }, () => {
+        return { board: ArduinoContext.boardManager.currentBoard.name };
+    });
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
+    registerArduinoCommand("arduino.installBoard", async (packageName, arch, version) => {
+        return await ArduinoContext.arduinoApp.installBoard(packageName, arch, version);
+    });
 
     // serial monitor commands
     const serialMonitor = SerialMonitor.getInstance();
