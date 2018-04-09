@@ -5,14 +5,14 @@ All notable changes to this project will be documented in this file.
 - Release date: April 8, 2018
 
 ### Fixed
-- Fix board manager and library manamger issue with portable Arduino installation [#415](https://github.com/Microsoft/vscode-arduino/issues/415)
+- Fix board manager and library manager issue with portable Arduino installation [#415](https://github.com/Microsoft/vscode-arduino/issues/415)
 - Fix board type button issue [#483](https://github.com/Microsoft/vscode-arduino/issues/483)
 - Fix absolute output folder path issue [#450](https://github.com/Microsoft/vscode-arduino/issues/450)
 - Fix serial port line ending issue [#497](https://github.com/Microsoft/vscode-arduino/issues/497)
 - Fix debugging issue with file path contains spaces [#428](https://github.com/Microsoft/vscode-arduino/issues/428)
-- Fix board manager mixed up pacakges issue [#414](https://github.com/Microsoft/vscode-arduino/issues/414)
+- Fix board manager mixed up packages issue [#414](https://github.com/Microsoft/vscode-arduino/issues/414)
 
-Special thanks to [iFreilicht](https://github.com/iFreilicht), [emontnemery](https://github.com/emontnemery), [tsalinger](https://github.com/tsalinger), [Medeirox](https://github.com/Medeirox), [vphuoc](https://github.com/vphuoc), [nuno407](https://github.com/nuno407), thank you for your feedbacks.
+Special thanks to [Felix Uhl](https://github.com/iFreilicht), [emontnemery](https://github.com/emontnemery), [tsalinger](https://github.com/tsalinger), [Diego Medeiros](https://github.com/Medeirox), [vphuoc](https://github.com/vphuoc), [Nuno Sousa](https://github.com/nuno407), thank you for your feedbacks.
 
 ## Version 0.2.11
 - Release date: March 7, 2018
