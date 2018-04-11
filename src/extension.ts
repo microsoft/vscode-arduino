@@ -6,6 +6,7 @@ import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
+import { IBoard } from "./arduino/package";
 import ArduinoActivator from "./arduinoActivator";
 import ArduinoContext from "./arduinoContext";
 import {
@@ -20,7 +21,6 @@ import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
-import { IBoard } from "./arduino/package";
 
 const status: any = {};
 
@@ -176,7 +176,7 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
         if (!installed) {
-            await ArduinoContext.arduinoApp.installBoard(packageName, arch, version)
+            await ArduinoContext.arduinoApp.installBoard(packageName, arch, version);
         }
         return;
     });
