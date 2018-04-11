@@ -20,6 +20,7 @@ import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
+import { IBoard } from "./arduino/package";
 
 const status: any = {};
 
@@ -164,16 +165,20 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
     registerArduinoCommand("arduino.installBoard", async (packageName, arch, version: string = "") => {
+        let installed =  false;
         const installedBoards = ArduinoContext.boardManager.installedBoards;
-        for (const boardKey of Object.keys(installedBoards)) {
-            const board = installedBoards[boardKey];
-            if (packageName === board.platform.packageName &&
+        installedBoards.forEach((board: IBoard, key: string) => {
+            if (packageName === board.platform.package.name &&
                     arch === board.platform.architecture &&
                     (!version || version === board.platform.installedVersion)) {
-                return;
+                installed = true;
             }
+        });
+
+        if (!installed) {
+            await ArduinoContext.arduinoApp.installBoard(packageName, arch, version)
         }
-        return await ArduinoContext.arduinoApp.installBoard(packageName, arch, version);
+        return;
     });
 
     // serial monitor commands
