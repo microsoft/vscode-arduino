@@ -11,8 +11,5 @@
         "**/.git/objects/**": true,
         "**/out/*": true,
         "**/node_modules/**": true
-    },
-    "arduino.additionalUrls": [
-        "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json"
-    ]
+    }
 }
