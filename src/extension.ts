@@ -163,7 +163,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
-    registerArduinoCommand("arduino.installBoard", async (packageName, arch, version) => {
+    registerArduinoCommand("arduino.installBoard", async (packageName, arch, version: string = "") => {
+        const installedBoards = ArduinoContext.boardManager.installedBoards;
+        for (const boardKey of Object.keys(installedBoards)) {
+            const board = installedBoards[boardKey];
+            if (packageName === board.platform.packageName &&
+                    arch === board.platform.architecture &&
+                    (!version || version === board.platform.installedVersion)) {
+                return;
+            }
+        }
         return await ArduinoContext.arduinoApp.installBoard(packageName, arch, version);
     });
 
