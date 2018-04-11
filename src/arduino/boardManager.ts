@@ -206,7 +206,9 @@ export class BoardManager {
                     // addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
                     //     return a.name === b.name;
                     // });
-                    // addedPlatform.versions.push(plat.version);
+                    if (addedPlatform.name === plat.name) {
+                        addedPlatform.versions.push(plat.version);
+                    }
                 } else {
                     plat.versions = [plat.version];
                     // Clear the version information since the plat will be used to contain all supported versions.
