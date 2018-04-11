@@ -6,6 +6,7 @@ import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
 
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
+import { IBoard } from "./arduino/package";
 import ArduinoActivator from "./arduinoActivator";
 import ArduinoContext from "./arduinoContext";
 import {
@@ -157,13 +158,28 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             delete status.compile;
         }
-    },
-        () => {
-            return { board: ArduinoContext.boardManager.currentBoard.name };
-        });
+    }, () => {
+        return { board: ArduinoContext.boardManager.currentBoard.name };
+    });
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
+    registerArduinoCommand("arduino.installBoard", async (packageName, arch, version: string = "") => {
+        let installed =  false;
+        const installedBoards = ArduinoContext.boardManager.installedBoards;
+        installedBoards.forEach((board: IBoard, key: string) => {
+            if (packageName === board.platform.package.name &&
+                    arch === board.platform.architecture &&
+                    (!version || version === board.platform.installedVersion)) {
+                installed = true;
+            }
+        });
+
+        if (!installed) {
+            await ArduinoContext.arduinoApp.installBoard(packageName, arch, version);
+        }
+        return;
+    });
 
     // serial monitor commands
     const serialMonitor = SerialMonitor.getInstance();
