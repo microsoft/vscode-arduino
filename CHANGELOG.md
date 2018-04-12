@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.13
+- Release date: April 12, 2018
+
+### Fixed
+- Fix board manager package version issue [#520](https://github.com/Microsoft/vscode-arduino/issues/520)
+
+### Added
+- Add install board command
+
+### Changed
+- Disable auto popup get started page for IoT Devkit
+
 ## Version 0.2.12
 - Release date: April 8, 2018
 
