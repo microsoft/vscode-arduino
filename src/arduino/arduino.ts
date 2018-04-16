@@ -444,8 +444,8 @@ export class ArduinoApp {
                         browse: {
                             limitSymbolsToIncludedHeaders: false,
                         },
-                        cStandard: "c11",
-                        cppStandard: "c++17"
+                        cStandard: "c11",
+                        cppStandard: "c++17",
                     }],
                 };
                 util.mkdirRecursivelySync(path.dirname(cppConfigFilePath));
