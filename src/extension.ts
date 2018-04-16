@@ -177,6 +177,7 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
         if (!installed) {
+            await ArduinoContext.boardManager.loadPackages(true);
             await ArduinoContext.arduinoApp.installBoard(packageName, arch, version);
         }
         return;
