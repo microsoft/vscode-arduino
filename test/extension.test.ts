@@ -49,6 +49,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.closeSerialMonitor",
                     "arduino.reloadExample",
                     "arduino.showExampleExplorer",
+                    "arduino.loadPackages",
                     "arduino.installBoard",
                 ];
 
