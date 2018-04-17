@@ -78,16 +78,8 @@ export class SerialPortCtrl {
         this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
         this._outputChannel.show();
         this._currentSerialPort.on("open", () => {
-          this._currentSerialPort.write("TestingOpen", "Both NL & CR", (err) => {
-            // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
-            if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
-              this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
-              reject(err);
-            } else {
-              this._outputChannel.appendLine(`[Info] Opened the serial port - ${this._currentPort}`);
-              resolve();
-            }
-          });
+          this._outputChannel.appendLine(`[Info] Opened the serial port - ${this._currentPort}`);
+          return resolve();
         });
 
         this._currentSerialPort.on("data", (_event) => {
@@ -109,10 +101,13 @@ export class SerialPortCtrl {
       }
 
       this._currentSerialPort.write(text, SerialPortEnding[this._ending], (error) => {
-        if (!error) {
-          resolve();
-        } else {
+        // Make it lazy check for serial port opening
+        // https://github.com/Microsoft/vscode-arduino/issues/530
+        if (error && !(error.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
+          this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
           return reject(error);
+        } else {
+          return resolve();
         }
       });
     });

@@ -25,7 +25,7 @@ export const messages = {
     INVALID_ARDUINO_PATH: "Cannot find the Arduino installation path. You can specify the path in the user settings.",
     FAILED_SEND_SERIALPORT: "Failed to send message to serial port.",
     SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
-    SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",
+    SEND_BEFORE_OPEN_SERIALPORT: "Please open Serial Monitor first.",
 };
 
 export const statusBarPriority = {
