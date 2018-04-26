@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## Version 0.2.13
-- Release date: April 12, 2018
+- Release date: April 26, 2018
 
 ### Fixed
 - Fix board manager package version issue [#520](https://github.com/Microsoft/vscode-arduino/issues/520)
