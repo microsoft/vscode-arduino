@@ -240,7 +240,7 @@ export class ArduinoApp {
             } else {
                 configSection.includePath = [];
             }
-            configSection.includePath.push(childLibPath);
+            configSection.includePath.unshift(childLibPath);
         });
 
         libPaths.forEach((childLibPath) => {
@@ -254,7 +254,7 @@ export class ArduinoApp {
             } else {
                 configSection.browse.path = [];
             }
-            configSection.browse.path.push(childLibPath);
+            configSection.browse.path.unshift(childLibPath);
         });
 
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
@@ -437,14 +437,33 @@ export class ArduinoApp {
 
                 // Generate cpptools intellisense config
                 const cppConfigFilePath = path.join(destExample, constants.CPP_CONFIG_FILE);
+
+                // Current workspace
+                const includePath = ["${workspaceRoot}"];
+                // Defaut package for this board
+                includePath.concat(this.getDefaultPackageLibPaths());
+                // Arduino built-in package tools
+                includePath.push(path.join(this._settings.arduinoPath, "hardware", "tools"));
+                // Arduino built-in libraries
+                includePath.push(path.join(this._settings.arduinoPath, "libraries"));
+                // Arduino custom package tools
+                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "hardware", "tools"));
+                // Arduino custom libraries
+                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries"));
+
                 const cppConfig = {
                     configurations: [{
                         name: util.getCppConfigPlatform(),
-                        includePath: this.getDefaultPackageLibPaths(),
+                        includePath,
                         browse: {
+                            path: includePath,
                             limitSymbolsToIncludedHeaders: false,
                         },
+                        intelliSenseMode: "clang-x64",
+                        cStandard: "c11",
+                        cppStandard: "c++17",
                     }],
+                    version: 3,
                 };
                 util.mkdirRecursivelySync(path.dirname(cppConfigFilePath));
                 fs.writeFileSync(cppConfigFilePath, JSON.stringify(cppConfig, null, 4));
