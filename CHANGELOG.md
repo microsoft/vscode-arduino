@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.14
+- Release date: May 4, 2018
+
+### Fixed
+- Fix install board command issue
+
 ## Version 0.2.13
 - Release date: April 26, 2018
 
