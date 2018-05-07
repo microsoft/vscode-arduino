@@ -140,7 +140,12 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "verify";
             try {
-                await ArduinoContext.arduinoApp.verify();
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    title: "Arduino: Verifing...",
+                }, async () => {
+                    await ArduinoContext.arduinoApp.verify();
+                });
             } catch (ex) {
             }
             delete status.compile;
@@ -153,7 +158,12 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await ArduinoContext.arduinoApp.upload();
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    title: "Arduino: Uploading...",
+                }, async () => {
+                    await ArduinoContext.arduinoApp.upload();
+                });
             } catch (ex) {
             }
             delete status.compile;
