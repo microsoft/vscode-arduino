@@ -86,6 +86,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _sketchStatusBar: vscode.StatusBarItem;
 
+    private _prebuild: string;
+
     /**
      * @constructor
      */
@@ -142,6 +144,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._output = deviceConfigJson.output;
                         this._debugger = deviceConfigJson["debugger"];
                         this._onDidChange.fire();
+                        this._prebuild = deviceConfigJson.prebuild;
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
@@ -153,6 +156,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._output = null;
                     this._debugger = null;
                     this._onDidChange.fire();
+                    this._prebuild = null;
                 }
                 return this;
             }, (reason) => {
@@ -169,6 +173,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 this._output = null;
                 this._debugger = null;
                 this._onDidChange.fire();
+                this._prebuild = null;
 
                 return this;
             });
@@ -241,6 +246,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public set sketch(value: string) {
         this._sketch = value;
         this.saveContext();
+    }
+
+    public get prebuild() {
+        return this._prebuild.trim();
     }
 
     public get output() {
