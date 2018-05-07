@@ -172,6 +172,27 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: ArduinoContext.boardManager.currentBoard.name };
     });
 
+    registerArduinoCommand("arduino.setSketchFile", async () => {
+        const sketchFileName = deviceContext.sketch;
+        const newSketchFileName = await vscode.window.showInputBox({
+            placeHolder: sketchFileName,
+            validateInput: (value) => {
+                if (value && /^\w+\.((ino)|(cpp)|c)$/.test(value.trim())) {
+                    return null;
+                } else {
+                    return "Invalid sketch file name. Should be *.ino/*.cpp/*.c";
+                }
+            },
+        });
+
+        if (!newSketchFileName) {
+            return;
+        }
+
+        deviceContext.sketch = newSketchFileName;
+        deviceContext.showStatusBar();
+    });
+
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
     registerArduinoCommand("arduino.loadPackages", async () => await ArduinoContext.boardManager.loadPackages(true));
