@@ -84,6 +84,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _vscodeWatcher: vscode.FileSystemWatcher;
 
+    private _sketchStatusBar: vscode.StatusBarItem;
+
     /**
      * @constructor
      */
@@ -97,6 +99,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             this._watcher.onDidChange(() => this.loadContext());
             this._watcher.onDidDelete(() => this.loadContext());
             this._vscodeWatcher.onDidDelete(() => this.loadContext());
+            this._sketchStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.SKETCH);
+            this._sketchStatusBar.command = "arduino.setSketchFile";
+            this._sketchStatusBar.tooltip = "Sketch File";
         }
     }
 
@@ -167,6 +172,15 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
                 return this;
             });
+    }
+
+    public showStatusBar() {
+        if (!this._sketch) {
+            return false;
+        }
+
+        this._sketchStatusBar.text = this._sketch;
+        this._sketchStatusBar.show();
     }
 
     public saveContext() {

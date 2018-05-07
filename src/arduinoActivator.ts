@@ -29,6 +29,8 @@ class ArduinoActivator {
             // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
             const deviceContext = DeviceContext.getInstance();
             await deviceContext.loadContext();
+            // Show sketch status bar, and allow user to change sketch in config file
+            deviceContext.showStatusBar();
             // Arduino board manager & library manager
             arduinoApp.boardManager = new BoardManager(arduinoSettings, arduinoApp);
             ArduinoContext.boardManager = arduinoApp.boardManager;
