@@ -169,7 +169,14 @@ export async function activate(context: vscode.ExtensionContext) {
         let installed =  false;
         const installedBoards = ArduinoContext.boardManager.installedBoards;
         installedBoards.forEach((board: IBoard, key: string) => {
-            if (packageName === board.platform.package.name &&
+            let _packageName: string;
+            if (board.platform.package && board.platform.package.name) {
+                _packageName = board.platform.package.name;
+            } else {
+                _packageName = board.platform.packageName;
+            }
+
+            if (packageName === _packageName &&
                     arch === board.platform.architecture &&
                     (!version || version === board.platform.installedVersion)) {
                 installed = true;
