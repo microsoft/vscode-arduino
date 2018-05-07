@@ -453,6 +453,14 @@
         "mimetypes": [
           "text/x-code-output"
         ]
+      }, {
+        "id": "arduino",
+        "extensions": [
+          ".ino"
+        ],
+        "aliases": [
+          "Arduino"
+        ]
       }
     ],
     "grammars": [
