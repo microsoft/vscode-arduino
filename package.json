@@ -36,6 +36,8 @@
     "*",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
+    "onCommand:arduino.uploadByProgrammer",
+    "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
     "onCommand:arduino.addLibPath",
@@ -74,6 +76,14 @@
       {
         "command": "arduino.upload",
         "title": "Arduino: Upload"
+      },
+      {
+        "command": "arduino.uploadByProgrammer",
+        "title": "Arduino: Upload Using Programmer"
+      },
+      {
+        "command": "arduino.selectProgrammer",
+        "title": "Arduino: Select Programmer"
       },
       {
         "command": "arduino.selectSerialPort",

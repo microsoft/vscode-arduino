@@ -11,6 +11,7 @@ import { ExampleProvider } from "./arduino/exampleProvider";
 import { LibraryManager } from "./arduino/libraryManager";
 import ArduinoContext from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
+import { ProgrammerManager } from "./arduino/programmerManager";
 
 class ArduinoActivator {
     private _initializePromise: Promise<void>;
@@ -35,6 +36,7 @@ class ArduinoActivator {
             await arduinoApp.boardManager.loadPackages();
             arduinoApp.libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
             arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
+            arduinoApp.programmerManager = new ProgrammerManager(arduinoSettings, arduinoApp);
             ArduinoContext.arduinoApp = arduinoApp;
 
             const exampleProvider = new ExampleProvider(arduinoApp.exampleManager, arduinoApp.boardManager);

@@ -26,6 +26,7 @@ export const messages = {
     FAILED_SEND_SERIALPORT: "Failed to send message to serial port.",
     SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
     SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",
+    NO_PROGRAMMMER_SELECTED: "Please select the programmer first.",
 };
 
 export const statusBarPriority = {
@@ -34,4 +35,5 @@ export const statusBarPriority = {
     BAUD_RATE: 40,
     BOARD: 60,
     ENDING: 70,
+    PROGRAMMER: 80,
 };
