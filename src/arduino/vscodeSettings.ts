@@ -10,6 +10,7 @@ const configKeys = {
     LOG_LEVEL: "arduino.logLevel",
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
     ENABLE_USB_DETECTOIN: "arduino.enableUSBDetection",
+    DISABLE_TESTING_OPEN: "arduino.disableTestingOpen",
 };
 
 export interface IVscodeSettings {
@@ -18,6 +19,7 @@ export interface IVscodeSettings {
     additionalUrls: string | string[];
     logLevel: string;
     enableUSBDetection: boolean;
+    disableTestingOpen: boolean;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -51,6 +53,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get enableUSBDetection(): boolean {
         return this.getConfigValue<boolean>(configKeys.ENABLE_USB_DETECTOIN);
+    }
+
+    public get disableTestingOpen(): boolean {
+        return this.getConfigValue<boolean>(configKeys.DISABLE_TESTING_OPEN);
     }
 
     public async updateAdditionalUrls(value) {

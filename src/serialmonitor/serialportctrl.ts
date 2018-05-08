@@ -3,6 +3,7 @@
 
 import * as os from "os";
 import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 
 interface ISerialPortDetail {
   comName: string;
@@ -78,6 +79,11 @@ export class SerialPortCtrl {
         this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
         this._outputChannel.show();
         this._currentSerialPort.on("open", () => {
+          if (VscodeSettings.getInstance().disableTestingOpen) {
+            this._outputChannel.appendLine("[Warning] Auto checking serial port open is disabled");
+            return resolve();
+          }
+
           this._currentSerialPort.write("TestingOpen", "Both NL & CR", (err) => {
             // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
             if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {

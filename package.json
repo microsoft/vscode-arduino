@@ -436,6 +436,10 @@
         "arduino.enableUSBDetection": {
           "type": "boolean",
           "default": true
+        },
+        "arduino.disableTestingOpen": {
+          "type": "boolean",
+          "default": false
         }
       }
     },
