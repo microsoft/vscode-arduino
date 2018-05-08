@@ -31,11 +31,6 @@ export class ProgrammerManager {
 
     private _programmerStatusBar: vscode.StatusBarItem;
 
-    /**
-     * Need refresh Arduino IDE's setting when starting up.
-     * @param {boolean} force - Whether force initialize the arduino
-     */
-
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._programmerStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PROGRAMMER);
         this._programmerStatusBar.command = "arduino.selectProgrammer";
