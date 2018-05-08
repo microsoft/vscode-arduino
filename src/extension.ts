@@ -140,7 +140,12 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "verify";
             try {
-                await ArduinoContext.arduinoApp.verify();
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    title: "Arduino: Verifing...",
+                }, async () => {
+                    await ArduinoContext.arduinoApp.verify();
+                });
             } catch (ex) {
             }
             delete status.compile;
@@ -153,13 +158,39 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await ArduinoContext.arduinoApp.upload();
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    title: "Arduino: Uploading...",
+                }, async () => {
+                    await ArduinoContext.arduinoApp.upload();
+                });
             } catch (ex) {
             }
             delete status.compile;
         }
     }, () => {
         return { board: ArduinoContext.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.setSketchFile", async () => {
+        const sketchFileName = deviceContext.sketch;
+        const newSketchFileName = await vscode.window.showInputBox({
+            placeHolder: sketchFileName,
+            validateInput: (value) => {
+                if (value && /^\w+\.((ino)|(cpp)|c)$/.test(value.trim())) {
+                    return null;
+                } else {
+                    return "Invalid sketch file name. Should be *.ino/*.cpp/*.c";
+                }
+            },
+        });
+
+        if (!newSketchFileName) {
+            return;
+        }
+
+        deviceContext.sketch = newSketchFileName;
+        deviceContext.showStatusBar();
     });
 
     registerArduinoCommand("arduino.uploadByProgrammer", async () => {
@@ -186,7 +217,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     }, () => {
         return { board: ArduinoContext.boardManager.currentBoard.name };
-    });
+     });
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
@@ -195,7 +226,14 @@ export async function activate(context: vscode.ExtensionContext) {
         let installed =  false;
         const installedBoards = ArduinoContext.boardManager.installedBoards;
         installedBoards.forEach((board: IBoard, key: string) => {
-            if (packageName === board.platform.package.name &&
+            let _packageName: string;
+            if (board.platform.package && board.platform.package.name) {
+                _packageName = board.platform.package.name;
+            } else {
+                _packageName = board.platform.packageName;
+            }
+
+            if (packageName === _packageName &&
                     arch === board.platform.architecture &&
                     (!version || version === board.platform.installedVersion)) {
                 installed = true;

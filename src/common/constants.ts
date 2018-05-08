@@ -35,5 +35,6 @@ export const statusBarPriority = {
     BAUD_RATE: 40,
     BOARD: 60,
     ENDING: 70,
-    PROGRAMMER: 80,
+    SKETCH: 80,
+    PROGRAMMER: 90,
 };

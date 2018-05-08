@@ -53,6 +53,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.showExampleExplorer",
                     "arduino.loadPackages",
                     "arduino.installBoard",
+                    "arduino.setSketchFile",
                 ];
 
                 const foundArduinoCommands = commands.filter((value) => {

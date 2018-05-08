@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -446,6 +446,10 @@
         "arduino.enableUSBDetection": {
           "type": "boolean",
           "default": true
+        },
+        "arduino.disableTestingOpen": {
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -462,6 +466,14 @@
         "id": "arduino-output",
         "mimetypes": [
           "text/x-code-output"
+        ]
+      }, {
+        "id": "arduino",
+        "extensions": [
+          ".ino"
+        ],
+        "aliases": [
+          "Arduino"
         ]
       }
     ],
