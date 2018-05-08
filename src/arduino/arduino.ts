@@ -180,7 +180,8 @@ export class ArduinoApp {
         await vscode.workspace.saveAll(false);
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer --pref programmer=arduino:", selectProgrammer, appPath];
+        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
+                "--pref", "programmer=" + selectProgrammer, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }

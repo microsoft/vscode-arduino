@@ -9,9 +9,9 @@ import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { ExampleProvider } from "./arduino/exampleProvider";
 import { LibraryManager } from "./arduino/libraryManager";
+import { ProgrammerManager } from "./arduino/programmerManager";
 import ArduinoContext from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
-import { ProgrammerManager } from "./arduino/programmerManager";
 
 class ArduinoActivator {
     private _initializePromise: Promise<void>;

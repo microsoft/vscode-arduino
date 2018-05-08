@@ -61,46 +61,46 @@ export class ProgrammerManager {
         this._programmerStatusBar.text = chosen;
     }
 
-    public getProgrammer(newProgrammer: ProgrammerList) {       
+    public getProgrammer(newProgrammer: ProgrammerList) {
         switch (newProgrammer) {
             case ProgrammerList["AVR ISP"]:
-                this._programmervalue = "avrisp";
+                this._programmervalue = "arduino:avrisp";
                 break;
             case ProgrammerList["AVRISP mkII"]:
-                this._programmervalue = "avrispmkii";
+                this._programmervalue = "arduino:avrispmkii";
                 break;
             case ProgrammerList.USBtinyISP:
-                this._programmervalue = "usbtinyisp";
+                this._programmervalue = "arduino:usbtinyisp";
                 break;
             case ProgrammerList.ArduinoISP:
-                this._programmervalue = "arduinoisp";
+                this._programmervalue = "arduino:arduinoisp";
                 break;
             case ProgrammerList.USBasp:
-                this._programmervalue = "usbasp";
+                this._programmervalue = "arduino:usbasp";
                 break;
             case ProgrammerList["Parallel Programmer"]:
-                this._programmervalue = "parallel";
+                this._programmervalue = "arduino:parallel";
                 break;
             case ProgrammerList["Arduino as ISP"]:
-                this._programmervalue = "arduinoasisp";
+                this._programmervalue = "arduino:arduinoasisp";
                 break;
             case ProgrammerList["Arduino Gemma"]:
-                this._programmervalue = "usbGemma";
+                this._programmervalue = "arduino:usbGemma";
                 break;
             case ProgrammerList["BusPirate as ISP"]:
-                this._programmervalue = "buspirate";
+                this._programmervalue = "arduino:buspirate";
                 break;
             case ProgrammerList["Atmel STK500 development board"]:
-                this._programmervalue = "stk500";
+                this._programmervalue = "arduino:stk500";
                 break;
             case ProgrammerList["Atmel JTAGICE3 (ISP mode)"]:
-                this._programmervalue = "jtag3isp";
+                this._programmervalue = "arduino:jtag3isp";
                 break;
             case ProgrammerList["Atmel JTAGICE3 (JTAG mode)"]:
-                this._programmervalue = "jtag3";
+                this._programmervalue = "arduino:jtag3";
                 break;
             case ProgrammerList["Atmel-ICE (AVR)"]:
-                this._programmervalue = "atmel_ice";
+                this._programmervalue = "arduino:atmel_ice";
                 break;
             default:
                 break;
