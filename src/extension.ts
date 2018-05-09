@@ -217,7 +217,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     }, () => {
         return { board: ArduinoContext.boardManager.currentBoard.name };
-     });
+    });
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
