@@ -193,7 +193,7 @@ export async function activate(context: vscode.ExtensionContext) {
         deviceContext.showStatusBar();
     });
 
-    registerArduinoCommand("arduino.uploadByProgrammer", async () => {
+    registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
         if (!status.compile) {
             status.compile = "upload";
             try {

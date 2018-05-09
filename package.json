@@ -36,7 +36,7 @@
     "*",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
-    "onCommand:arduino.uploadByProgrammer",
+    "onCommand:arduino.uploadUsingProgrammer",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
@@ -78,7 +78,7 @@
         "title": "Arduino: Upload"
       },
       {
-        "command": "arduino.uploadByProgrammer",
+        "command": "arduino.uploadUsingProgrammer",
         "title": "Arduino: Upload Using Programmer"
       },
       {
@@ -467,7 +467,7 @@
         "mimetypes": [
           "text/x-code-output"
         ]
-      }, {
+        }, {
         "id": "arduino",
         "extensions": [
           ".ino"

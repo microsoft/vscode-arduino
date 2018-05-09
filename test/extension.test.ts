@@ -34,7 +34,7 @@ suite("Arduino: Extension Tests", () => {
                 const ARDUINO_COMMANDS = [
                     "arduino.verify",
                     "arduino.upload",
-                    "arduino.uploadByProgrammer",
+                    "arduino.uploadUsingProgrammer",
                     "arduino.selectProgrammer",
                     "arduino.showBoardManager",
                     "arduino.showLibraryManager",
