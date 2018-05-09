@@ -1,6 +1,22 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.15
+- Release date: May 14, 2018
+
+### Added
+- Add a sketch file button in status bar to reset sketch file [#481](https://github.com/Microsoft/vscode-arduino/issues/481)
+- Add loading status bar for verify and build command [#137](https://github.com/Microsoft/vscode-arduino/issues/137)
+- Add `prebuild` support in `arduio.json` [#411](https://github.com/Microsoft/vscode-arduino/issues/411)
+- Add upload using programmer command [#407](https://github.com/Microsoft/vscode-arduino/issues/407)
+- Add ignore option for board detection notification [#495](https://github.com/Microsoft/vscode-arduino/issues/495)
+- Add settings for disable/enable serial monitor TestingOpen [#530](https://github.com/Microsoft/vscode-arduino/issues/530)
+
+### Fixed
+- Fix intellisense issue of `c_cpp_properties.json` (preview) [#438](https://github.com/Microsoft/vscode-arduino/issues/438)
+
+Special thanks to [Joel Santos](https://github.com/mundodisco8), [John](https://github.com/VashJuan), [mybayern1974](https://github.com/mybayern1974), [Maxime Paquatte](https://github.com/maxime-paquatte), [Joe Saavedra](https://github.com/jmsaavedra), [Kye Burchard](https://github.com/kyeb), [Laurent Haas - F6FVY](https://github.com/f6fvy), thank you for your feedbacks.
+
 ## Version 0.2.14
 - Release date: May 4, 2018
 
