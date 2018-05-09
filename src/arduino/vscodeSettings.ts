@@ -11,6 +11,7 @@ const configKeys = {
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
     ENABLE_USB_DETECTOIN: "arduino.enableUSBDetection",
     DISABLE_TESTING_OPEN: "arduino.disableTestingOpen",
+    IGNORE_BOARDS: "arduino.ignoreBoards",
 };
 
 export interface IVscodeSettings {
@@ -20,6 +21,7 @@ export interface IVscodeSettings {
     logLevel: string;
     enableUSBDetection: boolean;
     disableTestingOpen: boolean;
+    ignoreBoards: string[];
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -57,6 +59,14 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get disableTestingOpen(): boolean {
         return this.getConfigValue<boolean>(configKeys.DISABLE_TESTING_OPEN);
+    }
+
+    public get ignoreBoards(): string[] {
+        return this.getConfigValue<string[]>(configKeys.IGNORE_BOARDS);
+    }
+
+    public set ignoreBoards(value: string[]) {
+        this.setConfigValue(configKeys.IGNORE_BOARDS, value, true);
     }
 
     public async updateAdditionalUrls(value) {
