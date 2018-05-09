@@ -22,6 +22,7 @@ import { arduinoChannel } from "../common/outputChannel";
 import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
+import { ProgrammerManager } from "./programmerManager";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -33,6 +34,8 @@ export class ArduinoApp {
     private _libraryManager: LibraryManager;
 
     private _exampleManager: ExampleManager;
+
+    private _programmerManager: ProgrammerManager;
 
     /**
      * @param {IArduinoSettings} _settings ArduinoSetting object.
@@ -133,6 +136,64 @@ export class ArduinoApp {
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+        if (VscodeSettings.getInstance().logLevel === "verbose") {
+            args.push("--verbose");
+        }
+        if (dc.output) {
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
+            args.push("--pref", `build.path=${outputPath}`);
+        } else {
+            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
+            arduinoChannel.warning(msg);
+        }
+        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+            UsbDetector.getInstance().resumeListening();
+            if (needRestore) {
+                await serialMonitor.openSerialMonitor();
+            }
+            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+        }, (reason) => {
+            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+        });
+    }
+
+    public async uploadUsingProgrammer() {
+        const dc = DeviceContext.getInstance();
+        const boardDescriptor = this.getBoardBuildString();
+        if (!boardDescriptor) {
+            return;
+        }
+
+        const selectProgrammer = this.getProgrammerString();
+        if (!selectProgrammer) {
+            return;
+        }
+
+        if (!ArduinoWorkspace.rootPath) {
+            vscode.window.showWarningMessage("Cannot find the sketch file.");
+            return;
+        }
+
+        if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
+            await this.getMainSketch(dc);
+        }
+        if (!dc.port) {
+            vscode.window.showErrorMessage("Please specify the upload serial port.");
+            return;
+        }
+
+        arduinoChannel.show();
+        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+
+        const serialMonitor = SerialMonitor.getInstance();
+
+        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+        UsbDetector.getInstance().pauseListening();
+        await vscode.workspace.saveAll(false);
+
+        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
+                "--pref", "programmer=" + selectProgrammer, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
@@ -526,6 +587,23 @@ export class ArduinoApp {
 
     public set exampleManager(value: ExampleManager) {
         this._exampleManager = value;
+    }
+
+    public get programmerManager() {
+        return this._programmerManager;
+    }
+
+    public set programmerManager(value: ProgrammerManager) {
+        this._programmerManager = value;
+    }
+
+    private getProgrammerString(): string {
+        const selectProgrammer = this.programmerManager.currentProgrammer;
+        if (!selectProgrammer) {
+            Logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
+            return;
+        }
+        return selectProgrammer;
     }
 
     private getBoardBuildString(): string {

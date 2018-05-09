@@ -9,6 +9,7 @@ import { BoardManager } from "./arduino/boardManager";
 import { ExampleManager } from "./arduino/exampleManager";
 import { ExampleProvider } from "./arduino/exampleProvider";
 import { LibraryManager } from "./arduino/libraryManager";
+import { ProgrammerManager } from "./arduino/programmerManager";
 import ArduinoContext from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
 
@@ -37,6 +38,7 @@ class ArduinoActivator {
             await arduinoApp.boardManager.loadPackages();
             arduinoApp.libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
             arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
+            arduinoApp.programmerManager = new ProgrammerManager(arduinoSettings, arduinoApp);
             ArduinoContext.arduinoApp = arduinoApp;
 
             const exampleProvider = new ExampleProvider(arduinoApp.exampleManager, arduinoApp.boardManager);

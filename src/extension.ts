@@ -193,6 +193,32 @@ export async function activate(context: vscode.ExtensionContext) {
         deviceContext.showStatusBar();
     });
 
+    registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
+        if (!status.compile) {
+            status.compile = "upload";
+            try {
+                await ArduinoContext.arduinoApp.uploadUsingProgrammer();
+            } catch (ex) {
+            }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: ArduinoContext.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.selectProgrammer", async () => {
+        if (!status.compile) {
+            status.compile = "upload";
+            try {
+                await ArduinoContext.arduinoApp.programmerManager.selectProgrammer();
+            } catch (ex) {
+            }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: ArduinoContext.boardManager.currentBoard.name };
+    });
+
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => ArduinoContext.arduinoApp.openExample(path));
     registerArduinoCommand("arduino.loadPackages", async () => await ArduinoContext.boardManager.loadPackages(true));

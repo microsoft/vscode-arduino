@@ -47,6 +47,7 @@ This extension provides several commands in the Command Palette (`F1` or `Ctrl +
 - **Arduino: Select Serial Port**: Change the current serial port.
 - **Arduino: Send Text to Serial Port**: Send a line of text via the current serial port.
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
+- **Arduino: Upload Using Programmer**: Upload using an external programmer.
 - **Arduino: Verify**: Build sketch.
 
 ## Options
