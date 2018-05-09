@@ -440,6 +440,10 @@
         "arduino.disableTestingOpen": {
           "type": "boolean",
           "default": false
+        },
+        "arduino.ignoreBoards": {
+          "type": "array",
+          "default": []
         }
       }
     },
