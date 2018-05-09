@@ -77,7 +77,12 @@ export class UsbDetector {
                 let bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
                 if (!bd) {
                     ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackageContent) => {
-                        vscode.window.showInformationMessage(`Install board package for ${deviceDescriptor.name}`, "Yes", "No").then((ans) => {
+                        const ignoreBoards = VscodeSettings.getInstance().ignoreBoards || [];
+                        if (ignoreBoards.indexOf(deviceDescriptor.name) >= 0) {
+                            return;
+                        }
+                        vscode.window.showInformationMessage(`Install board package for ${
+                                deviceDescriptor.name}`, "Yes", "No", "Don't ask again").then((ans) => {
                             if (ans === "Yes") {
                                 ArduinoContext.arduinoApp.installBoard(deviceDescriptor.package, deviceDescriptor.architecture)
                                     .then(() => {
@@ -88,6 +93,9 @@ export class UsbDetector {
                                         bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
                                         this.switchBoard(bd, deviceDescriptor);
                                     });
+                            } else if (ans === "Don't ask again") {
+                                ignoreBoards.push(deviceDescriptor.name);
+                                VscodeSettings.getInstance().ignoreBoards = ignoreBoards;
                             }
                         });
                     });
@@ -96,11 +104,18 @@ export class UsbDetector {
                     if (currBoard.board !== deviceDescriptor.id
                         || currBoard.platform.architecture !== deviceDescriptor.architecture
                         || currBoard.getPackageName() !== deviceDescriptor.package) {
+                        const ignoreBoards = VscodeSettings.getInstance().ignoreBoards || [];
+                        if (ignoreBoards.indexOf(deviceDescriptor.name) >= 0) {
+                            return;
+                        }
                         vscode.window.showInformationMessage(`Detected board ${deviceDescriptor.name}. Would you like to switch to this board type?`,
-                            "Yes", "No")
+                            "Yes", "No", "Don't ask again")
                             .then((ans) => {
                                 if (ans === "Yes") {
                                     return this.switchBoard(bd, deviceDescriptor);
+                                } else if (ans === "Don't ask again") {
+                                    ignoreBoards.push(deviceDescriptor.name);
+                                    VscodeSettings.getInstance().ignoreBoards = ignoreBoards;
                                 }
                             });
                     } else {
