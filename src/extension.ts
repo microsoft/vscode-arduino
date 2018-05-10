@@ -177,7 +177,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const newSketchFileName = await vscode.window.showInputBox({
             placeHolder: sketchFileName,
             validateInput: (value) => {
-                if (value && /^\w+\.((ino)|(cpp)|c)$/.test(value.trim())) {
+                if (value && /\.((ino)|(cpp)|c)$/.test(value.trim())) {
                     return null;
                 } else {
                     return "Invalid sketch file name. Should be *.ino/*.cpp/*.c";
