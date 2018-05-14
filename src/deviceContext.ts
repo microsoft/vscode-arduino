@@ -249,7 +249,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public get prebuild() {
-        return this._prebuild.trim ? this._prebuild.trim() : "";
+        return this._prebuild ? this._prebuild.trim() : "";
     }
 
     public get output() {
