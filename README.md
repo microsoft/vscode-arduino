@@ -60,7 +60,8 @@ The following Visual Studio Code settings are available for the Arduino extensio
     "arduino.additionalUrls": "",
     "arduino.logLevel": "info",
     "arduino.enableUSBDetection": true,
-    "arduino.disableTestingOpen": false
+    "arduino.disableTestingOpen": false,
+    "arduino.skipHeaderProvider": false,
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
@@ -69,6 +70,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
 - `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`.
 - `arduino.disableTestingOpen` - Disable/enable auto sending a test message to serial port for checking open status. The default value is `false` (a test message will be sent).
+- `arduino.skipHeaderProvider` - Enable/disable the extension providing completion items for headers. The functionality is included in newer versions of the C++ extension. The default value is `false`.
 
 The following settings are per sketch settings of the Arduino extension. You can find them in
 `.vscode/arduino.json` under the workspace.
