@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.16
+- Release date: May 30, 2018
+
+### Added
+- Add a way to skip header file provider [#565](https://github.com/Microsoft/vscode-arduino/pull/565)
+
+### Fixed
+- Fix arduino example display an empty tab issue [#533](https://github.com/Microsoft/vscode-arduino/issues/533)
+- Fix the error message when cannot resolve arduino path [#566](https://github.com/Microsoft/vscode-arduino/issues/566)
+
+Special thanks to [Thad House](https://github.com/ThadHouse), [Carlos Gomez](https://github.com/Kurolox), [Johannes Henninger](https://github.com/jhenninger), thank you for your contributions and feedbacks.
+
 ## Version 0.2.15
 - Release date: May 14, 2018
 
