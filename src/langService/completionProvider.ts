@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 import { ArduinoWorkspace } from "../common/workspace";
@@ -35,6 +36,9 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
     public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position):
          Promise<vscode.CompletionItem[]> {
+        if (VscodeSettings.getInstance().skipHeaderProvider) {
+            return [];
+        }
         if (!ArduinoContext.initialized) {
             await ArduinoActivator.activate();
         }
