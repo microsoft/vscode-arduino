@@ -111,6 +111,9 @@ export class ExampleManager {
     private async parseExamplesFromLibrary(rootPath: string, checkCompatibility: boolean, categorizeIncompatible: boolean = false) {
         const examples = [];
         const inCompatibles = [];
+        if (!util.directoryExistsSync(rootPath)) {
+            return [];
+        }
         const libraries = util.readdirSync(rootPath, true);
         for (const library of libraries) {
             const propertiesFile = path.join(rootPath, library, "library.properties");
