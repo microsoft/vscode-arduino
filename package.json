@@ -454,6 +454,10 @@
         "arduino.ignoreBoards": {
           "type": "array",
           "default": []
+        },
+        "arduino.skipHeaderProvider": {
+          "type": "boolean",
+          "default": false
         }
       }
     },

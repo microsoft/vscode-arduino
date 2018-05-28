@@ -12,6 +12,7 @@ const configKeys = {
     ENABLE_USB_DETECTOIN: "arduino.enableUSBDetection",
     DISABLE_TESTING_OPEN: "arduino.disableTestingOpen",
     IGNORE_BOARDS: "arduino.ignoreBoards",
+    SKIP_HEADER_PROVIDER: "arduino.skipHeaderProvider",
 };
 
 export interface IVscodeSettings {
@@ -22,6 +23,7 @@ export interface IVscodeSettings {
     enableUSBDetection: boolean;
     disableTestingOpen: boolean;
     ignoreBoards: string[];
+    skipHeaderProvider: boolean;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -67,6 +69,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public set ignoreBoards(value: string[]) {
         this.setConfigValue(configKeys.IGNORE_BOARDS, value, true);
+    }
+
+    public get skipHeaderProvider(): boolean {
+        return this.getConfigValue<boolean>(configKeys.SKIP_HEADER_PROVIDER);
     }
 
     public async updateAdditionalUrls(value) {
