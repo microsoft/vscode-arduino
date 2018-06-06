@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## Version 0.2.16
-- Release date: May 30, 2018
+- Release date: June 6, 2018
 
 ### Added
 - Add a way to skip header file provider [#565](https://github.com/Microsoft/vscode-arduino/pull/565)
