@@ -131,7 +131,7 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.reloadExample", () => {
         arduinoManagerProvider.update(EXAMPLES_URI);
     }, () => {
-        return { board: ArduinoContext.boardManager.currentBoard.name };
+        return { board: (ArduinoContext.boardManager.currentBoard === null) ? null : ArduinoContext.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
@@ -151,7 +151,7 @@ export async function activate(context: vscode.ExtensionContext) {
             delete status.compile;
         }
     }, () => {
-        return { board: ArduinoContext.boardManager.currentBoard.name };
+        return { board: (ArduinoContext.boardManager.currentBoard === null) ? null : ArduinoContext.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.upload", async () => {
@@ -216,7 +216,7 @@ export async function activate(context: vscode.ExtensionContext) {
             delete status.compile;
         }
     }, () => {
-        return { board: ArduinoContext.boardManager.currentBoard.name };
+        return { board: (ArduinoContext.boardManager.currentBoard === null) ? null : ArduinoContext.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContext.arduinoApp.addLibPath(path));

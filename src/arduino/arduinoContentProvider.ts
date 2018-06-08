@@ -236,7 +236,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public async getBoardConfig(req, res) {
         return res.json({
-            configitems: ArduinoContext.boardManager.currentBoard.configItems,
+            configitems: (ArduinoContext.boardManager.currentBoard === null) ? null : ArduinoContext.boardManager.currentBoard.configItems,
         });
     }
 
