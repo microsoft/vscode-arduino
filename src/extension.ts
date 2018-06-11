@@ -4,6 +4,7 @@
 import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
+import * as constants from "./common/constants";
 
 import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
 import { IBoard } from "./arduino/package";
@@ -80,6 +81,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
+            }
+
+            const arduinoPath = ArduinoContext.arduinoApp.settings.arduinoPath;
+            if (!arduinoPath) { // Pop up vscode User Settings page when cannot resolve arduino path.
+                Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
             }
 
             await commandExecution(command, commandBody, args, getUserData);
