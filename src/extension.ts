@@ -14,6 +14,7 @@ import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
     LIBRARY_MANAGER_URI,
 } from "./common/constants";
+import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
 import { ArduinoWorkspace } from "./common/workspace";
 import { ArduinoDebugConfigurationProvider } from "./debug/configurationProvider";
@@ -84,11 +85,11 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             const arduinoPath = ArduinoContext.arduinoApp.settings.arduinoPath;
-            if (!arduinoPath) { // Pop up vscode User Settings page when cannot resolve arduino path.
+            if (!arduinoPath || !validateArduinoPath(arduinoPath)) { // Pop up vscode User Settings page when cannot resolve arduino path.
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
+            } else {
+                await commandExecution(command, commandBody, args, getUserData);
             }
-
-            await commandExecution(command, commandBody, args, getUserData);
         }));
     };
 
