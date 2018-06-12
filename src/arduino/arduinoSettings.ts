@@ -208,9 +208,5 @@ export class ArduinoSettings implements IArduinoSettings {
         } else {
             this._arduinoPath = configValue;
         }
-
-        if (!this._arduinoPath || !validateArduinoPath(this._arduinoPath)) {
-            vscode.commands.executeCommand("workbench.action.openGlobalSettings");
-        }
     }
 }
