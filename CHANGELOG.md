@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.17
+- Release date: June 15, 2018
+
+### Fixed
+- Fix errors that frequently happened [#555](https://github.com/Microsoft/vscode-arduino/issues/555)
+- Check Arduino IDE in command palette when cannot resolve arduino path [#583](https://github.com/Microsoft/vscode-arduino/issues/583)
+
 ## Version 0.2.16
 - Release date: June 6, 2018
 
