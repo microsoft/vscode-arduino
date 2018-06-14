@@ -386,6 +386,10 @@ export class ArduinoApp {
         if (updatingIndex) {
             arduinoChannel.start(`Update package index files...`);
         } else {
+            const packagePath = path.join(this._settings.packagePath, "packages", packageName);
+            if (util.directoryExistsSync(packagePath)) {
+                util.rmdirRecursivelySync(packagePath);
+            }
             arduinoChannel.start(`Install package - ${packageName}...`);
         }
         try {
