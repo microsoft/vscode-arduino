@@ -386,7 +386,19 @@ export class ArduinoApp {
         if (updatingIndex) {
             arduinoChannel.start(`Update package index files...`);
         } else {
-            arduinoChannel.start(`Install package - ${packageName}...`);
+            try {
+                const packagePath = path.join(this._settings.packagePath, "packages", packageName);
+                if (util.directoryExistsSync(packagePath)) {
+                    util.rmdirRecursivelySync(packagePath);
+                }
+                arduinoChannel.start(`Install package - ${packageName}...`);
+            } catch (error) {
+                arduinoChannel.start(`Install package - ${packageName} failed under directory : ${error.path}${os.EOL}
+Please make sure the folder is not occupied by other procedures .`);
+                arduinoChannel.error(`Error message - ${error.message}${os.EOL}`);
+                arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+                return;
+            }
         }
         try {
             await util.spawn(this._settings.commandPath,
