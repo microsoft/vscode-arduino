@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fix errors that frequently happened [#555](https://github.com/Microsoft/vscode-arduino/issues/555)
 - Check Arduino IDE in command palette when cannot resolve arduino path [#583](https://github.com/Microsoft/vscode-arduino/issues/583)
+- Fix g++ not find issue when upgrade the board sdk to a new version [#586](https://github.com/Microsoft/vscode-arduino/issues/586)
 
 ## Version 0.2.16
 - Release date: June 6, 2018
