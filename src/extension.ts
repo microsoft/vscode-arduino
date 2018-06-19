@@ -150,7 +150,7 @@ export async function activate(context: vscode.ExtensionContext) {
             try {
                 await vscode.window.withProgress({
                     location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Verifing...",
+                    title: "Arduino: Verifying...",
                 }, async () => {
                     await ArduinoContext.arduinoApp.verify();
                 });
