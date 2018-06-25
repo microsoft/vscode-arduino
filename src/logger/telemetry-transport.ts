@@ -50,7 +50,7 @@ export class TelemetryTransport extends winston.Transport {
                 const properties: { [key: string]: string; } = { level };
                 const measures: { [key: string]: number; } = {};
                 for (const key of Object.keys(metadata)) {
-                    if (typeof key === "string" || key instanceof String) {
+                    if (typeof key === "string") {
                         const value = metadata[key];
                         if (value === null || typeof value === "string" || value instanceof String) {
                             properties[key] = value;
