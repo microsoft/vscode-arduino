@@ -531,7 +531,7 @@
     "gulp-tslint": "^7.0.1",
     "gulp-typescript": "^3.1.5",
     "gulp-util": "^3.0.8",
-    "mocha": "^2.3.3",
+    "mocha": "^4.1.0",
     "run-sequence": "^1.2.2",
     "tslint": "^4.2.0",
     "typemoq": "^1.6.0",
