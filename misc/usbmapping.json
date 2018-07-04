@@ -195,5 +195,17 @@
         "target": "stm32f1x.cfg"
       }
     ]
+  },
+  {
+    "boards": [
+      {
+        "name": "Seeed Wio 3G",
+        "package": "SeeedJP",
+        "architecture": "SeeedJP_STM32F4",
+        "id": "Wio3G",
+        "interface": "cmsis-dap.cfg",
+        "target": "stm32f4x.cfg"
+      }
+    ]
   }
 ]
