@@ -301,8 +301,6 @@ export class ArduinoApp {
         deviceContext.configurations.forEach((section) => {
             if (section.name === util.getCppConfigPlatform()) {
                 configSection = section;
-                configSection.browse = configSection.browse || {};
-                configSection.browse.limitSymbolsToIncludedHeaders = false;
             }
         });
 
@@ -310,7 +308,6 @@ export class ArduinoApp {
             configSection = {
                 name: util.getCppConfigPlatform(),
                 includePath: [],
-                browse: { limitSymbolsToIncludedHeaders: false },
             };
             deviceContext.configurations.push(configSection);
         }
@@ -327,20 +324,6 @@ export class ArduinoApp {
                 configSection.includePath = [];
             }
             configSection.includePath.unshift(childLibPath);
-        });
-
-        libPaths.forEach((childLibPath) => {
-            childLibPath = path.resolve(path.normalize(childLibPath));
-            if (configSection.browse.path && configSection.browse.path.length) {
-                for (const existingPath of configSection.browse.path) {
-                    if (childLibPath === path.resolve(path.normalize(existingPath))) {
-                        return;
-                    }
-                }
-            } else {
-                configSection.browse.path = [];
-            }
-            configSection.browse.path.unshift(childLibPath);
         });
 
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
@@ -475,13 +458,21 @@ Please make sure the folder is not occupied by other procedures .`);
             return result;
         }
         const toolsPath = boardDescriptor.platform.rootBoardPath;
-        if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
-            const coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
-            if (coreLibs && coreLibs.length > 0) {
-                coreLibs.forEach((coreLib) => {
-                    result.push(path.normalize(path.join(toolsPath, "cores", coreLib)));
-                });
-            }
+        result.push(path.normalize(path.join(toolsPath, "**")));
+        // if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
+        //     const coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
+        //     if (coreLibs && coreLibs.length > 0) {
+        //         coreLibs.forEach((coreLib) => {
+        //             result.push(path.normalize(path.join(toolsPath, "cores", coreLib)));
+        //         });
+        //     }
+        // }
+        // return result;
+
+        // <package>/hardware/<platform>/<version> -> <package>/tools
+        const toolPath = path.join(toolsPath, "..", "..", "..", "tools");
+        if (fs.existsSync(toolPath)) {
+            result.push(path.normalize(path.join(toolPath, "**")));
         }
         return result;
     }
@@ -537,26 +528,23 @@ Please make sure the folder is not occupied by other procedures .`);
                 const cppConfigFilePath = path.join(destExample, constants.CPP_CONFIG_FILE);
 
                 // Current workspace
-                const includePath = ["${workspaceRoot}"];
+                let includePath = ["${workspaceRoot}"];
                 // Defaut package for this board
-                includePath.concat(this.getDefaultPackageLibPaths());
+                const defaultPackageLibPaths = this.getDefaultPackageLibPaths();
+                includePath = includePath.concat(defaultPackageLibPaths);
                 // Arduino built-in package tools
-                includePath.push(path.join(this._settings.arduinoPath, "hardware", "tools"));
+                includePath.push(path.join(this._settings.arduinoPath, "hardware", "tools", "**"));
                 // Arduino built-in libraries
-                includePath.push(path.join(this._settings.arduinoPath, "libraries"));
+                includePath.push(path.join(this._settings.arduinoPath, "libraries", "**"));
                 // Arduino custom package tools
-                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "hardware", "tools"));
+                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "hardware", "tools", "**"));
                 // Arduino custom libraries
-                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries"));
+                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries", "**"));
 
                 const cppConfig = {
                     configurations: [{
                         name: util.getCppConfigPlatform(),
                         includePath,
-                        browse: {
-                            path: includePath,
-                            limitSymbolsToIncludedHeaders: false,
-                        },
                         intelliSenseMode: "clang-x64",
                         cStandard: "c11",
                         cppStandard: "c++17",
