@@ -112,6 +112,14 @@
         "package": "esp8266",
         "architecture": "esp8266",
         "id": "thingdev"
+      },
+      {
+        "vid": "1a86",
+        "pid": "7523",
+        "name": "WeMos D1",
+        "package": "esp8266",
+        "architecture": "esp8266",
+        "id": "d1"
       }
     ]
   },
