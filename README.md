@@ -62,13 +62,22 @@ The following Visual Studio Code settings are available for the Arduino extensio
     "arduino.enableUSBDetection": true,
     "arduino.disableTestingOpen": false,
     "arduino.skipHeaderProvider": false,
+    "arduino.additionalUrls": [
+        "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json",
+        "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
+    ]
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
 - `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. You can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac, `bin/run-arduino.sh` for Linux."
-- `arduino.additionalUrls` - Additional URLs for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
+- `arduino.additionalUrls` - Additional Boards Manager Urls for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
-- `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`.
+- `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. when plug in your device to your computer, will pop up a message "Detected board ****, Would you like to switch to this board type", after click "yes" button, will automatically detect on which serial port (COM) is connected an usb device. if your device does not support this feature, please provide us with the pid/vid of device, the code format is defined in misc/usbmapping.json. 
+> To learn more about how to list the vid/pid, use this tools https://github.com/EmergingTechnologyAdvisors/node-serialport
+```bash
+npm install -g serialport
+serialport-list -f jsonline
+```
 - `arduino.disableTestingOpen` - Disable/enable auto sending a test message to serial port for checking open status. The default value is `false` (a test message will be sent).
 - `arduino.skipHeaderProvider` - Enable/disable the extension providing completion items for headers. The functionality is included in newer versions of the C++ extension. The default value is `false`.
 
