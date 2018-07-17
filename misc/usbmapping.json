@@ -112,6 +112,14 @@
         "package": "esp8266",
         "architecture": "esp8266",
         "id": "thingdev"
+      },
+      {
+        "vid": "1a86",
+        "pid": "7523",
+        "name": "WeMos D1",
+        "package": "esp8266",
+        "architecture": "esp8266",
+        "id": "d1"
       }
     ]
   },
@@ -140,8 +148,7 @@
         "architecture": "stm32f4",
         "id": "MXCHIP_AZ3166",
         "interface": "stlink-v2-1.cfg",
-        "target": "stm32f4x.cfg", 
-        "readme": "ReleaseNotes.html"
+        "target": "stm32f4x.cfg"
       }
     ]
   },
@@ -194,6 +201,18 @@
         "id": "genericGD32F103C",
         "interface": "stlink-v2.cfg",
         "target": "stm32f1x.cfg"
+      }
+    ]
+  },
+  {
+    "boards": [
+      {
+        "name": "Seeed Wio 3G",
+        "package": "SeeedJP",
+        "architecture": "SeeedJP_STM32F4",
+        "id": "Wio3G",
+        "interface": "cmsis-dap.cfg",
+        "target": "stm32f4x.cfg"
       }
     ]
   }

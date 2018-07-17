@@ -94,6 +94,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _vscodeWatcher: vscode.FileSystemWatcher;
 
+    private _sketchStatusBar: vscode.StatusBarItem;
+
+    private _prebuild: string;
+
     /**
      * @constructor
      */
@@ -107,6 +111,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             this._watcher.onDidChange(() => this.loadContext());
             this._watcher.onDidDelete(() => this.loadContext());
             this._vscodeWatcher.onDidDelete(() => this.loadContext());
+            this._sketchStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.SKETCH);
+            this._sketchStatusBar.command = "arduino.setSketchFile";
+            this._sketchStatusBar.tooltip = "Sketch File";
         }
     }
 
@@ -148,6 +155,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._output = deviceConfigJson.output;
                         this._debugger = deviceConfigJson["debugger"];
                         this._onDidChange.fire();
+                        this._prebuild = deviceConfigJson.prebuild;
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
@@ -160,6 +168,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._output = null;
                     this._debugger = null;
                     this._onDidChange.fire();
+                    this._prebuild = null;
                 }
                 return this;
             }, (reason) => {
@@ -176,9 +185,19 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 this._output = null;
                 this._debugger = null;
                 this._onDidChange.fire();
+                this._prebuild = null;
 
                 return this;
             });
+    }
+
+    public showStatusBar() {
+        if (!this._sketch) {
+            return false;
+        }
+
+        this._sketchStatusBar.text = this._sketch;
+        this._sketchStatusBar.show();
     }
 
     public saveContext() {
@@ -249,6 +268,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public set sketch(value: string) {
         this._sketch = value;
         this.saveContext();
+    }
+
+    public get prebuild() {
+        return this._prebuild ? this._prebuild.trim() : "";
     }
 
     public get output() {

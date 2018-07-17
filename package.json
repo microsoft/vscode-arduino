@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.12",
+  "version": "0.2.18",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -36,6 +36,8 @@
     "*",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
+    "onCommand:arduino.uploadUsingProgrammer",
+    "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
     "onCommand:arduino.addLibPath",
@@ -74,6 +76,14 @@
       {
         "command": "arduino.upload",
         "title": "Arduino: Upload"
+      },
+      {
+        "command": "arduino.uploadUsingProgrammer",
+        "title": "Arduino: Upload Using Programmer"
+      },
+      {
+        "command": "arduino.selectProgrammer",
+        "title": "Arduino: Select Programmer"
       },
       {
         "command": "arduino.selectSerialPort",
@@ -436,6 +446,18 @@
         "arduino.enableUSBDetection": {
           "type": "boolean",
           "default": true
+        },
+        "arduino.disableTestingOpen": {
+          "type": "boolean",
+          "default": false
+        },
+        "arduino.ignoreBoards": {
+          "type": "array",
+          "default": []
+        },
+        "arduino.skipHeaderProvider": {
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -452,6 +474,15 @@
         "id": "arduino-output",
         "mimetypes": [
           "text/x-code-output"
+        ]
+      },
+      {
+        "id": "cpp",
+        "extensions": [
+          ".ino"
+        ],
+        "aliases": [
+          "Arduino"
         ]
       }
     ],
@@ -500,7 +531,7 @@
     "gulp-tslint": "^7.0.1",
     "gulp-typescript": "^3.1.5",
     "gulp-util": "^3.0.8",
-    "mocha": "^2.3.3",
+    "mocha": "^4.1.0",
     "run-sequence": "^1.2.2",
     "tslint": "^4.2.0",
     "typemoq": "^1.6.0",

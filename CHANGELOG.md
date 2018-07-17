@@ -1,6 +1,73 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.18
+- Release date: July 17, 2018
+
+### Added
+- Add Wio 3G board and WeMos D1 board [#223](https://github.com/Microsoft/vscode-arduino/pull/223)
+
+### Fixed
+- Fix intellisense issue of `c_cpp_properties.json`
+- Fix "Verifying" is misspelled issue [#591](https://github.com/Microsoft/vscode-arduino/issues/591)
+- Improve config setting descriptions [#605](https://github.com/Microsoft/vscode-arduino/issues/605)
+
+Special thanks to [Takashi Matsuoka](https://github.com/matsujirushi), [Andrew Churchill](https://github.com/xxaxdxcxx), [Pharap](https://github.com/Pharap), thank you for your contributions and feedbacks.
+
+## Version 0.2.17
+- Release date: June 15, 2018
+
+### Fixed
+- Fix errors that frequently happened [#555](https://github.com/Microsoft/vscode-arduino/issues/555)
+- Check Arduino IDE in command palette when cannot resolve arduino path [#583](https://github.com/Microsoft/vscode-arduino/issues/583)
+- Fix g++ not find issue when upgrade the board sdk to a new version [#586](https://github.com/Microsoft/vscode-arduino/issues/586)
+
+## Version 0.2.16
+- Release date: June 6, 2018
+
+### Added
+- Add a way to skip header file provider [#565](https://github.com/Microsoft/vscode-arduino/pull/565)
+
+### Fixed
+- Fix arduino example display an empty tab issue [#533](https://github.com/Microsoft/vscode-arduino/issues/533)
+- Fix the error message when cannot resolve arduino path [#566](https://github.com/Microsoft/vscode-arduino/issues/566)
+
+Special thanks to [Thad House](https://github.com/ThadHouse), [Carlos Gomez](https://github.com/Kurolox), [Johannes Henninger](https://github.com/jhenninger), thank you for your contributions and feedbacks.
+
+## Version 0.2.15
+- Release date: May 14, 2018
+
+### Added
+- Add a sketch file button in status bar to reset sketch file [#481](https://github.com/Microsoft/vscode-arduino/issues/481)
+- Add loading status bar for verify and build command [#137](https://github.com/Microsoft/vscode-arduino/issues/137)
+- Add `prebuild` support in `arduio.json` [#411](https://github.com/Microsoft/vscode-arduino/issues/411)
+- Add upload using programmer command [#407](https://github.com/Microsoft/vscode-arduino/issues/407)
+- Add ignore option for board detection notification [#495](https://github.com/Microsoft/vscode-arduino/issues/495)
+- Add settings for disable/enable serial monitor TestingOpen [#530](https://github.com/Microsoft/vscode-arduino/issues/530)
+
+### Fixed
+- Fix intellisense issue of `c_cpp_properties.json` (preview) [#438](https://github.com/Microsoft/vscode-arduino/issues/438)
+
+Special thanks to [Joel Santos](https://github.com/mundodisco8), [John](https://github.com/VashJuan), [mybayern1974](https://github.com/mybayern1974), [Maxime Paquatte](https://github.com/maxime-paquatte), [Joe Saavedra](https://github.com/jmsaavedra), [Kye Burchard](https://github.com/kyeb), [Laurent Haas - F6FVY](https://github.com/f6fvy), thank you for your feedbacks.
+
+## Version 0.2.14
+- Release date: May 4, 2018
+
+### Fixed
+- Fix install board command issue
+
+## Version 0.2.13
+- Release date: April 26, 2018
+
+### Fixed
+- Fix board manager package version issue [#520](https://github.com/Microsoft/vscode-arduino/issues/520)
+
+### Added
+- Add install board command
+
+### Changed
+- Disable auto popup get started page for IoT Devkit
+
 ## Version 0.2.12
 - Release date: April 8, 2018
 

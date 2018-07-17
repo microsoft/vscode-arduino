@@ -22,10 +22,11 @@ export const EXAMPLES_URI = vscode.Uri.parse("arduino-manager://arduino/arduino-
 export const messages = {
     ARDUINO_FILE_ERROR: "The arduino.json file format is not correct.",
     NO_BOARD_SELECTED: "Please select the board type first.",
-    INVALID_ARDUINO_PATH: "Cannot find the Arduino installation path. You can specify the path in the user settings.",
+    INVALID_ARDUINO_PATH: "Cannot find Arduino IDE. Please specify the \"arduino.path\" in the User Settings. Requires a restart after change.",
     FAILED_SEND_SERIALPORT: "Failed to send message to serial port.",
     SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
     SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",
+    NO_PROGRAMMMER_SELECTED: "Please select the programmer first.",
 };
 
 export const statusBarPriority = {
@@ -34,4 +35,6 @@ export const statusBarPriority = {
     BAUD_RATE: 40,
     BOARD: 60,
     ENDING: 70,
+    SKETCH: 80,
+    PROGRAMMER: 90,
 };
