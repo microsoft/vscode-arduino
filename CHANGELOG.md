@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## Version 0.2.18
-- Release date: July 20, 2018
+- Release date: July 17, 2018
 
 ### Added
 - Add Wio 3G board and WeMos D1 board [#223](https://github.com/Microsoft/vscode-arduino/pull/223)
