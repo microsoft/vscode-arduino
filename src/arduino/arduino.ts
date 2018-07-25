@@ -542,7 +542,7 @@ Please make sure the folder is not occupied by other procedures .`);
                 includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries", "**"));
 
                 const defines = [
-                    "ARDUINO=10800"
+                    "ARDUINO=10800",
                 ];
                 const cppConfig = {
                     configurations: [{
