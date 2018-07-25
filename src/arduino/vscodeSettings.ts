@@ -13,6 +13,7 @@ const configKeys = {
     DISABLE_TESTING_OPEN: "arduino.disableTestingOpen",
     IGNORE_BOARDS: "arduino.ignoreBoards",
     SKIP_HEADER_PROVIDER: "arduino.skipHeaderProvider",
+    DEFAULT_BAUD_RATE: "arduino.defaultBaudRate",
 };
 
 export interface IVscodeSettings {
@@ -24,6 +25,7 @@ export interface IVscodeSettings {
     disableTestingOpen: boolean;
     ignoreBoards: string[];
     skipHeaderProvider: boolean;
+    defaultBaudRate: number;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -69,6 +71,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public set ignoreBoards(value: string[]) {
         this.setConfigValue(configKeys.IGNORE_BOARDS, value, true);
+    }
+
+    public get defaultBaudRate(): number {
+        return this.getConfigValue<number>(configKeys.DEFAULT_BAUD_RATE);
     }
 
     public get skipHeaderProvider(): boolean {
