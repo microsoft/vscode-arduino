@@ -541,9 +541,13 @@ Please make sure the folder is not occupied by other procedures .`);
                 // Arduino custom libraries
                 includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries", "**"));
 
+                const defines = [
+                    "ARDUINO=10800"
+                ];
                 const cppConfig = {
                     configurations: [{
                         name: util.getCppConfigPlatform(),
+                        defines,
                         includePath,
                         intelliSenseMode: "clang-x64",
                         cStandard: "c11",
