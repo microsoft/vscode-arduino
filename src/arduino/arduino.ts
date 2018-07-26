@@ -282,7 +282,7 @@ export class ArduinoApp {
             libPaths = this.getDefaultPackageLibPaths();
         }
 
-        const defaultForcedInclude = this.getDefaultForcedIncludePath();
+        const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
 
         if (!ArduinoWorkspace.rootPath) {
             return;
@@ -492,7 +492,7 @@ Please make sure the folder is not occupied by other procedures .`);
         return result;
     }
 
-    public getDefaultForcedIncludePath(): string[] {
+    public getDefaultForcedIncludeFiles(): string[] {
         const result = [];
         const boardDescriptor = this._boardManager.currentBoard;
         if (!boardDescriptor) {
@@ -569,7 +569,7 @@ Please make sure the folder is not occupied by other procedures .`);
                 // Arduino custom libraries
                 includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries", "**"));
 
-                const forcedInclude = this.getDefaultForcedIncludePath();
+                const forcedInclude = this.getDefaultForcedIncludeFiles();
 
                 const defines = [
                     "ARDUINO=10800",
