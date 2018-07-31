@@ -286,6 +286,9 @@ export class ArduinoApp {
         } else {
             libPaths = this.getDefaultPackageLibPaths();
         }
+
+        const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
+
         if (!ArduinoWorkspace.rootPath) {
             return;
         }
@@ -330,6 +333,18 @@ export class ArduinoApp {
             }
             configSection.includePath.unshift(childLibPath);
         });
+
+        if (!configSection.forcedInclude) {
+            configSection.forcedInclude = defaultForcedInclude;
+        } else {
+            for (let i = 0; i < configSection.forcedInclude.length; i++) {
+                if (/arduino\.h$/i.test(configSection.forcedInclude[i])) {
+                    configSection.forcedInclude.splice(i, 1);
+                    i--;
+                }
+            }
+            configSection.forcedInclude = defaultForcedInclude.concat(configSection.forcedInclude);
+        }
 
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
     }
@@ -482,6 +497,19 @@ Please make sure the folder is not occupied by other procedures .`);
         return result;
     }
 
+    public getDefaultForcedIncludeFiles(): string[] {
+        const result = [];
+        const boardDescriptor = this._boardManager.currentBoard;
+        if (!boardDescriptor) {
+            return result;
+        }
+        const arduinoHeadFilePath = path.normalize(path.join(boardDescriptor.platform.rootBoardPath, "cores", "arduino", "Arduino.h"));
+        if (fs.existsSync(arduinoHeadFilePath)) {
+            result.push(arduinoHeadFilePath);
+        }
+        return result;
+    }
+
     public openExample(example) {
         function tmpName(name) {
             let counter = 0;
@@ -546,10 +574,17 @@ Please make sure the folder is not occupied by other procedures .`);
                 // Arduino custom libraries
                 includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries", "**"));
 
+                const forcedInclude = this.getDefaultForcedIncludeFiles();
+
+                const defines = [
+                    "ARDUINO=10800",
+                ];
                 const cppConfig = {
                     configurations: [{
                         name: util.getCppConfigPlatform(),
+                        defines,
                         includePath,
+                        forcedInclude,
                         intelliSenseMode: "clang-x64",
                         cStandard: "c11",
                         cppStandard: "c++17",
