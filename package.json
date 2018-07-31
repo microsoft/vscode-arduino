@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.18",
+  "version": "0.2.19",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -551,7 +551,7 @@
     "iconv-lite": "^0.4.18",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
-    "vscode-extension-telemetry": "0.0.6",
+    "vscode-extension-telemetry": "0.0.18",
     "winreg": "^1.2.3",
     "winston": "^2.3.1"
   }
