@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import * as vscode from "vscode";
+import ArduinoContext from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
@@ -66,8 +67,9 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public initialize() {
+        const defaultBaudRate = ArduinoContext.arduinoApp.settings.defaultBaudRate || SerialMonitor.DEFAULT_BAUD_RATE;
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
-        this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
+        this._currentBaudRate = defaultBaudRate;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
         this._portsStatusBar.tooltip = "Select Serial Port";
@@ -82,7 +84,7 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BAUD_RATE);
         this._baudRateStatusBar.command = "arduino.changeBaudRate";
         this._baudRateStatusBar.tooltip = "Baud Rate";
-        this._baudRateStatusBar.text = SerialMonitor.DEFAULT_BAUD_RATE.toString();
+        this._baudRateStatusBar.text = defaultBaudRate.toString();
         this.updatePortListStatus(null);
 
         this._endingStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.ENDING);

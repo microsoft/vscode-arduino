@@ -458,6 +458,10 @@
         "arduino.skipHeaderProvider": {
           "type": "boolean",
           "default": false
+        },
+        "defaultBaudRate": {
+          "type": "number",
+          "default": 115200
         }
       }
     },
