@@ -85,9 +85,12 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             const arduinoPath = ArduinoContext.arduinoApp.settings.arduinoPath;
+            const commandPath = ArduinoContext.arduinoApp.settings.commandPath;
             if (!arduinoPath || !validateArduinoPath(arduinoPath)) { // Pop up vscode User Settings page when cannot resolve arduino path.
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+            } else if (!commandPath || !util.fileExistsSync(commandPath)) {
+                Logger.notifyUserError("InvalidCommandPath", new Error(constants.messages.INVALID_COMMAND_PATH + commandPath));
             } else {
                 await commandExecution(command, commandBody, args, getUserData);
             }
