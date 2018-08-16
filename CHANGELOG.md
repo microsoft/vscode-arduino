@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.20
+- Release date: August 16, 2018
+
+### Changed
+- Add arduino.defaultBaudRate option [#616](https://github.com/Microsoft/vscode-arduino/issues/616)
+- Pop up a message to help the user figure out what settings are wrong [#611](https://github.com/Microsoft/vscode-arduino/issues/611)
+
 ## Version 0.2.19
 - Release date: July 31, 2018
 
