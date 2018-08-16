@@ -57,7 +57,6 @@ The following Visual Studio Code settings are available for the Arduino extensio
 {
     "arduino.path": "C:/Program Files (x86)/Arduino",
     "arduino.commandPath": "run-arduino.bat",
-    "arduino.additionalUrls": "",
     "arduino.logLevel": "info",
     "arduino.enableUSBDetection": true,
     "arduino.disableTestingOpen": false,
