@@ -66,7 +66,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
         "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json",
         "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
     ],
-    "arduino.defaultBaudRate": 115200,
+    "arduino.defaultBaudRate": 115200
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
