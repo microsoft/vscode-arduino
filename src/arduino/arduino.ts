@@ -143,8 +143,13 @@ export class ArduinoApp {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            arduinoChannel.warning(msg);
+            if (VscodeSettings.getInstance().defaultOutputPath != ""){
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, VscodeSettings.getInstance().defaultOutputPath);
+                args.push("--pref", `build.path=${outputPath}`);
+            } else {
+                const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
+                arduinoChannel.warning(msg);
+            }
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
             UsbDetector.getInstance().resumeListening();
@@ -201,8 +206,13 @@ export class ArduinoApp {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            arduinoChannel.warning(msg);
+            if (VscodeSettings.getInstance().defaultOutputPath != ""){
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, VscodeSettings.getInstance().defaultOutputPath);
+                args.push("--pref", `build.path=${outputPath}`);
+            } else {
+                const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
+                arduinoChannel.warning(msg);
+            }
         }
         await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
             UsbDetector.getInstance().resumeListening();
@@ -256,10 +266,14 @@ export class ArduinoApp {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
             args.push("--pref", `build.path=${outputPath}`);
         } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
-            arduinoChannel.warning(msg);
+            if (VscodeSettings.getInstance().defaultOutputPath != ""){
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, VscodeSettings.getInstance().defaultOutputPath);
+                args.push("--pref", `build.path=${outputPath}`);
+            } else {
+                const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
+                arduinoChannel.warning(msg);
+            }
         }
-
         arduinoChannel.show();
         // we need to return the result of verify
         try {
