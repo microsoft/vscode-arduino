@@ -68,7 +68,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
     "arduino.defaultBaudRate": 115200
 }
 ```
-- `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/$user/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
+- `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
 - `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. You can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac, `bin/run-arduino.sh` for Linux."
 - `arduino.additionalUrls` - Additional Boards Manager Urls for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
