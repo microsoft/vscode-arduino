@@ -529,7 +529,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-require-path-exists": "^1.1.7",
     "eslint-plugin-standard": "^3.0.1",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-eslint": "^3.0.1",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^7.0.1",
