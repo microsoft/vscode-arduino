@@ -64,6 +64,18 @@ export class ExampleManager {
                 children: examplesFromCustomLibraries,
             });
         }
+
+        // load Examples from user's workspace
+        const sketchesPath = path.join(this._settings.sketchbookPath, "Sketches");
+        const examplesFromSketches = await this.parseExamples(sketchesPath, true, true);
+        if (examplesFromSketches.length) {
+            examples.push({
+                name: "Workspace",
+                path: sketchesPath,
+                children: examplesFromSketches,
+            });
+        }
+
         return examples;
     }
 
