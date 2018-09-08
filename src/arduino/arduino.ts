@@ -149,6 +149,10 @@ export class ArduinoApp {
 
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+        } else if (VscodeSettings.getInstance().defaultOutputPath != "") {
+            const outputPath = VscodeSettings.getInstance().defaultOutputPath;
+            args.push("--pref", `build.path=${outputPath}`);
+            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
             arduinoChannel.warning(msg);
@@ -206,6 +210,9 @@ export class ArduinoApp {
         }
         if (dc.output) {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
+            args.push("--pref", `build.path=${outputPath}`);
+        } else if (VscodeSettings.getInstance().defaultOutputPath != "") {
+            const outputPath = VscodeSettings.getInstance().defaultOutputPath;
             args.push("--pref", `build.path=${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
@@ -269,11 +276,15 @@ export class ArduinoApp {
 
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+        } else if (VscodeSettings.getInstance().defaultOutputPath != "") {
+            const outputPath = VscodeSettings.getInstance().defaultOutputPath;
+            args.push("--pref", `build.path=${outputPath}`);
+            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
             arduinoChannel.warning(msg);
         }
-
+        
         arduinoChannel.show();
         // we need to return the result of verify
         try {

@@ -462,6 +462,10 @@
         "defaultBaudRate": {
           "type": "number",
           "default": 115200
+        },
+        "arduino.defaultOutputPath": {
+          "type": "string",
+          "default": ""
         }
       }
     },

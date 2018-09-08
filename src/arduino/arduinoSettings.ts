@@ -21,6 +21,7 @@ export interface IArduinoSettings {
     sketchbookPath: string;
     preferencePath: string;
     defaultBaudRate: number;
+    defaultOutputPath: string;
     preferences: Map<string, string>;
     reloadPreferences(): void;
 }
@@ -35,6 +36,8 @@ export class ArduinoSettings implements IArduinoSettings {
     private _sketchbookPath: string;
 
     private _defaultBaudRate: number;
+    
+    private _defaultOutputPath: string;
 
     private _preferences: Map<string, string>;
 
@@ -46,6 +49,7 @@ export class ArduinoSettings implements IArduinoSettings {
         this._commandPath = VscodeSettings.getInstance().commandPath;
         await this.tryResolveArduinoPath();
         await this.tryGetDefaultBaudRate();
+        await this.tryGetDefaultOutputPath();
         if (platform === "win32") {
             await this.updateWindowsPath();
             if (this._commandPath === "") {
@@ -153,6 +157,10 @@ export class ArduinoSettings implements IArduinoSettings {
     public get defaultBaudRate() {
         return this._defaultBaudRate;
     }
+    
+    public get defaultOutputPath(): string {
+        return this._defaultOutputPath;
+    }
 
     public reloadPreferences() {
         this._preferences = util.parseConfigFile(this.preferencePath);
@@ -225,6 +233,16 @@ export class ArduinoSettings implements IArduinoSettings {
             this._defaultBaudRate = 0;
         } else {
             this._defaultBaudRate = configValue;
+        }
+    }
+    
+    private async tryGetDefaultOutputPath(): Promise<void> {
+        const configValue = VscodeSettings.getInstance().defaultOutputPath;
+        if (!configValue || !configValue.trim()) {
+            //not set
+            //return ""?
+        } else {
+            this._defaultOutputPath = configValue;
         }
     }
 }

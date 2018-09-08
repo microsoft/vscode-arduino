@@ -65,7 +65,8 @@ The following Visual Studio Code settings are available for the Arduino extensio
         "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json",
         "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
     ],
-    "arduino.defaultBaudRate": 115200
+    "arduino.defaultBaudRate": 115200,
+    "arduino.defaultOutputPath": ""
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
@@ -81,6 +82,7 @@ serialport-list -f jsonline
 - `arduino.disableTestingOpen` - Disable/enable auto sending a test message to serial port for checking open status. The default value is `false` (a test message will be sent).
 - `arduino.skipHeaderProvider` - Enable/disable the extension providing completion items for headers. The functionality is included in newer versions of the C++ extension. The default value is `false`.
 - `arduino.defaultBaudRate` - Default baud rate for serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000.
+- `arduino.defaultOutputPath` - Default output path for the compiler. By default, this option is not set.
 
 The following settings are per sketch settings of the Arduino extension. You can find them in
 `.vscode/arduino.json` under the workspace.
