@@ -459,7 +459,7 @@
           "type": "boolean",
           "default": false
         },
-        "defaultBaudRate": {
+        "arduino.defaultBaudRate": {
           "type": "number",
           "default": 115200
         }
