@@ -68,10 +68,10 @@ suite("Arduino: Library Manager.", () => {
     // Arduino: Library Manager: Install extenal libarary.
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to install libraries", function(done) {
-        this.timeout(3 * 60 * 1000);
+        this.timeout(5 * 60 * 1000);
         try {
             // Library Manager: Install extenal libarary.
-            ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.35", true).then((result) => {
+            ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.45", true).then((result) => {
                 // check if the installation succeeds or not
                 const arduinoSettings = ArduinoContext.arduinoApp.settings;
                 const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");

@@ -102,7 +102,7 @@ suite("Arduino: Board Manager.", () => {
     // Arduino: Board Manager: Manage packages for boards.
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to install boards packages", function(done) {
-        this.timeout(4 * 60 * 1000);
+        this.timeout(5 * 60 * 1000);
         try {
             // Board Manager: install boards packages.
             ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
