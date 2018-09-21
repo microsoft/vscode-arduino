@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import * as fs from "fs";
 
+import * as os from "os";
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
@@ -147,4 +148,12 @@ suite("Arduino: Board Manager.", () => {
         }
     });
 
+    suiteTeardown(() => {
+        // When running test on osx, the vscode instance is hanging there after tests finished and cause mocha timeout.
+        // As a workaround, closing usb-detection process manually would make test window exit normally.
+        if (os.platform() !== "linux") {
+            const usbDector = require("../../vendor/node-usb-native").detector;
+            usbDector.stopMonitoring();
+        }
+    });
 });
