@@ -81,12 +81,13 @@ suite("Arduino: Library Manager.", () => {
                 const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
                 // tslint:disable-next-line
                 console.log("libPath :" + libPath);
-                if (util.directoryExistsSync(arduinoSettings.sketchbookPath)) {
+                const libtestPath = Path.join(arduinoSettings.sketchbookPath, "libraries");
+                if (util.directoryExistsSync(libtestPath)) {
                     // tslint:disable-next-line
-                    console.log("sketchbookPath directory is exist" + arduinoSettings.sketchbookPath);
+                    console.log("sketchbookPath directory is exist" + libtestPath);
                 } else {
                     // tslint:disable-next-line
-                    console.log("sketchbookPath directory is not exist" + arduinoSettings.sketchbookPath);
+                    console.log("sketchbookPath directory is not exist" + libtestPath);
                 }
 
                 if (util.directoryExistsSync(libPath)) {

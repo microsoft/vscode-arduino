@@ -113,12 +113,21 @@ suite("Arduino: Board Manager.", () => {
                 // tslint:disable-next-line
                 console.log("arduinoSettings :" + arduinoSettings.arduinoPath);
                 const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
-                if (util.directoryExistsSync(arduinoSettings.packagePath)) {
+                const testPath = Path.join(arduinoSettings.packagePath, "packages");
+                if (util.directoryExistsSync(testPath)) {
                     // tslint:disable-next-line
-                    console.log("package directory is exist" + arduinoSettings.packagePath);
+                    console.log("package directory is exist" + testPath);
                 } else {
                     // tslint:disable-next-line
-                    console.log("package directory is not exist" + arduinoSettings.packagePath);
+                    console.log("package directory is not exist" + testPath);
+                }
+                const testanotherPath = Path.join(arduinoSettings.packagePath, "Packages");
+                if (util.directoryExistsSync(testanotherPath)) {
+                    // tslint:disable-next-line
+                    console.log("another package directory is exist" + testanotherPath);
+                } else {
+                    // tslint:disable-next-line
+                    console.log("another package directory is not exist" + testanotherPath);
                 }
                 // tslint:disable-next-line
                 console.log("packagePath :" + packagePath);
