@@ -70,15 +70,20 @@ suite("Arduino: Library Manager.", () => {
     test("should be able to install libraries", function(done) {
         this.timeout(3 * 60 * 1000);
         try {
+            assert.ok("run test case :install libraries");
             // Library Manager: Install extenal libarary.
             ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.35", true).then((result) => {
                 // check if the installation succeeds or not
                 const arduinoSettings = ArduinoContext.arduinoApp.settings;
+                assert.ok("arduinoSettings :" + arduinoSettings);
                 const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
+                assert.ok("libPath :" + libPath);
 
                 if (util.directoryExistsSync(libPath)) {
+                    assert.ok("the directory is exist" + libPath);
                     done();
                 } else {
+                    assert.ok("the directory is not exist");
                     done(new Error("AzureIoTHub library install failure, can't find library path :" + libPath));
                 }
             });

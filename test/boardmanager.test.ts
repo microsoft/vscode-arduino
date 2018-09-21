@@ -105,13 +105,18 @@ suite("Arduino: Board Manager.", () => {
         this.timeout(4 * 60 * 1000);
         try {
             // Board Manager: install boards packages.
+            assert.ok("run test case :install boards packages");
             ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
                 const arduinoSettings = ArduinoContext.arduinoApp.settings;
+                assert.ok("arduinoSettings :" + arduinoSettings);
                 const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+                assert.ok("packagePath :" + packagePath);
                 // check if the installation succeeds or not
                 if (util.directoryExistsSync(packagePath)) {
+                    assert.ok("the directory is exist" + packagePath);
                     done();
                 } else {
+                    assert.ok("the directory is not exist");
                     done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
                 }
             });
