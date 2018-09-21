@@ -70,19 +70,24 @@ suite("Arduino: Library Manager.", () => {
     test("should be able to install libraries", function(done) {
         this.timeout(3 * 60 * 1000);
         try {
+            // tslint:disable-next-line
             console.log("run test case :install libraries");
             // Library Manager: Install extenal libarary.
             ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.35", true).then((result) => {
                 // check if the installation succeeds or not
                 const arduinoSettings = ArduinoContext.arduinoApp.settings;
-                console.log("arduinoSettings :" + arduinoSettings);
+                // tslint:disable-next-line
+                console.log("arduinoSettings :" + arduinoSettings.arduinoPath);
                 const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
+                // tslint:disable-next-line
                 console.log("libPath :" + libPath);
 
                 if (util.directoryExistsSync(libPath)) {
+                    // tslint:disable-next-line
                     console.log("the directory is exist" + libPath);
                     done();
                 } else {
+                    // tslint:disable-next-line
                     console.log("the directory is not exist");
                     done(new Error("AzureIoTHub library install failure, can't find library path :" + libPath));
                 }
@@ -98,14 +103,18 @@ suite("Arduino: Library Manager.", () => {
     test("should be able to remove libraries", () => {
         try {
             // Library Manager: remove extenal libarary.
+            // tslint:disable-next-line
             console.log("run test case :remove libraries");
             const arduinoSettings = ArduinoContext.arduinoApp.settings;
             const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
+            // tslint:disable-next-line
             console.log("libPath :" + libPath);
 
             if (util.directoryExistsSync(libPath)) {
+                // tslint:disable-next-line
                 console.log("directory is exist,start to uninstall library");
                 ArduinoContext.arduinoApp.uninstallLibrary("AzureIoTHub", libPath);
+                // tslint:disable-next-line
                 console.log("uninstall library finished");
                 assert.equal(util.directoryExistsSync(libPath), false,
                  "Library path still exist after calling uninstall library,remove the library failure");

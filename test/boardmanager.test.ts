@@ -106,17 +106,27 @@ suite("Arduino: Board Manager.", () => {
         this.timeout(4 * 60 * 1000);
         try {
             // Board Manager: install boards packages.
+            // tslint:disable-next-line
             console.log("run test case :install boards packages");
             ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
                 const arduinoSettings = ArduinoContext.arduinoApp.settings;
-                console.log("arduinoSettings :" + arduinoSettings);
+                // tslint:disable-next-line
+                console.log("arduinoSettings :" + arduinoSettings.arduinoPath);
                 const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+                const testPath = Path.join(arduinoSettings.packagePath, "packages");
+                if (util.directoryExistsSync(testPath)) {
+                    // tslint:disable-next-line
+                    console.log("package directory is exist" + testPath);
+                }
+                // tslint:disable-next-line
                 console.log("packagePath :" + packagePath);
                 // check if the installation succeeds or not
                 if (util.directoryExistsSync(packagePath)) {
+                    // tslint:disable-next-line
                     console.log("the directory is exist" + packagePath);
                     done();
                 } else {
+                    // tslint:disable-next-line
                     console.log("the directory is not exist");
                     done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
                 }
@@ -132,13 +142,17 @@ suite("Arduino: Board Manager.", () => {
     test("should be able to remove boards packages", () => {
         try {
             // Board Manager: remove boards packages.
+            // tslint:disable-next-line
             console.log("run test case :remove boards packages");
             const arduinoSettings = ArduinoContext.arduinoApp.settings;
             const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+            // tslint:disable-next-line
             console.log("remove packagePath:" + packagePath);
             if (util.directoryExistsSync(packagePath)) {
+                // tslint:disable-next-line
                 console.log(" start to remove boards packages");
                 ArduinoContext.arduinoApp.uninstallBoard("Microsoft", packagePath);
+                // tslint:disable-next-line
                 console.log(" remove boards packages finished");
                 assert.equal(util.directoryExistsSync(packagePath), false,
                  "Package path still exist after calling uninstall package,remove the board package failure");
