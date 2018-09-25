@@ -108,11 +108,11 @@ suite("Arduino: Board Manager.", () => {
             // Board Manager: install boards packages.
             // tslint:disable-next-line
             console.log("run test case :install boards packages");
-            ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
+            ArduinoContext.arduinoApp.installBoard("arduino", "sam", "1.6.11", true).then((result) => {
                 const arduinoSettings = ArduinoContext.arduinoApp.settings;
                 // tslint:disable-next-line
                 console.log("arduinoSettings :" + arduinoSettings.arduinoPath);
-                const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+                const packagePath = Path.join(arduinoSettings.packagePath, "packages", "arduino");
                 const testPath = Path.join(arduinoSettings.packagePath, "packages");
                 if (util.directoryExistsSync(testPath)) {
                     // tslint:disable-next-line
@@ -120,15 +120,7 @@ suite("Arduino: Board Manager.", () => {
                 } else {
                     // tslint:disable-next-line
                     console.log("package directory is not exist" + testPath);
-                }
-                const testanotherPath = Path.join(arduinoSettings.packagePath, "Packages");
-                if (util.directoryExistsSync(testanotherPath)) {
-                    // tslint:disable-next-line
-                    console.log("another package directory is exist" + testanotherPath);
-                } else {
-                    // tslint:disable-next-line
-                    console.log("another package directory is not exist" + testanotherPath);
-                }
+                }                
                 // tslint:disable-next-line
                 console.log("packagePath :" + packagePath);
                 // check if the installation succeeds or not
