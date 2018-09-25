@@ -394,29 +394,43 @@ export class ArduinoApp {
      */
     public async installBoard(packageName: string, arch: string = "", version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
+        // tslint:disable-next-line
+        console.log("installBoard:start");
         const updatingIndex = packageName === "dummy" && !arch && !version;
         if (updatingIndex) {
             arduinoChannel.start(`Update package index files...`);
+            // tslint:disable-next-line
+            console.log("installBoard:Update package index files...");
         } else {
             try {
                 const packagePath = path.join(this._settings.packagePath, "packages", packageName);
+                // tslint:disable-next-line
+                console.log("installBoard: verify package path " + packagePath);
                 if (util.directoryExistsSync(packagePath)) {
                     util.rmdirRecursivelySync(packagePath);
                 }
                 arduinoChannel.start(`Install package - ${packageName}...`);
+                 // tslint:disable-next-line
+                 console.log("installBoard:Install package " + packageName);
             } catch (error) {
                 arduinoChannel.start(`Install package - ${packageName} failed under directory : ${error.path}${os.EOL}
 Please make sure the folder is not occupied by other procedures .`);
                 arduinoChannel.error(`Error message - ${error.message}${os.EOL}`);
                 arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
+                // tslint:disable-next-line
+                console.log("installBoard:Error message:" + error.message);
                 return;
             }
         }
         try {
+            // tslint:disable-next-line
+            console.log("installBoard:util.spawn start");
             await util.spawn(this._settings.commandPath,
                 showOutput ? arduinoChannel.channel : null,
                 ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`]);
 
+                // tslint:disable-next-line
+            console.log("installBoard:util.spawn end");
             if (updatingIndex) {
                 arduinoChannel.end("Updated package index files.");
             } else {
