@@ -43,6 +43,46 @@ suite("Arduino: Board Manager.", () => {
         }
     });
 
+    // Arduino: Board Manager: Manage packages for boards.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to install boards packages", function(done) {
+        this.timeout(4 * 60 * 1000);
+        try {
+            // Board Manager: install boards packages.
+            // tslint:disable-next-line
+            console.log("run test case :install boards packages");
+            ArduinoContext.arduinoApp.installBoard("arduino", "sam", "1.6.11", true).then((result) => {
+                const arduinoSettings = ArduinoContext.arduinoApp.settings;
+                // tslint:disable-next-line
+                console.log("arduinoSettings :" + arduinoSettings.arduinoPath);
+                const packagePath = Path.join(arduinoSettings.packagePath, "packages", "arduino");
+                const testPath = Path.join(arduinoSettings.packagePath, "packages");
+                if (util.directoryExistsSync(testPath)) {
+                    // tslint:disable-next-line
+                    console.log("package directory is exist" + testPath);
+                } else {
+                    // tslint:disable-next-line
+                    console.log("package directory is not exist" + testPath);
+                }                
+                // tslint:disable-next-line
+                console.log("packagePath :" + packagePath);
+                // check if the installation succeeds or not
+                if (util.directoryExistsSync(packagePath)) {
+                    // tslint:disable-next-line
+                    console.log("the directory is exist" + packagePath);
+                    done();
+                } else {
+                    // tslint:disable-next-line
+                    console.log("the directory is not exist");
+                    done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
+                }
+            });
+
+        } catch (error) {
+            done(new Error(error));
+        }
+    });
+
     test("should be able to load packages", () => {
         const platforms = boardManager.platforms;
         assert.equal(platforms.length, 14);
@@ -98,46 +138,6 @@ suite("Arduino: Board Manager.", () => {
         const platformConfig = util.parseConfigFile(Path.join(Resources.mockedSketchbookPath, "hardware/esp8266/esp8266/platform.txt"));
         assert.equal(platformConfig.get("name"), "ESP8266 Modules");
         assert.equal(platformConfig.get("version"), "2.2.0");
-    });
-
-    // Arduino: Board Manager: Manage packages for boards.
-    // tslint:disable-next-line: only-arrow-functions
-    test("should be able to install boards packages", function(done) {
-        this.timeout(4 * 60 * 1000);
-        try {
-            // Board Manager: install boards packages.
-            // tslint:disable-next-line
-            console.log("run test case :install boards packages");
-            ArduinoContext.arduinoApp.installBoard("arduino", "sam", "1.6.11", true).then((result) => {
-                const arduinoSettings = ArduinoContext.arduinoApp.settings;
-                // tslint:disable-next-line
-                console.log("arduinoSettings :" + arduinoSettings.arduinoPath);
-                const packagePath = Path.join(arduinoSettings.packagePath, "packages", "arduino");
-                const testPath = Path.join(arduinoSettings.packagePath, "packages");
-                if (util.directoryExistsSync(testPath)) {
-                    // tslint:disable-next-line
-                    console.log("package directory is exist" + testPath);
-                } else {
-                    // tslint:disable-next-line
-                    console.log("package directory is not exist" + testPath);
-                }                
-                // tslint:disable-next-line
-                console.log("packagePath :" + packagePath);
-                // check if the installation succeeds or not
-                if (util.directoryExistsSync(packagePath)) {
-                    // tslint:disable-next-line
-                    console.log("the directory is exist" + packagePath);
-                    done();
-                } else {
-                    // tslint:disable-next-line
-                    console.log("the directory is not exist");
-                    done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
-                }
-            });
-
-        } catch (error) {
-            done(new Error(error));
-        }
     });
 
     // Arduino: Board Manager: remove boards packages.
