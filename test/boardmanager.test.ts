@@ -51,11 +51,26 @@ suite("Arduino: Board Manager.", () => {
             // Board Manager: install boards packages.
             // tslint:disable-next-line
             console.log("run test case :install boards packages");
-            ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
-                const arduinoSettings = ArduinoContext.arduinoApp.settings;
+            const arduinoSettings = ArduinoContext.arduinoApp.settings;
+            const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+            // tslint:disable-next-line
+            console.log("packagePath:" + packagePath);
+            if (util.directoryExistsSync(packagePath)) {
                 // tslint:disable-next-line
-                console.log("arduinoSettings :" + arduinoSettings.arduinoPath);
-                const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+                console.log(" start to remove boards packages");
+                ArduinoContext.arduinoApp.uninstallBoard("Microsoft", packagePath);
+                 if (util.directoryExistsSync(packagePath)) {
+                    // tslint:disable-next-line
+                    console.log(" remove boards packages finished");
+                 } else {
+                     // tslint:disable-next-line
+                    console.log(" remove the board package failure");
+                 }
+            }
+
+            ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
+                // tslint:disable-next-line
+                console.log("arduinoSettings :" + arduinoSettings.arduinoPath);                
                 const testPath = Path.join(arduinoSettings.packagePath, "packages");
                 if (util.directoryExistsSync(testPath)) {
                     // tslint:disable-next-line
