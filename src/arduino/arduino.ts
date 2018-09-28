@@ -425,12 +425,24 @@ Please make sure the folder is not occupied by other procedures .`);
         try {
             // tslint:disable-next-line
             console.log("installBoard:util.spawn start");
-            await util.spawn(this._settings.commandPath,
+            // tslint:disable-next-line
+            console.log("installBoard:commandPath:" + this._settings.commandPath);
+            if (util.fileExistsSync(this._settings.commandPath)) {
+                // tslint:disable-next-line
+                console.log("installBoard:command is exist" + this._settings.commandPath);
+            } else {
+                // tslint:disable-next-line
+                console.log("installBoard:command is not exist" + this._settings.commandPath);
+            }
+
+            const result = await util.spawn(this._settings.commandPath,
                 showOutput ? arduinoChannel.channel : null,
                 ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`]);
+            // tslint:disable-next-line
+            console.log("installBoard:code:" + result["code"] + " stdout:" + result["stdout"] + " stderr:" + result["stderr"]);
 
                 // tslint:disable-next-line
-            console.log("installBoard:util.spawn end");
+            console.log("installBoard:util.spawn end");            
             if (updatingIndex) {
                 arduinoChannel.end("Updated package index files.");
             } else {
