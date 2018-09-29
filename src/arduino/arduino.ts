@@ -452,7 +452,7 @@ Please make sure the folder is not occupied by other procedures .`);
             // tslint:disable-next-line
             console.log("installBoard error:" + error.message);
             // tslint:disable-next-line
-            console.log("installBoard error code:" + error.code + " EOL:" + os.EOL);
+            console.log(JSON.stringify(error,null,2));
             // If a platform with the same version is already installed, nothing is installed and program exits with exit code 1
             if (error.code === 1) {
                 if (updatingIndex) {

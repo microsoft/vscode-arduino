@@ -57,16 +57,11 @@ suite("Arduino: Board Manager.", () => {
             console.log("packagePath:" + packagePath);
             if (util.directoryExistsSync(packagePath)) {
                 // tslint:disable-next-line
-                console.log(" start to remove boards packages");
-                ArduinoContext.arduinoApp.uninstallBoard("Microsoft", packagePath);
-                 if (util.directoryExistsSync(packagePath)) {
-                    // tslint:disable-next-line
-                    console.log(" remove boards packages finished");
-                 } else {
-                     // tslint:disable-next-line
-                    console.log(" remove the board package failure");
-                 }
-            }
+                console.log(" boards packages is exist before install");
+             } else {
+                 // tslint:disable-next-line
+                console.log(" boards packages is not exist before install");
+             }
 
             ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
                 // tslint:disable-next-line
