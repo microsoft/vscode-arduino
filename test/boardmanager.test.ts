@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import * as fs from "fs";
 
+import * as os from "os";
 import * as Path from "path";
 import * as TypeMoq from "typemoq";
 
@@ -39,6 +40,56 @@ suite("Arduino: Board Manager.", () => {
             });
         } catch (error) {
             done(`Failed to load board manager packages: ${error}`);
+        }
+    });
+
+    // Arduino: Board Manager: Manage packages for boards.
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to install boards packages", function(done) {
+        this.timeout(4 * 60 * 1000);
+        try {
+            // Board Manager: install boards packages.
+            // tslint:disable-next-line
+            console.log("run test case :install boards packages");
+            const arduinoSettings = ArduinoContext.arduinoApp.settings;
+            const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+            // tslint:disable-next-line
+            console.log("packagePath:" + packagePath);
+            if (util.directoryExistsSync(packagePath)) {
+                // tslint:disable-next-line
+                console.log(" boards packages is exist before install");
+             } else {
+                 // tslint:disable-next-line
+                console.log(" boards packages is not exist before install");
+             }
+
+            ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
+                // tslint:disable-next-line
+                console.log("arduinoSettings :" + arduinoSettings.arduinoPath);                
+                const testPath = Path.join(arduinoSettings.packagePath, "packages");
+                if (util.directoryExistsSync(testPath)) {
+                    // tslint:disable-next-line
+                    console.log("package directory is exist" + testPath);
+                } else {
+                    // tslint:disable-next-line
+                    console.log("package directory is not exist" + testPath);
+                }
+                // tslint:disable-next-line
+                console.log("packagePath :" + packagePath);
+                // check if the installation succeeds or not
+                if (util.directoryExistsSync(packagePath)) {
+                    // tslint:disable-next-line
+                    console.log("the directory is exist" + packagePath);
+                    done();
+                } else {
+                    // tslint:disable-next-line
+                    console.log("the directory is not exist");
+                    done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
+                }
+            });
+
+        } catch (error) {
+            done(new Error(error));
         }
     });
 
@@ -99,37 +150,23 @@ suite("Arduino: Board Manager.", () => {
         assert.equal(platformConfig.get("version"), "2.2.0");
     });
 
-    // Arduino: Board Manager: Manage packages for boards.
-    // tslint:disable-next-line: only-arrow-functions
-    test("should be able to install boards packages", function(done) {
-        this.timeout(4 * 60 * 1000);
-        try {
-            // Board Manager: install boards packages.
-            ArduinoContext.arduinoApp.installBoard("Microsoft", "win10", "1.1.2", true).then((result) => {
-                const arduinoSettings = ArduinoContext.arduinoApp.settings;
-                const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
-                // check if the installation succeeds or not
-                if (util.directoryExistsSync(packagePath)) {
-                    done();
-                } else {
-                    done(new Error("Microsoft board package install failure, can't find package path :" + packagePath));
-                }
-            });
-
-        } catch (error) {
-            done(new Error(error));
-        }
-    });
-
     // Arduino: Board Manager: remove boards packages.
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to remove boards packages", () => {
         try {
             // Board Manager: remove boards packages.
+            // tslint:disable-next-line
+            console.log("run test case :remove boards packages");
             const arduinoSettings = ArduinoContext.arduinoApp.settings;
             const packagePath = Path.join(arduinoSettings.packagePath, "packages", "Microsoft");
+            // tslint:disable-next-line
+            console.log("remove packagePath:" + packagePath);
             if (util.directoryExistsSync(packagePath)) {
+                // tslint:disable-next-line
+                console.log(" start to remove boards packages");
                 ArduinoContext.arduinoApp.uninstallBoard("Microsoft", packagePath);
+                // tslint:disable-next-line
+                console.log(" remove boards packages finished");
                 assert.equal(util.directoryExistsSync(packagePath), false,
                  "Package path still exist after calling uninstall package,remove the board package failure");
             }
@@ -138,4 +175,12 @@ suite("Arduino: Board Manager.", () => {
         }
     });
 
+    suiteTeardown(() => {
+        // When running test on osx, the vscode instance is hanging there after tests finished and cause mocha timeout.
+        // As a workaround, closing usb-detection process manually would make test window exit normally.
+        if (os.platform() !== "linux") {
+            const usbDector = require("../../vendor/node-usb-native").detector;
+            usbDector.stopMonitoring();
+        }
+    });
 });

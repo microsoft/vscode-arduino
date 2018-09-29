@@ -203,14 +203,22 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
     return new Promise((resolve, reject) => {
         const stdout = "";
         const stderr = "";
+        // tslint:disable-next-line
+        console.log("spawn start");
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
+        // tslint:disable-next-line
+        console.log("spawn options.cwd:" + options.cwd);
         const child = childProcess.spawn(command, args, options);
+        // tslint:disable-next-line
+        console.log("spawn command:" + command + " args:" + args +" options: " + options);
 
         let codepage = "65001";
         if (os.platform() === "win32") {
             codepage = childProcess.execSync("chcp").toString().split(":").pop().trim();
         }
 
+        // tslint:disable-next-line
+        console.log("spawn outputChannel:" + outputChannel.name);
         if (outputChannel) {
             child.stdout.on("data", (data: Buffer) => {
                 outputChannel.append(decodeData(data, codepage));
@@ -220,12 +228,22 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
             });
         }
 
+        // tslint:disable-next-line
+        console.log("spawn if error:" + stderr + stdout);
         child.on("error", (error) => reject({ error, stderr, stdout }));
 
+        // tslint:disable-next-line
+        console.log("spawn if exit:" + stderr + stdout);
         child.on("exit", (code) => {
+            // tslint:disable-next-line
+            console.log("spawn exit:");
             if (code === 0) {
+                // tslint:disable-next-line
+                console.log("spawn exit code:" + code + stderr + stdout);
                 resolve({ code, stdout, stderr });
             } else {
+                // tslint:disable-next-line
+                console.log("spawn exit code:" + code + stderr + stdout);
                 reject({ code, stdout, stderr });
             }
         });
