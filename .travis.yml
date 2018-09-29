@@ -39,6 +39,7 @@ before_install:
 - if [ $TRAVIS_OS_NAME == "osx" ]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
     brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/f908f03d37c981de93af8447b32641551d8bf74e/Casks/arduino.rb;
+  fi
 
 install:
 - npm install -g vsce
