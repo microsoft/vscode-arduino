@@ -38,7 +38,9 @@ before_install:
   fi
 - if [ $TRAVIS_OS_NAME == "osx" ]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-    brew cask install arduino;
+# Arduino 1.8.7 has breaking change, Install board package and library will fail
+# https://github.com/arduino/Arduino/issues/8034
+    brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/f908f03d37c981de93af8447b32641551d8bf74e/Casks/arduino.rb;
   fi
 
 install:
