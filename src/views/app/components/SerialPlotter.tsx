@@ -96,7 +96,7 @@ class SerialPlotter extends React.Component<ISerialPlotterProps, ISerialPlotterS
 export default connect(mapStateToProps, mapDispatchToProps)(withHighcharts(SerialPlotter, Highcharts));
 
 
-function getRandomColor() {
+function getRandomColor(): string {
     const letters = "0123456789ABCDEF";
     let color = "#";
     for (let i = 0; i < 6; i++) {

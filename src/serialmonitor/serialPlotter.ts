@@ -7,7 +7,7 @@ import { SerialPortCtrl } from "./serialportctrl";
 
 export class SerialPlotter implements vscode.Disposable {
     private _wss: WebSocket.Server;
-    private _throttling: number = 100;
+    private _throttling: number = 50;
     private sendCurrentStateThrottled;
 
     private _currentState: {
@@ -17,6 +17,7 @@ export class SerialPlotter implements vscode.Disposable {
 
     constructor() {
         this.setThrottling(this._throttling);
+        this._currentState = {};
     }
 
     public open() {
@@ -30,7 +31,7 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     public setSerialPortCtrl(serialPortCtrl: SerialPortCtrl) {
-        serialPortCtrl.onData(this.handleSerialData.bind(this));
+        serialPortCtrl.onLine(this.handleSerialLine.bind(this));
     }
 
     public setThrottling(throttling: number): void {
@@ -48,36 +49,20 @@ export class SerialPlotter implements vscode.Disposable {
                 client.send(JSON.stringify(this._currentState));
             }
         });
-
-        this._currentState = undefined;
     }
 
-    private handleSerialData(line: string): void {
-        if (line.length === 0) {
+    private handleSerialLine(line: string): void {
+        const match = line.match(/^PLOT\[(\d+)\]\[(.+?)=(.+?)\]/)
+
+        if (!match) {
             return;
         }
 
-        if (line.indexOf("PLOT") === -1) {
-            return;
-        }
+        const [, time, field, value] = match
 
-        const startIdx = line.indexOf("[");
-        const timeDelimeterIdx = line.indexOf(";");
-        const endIdx = line.indexOf("]");
-        const equalityIdx = line.indexOf("=");
-
-        const timeStr = line.slice(startIdx + 1, timeDelimeterIdx);
-        const time = parseInt(timeStr, 10);
-        const field = line.slice(timeDelimeterIdx + 1, equalityIdx);
-        const valueStr = line.slice(equalityIdx + 1, endIdx);
-        const value = parseFloat(valueStr);
-
-        this._currentState = {
-            ...this._currentState,
-            [field]: value,
-            time,
-        };
-
+        this._currentState.time = parseInt(time)
+        this._currentState[field] = parseFloat(value)
+        
         this.sendCurrentStateThrottled();
     }
 }
