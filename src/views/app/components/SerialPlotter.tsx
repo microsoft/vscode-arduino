@@ -1,56 +1,44 @@
-import * as React from "react";
-import { connect, ReactNode } from "react-redux";
-import {
-    FormGroup,
-    FormControl,
-    Col,
-    Button,
-    InputGroup,
-    ControlLabel
-} from "react-bootstrap";
 import * as Highcharts from "highcharts/highstock";
 import * as boost from "highcharts/modules/boost";
-import { chartConfig } from "./chartConfig";
+import * as React from "react";
+import {
+    Button,
+    ControlLabel,
+    FormControl,
+    FormGroup,
+    InputGroup,
+} from "react-bootstrap";
 import * as API from "../actions/api";
+import { chartConfig } from "./chartConfig";
 
 boost(Highcharts);
 
-interface DataFrame {
+interface IDataFrame {
     time: number;
     [field: string]: number;
 }
 
-interface DataAction {
+interface IDataAction {
     action: string;
 }
-
-interface ISerialPlotterProps extends React.Props<any> {}
 
 interface ISerialPlotterState extends React.Props<any> {
     rate: string;
     active: boolean;
 }
 
-const mapStateToProps = store => {
-    return {};
-};
-
-const mapDispatchToProps = dispatch => {
-    return {};
-};
-
 class SerialPlotter extends React.Component<
-    ISerialPlotterProps,
+    void,
     ISerialPlotterState
 > {
+    public state = {
+        rate: "100",
+        active: false,
+    };
+
     private _chartRef: HTMLElement;
     private _chart: Highcharts;
     private _ws: WebSocket;
-
-    public state = {
-        rate: "100",
-        active: false
-    };
 
     constructor(props) {
         super(props);
@@ -64,7 +52,7 @@ class SerialPlotter extends React.Component<
     public render() {
         return (
             <div>
-                <div ref={el => (this._chartRef = el)} />
+                <div ref={(el) => (this._chartRef = el)} />
                 <div>
                     <FormGroup bsSize="small">
                         <InputGroup>
@@ -89,7 +77,7 @@ class SerialPlotter extends React.Component<
 
                         <InputGroup>
                             <InputGroup.Button>
-                                <Button onClick={this.state.active ? this.pause : this.play}>{this.state.active ? 'Pause' : 'Play'}</Button>
+                                <Button onClick={this.state.active ? this.pause : this.play}>{this.state.active ? "Pause" : "Play"}</Button>
                             </InputGroup.Button>
                         </InputGroup>
                     </FormGroup>
@@ -102,7 +90,7 @@ class SerialPlotter extends React.Component<
         this._chart = Highcharts.stockChart(this._chartRef, chartConfig);
     }
 
-    private addFrame(frame: DataFrame) {
+    private addFrame(frame: IDataFrame) {
         const time = frame.time;
 
         for (const field of Object.keys(frame)) {
@@ -121,13 +109,13 @@ class SerialPlotter extends React.Component<
                     name: field,
                     data: [point],
                     color: getRandomColor(),
-                    type: "line"
+                    type: "line",
                 });
             }
         }
     }
 
-    private doAction(action: DataAction) {
+    private doAction(action: IDataAction) {
         if (action.action === "RESET") {
             this.reset();
         }
@@ -135,15 +123,15 @@ class SerialPlotter extends React.Component<
 
     private play = () => {
         this.setState({
-            active: true
+            active: true,
         });
-    };
+    }
 
     private pause = () => {
         this.setState({
-            active: false
+            active: false,
         });
-    };
+    }
 
     private reset = () => {
         while (this._chart.series.length > 0) {
@@ -151,14 +139,14 @@ class SerialPlotter extends React.Component<
         }
 
         this._chart.redraw();
-    };
+    }
 
     private initWebSocket() {
         this._ws = new WebSocket(`ws://${window.location.host}`);
 
         this._ws.onmessage = (e: MessageEvent) => {
-            if(!this.state.active) {
-                return
+            if (!this.state.active) {
+                return;
             }
 
             const data = JSON.parse(e.data);
@@ -171,31 +159,28 @@ class SerialPlotter extends React.Component<
         };
 
         this.setState({
-            active: true
+            active: true,
         });
     }
 
     private updatePlotRefreshRate = async () => {
-        const rate = parseInt(this.state.rate);
+        const rate = parseInt(this.state.rate, 10);
 
         if (!Number.isFinite(rate)) {
             return;
         }
 
         await API.updatePlotRefreshRate(rate);
-    };
+    }
 
-    private onRateChange = e => {
+    private onRateChange = (e) => {
         this.setState({
-            rate: e.target.value
+            rate: e.target.value,
         });
-    };
+    }
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(SerialPlotter);
+export default SerialPlotter;
 
 function getRandomColor(): string {
     const letters = "0123456789ABCDEF";

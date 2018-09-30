@@ -6,8 +6,8 @@ import ArduinoContext from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
-import { SerialPortCtrl, SerialPortEnding } from "./serialportctrl";
 import { SerialPlotter } from "./serialPlotter";
+import { SerialPortCtrl, SerialPortEnding } from "./serialportctrl";
 
 export interface ISerialPortDetail {
     comName: string;
@@ -51,7 +51,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _endingStatusBar: vscode.StatusBarItem;
 
-    private _openPlotterStatusBar: vscode.StatusBarItem;
+    private _openPlotStatusBar: vscode.StatusBarItem;
 
     private _serialPortCtrl: SerialPortCtrl = null;
 
@@ -59,7 +59,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _ending: SerialPortEnding;
 
-    private constructor() {       
+    private constructor() {
         this._serialPlotter = new SerialPlotter();
 
         const dc = DeviceContext.getInstance();
@@ -100,11 +100,11 @@ export class SerialMonitor implements vscode.Disposable {
         this._endingStatusBar.tooltip = "Serial Port Line Ending";
         this._endingStatusBar.text = `No line ending`;
 
-        this._openPlotterStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_SERIAL_PLOTTER);
-        this._openPlotterStatusBar.command = "arduino.openSerialPlotter";
-        this._openPlotterStatusBar.tooltip = "Open Serial Plotter";
-        this._openPlotterStatusBar.text = "Plotter";
-        this._openPlotterStatusBar.show();
+        this._openPlotStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_SERIAL_PLOTTER);
+        this._openPlotStatusBar.command = "arduino.openSerialPlotter";
+        this._openPlotStatusBar.tooltip = "Open Serial Plotter";
+        this._openPlotStatusBar.text = "Plotter";
+        this._openPlotStatusBar.show();
     }
     public get initialized(): boolean {
         return !!this._outputChannel;
@@ -194,8 +194,8 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async openSerialPlotter() {
-        if(!this._serialPortCtrl || !this._serialPortCtrl.isActive) {
-            await this.openSerialMonitor()
+        if (!this._serialPortCtrl || !this._serialPortCtrl.isActive) {
+            await this.openSerialMonitor();
         }
 
         this._serialPlotter.setSerialPortCtrl(this._serialPortCtrl);

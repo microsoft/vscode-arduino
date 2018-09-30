@@ -11,9 +11,9 @@ import * as Constants from "../common/constants";
 import { SERIAL_PLOTTER_URI } from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
+import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import LocalWebServer from "./localWebServer";
 import { VscodeSettings } from "./vscodeSettings";
-import { SerialMonitor } from "../serialmonitor/serialMonitor";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
@@ -55,7 +55,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
         // Arduino Serial Plotter
         this.addHandlerWithLogger("show-serialplotter", "/serialplotter", (req, res) => this.getHtmlView(req, res));
-        this.addHandlerWithLogger("update-plot-refresh-rate", "/api/update-plot-refresh-rate", (req, res) => this.updatePlotRefreshRate(req, res), true);
+        this.addHandlerWithLogger("updateplotrate", "/api/updateplotrate", (req, res) => this.updatePlotRefreshRate(req, res), true);
 
         this._webserver.start();
     }
@@ -312,7 +312,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         } else {
             try {
                 const serialMonitor = SerialMonitor.getInstance();
-                
+
                 serialMonitor.serialPlotter.setThrottling(req.body.rate);
 
                 return res.json({

@@ -5,9 +5,9 @@ import * as WebSocket from "ws";
 import { SERIAL_PLOTTER_URI } from "../common/constants";
 import { SerialPortCtrl } from "./serialportctrl";
 
-interface DataFrame {
-    time?: number,
-    [field: string]: number,
+interface IDataFrame {
+    time?: number;
+    [field: string]: number;
 }
 
 export class SerialPlotter implements vscode.Disposable {
@@ -15,7 +15,7 @@ export class SerialPlotter implements vscode.Disposable {
     private _throttling: number = 100;
     private sendCurrentFrameThrottled;
 
-    private _currentFrame: DataFrame;
+    private _currentFrame: IDataFrame;
     private _lastSentTime: number;
 
     constructor() {
@@ -28,7 +28,7 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     public reset() {
-        this.sendMessage({action: 'RESET'});
+        this.sendMessage({action: "RESET"});
     }
 
     public dispose() {}
@@ -47,13 +47,13 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     private sendCurrentFrame() {
-        if(this._lastSentTime >= this._currentFrame.time) {
-            return
+        if (this._lastSentTime >= this._currentFrame.time) {
+            return;
         }
 
         this.sendMessage(this._currentFrame);
         this._lastSentTime = this._currentFrame.time;
-        this._currentFrame = {}
+        this._currentFrame = {};
     }
 
     private sendMessage(msg: {}) {
@@ -69,20 +69,20 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     private handleSerialLine(line: string): void {
-        const match = line.match(/^PLOT\[(\d+)\]\[(.+?)=(.+?)\]/)
+        const match = line.match(/^PLOT\[(\d+)\]\[(.+?)=(.+?)\]/);
 
         if (!match) {
             return;
         }
 
-        const [, time, field, value] = match
+        const [, time, field, value] = match;
 
         this._currentFrame = {
             ...this._currentFrame,
             [field]: parseFloat(value),
-            time: parseInt(time),
-        }
-        
+            time: parseInt(time, 10),
+        };
+
         this.sendCurrentFrameThrottled();
     }
 }

@@ -1,9 +1,9 @@
 export const chartConfig = {
     chart: {
-        zoomType: "x"
+        zoomType: "x",
     },
     title: {
-        text: "Serial Plotter"
+        text: "Serial Plotter",
     },
     boost: {
         enabled: true,
@@ -13,60 +13,60 @@ export const chartConfig = {
         type: "datetime",
         crosshair: true,
         title: {
-            text: "Time"
-        }
+            text: "Time",
+        },
     },
     yAxis: {
         title: {
-            text: "Value"
-        }
+            text: "Value",
+        },
     },
     series: {
         marker: {
-            enabled: false
-        }
+            enabled: false,
+        },
     },
     tooltip: {
         animation: false,
         split: true,
-        xDateFormat: "%H:%M:%S.%L"
+        xDateFormat: "%H:%M:%S.%L",
     },
     legend: {
         layout: "vertical",
         align: "right",
         verticalAlign: "middle",
         title: {
-            text: "Legend"
-        }
+            text: "Legend",
+        },
     },
     plotOptions: {
         series: {
-            showInNavigator: true
-        }
+            showInNavigator: true,
+        },
     },
     rangeSelector: {
         buttons: [
             {
                 count: 10,
                 type: "second",
-                text: "10s"
+                text: "10s",
             },
             {
                 count: 30,
                 type: "second",
-                text: "30s"
+                text: "30s",
             },
             {
                 count: 1,
                 type: "minute",
-                text: "1m"
+                text: "1m",
             },
             {
                 type: "all",
-                text: "All"
-            }
+                text: "All",
+            },
         ],
         inputEnabled: false,
-        selected: 0
-    }
+        selected: 0,
+    },
 };

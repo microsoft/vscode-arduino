@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import * as os from "os";
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
 import { VscodeSettings } from "../arduino/vscodeSettings";
 
@@ -107,8 +107,8 @@ export class SerialPortCtrl {
 
         this._currentSerialPort.on("data", (_event) => {
           this._outputChannel.append(_event.toString());
-          
-          this.readLines(_event).forEach(line => this._lineEmitter.fire(line));
+
+          this.readLines(_event).forEach((line) => this._lineEmitter.fire(line));
         });
 
         this._currentSerialPort.on("error", (_error) => {
@@ -196,7 +196,7 @@ export class SerialPortCtrl {
     this._ending = newEnding;
   }
 
-  private readLines(buf: Buffer): Array<string> {
+  private readLines(buf: Buffer): string[] {
     this._lineBuffer = Buffer.concat([this._lineBuffer, buf]);
 
     const lastEndingIdx = this._lineBuffer.lastIndexOf("\r\n");
