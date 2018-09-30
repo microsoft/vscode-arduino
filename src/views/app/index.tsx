@@ -13,7 +13,6 @@ import LibraryManager from "./components/LibraryManager";
 import SerialPlotter from "./components/SerialPlotter";
 import reducer from "./reducers";
 import "./styles";
-import { createSocketMiddleware } from "./WebSocketMiddleware";
 
 class App extends React.Component<{}, {}> {
   public render() {
@@ -25,8 +24,7 @@ class App extends React.Component<{}, {}> {
   }
 }
 
-const webSocketMiddleware = createSocketMiddleware();
-const createStoreWithMiddleware = applyMiddleware(webSocketMiddleware)(createStore);
+const createStoreWithMiddleware = applyMiddleware()(createStore);
 const store = createStoreWithMiddleware(reducer);
 
 ReactDOM.render(

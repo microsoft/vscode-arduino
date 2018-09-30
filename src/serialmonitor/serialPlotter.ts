@@ -7,7 +7,7 @@ import { SerialPortCtrl } from "./serialportctrl";
 
 export class SerialPlotter implements vscode.Disposable {
     private _wss: WebSocket.Server;
-    private _throttling: number = 50;
+    private _throttling: number = 100;
     private sendCurrentStateThrottled;
 
     private _currentState: {

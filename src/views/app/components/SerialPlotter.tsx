@@ -1,106 +1,100 @@
 import * as React from "react";
-import { Button, Checkbox, DropdownButton, MenuItem } from "react-bootstrap";
-import * as ReactList from "react-list";
-import { connect } from "react-redux";
-import SearchInput, { createFilter } from "react-search-input";
-import * as actions from "../actions";
-import { versionCompare } from "../utils/util";
-import LibraryItemView from "./LibraryItemView";
-import {
-    HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Legend, LineSeries, Tooltip
-  } from "react-jsx-highcharts";
-import * as Highcharts from "highcharts";
+import { connect, ReactNode } from "react-redux";
+import * as Highcharts from "highcharts/highstock";
+import * as boost from "highcharts/modules/boost";
+import { chartConfig } from "./chartConfig";
+
+boost(Highcharts);
 
 interface ISerialPlotterProps extends React.Props<any> {
     plotData: {
-        [field: string]: number[][]
+        [field: string]: number[][];
     };
 }
 
 interface ISerialPlotterState extends React.Props<any> {}
 
 const mapStateToProps = store => {
-    return {
-        plotData: store.serialPlotterStore.data,
-    };
+    return {};
 };
 
 const mapDispatchToProps = dispatch => {
     return {};
 };
 
-class SerialPlotter extends React.Component<ISerialPlotterProps, ISerialPlotterState> {
-    private fieldColorMap: {
-        [field: string]: string,
-    } = {};
+class SerialPlotter extends React.Component<
+    ISerialPlotterProps,
+    ISerialPlotterState
+> {
+    private _chartRef: HTMLElement;
+    private _chart: Highcharts;
+    private _ws: WebSocket;
 
     constructor(props) {
         super(props);
     }
 
+    public componentDidMount() {
+        this.initWebSocket();
+        this.initChart();
+    }
+
     public render() {
-        const lines = Object.keys(this.props.plotData).map((field) => (
-            <LineSeries
-                id={field}
-                name={field}
-                data={this.props.plotData[field]}
-                color={this.getColorForField(field)}
-            />
-        ));
-
-        const plotOptions = {
-            series: {
-                marker: {
-                    enabled: false,
-                }
-            }
-        };
-
         return (
             <div>
-                <div>
-                    <HighchartsChart plotOptions={plotOptions}>
-                        <Chart zoomType="x" />
-                        <Title>Serial Plotter</Title>
-
-                        <Legend layout="vertical" align="right" verticalAlign="middle">
-                            <Legend.Title>Legend</Legend.Title>
-                        </Legend>
-
-                        <Tooltip shared={true} crosshairs={true}/>
-
-                        <XAxis type="datetime">
-                            <XAxis.Title>Time</XAxis.Title>
-                        </XAxis>
-
-                        <YAxis id="value">
-                            <YAxis.Title>Value</YAxis.Title>
-                            {...lines}
-                        </YAxis>
-                    </HighchartsChart>
-                </div>
+                <div ref={el => (this._chartRef = el)} />
             </div>
         );
     }
 
-    private getColorForField(field: string) {
-        if (!this.fieldColorMap[field]) {
-            this.fieldColorMap[field] = getRandomColor();
-        }
+    private initChart() {
+        this._chart = Highcharts.stockChart(this._chartRef, chartConfig);
+    }
 
-        const fieldColor = this.fieldColorMap[field];
-        return fieldColor;
+    private addFrame(frame) {
+        const time = frame.time;
+
+        for (const field of Object.keys(frame)) {
+            if (field === "time") {
+                continue;
+            }
+
+            const point = [time, frame[field]];
+            const series = this._chart.get(field);
+
+            if (series) {
+                series.addPoint(point, true, false, false);
+            } else {
+                this._chart.addSeries({
+                    id: field,
+                    name: field,
+                    data: [point],
+                    color: getRandomColor(),
+                    type: "line"
+                });
+            }
+        }
+    }
+
+    private initWebSocket() {
+        this._ws = new WebSocket(`ws://${window.location.host}`);
+
+        this._ws.onmessage = (e: MessageEvent) => {
+            this.addFrame(JSON.parse(e.data));
+        };
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withHighcharts(SerialPlotter, Highcharts));
-
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(SerialPlotter);
 
 function getRandomColor(): string {
     const letters = "0123456789ABCDEF";
     let color = "#";
     for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
-  }
+}
