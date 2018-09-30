@@ -46,13 +46,15 @@ export class SerialPortCtrl {
   private _currentBaudRate: number;
   private _currentSerialPort = null;
   private _ending: SerialPortEnding;
-  private _dataEmitter: vscode.EventEmitter<string>;
+  private _lineEmitter: vscode.EventEmitter<string>;
+  private _lineBuffer: Buffer;
 
   public constructor(port: string, baudRate: number, ending: SerialPortEnding, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
     this._ending = ending;
-    this._dataEmitter = new vscode.EventEmitter();
+    this._lineEmitter = new vscode.EventEmitter();
+    this._lineBuffer = Buffer.alloc(0);
   }
 
   public get isActive(): boolean {
@@ -63,8 +65,8 @@ export class SerialPortCtrl {
     return this._currentPort;
   }
 
-  public onData(listener: (string) => {}): vscode.Disposable {
-      return this._dataEmitter.event(listener);
+  public onLine(listener: (string) => {}): vscode.Disposable {
+      return this._lineEmitter.event(listener);
   }
 
   public open(): Promise<any> {
@@ -105,7 +107,8 @@ export class SerialPortCtrl {
 
         this._currentSerialPort.on("data", (_event) => {
           this._outputChannel.append(_event.toString());
-          this._dataEmitter.fire(_event.toString());
+          
+          this.readLines(_event).forEach(line => this._lineEmitter.fire(line));
         });
 
         this._currentSerialPort.on("error", (_error) => {
@@ -191,5 +194,16 @@ export class SerialPortCtrl {
   }
   public changeEnding(newEnding: SerialPortEnding) {
     this._ending = newEnding;
+  }
+
+  private readLines(buf: Buffer): Array<string> {
+    this._lineBuffer = Buffer.concat([this._lineBuffer, buf]);
+
+    const lastEndingIdx = this._lineBuffer.lastIndexOf("\r\n");
+    const lines = this._lineBuffer.slice(0, lastEndingIdx).toString().split("\r\n");
+
+    this._lineBuffer = this._lineBuffer.slice(lastEndingIdx + 1);
+
+    return lines;
   }
 }
