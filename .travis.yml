@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-- 'node'
+- '9'
 
 os:
 - linux
@@ -11,8 +11,12 @@ dist: trusty # using Ubuntu 14.04.5 LTS
 # fixing https://github.com/Microsoft/vscode/issues/33998
 addons:
   apt:
+    sources:
+      # https://docs.travis-ci.com/user/languages/c/#GCC-on-Linux
+      - ubuntu-toolchain-r-test
     packages:
       - libsecret-1-dev
+      - g++-4.9
 
 branches:
   only:
@@ -25,16 +29,18 @@ env:
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
-    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
+    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0 CODE_VERSION=1.20.1;
     sh -e /etc/init.d/xvfb start;
     sleep 3;
     wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER;
     tar -xvf /home/$USER/arduino-1.8.2-linux64.tar.xz -C /home/$USER/;
     sudo ln -s /home/$USER/arduino-1.8.2/arduino /usr/bin/arduino;
   fi
+# Arduino 1.8.7 has breaking change, Install board package and library will fail
+# https://github.com/arduino/Arduino/issues/8034
 - if [ $TRAVIS_OS_NAME == "osx" ]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-    brew cask install arduino;
+    brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/f908f03d37c981de93af8447b32641551d8bf74e/Casks/arduino.rb;
   fi
 
 install:
@@ -42,6 +48,8 @@ install:
 - npm install -g typescript
 - npm install -g gulp
 - npm install
+# https://github.com/travis-ci/travis-ci/issues/8813
+- rm -f ./node_modules/.bin/which
 
 script:
 - gulp tslint
@@ -55,6 +63,7 @@ deploy:
     api_key: $GIT_TOKEN
     file_glob: true
     file: "*.vsix"
+    skip_cleanup: true
     on:
       tags: true
       all_branches: true
@@ -62,6 +71,7 @@ deploy:
   # deploy to vscode extension market
   - provider: script  
     script: vsce publish -p $VSCE_TOKEN --packagePath *.vsix
+    skip_cleanup: true
     on:
       tags: true
       all_branches: true

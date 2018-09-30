@@ -2,14 +2,22 @@
 // Licensed under the MIT license.
 
 import * as os from "os";
-import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
 import * as vscode from 'vscode';
+import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 
 interface ISerialPortDetail {
   comName: string;
   manufacturer: string;
   vendorId: string;
   productId: string;
+}
+
+export enum SerialPortEnding {
+  "No line ending",
+  "Newline",
+  "Carriage return",
+  "Both NL & CR",
 }
 
 export class SerialPortCtrl {
@@ -37,11 +45,13 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
+  private _ending: SerialPortEnding;
   private _dataEmitter: vscode.EventEmitter<string>;
 
-  public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
+  public constructor(port: string, baudRate: number, ending: SerialPortEnding, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
+    this._ending = ending;
     this._dataEmitter = new vscode.EventEmitter();
   }
 
@@ -73,13 +83,15 @@ export class SerialPortCtrl {
           });
         });
       } else {
-        this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { 
-            baudRate: this._currentBaudRate,
-            parser: SerialPortCtrl.serialport.parsers.readline(/\r?\n/, 'utf8'),
-        });
+        this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
         this._outputChannel.show();
         this._currentSerialPort.on("open", () => {
-          this._currentSerialPort.write("TestingOpen", (err) => {
+          if (VscodeSettings.getInstance().disableTestingOpen) {
+            this._outputChannel.appendLine("[Warning] Auto checking serial port open is disabled");
+            return resolve();
+          }
+
+          this._currentSerialPort.write("TestingOpen", "Both NL & CR", (err) => {
             // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
             if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
               this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
@@ -91,9 +103,9 @@ export class SerialPortCtrl {
           });
         });
 
-        this._currentSerialPort.on("data", (line) => {
-            this._outputChannel.appendLine(line);
-            this._dataEmitter.fire(line);
+        this._currentSerialPort.on("data", (_event) => {
+          this._outputChannel.append(_event.toString());
+          this._dataEmitter.fire(_event.toString());
         });
 
         this._currentSerialPort.on("error", (_error) => {
@@ -110,7 +122,7 @@ export class SerialPortCtrl {
         return;
       }
 
-      this._currentSerialPort.write(text, (error) => {
+      this._currentSerialPort.write(text, SerialPortEnding[this._ending], (error) => {
         if (!error) {
           resolve();
         } else {
@@ -176,5 +188,8 @@ export class SerialPortCtrl {
         }
       });
     });
+  }
+  public changeEnding(newEnding: SerialPortEnding) {
+    this._ending = newEnding;
   }
 }

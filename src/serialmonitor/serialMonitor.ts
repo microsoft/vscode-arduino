@@ -2,11 +2,12 @@
 // Licensed under the MIT license.
 
 import * as vscode from "vscode";
+import ArduinoContext from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
+import { SerialPortCtrl, SerialPortEnding } from "./serialportctrl";
 import { SerialPlotter } from "./serialPlotter";
-import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
     comName: string;
@@ -20,6 +21,8 @@ export class SerialMonitor implements vscode.Disposable {
     public static SERIAL_MONITOR: string = "Serial Monitor";
 
     public static DEFAULT_BAUD_RATE: number = 115200;
+
+    public static DEFAULT_ENDING: SerialPortEnding = SerialPortEnding["No line ending"];
 
     public static listBaudRates(): number[] {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
@@ -46,11 +49,15 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _baudRateStatusBar: vscode.StatusBarItem;
 
+    private _endingStatusBar: vscode.StatusBarItem;
+
     private _openPlotterStatusBar: vscode.StatusBarItem;
 
     private _serialPortCtrl: SerialPortCtrl = null;
 
     private _outputChannel: vscode.OutputChannel;
+
+    private _ending: SerialPortEnding;
 
     private constructor() {
         this._serialPlotter = new SerialPlotter();
@@ -67,8 +74,9 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public initialize() {
+        const defaultBaudRate = ArduinoContext.arduinoApp.settings.defaultBaudRate || SerialMonitor.DEFAULT_BAUD_RATE;
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
-        this._currentBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
+        this._currentBaudRate = defaultBaudRate;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
         this._portsStatusBar.tooltip = "Select Serial Port";
@@ -83,15 +91,20 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.BAUD_RATE);
         this._baudRateStatusBar.command = "arduino.changeBaudRate";
         this._baudRateStatusBar.tooltip = "Baud Rate";
-        this._baudRateStatusBar.text = SerialMonitor.DEFAULT_BAUD_RATE.toString();
+        this._baudRateStatusBar.text = defaultBaudRate.toString();
+        this.updatePortListStatus(null);
+
+        this._endingStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.ENDING);
+        this._ending = SerialMonitor.DEFAULT_ENDING;
+        this._endingStatusBar.command = "arduino.changeEnding";
+        this._endingStatusBar.tooltip = "Serial Port Line Ending";
+        this._endingStatusBar.text = `No line ending`;
 
         this._openPlotterStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_SERIAL_PLOTTER);
         this._openPlotterStatusBar.command = "arduino.openSerialPlotter";
         this._openPlotterStatusBar.tooltip = "Open Serial Plotter";
         this._openPlotterStatusBar.text = "Plotter";
         this._openPlotterStatusBar.show();
-
-        this.updatePortListStatus(null);
     }
     public get initialized(): boolean {
         return !!this._outputChannel;
@@ -162,7 +175,7 @@ export class SerialMonitor implements vscode.Disposable {
                 return;
             }
         } else {
-            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._outputChannel);
+            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._ending, this._outputChannel);
         }
 
         if (!this._serialPortCtrl.currentPort) {
@@ -220,6 +233,19 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.text = chosen;
     }
 
+    public async changeEnding() {
+        const chosen: string|undefined = await vscode.window.showQuickPick(Object.keys(SerialPortEnding)
+            .filter((key) => {
+                return !isNaN(Number(SerialPortEnding[key]));
+            }), { placeHolder: "Select serial port ending" });
+        if (!chosen) {
+            return;
+        }
+        this._ending = SerialPortEnding[chosen];
+        this._serialPortCtrl.changeEnding(this._ending);
+        this._endingStatusBar.text = chosen;
+    }
+
     public async closeSerialMonitor(port: string, showWarning: boolean = true): Promise<boolean> {
         if (this._serialPortCtrl) {
             if (port && port !== this._serialPortCtrl.currentPort) {
@@ -255,11 +281,13 @@ export class SerialMonitor implements vscode.Disposable {
             this._openPortStatusBar.text = `$(x)`;
             this._openPortStatusBar.tooltip = "Close Serial Monitor";
             this._baudRateStatusBar.show();
+            this._endingStatusBar.show();
         } else {
             this._openPortStatusBar.command = "arduino.openSerialMonitor";
             this._openPortStatusBar.text = `$(plug)`;
             this._openPortStatusBar.tooltip = "Open Serial Monitor";
             this._baudRateStatusBar.hide();
+            this._endingStatusBar.hide();
         }
 
     }

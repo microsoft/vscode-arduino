@@ -202,10 +202,13 @@ export class BoardManager {
                     .find((_plat) => _plat.architecture === plat.architecture && _plat.package.name === plat.package.name);
                 if (addedPlatform) {
                     // union boards from all versions.
-                    addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
-                        return a.name === b.name;
-                    });
-                    addedPlatform.versions.push(plat.version);
+                    // We should not union boards: https://github.com/Microsoft/vscode-arduino/issues/414
+                    // addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
+                    //     return a.name === b.name;
+                    // });
+                    if (addedPlatform.name === plat.name) {
+                        addedPlatform.versions.push(plat.version);
+                    }
                 } else {
                     plat.versions = [plat.version];
                     // Clear the version information since the plat will be used to contain all supported versions.
@@ -415,10 +418,15 @@ export class BoardManager {
     private getAdditionalUrls(): string[] {
         function formatUrls(urls): string[] {
             if (urls) {
+                let _urls: string[];
+
                 if (!Array.isArray(urls) && typeof urls === "string") {
-                    return (<string>urls).split(",");
+                    _urls = (<string>urls).split(",");
+                } else {
+                    _urls = <string[]>urls;
                 }
-                return <string[]>urls;
+
+                return util.trim(_urls);
             }
             return [];
         }

@@ -7,8 +7,10 @@ import * as vscode from "vscode";
 import * as constants from "../common/constants";
 import * as util from "../common/util";
 
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
+import { ArduinoWorkspace } from "../common/workspace";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {
 
@@ -23,8 +25,8 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
     private _activated: boolean = false;
 
     constructor() {
-        if (vscode.workspace && vscode.workspace.rootPath) {
-            this._cppConfigFile = path.join(vscode.workspace.rootPath, constants.CPP_CONFIG_FILE);
+        if (vscode.workspace && ArduinoWorkspace.rootPath) {
+            this._cppConfigFile = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
             this._watcher = vscode.workspace.createFileSystemWatcher(this._cppConfigFile);
             this._watcher.onDidCreate(() => this.updateLibList());
             this._watcher.onDidChange(() => this.updateLibList());
@@ -34,6 +36,9 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
 
     public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position):
          Promise<vscode.CompletionItem[]> {
+        if (VscodeSettings.getInstance().skipHeaderProvider) {
+            return [];
+        }
         if (!ArduinoContext.initialized) {
             await ArduinoActivator.activate();
         }

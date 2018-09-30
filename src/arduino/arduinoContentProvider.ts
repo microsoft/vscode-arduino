@@ -247,7 +247,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
 
     public async getBoardConfig(req, res) {
         return res.json({
-            configitems: ArduinoContext.boardManager.currentBoard.configItems,
+            configitems: (ArduinoContext.boardManager.currentBoard === null) ? null : ArduinoContext.boardManager.currentBoard.configItems,
         });
     }
 
@@ -310,6 +310,12 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             let properties = {};
             if (post) {
                 properties = { ...req.body };
+
+                // Removal requirement for GDPR
+                if ("install-board" === handlerName) {
+                    const packageNameKey = "packageName";
+                    delete properties[packageNameKey];
+                }
             }
             Logger.traceUserData(`start-` + handlerName, { correlationId: guid, ...properties });
             const timer1 = new Logger.Timer();

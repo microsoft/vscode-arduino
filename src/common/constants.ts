@@ -23,16 +23,23 @@ export const SERIAL_PLOTTER_URI = vscode.Uri.parse("arduino-manager://arduino/ar
 export const messages = {
     ARDUINO_FILE_ERROR: "The arduino.json file format is not correct.",
     NO_BOARD_SELECTED: "Please select the board type first.",
-    INVALID_ARDUINO_PATH: "Cannot find the Arduino installation path. You can specify the path in the user settings.",
+    INVALID_ARDUINO_PATH: "Cannot find Arduino IDE. Please specify the \"arduino.path\" in the User Settings. Requires a restart after change.",
+    INVALID_COMMAND_PATH: "Please check the \"arduino.commandPath\" in the User Settings." +
+"Requires a restart after change.Cannot find the command file:",
     FAILED_SEND_SERIALPORT: "Failed to send message to serial port.",
     SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
     SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",
+    NO_PROGRAMMMER_SELECTED: "Please select the programmer first.",
+    INVALID_OUTPUT_PATH: "Please check the \"output\" in the sketch Settings.Cannot find the output path:",
 };
 
 export const statusBarPriority = {
-    PORT: 2,
-    OPEN_PORT: 3,
-    BAUD_RATE: 4,
-    OPEN_SERIAL_PLOTTER: 5,
-    BOARD: 6,
+    PORT: 20,
+    OPEN_PORT: 30,
+    BAUD_RATE: 40,
+    OPEN_SERIAL_PLOTTER: 50,
+    BOARD: 60,
+    ENDING: 70,
+    SKETCH: 80,
+    PROGRAMMER: 90,
 };

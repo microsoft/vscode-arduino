@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.10",
+  "version": "0.2.20",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -36,6 +36,8 @@
     "*",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
+    "onCommand:arduino.uploadUsingProgrammer",
+    "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
     "onCommand:arduino.addLibPath",
@@ -74,6 +76,14 @@
       {
         "command": "arduino.upload",
         "title": "Arduino: Upload"
+      },
+      {
+        "command": "arduino.uploadUsingProgrammer",
+        "title": "Arduino: Upload Using Programmer"
+      },
+      {
+        "command": "arduino.selectProgrammer",
+        "title": "Arduino: Select Programmer"
       },
       {
         "command": "arduino.selectSerialPort",
@@ -155,7 +165,7 @@
                   "text": "target remote localhost:3333"
                 },
                 {
-                  "text": "^\"file \\${file}\""
+                  "text": "^\"file \\\"\\${file}\\\"\""
                 },
                 {
                   "text": "load"
@@ -436,6 +446,22 @@
         "arduino.enableUSBDetection": {
           "type": "boolean",
           "default": true
+        },
+        "arduino.disableTestingOpen": {
+          "type": "boolean",
+          "default": false
+        },
+        "arduino.ignoreBoards": {
+          "type": "array",
+          "default": []
+        },
+        "arduino.skipHeaderProvider": {
+          "type": "boolean",
+          "default": false
+        },
+        "arduino.defaultBaudRate": {
+          "type": "number",
+          "default": 115200
         }
       }
     },
@@ -452,6 +478,15 @@
         "id": "arduino-output",
         "mimetypes": [
           "text/x-code-output"
+        ]
+      },
+      {
+        "id": "cpp",
+        "extensions": [
+          ".ino"
+        ],
+        "aliases": [
+          "Arduino"
         ]
       }
     ],
@@ -501,12 +536,12 @@
     "gulp-tslint": "^7.0.1",
     "gulp-typescript": "^3.1.5",
     "gulp-util": "^3.0.8",
-    "mocha": "^2.3.3",
+    "mocha": "^4.1.0",
     "run-sequence": "^1.2.2",
     "tslint": "^4.2.0",
     "typemoq": "^1.6.0",
     "typescript": "^2.2.1",
-    "vscode": "^1.0.0",
+    "vscode": "^1.1.10",
     "webpack": "^2.2.1"
   },
   "dependencies": {
@@ -518,7 +553,7 @@
     "lodash.throttle": "^4.1.1",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
-    "vscode-extension-telemetry": "0.0.6",
+    "vscode-extension-telemetry": "0.0.18",
     "winreg": "^1.2.3",
     "winston": "^2.3.1",
     "ws": "^4.0.0"
