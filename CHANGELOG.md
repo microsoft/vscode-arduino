@@ -2,13 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## Version 0.2.21
-- Release date: September 20, 2018
+- Release date: October 10, 2018
 
 ### Changed
+- Travis will install arduino 1.8.6 on Mac OS instead of latest version, because arduino 1.8.7 will install board package and library failed.
 - Fix the output path not exist issue [#641](https://github.com/Microsoft/vscode-arduino/issues/641)
 - Update arduino.path instruction [#635](https://github.com/Microsoft/vscode-arduino/issues/635)
 
-Special thanks to [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you for your feedbacks.
+Special thanks to [aster94](https://github.com/aster94),  [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you foryour contributions and feedbacks.
 
 ## Version 0.2.20
 - Release date: August 16, 2018
