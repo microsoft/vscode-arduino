@@ -1,5 +1,13 @@
 import * as React from "react";
 import { connect, ReactNode } from "react-redux";
+import {
+    FormGroup,
+    FormControl,
+    Col,
+    Button,
+    InputGroup,
+    ControlLabel
+} from "react-bootstrap";
 import * as Highcharts from "highcharts/highstock";
 import * as boost from "highcharts/modules/boost";
 import { chartConfig } from "./chartConfig";
@@ -43,6 +51,17 @@ class SerialPlotter extends React.Component<
         return (
             <div>
                 <div ref={el => (this._chartRef = el)} />
+                <div>
+                    <FormGroup bsSize="small">
+                        <InputGroup>
+                            <ControlLabel>Refresh rate</ControlLabel>
+                            <FormControl type="text" value="100" />
+                            <InputGroup.Button>
+                                <Button>Apply</Button>
+                            </InputGroup.Button>
+                        </InputGroup>
+                    </FormGroup>
+                </div>
             </div>
         );
     }
