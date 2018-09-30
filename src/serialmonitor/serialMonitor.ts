@@ -59,9 +59,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _ending: SerialPortEnding;
 
-    private constructor() {
-        this._serialPlotter = new SerialPlotter();
-        
+    private constructor() {       
         const dc = DeviceContext.getInstance();
         dc.onDidChange(() => {
             if (dc.port) {
@@ -193,7 +191,13 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async openSerialPlotter() {
-        // TODO: check if monitor active
+        if(!this._serialPlotter) {
+            this._serialPlotter = new SerialPlotter();
+        }
+
+        if(!this._serialPortCtrl || !this._serialPortCtrl.isActive) {
+            await this.openSerialMonitor()
+        }
 
         this._serialPlotter.setSerialPortCtrl(this._serialPortCtrl);
         this._serialPlotter.open();
