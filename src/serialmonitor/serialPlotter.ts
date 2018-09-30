@@ -5,19 +5,22 @@ import * as WebSocket from "ws";
 import { SERIAL_PLOTTER_URI } from "../common/constants";
 import { SerialPortCtrl } from "./serialportctrl";
 
+interface DataFrame {
+    time?: number,
+    [field: string]: number,
+}
+
 export class SerialPlotter implements vscode.Disposable {
     private _wss: WebSocket.Server;
     private _throttling: number = 100;
-    private sendCurrentStateThrottled;
+    private sendCurrentFrameThrottled;
 
-    private _currentState: {
-        time?: number,
-        [field: string]: number,
-    };
+    private _currentFrame: DataFrame;
+    private _lastSentTime: number;
 
     constructor() {
         this.setThrottling(this._throttling);
-        this._currentState = {};
+        this._currentFrame = {};
     }
 
     public open() {
@@ -40,11 +43,17 @@ export class SerialPlotter implements vscode.Disposable {
 
     public setThrottling(throttling: number): void {
         this._throttling = throttling;
-        this.sendCurrentStateThrottled = throttle(this.sendCurrentState, this._throttling, { leading: false });
+        this.sendCurrentFrameThrottled = throttle(this.sendCurrentFrame, this._throttling, { leading: false });
     }
 
-    private sendCurrentState() {
-        this.sendMessage(this._currentState);
+    private sendCurrentFrame() {
+        if(this._lastSentTime >= this._currentFrame.time) {
+            return
+        }
+
+        this.sendMessage(this._currentFrame);
+        this._lastSentTime = this._currentFrame.time;
+        this._currentFrame = {}
     }
 
     private sendMessage(msg: {}) {
@@ -68,9 +77,12 @@ export class SerialPlotter implements vscode.Disposable {
 
         const [, time, field, value] = match
 
-        this._currentState.time = parseInt(time)
-        this._currentState[field] = parseFloat(value)
+        this._currentFrame = {
+            ...this._currentFrame,
+            [field]: parseFloat(value),
+            time: parseInt(time),
+        }
         
-        this.sendCurrentStateThrottled();
+        this.sendCurrentFrameThrottled();
     }
 }
