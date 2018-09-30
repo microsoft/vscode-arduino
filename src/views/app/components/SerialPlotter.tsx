@@ -15,10 +15,20 @@ import * as API from "../actions/api";
 
 boost(Highcharts);
 
+interface DataFrame {
+    time: number;
+    [field: string]: number;
+}
+
+interface DataAction {
+    action: string;
+}
+
 interface ISerialPlotterProps extends React.Props<any> {}
 
 interface ISerialPlotterState extends React.Props<any> {
     rate: string;
+    active: boolean;
 }
 
 const mapStateToProps = store => {
@@ -38,7 +48,8 @@ class SerialPlotter extends React.Component<
     private _ws: WebSocket;
 
     public state = {
-        rate: '100'
+        rate: "100",
+        active: false
     };
 
     constructor(props) {
@@ -69,6 +80,18 @@ class SerialPlotter extends React.Component<
                                 </Button>
                             </InputGroup.Button>
                         </InputGroup>
+
+                        <InputGroup>
+                            <InputGroup.Button>
+                                <Button onClick={this.reset}>Reset</Button>
+                            </InputGroup.Button>
+                        </InputGroup>
+
+                        <InputGroup>
+                            <InputGroup.Button>
+                                <Button onClick={this.state.active ? this.pause : this.play}>{this.state.active ? 'Pause' : 'Play'}</Button>
+                            </InputGroup.Button>
+                        </InputGroup>
                     </FormGroup>
                 </div>
             </div>
@@ -79,7 +102,7 @@ class SerialPlotter extends React.Component<
         this._chart = Highcharts.stockChart(this._chartRef, chartConfig);
     }
 
-    private addFrame(frame) {
+    private addFrame(frame: DataFrame) {
         const time = frame.time;
 
         for (const field of Object.keys(frame)) {
@@ -104,12 +127,52 @@ class SerialPlotter extends React.Component<
         }
     }
 
+    private doAction(action: DataAction) {
+        if (action.action === "RESET") {
+            this.reset();
+        }
+    }
+
+    private play = () => {
+        this.setState({
+            active: true
+        });
+    };
+
+    private pause = () => {
+        this.setState({
+            active: false
+        });
+    };
+
+    private reset = () => {
+        while (this._chart.series.length > 0) {
+            this._chart.series[0].remove(false);
+        }
+
+        this._chart.redraw();
+    };
+
     private initWebSocket() {
         this._ws = new WebSocket(`ws://${window.location.host}`);
 
         this._ws.onmessage = (e: MessageEvent) => {
-            this.addFrame(JSON.parse(e.data));
+            if(!this.state.active) {
+                return
+            }
+
+            const data = JSON.parse(e.data);
+
+            if (data.time) {
+                this.addFrame(data);
+            } else if (data.action) {
+                this.doAction(data);
+            }
         };
+
+        this.setState({
+            active: true
+        });
     }
 
     private updatePlotRefreshRate = async () => {

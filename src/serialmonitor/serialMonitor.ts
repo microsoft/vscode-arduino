@@ -186,6 +186,7 @@ export class SerialMonitor implements vscode.Disposable {
         try {
             await this._serialPortCtrl.open();
             this.updatePortStatus(true);
+            this._serialPlotter.reset();
         } catch (error) {
             Logger.notifyUserWarning("openSerialMonitorError", error,
                 `Failed to open serial port ${this._currentPort} due to error: + ${error.toString()}`);

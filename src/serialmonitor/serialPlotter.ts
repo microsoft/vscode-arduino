@@ -24,6 +24,10 @@ export class SerialPlotter implements vscode.Disposable {
         vscode.commands.executeCommand("vscode.previewHtml", SERIAL_PLOTTER_URI, vscode.ViewColumn.Two, "Serial Plotter");
     }
 
+    public reset() {
+        this.sendMessage({action: 'RESET'});
+    }
+
     public dispose() {}
 
     public setWebSocketServer(wss: WebSocket.Server) {
@@ -40,13 +44,17 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     private sendCurrentState() {
+        this.sendMessage(this._currentState);
+    }
+
+    private sendMessage(msg: {}) {
         if (!this._wss) {
             return;
         }
 
         this._wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(this._currentState));
+                client.send(JSON.stringify(msg));
             }
         });
     }
