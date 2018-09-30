@@ -13,6 +13,7 @@ import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
 import LocalWebServer from "./localWebServer";
 import { VscodeSettings } from "./vscodeSettings";
+import { SerialMonitor } from "../serialmonitor/serialMonitor";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
@@ -52,8 +53,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("load-examples", "/api/examples", async (req, res) => await this.getExamples(req, res));
         this.addHandlerWithLogger("open-example", "/api/openexample", (req, res) => this.openExample(req, res), true);
 
-        // Serial Plotter
+        // Arduino Serial Plotter
         this.addHandlerWithLogger("show-serialplotter", "/serialplotter", (req, res) => this.getHtmlView(req, res));
+        this.addHandlerWithLogger("update-plot-refresh-rate", "/api/update-plot-refresh-rate", (req, res) => this.updatePlotRefreshRate(req, res), true);
 
         this._webserver.start();
     }
@@ -300,6 +302,24 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                 });
             } catch (error) {
                 return res.status(500).send(`Cannot open the example folder with error message "${error}"`);
+            }
+        }
+    }
+
+    public updatePlotRefreshRate(req, res) {
+        if (!req.body.rate) {
+            return res.status(400).send("BAD Request! Missing parameters!");
+        } else {
+            try {
+                const serialMonitor = SerialMonitor.getInstance();
+                
+                serialMonitor.serialPlotter.setThrottling(req.body.rate);
+
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Update plot refresh rate failed with message "code:${error.code}, err:${error.stderr}"`);
             }
         }
     }

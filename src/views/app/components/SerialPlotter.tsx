@@ -11,16 +11,15 @@ import {
 import * as Highcharts from "highcharts/highstock";
 import * as boost from "highcharts/modules/boost";
 import { chartConfig } from "./chartConfig";
+import * as API from "../actions/api";
 
 boost(Highcharts);
 
-interface ISerialPlotterProps extends React.Props<any> {
-    plotData: {
-        [field: string]: number[][];
-    };
-}
+interface ISerialPlotterProps extends React.Props<any> {}
 
-interface ISerialPlotterState extends React.Props<any> {}
+interface ISerialPlotterState extends React.Props<any> {
+    rate: string;
+}
 
 const mapStateToProps = store => {
     return {};
@@ -37,6 +36,10 @@ class SerialPlotter extends React.Component<
     private _chartRef: HTMLElement;
     private _chart: Highcharts;
     private _ws: WebSocket;
+
+    public state = {
+        rate: '100'
+    };
 
     constructor(props) {
         super(props);
@@ -55,9 +58,15 @@ class SerialPlotter extends React.Component<
                     <FormGroup bsSize="small">
                         <InputGroup>
                             <ControlLabel>Refresh rate</ControlLabel>
-                            <FormControl type="text" value="100" />
+                            <FormControl
+                                type="text"
+                                value={this.state.rate}
+                                onChange={this.onRateChange}
+                            />
                             <InputGroup.Button>
-                                <Button>Apply</Button>
+                                <Button onClick={this.updatePlotRefreshRate}>
+                                    Apply
+                                </Button>
                             </InputGroup.Button>
                         </InputGroup>
                     </FormGroup>
@@ -102,6 +111,22 @@ class SerialPlotter extends React.Component<
             this.addFrame(JSON.parse(e.data));
         };
     }
+
+    private updatePlotRefreshRate = async () => {
+        const rate = parseInt(this.state.rate);
+
+        if (!Number.isFinite(rate)) {
+            return;
+        }
+
+        await API.updatePlotRefreshRate(rate);
+    };
+
+    private onRateChange = e => {
+        this.setState({
+            rate: e.target.value
+        });
+    };
 }
 
 export default connect(
