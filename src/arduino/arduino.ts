@@ -211,6 +211,7 @@ export class ArduinoApp {
         if (dc.output) {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             args.push("--pref", `build.path=${outputPath}`);
+            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
         } else if (VscodeSettings.getInstance().defaultOutputPath !== "") {
             const outputPath = VscodeSettings.getInstance().defaultOutputPath;
             args.push("--pref", `build.path=${outputPath}`);
