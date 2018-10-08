@@ -17,6 +17,7 @@ Welcome to Visual Studio Code extension for **Arduino** <sup>preview</sup> ! The
 
 ## Prerequisites
 Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software#download).
+- `Note: Arduino IDE 1.8.7 has some breaking changes, it will install board package and library failed, So it is recommended that you install version 1.8.6`
 - The supported Arduino IDE versions are 1.6.x and later.
 - The Windows Store's version of Arduino IDE is not supported because of the sandbox environment of Windows app.
 
