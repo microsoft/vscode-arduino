@@ -17,6 +17,7 @@ Welcome to Visual Studio Code extension for **Arduino** <sup>preview</sup> ! The
 
 ## Prerequisites
 Arduino IDE is required. Please install it from [here](https://www.arduino.cc/en/main/software#download).
+- `Note: Arduino IDE 1.8.7 has some breaking changes, it will install board package and library failed, So it is recommended that you install version 1.8.6`
 - The supported Arduino IDE versions are 1.6.x and later.
 - The Windows Store's version of Arduino IDE is not supported because of the sandbox environment of Windows app.
 
@@ -69,7 +70,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
-- `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. You can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac, `bin/run-arduino.sh` for Linux."
+- `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`.The default value is `arduino_debug.exe`for windows,`arduino`for ubuntu; You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac, `bin/run-arduino.sh` for Linux."
 - `arduino.additionalUrls` - Additional Boards Manager Urls for 3rd party packages. You can have multiple URLs in one string with comma(,) as separator, or have a string array. The default value is empty.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
 - `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. when plug in your device to your computer, will pop up a message "Detected board ****, Would you like to switch to this board type", after click "yes" button, will automatically detect on which serial port (COM) is connected an usb device. if your device does not support this feature, please provide us with the pid/vid of device, the code format is defined in misc/usbmapping.json. 
