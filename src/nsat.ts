@@ -9,9 +9,8 @@ import * as Logger from "./logger/logger";
 
 const IS_MUST_CANDIDATE_VERSION = false;
 const NSAT_SURVEY_URL = "https://www.surveymonkey.com/r/CC2GVRC";
-// const PROBABILITY = 0.5;
+const PROBABILITY = 0.5;
 const SESSION_COUNT_THRESHOLD = 2;
-const PROBABILITY = 0;
 const SESSION_COUNT_KEY = "nsat/sessionCount";
 const LAST_SESSION_DATE_KEY = "nsat/lastSessionDate";
 const TAKE_SURVEY_DATE_KEY = "nsat/takeSurveyDate";
@@ -46,7 +45,7 @@ export class NSAT {
     await globalState.update(LAST_SESSION_DATE_KEY, today);
     await globalState.update(SESSION_COUNT_KEY, sessionCount);
 
-    if (sessionCount < SESSION_COUNT_THRESHOLD || (candidatedVersion !== "remindmelater" && Math.random() < PROBABILITY)) {
+    if (sessionCount < SESSION_COUNT_THRESHOLD || (candidatedVersion !== "remindmelater" && Math.random() > PROBABILITY)) {
       return;
     }
 
