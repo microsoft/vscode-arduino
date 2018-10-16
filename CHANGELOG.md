@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.22
+- Release date: October 17, 2018
+
+### Added
+- Add Net Satisfaction Score survey
+
 ## Version 0.2.21
 - Release date: October 10, 2018
 
