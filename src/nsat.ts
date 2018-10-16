@@ -10,7 +10,7 @@ import * as Logger from "./logger/logger";
 const IS_MUST_CANDIDATE_VERSION = false;
 const NSAT_SURVEY_URL = "https://www.surveymonkey.com/r/CC2GVRC";
 const PROBABILITY = 0.5;
-const SESSION_COUNT_THRESHOLD = 7;
+const SESSION_COUNT_THRESHOLD = 5;
 const SESSION_COUNT_KEY = "nsat/sessionCount";
 const LAST_SESSION_DATE_KEY = "nsat/lastSessionDate";
 const TAKE_SURVEY_DATE_KEY = "nsat/takeSurveyDate";
@@ -60,6 +60,7 @@ export class NSAT {
                 encodeURIComponent(extensionVersion)}`));
         await globalState.update(CANDIDATED_VERSION_KEY, extensionVersion);
         await globalState.update(TAKE_SURVEY_DATE_KEY, today);
+        await globalState.update(SESSION_COUNT_KEY, 0);
       },
     };
     const remind = {
