@@ -10,7 +10,7 @@ import * as Logger from "./logger/logger";
 const IS_MUST_CANDIDATE_VERSION = false;
 const NSAT_SURVEY_URL = "https://www.surveymonkey.com/r/CC2GVRC";
 const PROBABILITY = 0.5;
-const SESSION_COUNT_THRESHOLD = 2;
+const SESSION_COUNT_THRESHOLD = 7;
 const SESSION_COUNT_KEY = "nsat/sessionCount";
 const LAST_SESSION_DATE_KEY = "nsat/lastSessionDate";
 const TAKE_SURVEY_DATE_KEY = "nsat/takeSurveyDate";
