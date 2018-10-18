@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## Version 0.2.22
-- Release date: October 17, 2018
+- Release date: October 18, 2018
 
 ### Added
 - Add Net Satisfaction Score survey
