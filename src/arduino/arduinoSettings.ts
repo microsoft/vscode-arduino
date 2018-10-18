@@ -239,8 +239,7 @@ export class ArduinoSettings implements IArduinoSettings {
     private async tryGetDefaultOutputPath(): Promise<void> {
         const configValue = VscodeSettings.getInstance().defaultOutputPath;
         if (!configValue || !configValue.trim()) {
-            // not set
-            // return ""?
+            this._defaultOutputPath = undefined;
         } else {
             this._defaultOutputPath = configValue;
         }

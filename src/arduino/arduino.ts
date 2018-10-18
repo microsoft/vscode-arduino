@@ -146,10 +146,9 @@ export class ArduinoApp {
                 Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return;
             }
-
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
-        } else if (VscodeSettings.getInstance().defaultOutputPath !== "") {
+        } else if (!VscodeSettings.getInstance().defaultOutputPath) {
             const outputPath = VscodeSettings.getInstance().defaultOutputPath;
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
@@ -215,10 +214,9 @@ export class ArduinoApp {
                 Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return;
             }
-
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
-        } else if (VscodeSettings.getInstance().defaultOutputPath !== "") {
+        } else if (!VscodeSettings.getInstance().defaultOutputPath) {
             const outputPath = VscodeSettings.getInstance().defaultOutputPath;
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
@@ -281,10 +279,9 @@ export class ArduinoApp {
                 Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return;
             }
-
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
-        } else if (VscodeSettings.getInstance().defaultOutputPath !== "") {
+        } else if (!VscodeSettings.getInstance().defaultOutputPath) {
             const outputPath = VscodeSettings.getInstance().defaultOutputPath;
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
@@ -292,7 +289,7 @@ export class ArduinoApp {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
             arduinoChannel.warning(msg);
         }
-        
+
         arduinoChannel.show();
         // we need to return the result of verify
         try {
