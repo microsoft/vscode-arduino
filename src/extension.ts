@@ -21,6 +21,7 @@ import { ArduinoDebugConfigurationProvider } from "./debug/configurationProvider
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
+import { NSAT } from "./nsat";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
 
@@ -73,6 +74,8 @@ export async function activate(context: vscode.ExtensionContext) {
             correlationId: guid,
             duration: timer1.end(),
         });
+
+        NSAT.takeSurvey(context);
     };
     const registerArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
@@ -85,9 +88,12 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             const arduinoPath = ArduinoContext.arduinoApp.settings.arduinoPath;
+            const commandPath = ArduinoContext.arduinoApp.settings.commandPath;
             if (!arduinoPath || !validateArduinoPath(arduinoPath)) { // Pop up vscode User Settings page when cannot resolve arduino path.
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+            } else if (!commandPath || !util.fileExistsSync(commandPath)) {
+                Logger.notifyUserError("InvalidCommandPath", new Error(constants.messages.INVALID_COMMAND_PATH + commandPath));
             } else {
                 await commandExecution(command, commandBody, args, getUserData);
             }

@@ -1,6 +1,28 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.22
+- Release date: October 18, 2018
+
+### Added
+- Add Net Satisfaction Score survey
+
+## Version 0.2.21
+- Release date: October 10, 2018
+
+### Changed
+- Fix the output path not exist issue [#641](https://github.com/Microsoft/vscode-arduino/issues/641)
+- Update arduino.path instruction [#635](https://github.com/Microsoft/vscode-arduino/issues/635)
+
+Special thanks to [aster94](https://github.com/aster94),  [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you foryour contributions and feedbacks.
+
+## Version 0.2.20
+- Release date: August 16, 2018
+
+### Changed
+- Add arduino.defaultBaudRate option [#616](https://github.com/Microsoft/vscode-arduino/issues/616)
+- Pop up a message to help the user figure out what settings are wrong [#611](https://github.com/Microsoft/vscode-arduino/issues/611)
+
 ## Version 0.2.19
 - Release date: July 31, 2018
 

@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.19",
+  "version": "0.2.22",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -459,7 +459,7 @@
           "type": "boolean",
           "default": false
         },
-        "defaultBaudRate": {
+        "arduino.defaultBaudRate": {
           "type": "number",
           "default": 115200
         }
@@ -518,6 +518,7 @@
     "ms-vscode.cpptools"
   ],
   "devDependencies": {
+    "@types/compare-versions": "^3.0.0",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "@types/winreg": "^1.2.30",
@@ -545,6 +546,7 @@
   },
   "dependencies": {
     "body-parser": "^1.16.1",
+    "compare-versions": "^3.4.0",
     "eventemitter2": "^4.1.0",
     "express": "^4.14.1",
     "glob": "^7.1.1",
