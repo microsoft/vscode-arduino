@@ -1,63 +1,62 @@
-import *  as mdns from "mdns-js";
+import * as mdns from "mdns-js";
 import { hostname, networkInterfaces } from "os";
 
-export interface RemotePortDetail {
+export interface IRemotePortDetail {
     ip: string;
     port?: string;
     host: string;
     name: string;
 }
 
-interface mDNSData {
-    addresses?: string[],
-    query?: string[],
-    port?: number,
-    fullname?: string,
-    txt?: string[],
-    type: {
+interface IMdnsData {
+    addresses?: string[];
+    query?: string[];
+    port?: number;
+    fullname?: string;
+    txt?: string[];
+    type: Array<{
         name: string,
         protocol: string,
         subtypes: string[],
         description?: string,
-    }[],
-    host?: string,
-    interfaceIndex: number,
-    networkInterface: string,
+    }>;
+    host?: string;
+    interfaceIndex: number;
+    networkInterface: string;
 }
 
 export class RemotePortCtrl {
     private ports: RemotePortDetail[];
 
     constructor() {
-        const browser = mdns.createBrowser('_arduino._tcp');
-        mdns.excludeInterface('0.0.0.0');
+        const browser = mdns.createBrowser("_arduino._tcp");
+        mdns.excludeInterface("0.0.0.0");
 
-        browser.on('ready', () => { browser.discover() });
-        browser.on('update', this.onUpdate.bind(this));
+        browser.on("ready", () => { browser.discover(); });
+        browser.on("update", this.onUpdate.bind(this));
     }
 
     public listPorts(): RemotePortDetail[] {
         return this.ports;
     }
 
-    private onUpdate(mDNSData: mDNSData): void {
-        if (this.isArduino(mDNSData)) {
-            this.ports = new Array(); 
-            const sshUploadPort = mDNSData.txt.filter(value => value.includes('ssh_upload_port')).pop();
-            const ports = mDNSData.addresses.map((address: string): RemotePortDetail => {
-                
+    private onUpdate(mdsnData: IMdnsData): void {
+        if (this.isArduino(mdsnData)) {
+            this.ports = new Array();
+            const sshUploadPort = mdsnData.txt.filter((value) => { value.includes("ssh_upload_port"); }).pop();
+            const ports = mdsnData.addresses.map((address: string): IRemotePortDetail => {
                 return {
                     ip: address,
                     port: sshUploadPort ? sshUploadPort.split("=")[1] : null,
-                    host: mDNSData.host.replace('.local', ''),
-                    name: mDNSData.fullname.replace('._arduino._tcp.local', ''),
+                    host: mdsnData.host.replace(".local", ""),
+                    name: mdsnData.fullname.replace("._arduino._tcp.local", ""),
                 };
             });
             this.ports.push(...ports);
         }
     }
 
-    private isArduino(data: mDNSData) {
-        return data.fullname && data.fullname.includes('arduino');
+    private isArduino(data: IMdnsData) {
+        return data.fullname && data.fullname.includes("arduino");
     }
 }

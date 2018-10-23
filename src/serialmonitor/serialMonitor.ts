@@ -6,9 +6,8 @@ import ArduinoContext from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
+import { IRemotePortDetail, RemotePortCtrl } from "./RemotePortCtrl";
 import { SerialPortCtrl, SerialPortEnding } from "./serialportctrl";
-import *  as mdns from "mdns-js";
-import { RemotePortCtrl, RemotePortDetail } from "./RemotePortCtrl";
 
 export interface ISerialPortDetail {
     comName: string;
@@ -61,7 +60,7 @@ export class SerialMonitor implements vscode.Disposable {
     private constructor() {
         const dc = DeviceContext.getInstance();
         dc.onDidChange(() => {
-            if (dc.port) { 
+            if (dc.port) {
                 if (!this.initialized) {
                     this.initialize();
                 }
@@ -111,7 +110,6 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async selectSerialPort(vid: string, pid: string) {
         const lists = await SerialPortCtrl.list();
-
         const networkPortsList = this._remotePortCtrl.listPorts();
 
         if (!lists.length) {
@@ -140,7 +138,7 @@ export class SerialMonitor implements vscode.Disposable {
                     label: l.comName,
                 };
             });
-            const networkPorts = networkPortsList.map((remotePort: RemotePortDetail): vscode.QuickPickItem => {
+            const networkPorts = networkPortsList.map((remotePort: IRemotePortDetail): vscode.QuickPickItem => {
                 return {
                     description: remotePort.name,
                     label: this.getNetworkPortLable(remotePort),
@@ -151,7 +149,7 @@ export class SerialMonitor implements vscode.Disposable {
             });
 
             const chosen = await vscode.window.showQuickPick(ports, { placeHolder: "Select a serial port" });
-            
+
             if (chosen && chosen.label) {
                 this.updatePortListStatus(chosen.label);
             }
@@ -286,11 +284,11 @@ export class SerialMonitor implements vscode.Disposable {
         }
     }
 
-    private getNetworkPortLable(remotePort: RemotePortDetail): string {
+    private getNetworkPortLable(remotePort: IRemotePortDetail): string {
         if (!remotePort.port) {
             return remotePort.ip;
         }
-        
-        return remotePort.ip+":"+remotePort.port
+
+        return `${remotePort.ip}:${remotePort.port}`;
     }
 }
