@@ -26,7 +26,7 @@ interface IMdnsData {
 }
 
 export class RemotePortCtrl {
-    private ports: RemotePortDetail[];
+    private ports: IRemotePortDetail[];
 
     constructor() {
         const browser = mdns.createBrowser("_arduino._tcp");
@@ -36,7 +36,7 @@ export class RemotePortCtrl {
         browser.on("update", this.onUpdate.bind(this));
     }
 
-    public listPorts(): RemotePortDetail[] {
+    public listPorts(): IRemotePortDetail[] {
         return this.ports;
     }
 
