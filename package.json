@@ -549,6 +549,8 @@
     "express": "^4.14.1",
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
+    "mdns-js": "^1.0.1",
+    "node-sass": "^4.9.4",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.18",

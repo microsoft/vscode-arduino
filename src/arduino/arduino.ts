@@ -135,7 +135,7 @@ export class ArduinoApp {
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+        const args = ["--pref", "runtime.pwd."+dc.port+"="+dc.password, "--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }

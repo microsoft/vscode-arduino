@@ -7,26 +7,27 @@
 // ${cwd}: the current working directory of the spawned process
 // A task runner that calls a custom npm script that compiles the extension.
 {
-    "version": "0.1.0",
+    "version": "2.0.0",
     "command": "gulp",
-    "isShellCommand": true,
+    "type": "shell",
     "args": [
         "--no-color"
     ],
     "tasks": [
         {
-            "taskName": "build",
+            "label": "build",
             "args": [],
-            "isBuildCommand": true,
+            "group": "build",
             "isBackground": false,
             "problemMatcher": [
                 "$tsc"
             ]
         },
         {
-            "taskName": "build_without_view",
+
+            "label": "build_without_view",
             "args": [],
-            "isBuildCommand": true,
+            "group": "build",
             "isBackground": false,
             "problemMatcher": [
                 "$tsc"

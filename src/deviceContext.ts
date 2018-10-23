@@ -68,6 +68,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _port: string;
 
+    private _password: string;
+
     private _board: string;
 
     private _sketch: string;
@@ -145,6 +147,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._debugger = deviceConfigJson["debugger"];
                         this._onDidChange.fire();
                         this._prebuild = deviceConfigJson.prebuild;
+                        this._password = deviceConfigJson.password;
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
@@ -157,6 +160,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._debugger = null;
                     this._onDidChange.fire();
                     this._prebuild = null;
+                    this._password = null;
                 }
                 return this;
             }, (reason) => {
@@ -174,6 +178,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 this._debugger = null;
                 this._onDidChange.fire();
                 this._prebuild = null;
+                this._password = null;
 
                 return this;
             });
@@ -207,6 +212,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.output = this.output;
         deviceConfigJson["debugger"] = this.debugger_;
         deviceConfigJson.configuration = this.configuration;
+        deviceConfigJson.password = this.password;
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
         fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, (key, value) => {
@@ -219,6 +225,15 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public get onDidChange(): vscode.Event<void> {
         return this._onDidChange.event;
+    }
+
+    public get password() {
+        return this._password;
+    }
+
+    public set password(value: string) {
+        this._password = value;
+        this.saveContext();
     }
 
     public get port() {

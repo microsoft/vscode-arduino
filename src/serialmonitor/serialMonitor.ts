@@ -7,6 +7,8 @@ import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
 import { SerialPortCtrl, SerialPortEnding } from "./serialportctrl";
+import *  as mdns from "mdns-js";
+import { RemotePortCtrl, RemotePortDetail } from "./RemotePortCtrl";
 
 export interface ISerialPortDetail {
     comName: string;
@@ -54,10 +56,12 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _ending: SerialPortEnding;
 
+    private _remotePortCtrl: RemotePortCtrl;
+
     private constructor() {
         const dc = DeviceContext.getInstance();
         dc.onDidChange(() => {
-            if (dc.port) {
+            if (dc.port) { 
                 if (!this.initialized) {
                     this.initialize();
                 }
@@ -92,6 +96,8 @@ export class SerialMonitor implements vscode.Disposable {
         this._endingStatusBar.command = "arduino.changeEnding";
         this._endingStatusBar.tooltip = "Serial Port Line Ending";
         this._endingStatusBar.text = `No line ending`;
+
+        this._remotePortCtrl = new RemotePortCtrl();
     }
     public get initialized(): boolean {
         return !!this._outputChannel;
@@ -105,6 +111,9 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async selectSerialPort(vid: string, pid: string) {
         const lists = await SerialPortCtrl.list();
+
+        const networkPortsList = this._remotePortCtrl.listPorts();
+
         if (!lists.length) {
             vscode.window.showInformationMessage("No serial port is available.");
             return;
@@ -125,14 +134,24 @@ export class SerialMonitor implements vscode.Disposable {
                 this.updatePortListStatus(foundPort.comName);
             }
         } else {
-            const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
+            const serialPorts = lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
                 return {
                     description: l.manufacturer,
                     label: l.comName,
                 };
-            }).sort((a, b): number => {
+            });
+            const networkPorts = networkPortsList.map((remotePort: RemotePortDetail): vscode.QuickPickItem => {
+                return {
+                    description: remotePort.name,
+                    label: this.getNetworkPortLable(remotePort),
+                };
+            });
+            const ports = <vscode.QuickPickItem[]>serialPorts.concat(networkPorts).sort((a, b): number => {
                 return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
-            }), { placeHolder: "Select a serial port" });
+            });
+
+            const chosen = await vscode.window.showQuickPick(ports, { placeHolder: "Select a serial port" });
+            
             if (chosen && chosen.label) {
                 this.updatePortListStatus(chosen.label);
             }
@@ -141,7 +160,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async openSerialMonitor() {
         if (!this._currentPort) {
-            const ans = await vscode.window.showInformationMessage("No serial port was selected, please select a serial port first", "Yes", "No");
+            const ans = await vscode.window.showInformationMessage("No port was selected, please select a port first", "Yes", "No");
             if (ans === "Yes") {
                 await this.selectSerialPort(null, null);
             }
@@ -265,6 +284,13 @@ export class SerialMonitor implements vscode.Disposable {
             this._baudRateStatusBar.hide();
             this._endingStatusBar.hide();
         }
+    }
 
+    private getNetworkPortLable(remotePort: RemotePortDetail): string {
+        if (!remotePort.port) {
+            return remotePort.ip;
+        }
+        
+        return remotePort.ip+":"+remotePort.port
     }
 }
