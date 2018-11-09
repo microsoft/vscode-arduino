@@ -28,6 +28,10 @@ suite("Arduino: App Initialization", () => {
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to resolve arduino settings correctly", function(done) {
         const arduinoSettings = ArduinoContext.arduinoApp.settings;
+        console.log(`Arduino context initialized: ${ArduinoContext.initialized}`);
+        console.log(`Arduino app loaded: ${!!ArduinoContext.arduinoApp}`);
+        console.log(`Arduino settings:`);
+        console.log(arduinoSettings);
         assert.equal(util.directoryExistsSync(arduinoSettings.arduinoPath), true,
         "should resolve arduino installation directory automatically");
 
