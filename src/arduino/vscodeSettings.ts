@@ -87,7 +87,8 @@ export class VscodeSettings implements IVscodeSettings {
 
     private getConfigValue<T>(key: string): T {
         const workspaceConfig = vscode.workspace.getConfiguration();
-        console.log(workspaceConfig);
+        console.log(JSON.stringify(workspaceConfig, null, 2));
+        console.log(key, typeof workspaceConfig.get<T>(key), workspaceConfig.get<T>(key));
         return workspaceConfig.get<T>(key);
     }
 
