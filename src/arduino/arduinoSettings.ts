@@ -45,6 +45,7 @@ export class ArduinoSettings implements IArduinoSettings {
         console.log('Arduino settings initializing...');
         const platform = os.platform();
         this._commandPath = VscodeSettings.getInstance().commandPath;
+        console.log(`Read command path from vscode config: ${this._commandPath}<${typeof this._commandPath}>`)
         await this.tryResolveArduinoPath();
         await this.tryGetDefaultBaudRate();
         if (platform === "win32") {
