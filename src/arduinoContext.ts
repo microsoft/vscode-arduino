@@ -6,41 +6,39 @@ import { BoardManager } from "./arduino/boardManager";
 import { DebuggerManager } from "./debug/debuggerManager";
 import { DeviceContext } from "./deviceContext";
 
-class ArduinoContext {
-    public get initialized(): boolean {
-        return !!this._arduinoApp;
+export class ArduinoContext {
+    static get initialized(): boolean {
+        return !!ArduinoContext._arduinoApp;
     }
 
-    public get arduinoApp(): ArduinoApp {
-        return this._arduinoApp;
+    static get arduinoApp(): ArduinoApp {
+        return ArduinoContext._arduinoApp;
     }
 
-    public set arduinoApp(value: ArduinoApp) {
-        this._arduinoApp = value;
+    static set arduinoApp(value: ArduinoApp) {
+        ArduinoContext._arduinoApp = value;
     }
 
-    public get boardManager() {
-        return this._boardManager;
+    static get boardManager() {
+        return ArduinoContext._boardManager;
     }
 
-    public set boardManager(value: BoardManager) {
-        this._boardManager = value;
+    static set boardManager(value: BoardManager) {
+        ArduinoContext._boardManager = value;
     }
 
-    public get debuggerManager(): DebuggerManager {
-        if (this._debuggerManager === null) {
-            this._debuggerManager = new DebuggerManager(
+    static get debuggerManager(): DebuggerManager {
+        if (ArduinoContext._debuggerManager === null) {
+            ArduinoContext._debuggerManager = new DebuggerManager(
                 DeviceContext.getInstance().extensionPath,
-                this.arduinoApp.settings,
-                this.boardManager);
-            this._debuggerManager.initialize();
+                ArduinoContext.arduinoApp.settings,
+                ArduinoContext.boardManager);
+                ArduinoContext._debuggerManager.initialize();
         }
-        return this._debuggerManager;
+        return ArduinoContext._debuggerManager;
     }
 
-    private _arduinoApp: ArduinoApp = null;
-    private _debuggerManager: DebuggerManager = null;
-    private _boardManager: BoardManager = null;
+    private static _arduinoApp: ArduinoApp = null;
+    private static _debuggerManager: DebuggerManager = null;
+    private static _boardManager: BoardManager = null;
 }
-
-export default new ArduinoContext();

@@ -5,8 +5,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { ArduinoApp } from "../arduino/arduino";
-import ArduinoActivator from "../arduinoActivator";
-import ArduinoContext from "../arduinoContext";
+import { ArduinoActivator } from "../arduinoActivator";
+import { ArduinoContext } from "../arduinoContext";
 
 import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as platform from "../common/platform";

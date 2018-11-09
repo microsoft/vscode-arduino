@@ -10,18 +10,18 @@ import { ExampleManager } from "./arduino/exampleManager";
 import { ExampleProvider } from "./arduino/exampleProvider";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ProgrammerManager } from "./arduino/programmerManager";
-import ArduinoContext from "./arduinoContext";
+import { ArduinoContext } from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
 
-class ArduinoActivator {
-    private _initializePromise: Promise<void>;
-    public async activate() {
-        if (this._initializePromise) {
-            await this._initializePromise;
+export class ArduinoActivator {
+    private static _initializePromise: Promise<void>;
+    static async activate() {
+        if (ArduinoActivator._initializePromise) {
+            await ArduinoActivator._initializePromise;
             return;
         }
 
-        this._initializePromise = (async () => {
+        ArduinoActivator._initializePromise = (async () => {
             const arduinoSettings = new ArduinoSettings();
             await arduinoSettings.initialize();
             const arduinoApp = new ArduinoApp(arduinoSettings);
@@ -44,7 +44,7 @@ class ArduinoActivator {
             const exampleProvider = new ExampleProvider(arduinoApp.exampleManager, arduinoApp.boardManager);
             vscode.window.registerTreeDataProvider("arduinoExampleExplorer", exampleProvider);
         })();
-        await this._initializePromise;
+        await ArduinoActivator._initializePromise;
     }
 }
-export default new ArduinoActivator();
+

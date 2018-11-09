@@ -8,8 +8,8 @@ import * as constants from "../common/constants";
 import * as util from "../common/util";
 
 import { VscodeSettings } from "../arduino/vscodeSettings";
-import ArduinoActivator from "../arduinoActivator";
-import ArduinoContext from "../arduinoContext";
+import { ArduinoActivator } from "../arduinoActivator";
+import { ArduinoContext } from "../arduinoContext";
 import { ArduinoWorkspace } from "../common/workspace";
 
 export class CompletionProvider implements vscode.CompletionItemProvider {

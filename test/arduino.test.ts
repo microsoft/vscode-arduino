@@ -2,8 +2,8 @@ import * as assert from "assert";
 import * as Path from "path";
 import * as util from "../src/common/util";
 
-import ArduinoActivator from "../src/arduinoActivator";
-import ArduinoContext from "../src/arduinoContext";
+import { ArduinoActivator } from "../src/arduinoActivator";
+import { ArduinoContext } from "../src/arduinoContext";
 
 suite("Arduino: App Initialization", () => {
 

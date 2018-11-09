@@ -5,7 +5,7 @@ import * as TypeMoq from "typemoq";
 
 import * as Resources from "./resources";
 
-import ArduinoContext from "..//src/arduinoContext";
+import { ArduinoContext } from "..//src/arduinoContext";
 import { ArduinoApp } from "../src/arduino/arduino";
 import { ArduinoSettings } from "../src/arduino/arduinoSettings";
 import { BoardManager } from "../src/arduino/boardManager";

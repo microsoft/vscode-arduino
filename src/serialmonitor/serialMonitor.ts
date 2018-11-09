@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import * as vscode from "vscode";
-import ArduinoContext from "../arduinoContext";
+import { ArduinoContext } from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
@@ -14,7 +14,7 @@ export interface ISerialPortDetail {
     vendorId: string;
     productId: string;
 }
-
+console.log(ArduinoContext, DeviceContext, SerialPortCtrl)
 export class SerialMonitor implements vscode.Disposable {
 
     public static SERIAL_MONITOR: string = "Serial Monitor";
@@ -67,6 +67,10 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public initialize() {
+        if (this.initialized) {
+            return;
+        }
+        console.log(ArduinoContext)
         const defaultBaudRate = ArduinoContext.arduinoApp.settings.defaultBaudRate || SerialMonitor.DEFAULT_BAUD_RATE;
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._currentBaudRate = defaultBaudRate;
