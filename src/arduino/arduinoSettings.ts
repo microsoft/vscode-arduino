@@ -44,6 +44,7 @@ export class ArduinoSettings implements IArduinoSettings {
     public async initialize() {
         const platform = os.platform();
         this._commandPath = VscodeSettings.getInstance().commandPath;
+        console.log(`Read command path from vscode config: ${this._commandPath}<${typeof this._commandPath}>`)
         await this.tryResolveArduinoPath();
         await this.tryGetDefaultBaudRate();
         if (platform === "win32") {
@@ -68,8 +69,11 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._sketchbookPath = path.join(process.env.HOME, "Arduino");
             }
 
+            console.log(`Chech if ${this._commandPath} is empty string.`)
             if (this._commandPath === "") {
+                console.log(`${this._commandPath} is empty string.`)
                 this._commandPath = "arduino";
+                console.log(`assign command path default value: arduino.`)
             }
         } else if (platform === "darwin") {
             if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
