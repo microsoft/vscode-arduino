@@ -28,18 +28,28 @@ suite("Arduino: App Initialization", () => {
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to resolve arduino settings correctly", function(done) {
         const arduinoSettings = ArduinoContext.arduinoApp.settings;
+        console.log(`Arduino context initialized: ${ArduinoContext.initialized}`);
+        console.log(`Arduino app loaded: ${!!ArduinoContext.arduinoApp}`);
+        console.log(`Arduino settings:`);
+        console.log(arduinoSettings);
+
+        console.log(`Arduino installation directory (${arduinoSettings.arduinoPath}) exists: ${util.directoryExistsSync(arduinoSettings.arduinoPath)}`);
         assert.equal(util.directoryExistsSync(arduinoSettings.arduinoPath), true,
         "should resolve arduino installation directory automatically");
 
+        console.log(`Arduino command (${arduinoSettings.commandPath}) exists: ${util.directoryExistsSync(arduinoSettings.commandPath)}`);
         assert.equal(util.fileExistsSync(arduinoSettings.commandPath), true,
         "should resolve arduino executable correctly");
 
+        console.log(`Arduino built-in package dir (${arduinoSettings.defaultPackagePath}) exists: ${util.directoryExistsSync(arduinoSettings.defaultPackagePath)}`);
         assert.equal(util.directoryExistsSync(arduinoSettings.defaultPackagePath), true,
         "should resolve arduino IDE built-in package directory correctly");
 
+        console.log(`Arduino built-in library dir (${arduinoSettings.defaultLibPath}) exists: ${util.directoryExistsSync(arduinoSettings.defaultLibPath)}`);
         assert.equal(util.directoryExistsSync(arduinoSettings.defaultLibPath), true,
         "should resolve arduino IDE built-in library directory correctly");
 
+        console.log(`Arduino built-in example dir (${arduinoSettings.defaultExamplePath}) exists: ${util.directoryExistsSync(arduinoSettings.defaultExamplePath)}`);
         assert.equal(util.directoryExistsSync(arduinoSettings.defaultExamplePath), true,
         "should resolve arduino IDE built-in example directory correctly");
 
