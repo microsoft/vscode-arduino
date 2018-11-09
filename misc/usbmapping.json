@@ -3,6 +3,13 @@
     "index_file": "package_index.json",
     "boards": [
       {
+        "name": "Arduino/Genuino Uno",
+        "package": "arduino",
+        "architecture": "avr",
+        "id": "uno",
+        "interface": "debugWIRE"          
+      },            
+      {
         "vid": "2341",
         "pid": "804e",
         "name": "Arduino/Genuino MKR1000",

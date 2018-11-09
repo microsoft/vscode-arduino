@@ -69,5 +69,12 @@
         "name": "CMSIS-DAP",
         "short_name": "cmsis-dap",
         "config_file": "cmsis-dap.cfg"
+    },
+    {
+        "vid": "1781",
+        "pid": "0c9f",
+        "name": "USBtinySPI",
+        "short_name": "debugWIRE",
+        "config_file": ""
     }
 ]
