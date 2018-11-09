@@ -42,6 +42,7 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public async initialize() {
+        console.log('Arduino settings initializing...');
         const platform = os.platform();
         this._commandPath = VscodeSettings.getInstance().commandPath;
         await this.tryResolveArduinoPath();
@@ -52,11 +53,13 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._commandPath = "arduino_debug.exe";
             }
         } else if (platform === "linux") {
+            console.log('Liunx checked...');
             if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
                 this._packagePath = path.join(this._arduinoPath, "portable");
             } else {
                 this._packagePath = path.join(process.env.HOME, ".arduino15");
             }
+            console.log(`Arduino package path found: ${this._packagePath}`);
 
             if (this.preferences.get("sketchbook.path")) {
                 if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
@@ -67,10 +70,12 @@ export class ArduinoSettings implements IArduinoSettings {
             } else {
                 this._sketchbookPath = path.join(process.env.HOME, "Arduino");
             }
+            console.log(`Arduino sketchbook path found: ${this._sketchbookPath}`);
 
             if (this._commandPath === "") {
                 this._commandPath = "arduino";
             }
+            console.log(`Arduino command path found: ${this._commandPath}`);
         } else if (platform === "darwin") {
             if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
                 this._packagePath = path.join(this._arduinoPath, "portable");
@@ -127,10 +132,13 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public get commandPath(): string {
+        console.log(`Getting Arduino command path...`);
         const platform = os.platform();
         if (platform === "darwin") {
             return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), path.normalize(this._commandPath));
         } else {
+            console.log(`Arduino Path: ${this._arduinoPath}`);
+            console.log(`Command Path: ${this._commandPath}`);
             return path.join(this._arduinoPath, path.normalize(this._commandPath));
         }
     }
