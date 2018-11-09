@@ -7,7 +7,7 @@
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.21.0"
+    "vscode": "^1.23.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",

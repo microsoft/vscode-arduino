@@ -48,7 +48,7 @@ export class ArduinoSettings implements IArduinoSettings {
         await this.tryGetDefaultBaudRate();
         if (platform === "win32") {
             await this.updateWindowsPath();
-            if (this._commandPath === "") {
+            if (!this._commandPath) {
                 this._commandPath = "arduino_debug.exe";
             }
         } else if (platform === "linux") {
@@ -68,7 +68,7 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._sketchbookPath = path.join(process.env.HOME, "Arduino");
             }
 
-            if (this._commandPath === "") {
+            if (!this._commandPath) {
                 this._commandPath = "arduino";
             }
         } else if (platform === "darwin") {
@@ -88,7 +88,7 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._sketchbookPath = path.join(process.env.HOME, "Documents/Arduino");
             }
 
-            if (this._commandPath === "") {
+            if (!this._commandPath) {
                 this._commandPath = "/Contents/MacOS/Arduino";
             }
         }
