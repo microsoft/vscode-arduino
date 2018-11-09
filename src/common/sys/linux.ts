@@ -15,6 +15,8 @@ export function resolveArduinoPath(): string {
         }
     } catch (ex) {
         // Ignore the errors.
+        console.error(`Error occured while find arduino path:`);
+        console.error(ex.message);
     }
 
     return pathString || "";
