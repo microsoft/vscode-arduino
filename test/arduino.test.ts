@@ -34,10 +34,11 @@ suite("Arduino: App Initialization", () => {
         console.log(arduinoSettings);
 
         console.log(`Arduino installation directory (${arduinoSettings.arduinoPath}) exists: ${util.directoryExistsSync(arduinoSettings.arduinoPath)}`);
+        console.log(`Arduino command: ${arduinoSettings.commandPath}`);
         assert.equal(util.directoryExistsSync(arduinoSettings.arduinoPath), true,
         "should resolve arduino installation directory automatically");
 
-        console.log(`Arduino command (${arduinoSettings.commandPath}) exists: ${util.directoryExistsSync(arduinoSettings.commandPath)}`);
+        console.log(`Arduino command (${arduinoSettings.commandPath}) exists: ${util.fileExistsSync(arduinoSettings.commandPath)}`);
         assert.equal(util.fileExistsSync(arduinoSettings.commandPath), true,
         "should resolve arduino executable correctly");
 
