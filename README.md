@@ -12,20 +12,19 @@ Welcome to the Visual Studio Code extension for **Arduino** <sup>preview</sup> !
 * Built-in serial monitor
 * Snippets for sketches
 * Automatic Arduino project scaffolding
-* Command Palette (`F1`) integration of frequently used commands (e.g. Verify, Upload...)
+* Command Palette (<kbd>F1</kbd>) integration of frequently used commands (e.g. Verify, Upload...)
 * Integrated Arduino Debugging <sup>New</sup>
 
 ## Prerequisites
 The Arduino IDE is required. Please install it from the [download page](https://www.arduino.cc/en/main/software#download).
-- Note: Arduino IDE 1.8.7 has some breaking changes, causing board package and library installation failures. So it is recommended to install version 1.8.6.
-- Arduino IDE versions 1.6.x and later are supported.
+- *Note:* Arduino IDE `1.8.7` has some breaking changes, causing board package and library installation failures. It is recommended to that you install version `1.8.6`
+- The supported Arduino IDE versions are `1.6.x` and later are supported.
 - The Windows Store's version of the Arduino IDE is not supported because of the sandbox environment that the application runs in.
 
 ## Installation
-Open VS Code and press `F1` or `Ctrl + Shift + P` to open the command palette, select **Install Extension** and enter `vscode-arduino`.
+Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
 
-Or launch VS Code Quick Open (`Ctrl + P`), paste the following command, and press enter:
-
+Or launch VS Code Quick Open (<kbd>Ctrl</kbd> + <kbd>P</kbd>), paste the following command, and press enter.
 ```bash
 ext install vscode-arduino
 ```
@@ -33,11 +32,10 @@ ext install vscode-arduino
 You can also install directly from the Marketplace within Visual Studio Code, searching for `Arduino`.
 
 ## Get Started
-You can find code samples and tutorials each time that you connect a supported device.
-Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://docs.microsoft.com/azure/iot-hub/iot-hub-arduino-iot-devkit-az3166-get-started).
+You can find code samples and tutorials each time that you connect a supported device. Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://docs.microsoft.com/azure/iot-hub/iot-hub-arduino-iot-devkit-az3166-get-started).
 
 ## Commands
-This extension provides several commands in the Command Palette (`F1` or `Ctrl + Shift + P`) for working with `*.ino` files:
+This extension provides several commands in the Command Palette (<kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) for working with `*.ino` files:
 
 - **Arduino: Board Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in the board manager.
 - **Arduino: Change Baud Rate**: Change the baud rate of the selected serial port.
@@ -54,7 +52,7 @@ This extension provides several commands in the Command Palette (`F1` or `Ctrl +
 - **Arduino: Verify**: Build sketch.
 
 ## Options
-The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences `Ctrl + ,` or workspace settings (.vscode/settings.json). The latter overrides the former.
+The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
 
 ```json
 {
@@ -72,20 +70,23 @@ The following Visual Studio Code settings are available for the Arduino extensio
 }
 ```
 - `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
-- `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for Windows and `arduino` for Ubuntu; You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux.
-- `arduino.additionalUrls` - Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma (,) as separator, or have a string array. The default value is empty.
+- `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for windows and `arduino` for ubuntu. You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux.
+- `arduino.additionalUrls` - Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma(`,`) as separator, or have a string array. The default value is empty.
 - `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
-- `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When plugging your device into your computer, it will pop a "Detected board ****, Would you like to switch to this board type" message up. After clicking thw "yes" button, it will automatically detect on which serial port (COM) that the USB device is connected. If your device does not support this feature, please provide us with the pid/vid of device and the code format as defined in `misc/usbmapping.json`. 
+- `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.
 > To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport
+
 ```bash
 npm install -g serialport
 serialport-list -f jsonline
 ```
-- `arduino.disableTestingOpen` - Disable/enable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent).
+
+- `arduino.disableTestingOpen` - Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent).
 - `arduino.skipHeaderProvider` - Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.
 - `arduino.defaultBaudRate` - Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000.
 
-The following settings are the per sketch settings of the Arduino extension. You can find them in `.vscode/arduino.json` under the workspace.
+The following settings are as per sketch settings of the Arduino extension. You can find them in
+`.vscode/arduino.json` under the workspace.
 
 ```json
 {
@@ -100,9 +101,9 @@ The following settings are the per sketch settings of the Arduino extension. You
 - `sketch` - The main sketch file name of Arduino.
 - `port` - Name of the serial port connected to the device. Can be set by the `Arduino: Select Serial Port` command.
 - `board` - Currently selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
-- `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build, leading to long verify/upload time. So it is recommended to set the field. Arduino requires that the output path not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set.
+- `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
-- `prebuild` - External command before building the sketch file. You should only set one `prebuild` command - `command1 && command2` does not work. If you need to run multiple commands before the build, then create a script.
+- `prebuild` - External command before building the sketch file. You should only set one `prebuild` command. `command1 && command2` does not work. If you need to run multiple commands before the build, then create a script.
 
 ## Debugging Arduino Code <sup>preview</sup>
 Before you start to debug your Arduino code, please read [this document](https://code.visualstudio.com/docs/editor/debugging) to learn about the basic mechanisms of debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for further reference.
@@ -115,10 +116,10 @@ Make sure that your Arduino board can work with [STLink](http://www.st.com/en/de
 - Arduino Zero Pro
 
 Steps to start debugging:
-1. Connect your board to your development machine. For boards that do not have an on-board debugging chip, you will need to use the STLink or JLink connector.
-2. Go to the **Debug View** (`Ctrl + Shift + D`) and set breakpoints in your source files.
-3. Press `F5` to select the debugging environment.
-4. When your breakpoint has been hit, you will be able to see variables and add expressions to watch on the Debug Side Bar.
+1. Plug in your board to your development machine properly. For those boards that do not have an on-board debugging chip, you need to use a STLink or JLink connector.
+2. Go to the **Debug View** (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd>). and set breakpoints in your source files.
+3. Press <kbd>F5</kbd> to select your debugging environment.
+4. When your breakpoint is hit, you can see variables and add expression(s) to watch on the Debug Side Bar.
 
 > To learn more about how to debug Arduino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
 
@@ -150,9 +151,9 @@ To *run and develop*, do the following:
 - Run `npm i`
 - Run `npm i -g gulp`
 - Open in Visual Studio Code (`code .`)
-- Press `F5` to debug
+- Press <kbd>F5</kbd> to debug.
 
-To *test*, press `F5` in VS Code with the "Launch Tests" debug configuration.
+To *test*, press <kbd>F5</kbd> in VS Code with the "Launch Tests" debug configuration.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.
