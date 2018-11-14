@@ -67,7 +67,7 @@ export class ExampleManager {
 
         // load Examples from user's workspace
         const sketchesPath = path.join(this._settings.sketchbookPath, "Sketches");
-        const examplesFromSketches = await this.parseExamples(sketchesPath, true, true);
+        const examplesFromSketches = await this.parseExamples(sketchesPath);
         if (examplesFromSketches.length) {
             examples.push({
                 name: "Workspace",
