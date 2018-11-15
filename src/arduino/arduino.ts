@@ -206,7 +206,14 @@ export class ArduinoApp {
         }
         if (dc.output) {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
+            const dirPath = path.dirname(outputPath);
+            if (!util.directoryExistsSync(dirPath)) {
+                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
+                return;
+            }
+
             args.push("--pref", `build.path=${outputPath}`);
+            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
             arduinoChannel.warning(msg);
