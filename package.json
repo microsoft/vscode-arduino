@@ -484,9 +484,6 @@
         "id": "cpp",
         "extensions": [
           ".ino"
-        ],
-        "aliases": [
-          "Arduino"
         ]
       }
     ],
