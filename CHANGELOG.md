@@ -1,6 +1,25 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.23
+-Release date: November 23, 2018
+
+### Added
+- Add debugging support for uno [#685](https://github.com/Microsoft/vscode-arduino/pull/685)
+- Add Wio LTE M1/NB1(BG96) board [#703](https://github.com/Microsoft/vscode-arduino/pull/703)
+- Add contribution guidelines [#665](https://github.com/Microsoft/vscode-arduino/pull/665)
+- Add sketches folder into examples view [#652](https://github.com/Microsoft/vscode-arduino/issues/652)
+
+### Changed
+- Change Arduino langauge ID to C++ [#686](https://github.com/Microsoft/vscode-arduino/issues/686)
+- Use VS Code new webview API [#701](https://github.com/Microsoft/vscode-arduino/issues/701)
+
+### Fixed
+- Fix major grammatical issues & formatting issues [#681](https://github.com/Microsoft/vscode-arduino/pull/681)
+- Spelling and grammar updates to README [#679](https://github.com/Microsoft/vscode-arduino/pull/679)
+
+Special thanks to [Deqing Sun](https://github.com/DeqingSun), [Takashi Matsuoka](https://github.com/matsujirushi), [Chinmay Chandak](https://github.com/CCAtAlvis), [aster94](https://github.com/aster94), [Ajit Panigrahi](https://github.com/AjitZero) and [Konrad Blum](https://github.com/kblum), thank you for your contributions and feedbacks.
+
 ## Version 0.2.22
 - Release date: October 18, 2018
 
@@ -14,7 +33,7 @@ All notable changes to this project will be documented in this file.
 - Fix the output path not exist issue [#641](https://github.com/Microsoft/vscode-arduino/issues/641)
 - Update arduino.path instruction [#635](https://github.com/Microsoft/vscode-arduino/issues/635)
 
-Special thanks to [aster94](https://github.com/aster94),  [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you foryour contributions and feedbacks.
+Special thanks to [aster94](https://github.com/aster94), [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you foryour contributions and feedbacks.
 
 ## Version 0.2.20
 - Release date: August 16, 2018
