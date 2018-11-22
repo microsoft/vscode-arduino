@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## Version 0.2.23
--Release date: November 23, 2018
+-Release date: November 22, 2018
 
 ### Added
 - Add debugging support for uno [#685](https://github.com/Microsoft/vscode-arduino/pull/685)
