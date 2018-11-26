@@ -76,5 +76,16 @@
         "name": "USBtinySPI",
         "short_name": "debugWIRE",
         "config_file": ""
+    },
+    {
+        "vid": "c251",
+        "pid": [
+            "f001",
+            "f002",
+            "2722"
+        ],
+        "name": "CMSIS-DAP",
+        "short_name": "cmsis-dap",
+        "config_file": "cmsis-dap.cfg"
     }
 ]
