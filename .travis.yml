@@ -1,12 +1,12 @@
 language: node_js
 
 node_js:
-- '9'
+- '11'
 
 os:
 - linux
 - osx
-dist: trusty # using Ubuntu 14.04.5 LTS
+# dist: trusty # using Ubuntu 14.04.5 LTS
 
 # fixing https://github.com/Microsoft/vscode/issues/33998
 addons:
@@ -29,7 +29,7 @@ env:
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
-    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0 CODE_VERSION=1.20.1;
+    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
     sh -e /etc/init.d/xvfb start;
     sleep 3;
     wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER;

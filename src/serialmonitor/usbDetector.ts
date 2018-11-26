@@ -170,7 +170,11 @@ export class UsbDetector {
                 if (readmeFilePath.endsWith(MARKDOWN_EXT)) {
                     vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file(readmeFilePath));
                 } else if (readmeFilePath.endsWith(HTML_EXT)) {
-                    vscode.commands.executeCommand("vscode.previewHtml", vscode.Uri.file(readmeFilePath));
+                    const panel = vscode.window.createWebviewPanel("arduinoBoardReadMe", "", vscode.ViewColumn.One, {
+                        enableScripts: true,
+                        retainContextWhenHidden: true,
+                    });
+                    panel.webview.html = fs.readFileSync(readmeFilePath, "utf8");
                 }
             }
         }
