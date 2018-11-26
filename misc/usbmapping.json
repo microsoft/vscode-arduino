@@ -3,6 +3,13 @@
     "index_file": "package_index.json",
     "boards": [
       {
+        "name": "Arduino/Genuino Uno",
+        "package": "arduino",
+        "architecture": "avr",
+        "id": "uno",
+        "interface": "debugWIRE"          
+      },            
+      {
         "vid": "2341",
         "pid": "804e",
         "name": "Arduino/Genuino MKR1000",
@@ -211,6 +218,14 @@
         "package": "SeeedJP",
         "architecture": "SeeedJP_STM32F4",
         "id": "Wio3G",
+        "interface": "cmsis-dap.cfg",
+        "target": "stm32f4x.cfg"
+      },
+      {
+        "name": "Seeed Wio LTE M1/NB1(BG96)",
+        "package": "SeeedJP",
+        "architecture": "SeeedJP_STM32F4",
+        "id": "WioLTEM1BG96",
         "interface": "cmsis-dap.cfg",
         "target": "stm32f4x.cfg"
       }
