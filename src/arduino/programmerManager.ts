@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import * as constants from "../common/constants";
+import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
-import { ArduinoSettings } from "./arduinoSettings";
 
 export enum ProgrammerList {
     "AVR ISP",
@@ -54,6 +54,8 @@ export class ProgrammerManager {
         this._currentprogrammer = ProgrammerList[chosen];
         this.getProgrammer(this._currentprogrammer);
         this._programmerStatusBar.text = chosen;
+        const dc = DeviceContext.getInstance();
+        dc.programmer = chosen;
     }
 
     public getProgrammer(newProgrammer: ProgrammerList) {

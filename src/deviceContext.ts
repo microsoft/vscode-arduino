@@ -46,6 +46,12 @@ export interface IDeviceContext {
     debugger_: string;
 
     /**
+     * Current selected programmer.
+     * @property {string}
+     */
+    programmer: string;
+
+    /**
      * Arduino custom board configuration
      * @property {string}
      */
@@ -87,6 +93,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _sketchStatusBar: vscode.StatusBarItem;
 
     private _prebuild: string;
+
+    private _programmer: string;
 
     /**
      * @constructor
@@ -145,6 +153,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._debugger = deviceConfigJson["debugger"];
                         this._onDidChange.fire();
                         this._prebuild = deviceConfigJson.prebuild;
+                        this._programmer = deviceConfigJson.programmer;
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
@@ -157,6 +166,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._debugger = null;
                     this._onDidChange.fire();
                     this._prebuild = null;
+                    this._programmer = null;
                 }
                 return this;
             }, (reason) => {
@@ -174,6 +184,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 this._debugger = null;
                 this._onDidChange.fire();
                 this._prebuild = null;
+                this._programmer = null;
 
                 return this;
             });
@@ -207,6 +218,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.output = this.output;
         deviceConfigJson["debugger"] = this.debugger_;
         deviceConfigJson.configuration = this.configuration;
+        deviceConfigJson.programmer = this.programmer;
 
         util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
         fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, (key, value) => {
@@ -276,6 +288,15 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set configuration(value: string) {
         this._configuration = value;
+        this.saveContext();
+    }
+
+    public get programmer() {
+        return this._programmer;
+    }
+
+    public set programmer(value: string) {
+        this._programmer = value;
         this.saveContext();
     }
 
