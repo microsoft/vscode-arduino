@@ -538,7 +538,7 @@
     "tslint": "^4.2.0",
     "typemoq": "^1.6.0",
     "typescript": "^2.2.1",
-    "vscode": "^1.1.21",
+    "vscode": "^1.1.22",
     "webpack": "^2.2.1"
   },
   "dependencies": {
