@@ -1,6 +1,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.24
+-Release date: December 11, 2018
+
+### Added
+- Add debugging support for cmsis-dap with Keil Software vid [#634](https://github.com/Microsoft/vscode-arduino/pull/634)
+
+### Changed
+- Save the selected programmer in Arduino.json [#714](https://github.com/Microsoft/vscode-arduino/pull/714)
+
+### Fixed
+- Fix dependency issue [#716](https://github.com/Microsoft/vscode-arduino/pull/716)
+- Install latest arduino on Mac [#724](https://github.com/Microsoft/vscode-arduino/pull/724)
+
+Special thanks to [Deqing Sun](https://github.com/DeqingSun), thank you for your contributions and feedbacks.
+
 ## Version 0.2.23
 -Release date: November 22, 2018
 
