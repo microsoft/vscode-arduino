@@ -83,7 +83,11 @@ NAN_METHOD(SerialportPoller::New) {
   }
 
   SerialportPoller* obj = new SerialportPoller();
-  obj->fd_ = info[0]->ToInt32()->Int32Value();
+  #if NODE_MAJOR_VERSION >= 10
+    obj->fd_ = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    obj->fd_ = info[0]->ToInt32()->Int32Value();
+  #endif
   obj->callback_ = new Nan::Callback(info[1].As<v8::Function>());
   // obj->callCallback();
 

@@ -87,7 +87,11 @@ v8::Local<v8::Value> getValueFromObject(v8::Local<v8::Object> options, std::stri
 }
 
 int getIntFromObject(v8::Local<v8::Object> options, std::string key) {
-  return getValueFromObject(options, key)->ToInt32()->Int32Value();
+  #if NODE_MAJOR_VERSION >= 10
+    return getValueFromObject(options, key)->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    return getValueFromObject(options, key)->ToInt32()->Int32Value();
+  #endif
 }
 
 bool getBoolFromObject(v8::Local<v8::Object> options, std::string key) {
@@ -99,7 +103,11 @@ v8::Local<v8::String> getStringFromObj(v8::Local<v8::Object> options, std::strin
 }
 
 double getDoubleFromObject(v8::Local<v8::Object> options, std::string key) {
-  return getValueFromObject(options, key)->ToNumber()->NumberValue();
+  #if NODE_MAJOR_VERSION >= 10
+    return getValueFromObject(options, key)->ToNumber(v8::Isolate::GetCurrent())->NumberValue();
+  #else
+    return getValueFromObject(options, key)->ToNumber()->NumberValue();
+  #endif
 }
 
 NAN_METHOD(Open) {
@@ -171,7 +179,12 @@ void EIO_AfterOpen(uv_work_t* req) {
     argv[0] = Nan::Null();
     argv[1] = Nan::New<v8::Int32>(data->result);
 
-    int fd = argv[1]->ToInt32()->Int32Value();
+    int fd;
+    #if NODE_MAJOR_VERSION >= 10
+      fd = argv[1]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    #else
+      fd = argv[1]->ToInt32()->Int32Value();
+    #endif
     newQForFD(fd);
 
     AfterOpenSuccess(data->result, data->dataCallback, data->disconnectedCallback, data->errorCallback);
@@ -190,7 +203,12 @@ NAN_METHOD(Update) {
     Nan::ThrowTypeError("First argument must be an int");
     return;
   }
-  int fd = info[0]->ToInt32()->Int32Value();
+  int fd;
+  #if NODE_MAJOR_VERSION >= 10
+    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    fd = info[0]->ToInt32()->Int32Value();
+  #endif
 
   // options
   if (!info[1]->IsObject()) {
@@ -214,7 +232,11 @@ NAN_METHOD(Update) {
   memset(baton, 0, sizeof(ConnectionOptionsBaton));
 
   baton->fd = fd;
-  baton->baudRate = Nan::Get(options, Nan::New<v8::String>("baudRate").ToLocalChecked()).ToLocalChecked()->ToInt32()->Int32Value();
+  #if NODE_MAJOR_VERSION >= 10
+    baton->baudRate = Nan::Get(options, Nan::New<v8::String>("baudRate").ToLocalChecked()).ToLocalChecked()->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    baton->baudRate = Nan::Get(options, Nan::New<v8::String>("baudRate").ToLocalChecked()).ToLocalChecked()->ToInt32()->Int32Value();
+  #endif
   baton->callback.Reset(info[2].As<v8::Function>());
 
   uv_work_t* req = new uv_work_t();
@@ -249,7 +271,12 @@ NAN_METHOD(Write) {
     Nan::ThrowTypeError("First argument must be an int");
     return;
   }
-  int fd = info[0]->ToInt32()->Int32Value();
+  int fd;
+  #if NODE_MAJOR_VERSION >= 10
+    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    fd = info[0]->ToInt32()->Int32Value();
+  #endif
 
   // buffer
   if (!info[1]->IsObject() || !node::Buffer::HasInstance(info[1])) {
@@ -366,7 +393,12 @@ NAN_METHOD(Close) {
 
   CloseBaton* baton = new CloseBaton();
   memset(baton, 0, sizeof(CloseBaton));
-  baton->fd = info[0]->ToInt32()->Int32Value();
+  #if NODE_MAJOR_VERSION >= 10
+    baton->fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    baton->fd = info[0]->ToInt32()->Int32Value();
+  #endif
+  
   baton->callback.Reset(info[1].As<v8::Function>());
 
   uv_work_t* req = new uv_work_t();
@@ -477,7 +509,12 @@ NAN_METHOD(Flush) {
     Nan::ThrowTypeError("First argument must be an int");
     return;
   }
-  int fd = info[0]->ToInt32()->Int32Value();
+  int fd;
+  #if NODE_MAJOR_VERSION >= 10
+    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    fd = info[0]->ToInt32()->Int32Value();
+  #endif
 
   // callback
   if (!info[1]->IsFunction()) {
@@ -525,7 +562,12 @@ NAN_METHOD(Set) {
     Nan::ThrowTypeError("First argument must be an int");
     return;
   }
-  int fd = info[0]->ToInt32()->Int32Value();
+  int fd;
+  #if NODE_MAJOR_VERSION >= 10
+    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    fd = info[0]->ToInt32()->Int32Value();
+  #endif
 
   // options
   if (!info[1]->IsObject()) {
@@ -582,7 +624,12 @@ NAN_METHOD(Drain) {
     Nan::ThrowTypeError("First argument must be an int");
     return;
   }
-  int fd = info[0]->ToInt32()->Int32Value();
+  int fd;
+  #if NODE_MAJOR_VERSION >= 10
+    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+  #else
+    fd = info[0]->ToInt32()->Int32Value();
+  #endif
 
   // callback
   if (!info[1]->IsFunction()) {
