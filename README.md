@@ -52,12 +52,30 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Verify**: Build sketch.
 
 ## Options
+| Option | Description |
+| --- | --- |
+| `arduino.path`  | Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path. |
+| `arduino.commandPath` | Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for windows,`arduino` for ubuntu and `Contents/MacOS/Arduino` for Mac, You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux. |
+| `arduino.additionalUrls` | Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma(`,`) as separator, or have a string array. The default value is empty. |
+| `arduino.logLevel` | CLI output log level. Could be info or verbose. The default value is `"info"`. |
+| `arduino.enableUSBDetection` | Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.
+> To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport
+
+```bash
+npm install -g serialport
+serialport-list -f jsonline
+```
+|
+| `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
+| `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
+| `arduino.defaultBaudRate` | Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000 |
+
 The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
 
 ```json
 {
     "arduino.path": "C:/Program Files (x86)/Arduino",
-    "arduino.commandPath": "run-arduino.bat",
+    "arduino.commandPath": "arduino_debug.exe",
     "arduino.logLevel": "info",
     "arduino.enableUSBDetection": true,
     "arduino.disableTestingOpen": false,
@@ -69,21 +87,6 @@ The following Visual Studio Code settings are available for the Arduino extensio
     "arduino.defaultBaudRate": 115200
 }
 ```
-- `arduino.path` - Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path.
-- `arduino.commandPath` - Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for windows and `arduino` for ubuntu. You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux.
-- `arduino.additionalUrls` - Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma(`,`) as separator, or have a string array. The default value is empty.
-- `arduino.logLevel` - CLI output log level. Could be info or verbose. The default value is `"info"`.
-- `arduino.enableUSBDetection` - Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.
-> To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport
-
-```bash
-npm install -g serialport
-serialport-list -f jsonline
-```
-
-- `arduino.disableTestingOpen` - Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent).
-- `arduino.skipHeaderProvider` - Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.
-- `arduino.defaultBaudRate` - Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000.
 
 The following settings are as per sketch settings of the Arduino extension. You can find them in
 `.vscode/arduino.json` under the workspace.
