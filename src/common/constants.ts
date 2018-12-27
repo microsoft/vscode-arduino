@@ -40,4 +40,6 @@ export const statusBarPriority = {
     ENDING: 70,
     SKETCH: 80,
     PROGRAMMER: 90,
+    UPLOAD: 100,
+    VERIFY: 110,
 };
