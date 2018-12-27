@@ -80,6 +80,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
     "arduino.defaultBaudRate": 115200
 }
 ```
+*Note:* You only need to set `arduino.path` in Visual Studio Code settings, other options are not required.
 
 The following settings are as per sketch settings of the Arduino extension. You can find them in
 `.vscode/arduino.json` under the workspace.
