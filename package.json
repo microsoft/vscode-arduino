@@ -71,11 +71,13 @@
       },
       {
         "command": "arduino.verify",
-        "title": "Arduino: Verify"
+        "title": "Arduino: Verify",
+        "icon": "./images/arduino.png"
       },
       {
         "command": "arduino.upload",
-        "title": "Arduino: Upload"
+        "title": "Arduino: Upload",
+        "icon": "./images/arduino.png"
       },
       {
         "command": "arduino.uploadUsingProgrammer",
@@ -126,6 +128,20 @@
         "title": "Arduino: Examples"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceExtname == .ino",
+          "command": "arduino.verify",
+          "group": "navigation@1"
+        },
+        {
+          "when": "resourceExtname == .ino",
+          "command": "arduino.upload",
+          "group": "navigation@2"
+        }
+      ]
+    },
     "views": {
       "explorer": [
         {
