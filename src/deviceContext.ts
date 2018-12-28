@@ -96,10 +96,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _programmer: string;
 
-    private _UploadStatusBar: vscode.StatusBarItem;
-
-    private _VerifyStatusBar: vscode.StatusBarItem;
-
     /**
      * @constructor
      */
@@ -116,16 +112,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             this._sketchStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.SKETCH);
             this._sketchStatusBar.command = "arduino.setSketchFile";
             this._sketchStatusBar.tooltip = "Sketch File";
-            this._UploadStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.UPLOAD);
-            this._UploadStatusBar.command = "arduino.upload";
-            this._UploadStatusBar.text = "Arduino Upload";
-            this._UploadStatusBar.tooltip = "Arduino Upload";
-            this._UploadStatusBar.show();
-            this._VerifyStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.VERIFY);
-            this._VerifyStatusBar.command = "arduino.verify";
-            this._VerifyStatusBar.text = "Arduino Verify";
-            this._VerifyStatusBar.tooltip = "Arduino Verify";
-            this._VerifyStatusBar.show();
         }
     }
 
