@@ -72,12 +72,12 @@
       {
         "command": "arduino.verify",
         "title": "Arduino: Verify",
-        "icon": "./images/arduino.png"
+        "icon": "images/arduino.png"
       },
       {
         "command": "arduino.upload",
         "title": "Arduino: Upload",
-        "icon": "./images/arduino.png"
+        "icon": "images/arduino.png"
       },
       {
         "command": "arduino.uploadUsingProgrammer",
@@ -133,12 +133,12 @@
         {
           "when": "resourceExtname == .ino",
           "command": "arduino.verify",
-          "group": "navigation@1"
+          "group": "navigation"
         },
         {
           "when": "resourceExtname == .ino",
           "command": "arduino.upload",
-          "group": "navigation@2"
+          "group": "navigation"
         }
       ]
     },
