@@ -71,11 +71,19 @@
       },
       {
         "command": "arduino.verify",
-        "title": "Arduino: Verify"
+        "title": "Arduino: Verify",
+        "icon": {
+          "light": "./images/verify.png",
+          "dark": "./images/verify.png"
+        }
       },
       {
         "command": "arduino.upload",
-        "title": "Arduino: Upload"
+        "title": "Arduino: Upload",
+        "icon": {
+          "light": "./images/upload.png",
+          "dark": "./images/upload.png"
+        }
       },
       {
         "command": "arduino.uploadUsingProgrammer",
@@ -126,6 +134,18 @@
         "title": "Arduino: Examples"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {          
+          "command": "arduino.verify",
+          "group": "navigation@1"
+        },
+        {
+          "command": "arduino.upload",
+          "group": "navigation@2"
+        }
+      ]
+    },
     "views": {
       "explorer": [
         {
