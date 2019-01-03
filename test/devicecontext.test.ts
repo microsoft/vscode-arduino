@@ -13,6 +13,7 @@ suite("Arduino: Device Context config", () => {
             deviceContext.loadContext().then(() => {
                 assert.equal(deviceContext.board, "arduino:avr:diecimila");
                 assert.equal(deviceContext.port, "COM4");
+                assert.equal(deviceContext.uploadPort, "COM4");
                 assert.equal(deviceContext.sketch, "blink.ino");
                 assert.equal(deviceContext.configuration, "cpu=atmega328");
                 assert.equal(deviceContext.output, null);

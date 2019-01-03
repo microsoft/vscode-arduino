@@ -108,17 +108,21 @@ export class ArduinoApp {
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
-        if (!dc.port) {
-            vscode.window.showErrorMessage("Please specify the upload serial port.");
+        if (!dc.uploadPort) {
+            vscode.window.showErrorMessage("Please specify the upload port.");
             return;
         }
 
         arduinoChannel.show();
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
-        const serialMonitor = SerialMonitor.getInstance();
+        let serialMonitor;
+        let needRestore = false;
+        if (dc.port === dc.uploadPort) {
+            serialMonitor = SerialMonitor.getInstance();
+            needRestore = await serialMonitor.closeSerialMonitor(dc.port);
+        }
 
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
@@ -135,7 +139,8 @@ export class ArduinoApp {
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+        const args = ["--upload", "--board", boardDescriptor, "--port", dc.uploadPort, appPath];
+
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
