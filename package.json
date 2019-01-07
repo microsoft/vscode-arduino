@@ -72,12 +72,18 @@
       {
         "command": "arduino.verify",
         "title": "Arduino: Verify",
-        "icon": "images/arduino.png"
+        "icon": {
+          "dark": "images/ArduinoVerify_inverse_16.svg",
+          "light": "images/ArduinoVerify_16.svg"
+        }
       },
       {
         "command": "arduino.upload",
         "title": "Arduino: Upload",
-        "icon": "images/arduino.png"
+        "icon": {
+          "dark": "images/ArduinoUpload_inverse_16.svg",
+          "light": "images/ArduinoUpload_16.svg"
+        }
       },
       {
         "command": "arduino.uploadUsingProgrammer",
