@@ -5,15 +5,8 @@ All notable changes to this project will be documented in this file.
 -Release date: January 10, 2019
 
 ### Added
-- Upload or Verify using a status bar button [#737](https://github.com/Microsoft/vscode-arduino/pull/737)
-- Add binary dependency for electron 3.0.10 [#731](https://github.com/Microsoft/vscode-arduino/pull/731)
-
-### Changed
-- change words for select serial port notification [#745](https://github.com/Microsoft/vscode-arduino/pull/745)
-
-### Fixed
-- fix breaking change issue for node 10 [#729](https://github.com/Microsoft/vscode-arduino/pull/729)
-- fix serialport build err under unix [#730](https://github.com/Microsoft/vscode-arduino/pull/730)
+- Add upload and verify button in action bar [#737](https://github.com/Microsoft/vscode-arduino/pull/737)
+- Add serial port support for Electron 3.0 [#729](https://github.com/Microsoft/vscode-arduino/pull/729), [#730](https://github.com/Microsoft/vscode-arduino/pull/730), [#731](https://github.com/Microsoft/vscode-arduino/pull/731), [#745](https://github.com/Microsoft/vscode-arduino/pull/745)
 
 Special thanks to [Michael Omiccioli](https://github.com/momiccioli) and [MarNwk](https://github.com/MarNwk),thank you for your feedbacks.
 
