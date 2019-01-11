@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.24",
+  "version": "0.2.25",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -71,11 +71,19 @@
       },
       {
         "command": "arduino.verify",
-        "title": "Arduino: Verify"
+        "title": "Arduino: Verify",
+        "icon": {
+          "dark": "images/ArduinoVerify_inverse_16.svg",
+          "light": "images/ArduinoVerify_16.svg"
+        }
       },
       {
         "command": "arduino.upload",
-        "title": "Arduino: Upload"
+        "title": "Arduino: Upload",
+        "icon": {
+          "dark": "images/ArduinoUpload_inverse_16.svg",
+          "light": "images/ArduinoUpload_16.svg"
+        }
       },
       {
         "command": "arduino.uploadUsingProgrammer",
@@ -126,6 +134,20 @@
         "title": "Arduino: Examples"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceExtname == .ino",
+          "command": "arduino.verify",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .ino",
+          "command": "arduino.upload",
+          "group": "navigation"
+        }
+      ]
+    },
     "views": {
       "explorer": [
         {

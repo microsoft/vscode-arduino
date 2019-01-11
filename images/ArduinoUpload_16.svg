@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#F6F6F6;}
+	.st1{fill:#424242;}
+	.st2{fill:#00979C;}
+</style>
+<g id="_x7B__PAGE_GRID__x7D_">
+</g>
+<g id="outline">
+	<path class="st0" d="M13,5V0l-3,2V0H6v2L3,0v5H0v11h16V5H13z"/>
+</g>
+<g id="icon_x5F_bg">
+	<path class="st1" d="M8,7L4,4V2l3,2V0h2v4l3-2v2L8,7z M14,6v8H2V6H1v9h14V6H14z"/>
+	<rect x="3" y="8" class="st2" width="2" height="2"/>
+	<rect x="11" y="8" class="st2" width="2" height="2"/>
+	<rect x="7" y="8" class="st2" width="2" height="2"/>
+	<rect x="9" y="11" class="st2" width="2" height="2"/>
+	<rect x="5" y="11" class="st2" width="2" height="2"/>
+</g>
+<g id="icon_x5F_fg">
+</g>
+<g id="not_x5F_bg">
+</g>
+<g id="not_x5F_fg">
+</g>
+</svg>

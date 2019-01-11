@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.25
+-Release date: January 10, 2019
+
+### Added
+- Add upload and verify button in action bar [#737](https://github.com/Microsoft/vscode-arduino/pull/737)
+- Add serial port support for Electron 3.0 [#729](https://github.com/Microsoft/vscode-arduino/pull/729), [#730](https://github.com/Microsoft/vscode-arduino/pull/730), [#731](https://github.com/Microsoft/vscode-arduino/pull/731)
+
+Special thanks to [Michael Omiccioli](https://github.com/momiccioli) and [MarNwk](https://github.com/MarNwk),thank you for your feedbacks.
+
 ## Version 0.2.24
 -Release date: December 11, 2018
 

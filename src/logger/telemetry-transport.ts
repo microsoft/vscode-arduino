@@ -26,7 +26,6 @@ function isNumeric(n) {
 }
 
 export class TelemetryTransport extends winston.Transport {
-    private name: string;
     private reporter: TelemetryReporter;
     constructor(options: any) {
         super({ ...options, context: null });
