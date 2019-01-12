@@ -154,6 +154,9 @@ export class ArduinoApp {
 
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+
+            fs.unlinkSync(path.join(outputPath, "build.options.json"));
+            util.rmdirRecursivelySync(path.join(outputPath, "sketch"));
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
             arduinoChannel.warning(msg);
@@ -224,6 +227,9 @@ export class ArduinoApp {
 
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+
+            fs.unlinkSync(path.join(outputPath, "build.options.json"));
+            util.rmdirRecursivelySync(path.join(outputPath, "sketch"));
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
             arduinoChannel.warning(msg);
@@ -286,6 +292,9 @@ export class ArduinoApp {
 
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+
+            fs.unlinkSync(path.join(outputPath, "build.options.json"));
+            util.rmdirRecursivelySync(path.join(outputPath, "sketch"));
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
             arduinoChannel.warning(msg);
