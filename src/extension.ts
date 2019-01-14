@@ -12,7 +12,7 @@ import ArduinoActivator from "./arduinoActivator";
 import ArduinoContext from "./arduinoContext";
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
-    LIBRARY_MANAGER_URI,
+    LIBRARY_MANAGER_URI, SERIAL_PLOTTER_URI
 } from "./common/constants";
 import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
@@ -144,6 +144,14 @@ export async function activate(context: vscode.ExtensionContext) {
             retainContextWhenHidden: true,
         });
         panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(EXAMPLES_URI);
+    });
+
+    registerArduinoCommand("arduino.showSerialPlotter", async () => {
+        const panel = vscode.window.createWebviewPanel("arduinoSerialPlotter", "Arduino Serial Plottter", vscode.ViewColumn.Two, {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        });
+        panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
     });
 
     // change board type

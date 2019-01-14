@@ -2,7 +2,6 @@ import * as throttle from "lodash.throttle";
 import * as vscode from "vscode";
 import * as WebSocket from "ws";
 
-import { SERIAL_PLOTTER_URI } from "../common/constants";
 import { SerialPortCtrl } from "./serialportctrl";
 
 interface IDataFrame {
@@ -24,7 +23,7 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     public open() {
-        vscode.commands.executeCommand("vscode.previewHtml", SERIAL_PLOTTER_URI, vscode.ViewColumn.Two, "Serial Plotter");
+        vscode.commands.executeCommand("arduino.showSerialPlotter");
     }
 
     public reset() {
