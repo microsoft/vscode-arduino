@@ -118,6 +118,8 @@ export class SerialMonitor implements vscode.Disposable {
         if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
             return this._serialPortCtrl.stop();
         }
+
+        this._serialPlotter.dispose();
     }
 
     public async selectSerialPort(vid: string, pid: string) {

@@ -1,17 +1,18 @@
 import * as throttle from "lodash.throttle";
 import * as vscode from "vscode";
-import * as WebSocket from "ws";
 
-import { SerialPortCtrl } from "./serialportctrl";
 import { VscodeSettings } from "../arduino/vscodeSettings";
+import { SerialPortCtrl } from "./serialportctrl";
 
 interface IDataFrame {
     time?: number;
     [field: string]: number;
 }
 
+type ISendMessage = (message: {}) => void;
+
 export class SerialPlotter implements vscode.Disposable {
-    private _wss: WebSocket.Server;
+    private _sendMessage: ISendMessage;
     private _throttling: number = 100;
     private sendCurrentFrameThrottled;
 
@@ -31,10 +32,11 @@ export class SerialPlotter implements vscode.Disposable {
         this.sendMessage({action: "RESET"});
     }
 
-    public dispose() {}
+    public dispose() {
+    }
 
-    public setWebSocketServer(wss: WebSocket.Server) {
-        this._wss = wss;
+    public setSendMessageFn(sendMessage: ISendMessage) {
+        this._sendMessage = sendMessage;
     }
 
     public setSerialPortCtrl(serialPortCtrl: SerialPortCtrl) {
@@ -57,15 +59,11 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     private sendMessage(msg: {}) {
-        if (!this._wss) {
+        if (!this._sendMessage) {
             return;
         }
 
-        this._wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(msg));
-            }
-        });
+        this._sendMessage(msg);
     }
 
     private handleSerialLine(line: string): void {

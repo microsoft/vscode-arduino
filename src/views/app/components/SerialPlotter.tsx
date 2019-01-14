@@ -27,10 +27,7 @@ interface ISerialPlotterState extends React.Props<any> {
     active: boolean;
 }
 
-class SerialPlotter extends React.Component<
-    void,
-    ISerialPlotterState
-> {
+class SerialPlotter extends React.Component<void, ISerialPlotterState> {
     public state = {
         rate: "100",
         active: false,
@@ -38,14 +35,13 @@ class SerialPlotter extends React.Component<
 
     private _chartRef: HTMLElement;
     private _chart: Highcharts;
-    private _ws: WebSocket;
 
     constructor(props) {
         super(props);
     }
 
     public componentDidMount() {
-        this.initWebSocket();
+        this.initMessageHandler();
         this.initChart();
     }
 
@@ -77,7 +73,15 @@ class SerialPlotter extends React.Component<
 
                         <InputGroup>
                             <InputGroup.Button>
-                                <Button onClick={this.state.active ? this.pause : this.play}>{this.state.active ? "Pause" : "Play"}</Button>
+                                <Button
+                                    onClick={
+                                        this.state.active
+                                            ? this.pause
+                                            : this.play
+                                    }
+                                >
+                                    {this.state.active ? "Pause" : "Play"}
+                                </Button>
                             </InputGroup.Button>
                         </InputGroup>
                     </FormGroup>
@@ -141,22 +145,20 @@ class SerialPlotter extends React.Component<
         this._chart.redraw();
     }
 
-    private initWebSocket() {
-        this._ws = new WebSocket(`ws://${window.location.host}`);
+    private initMessageHandler() {
+        window.addEventListener("message", (event) => {
+            const data = event.data;
 
-        this._ws.onmessage = (e: MessageEvent) => {
             if (!this.state.active) {
                 return;
             }
-
-            const data = JSON.parse(e.data);
 
             if (data.time) {
                 this.addFrame(data);
             } else if (data.action) {
                 this.doAction(data);
             }
-        };
+        });
 
         this.setState({
             active: true,

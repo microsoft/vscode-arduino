@@ -4,7 +4,6 @@
 import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
-import * as WebSocket from "ws";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 import * as Constants from "../common/constants";
@@ -60,10 +59,6 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this._webserver.start();
     }
 
-    public getWebSocketServer(): WebSocket.Server {
-        return this._webserver.getWebSocketServer();
-    }
-
     public async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
         if (!ArduinoContext.initialized) {
             await ArduinoActivator.activate();
@@ -97,7 +92,14 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                             "theme=" + encodeURIComponent(theme.trim()) +
                             "&backgroundcolor=" + encodeURIComponent(backgroundcolor.trim()) +
                             "&color=" + encodeURIComponent(color.trim());
-                    document.getElementById('frame').src = url;
+
+                    var iframe = document.getElementById('frame')                            
+                    iframe.src = url;
+
+                    window.addEventListener('message', msg => {
+                        var data = msg.data;
+                        iframe.contentWindow.postMessage(data, url);
+                    })
                 };
             </script>
         </head>

@@ -12,7 +12,7 @@ import ArduinoActivator from "./arduinoActivator";
 import ArduinoContext from "./arduinoContext";
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
-    LIBRARY_MANAGER_URI, SERIAL_PLOTTER_URI
+    LIBRARY_MANAGER_URI, SERIAL_PLOTTER_URI,
 } from "./common/constants";
 import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
@@ -23,6 +23,7 @@ import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
 import { NSAT } from "./nsat";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
+import { SerialPlotterPanel } from "./serialmonitor/serialPlotterPanel";
 import { UsbDetector } from "./serialmonitor/usbDetector";
 
 const status: any = {};
@@ -147,11 +148,11 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.showSerialPlotter", async () => {
-        const panel = vscode.window.createWebviewPanel("arduinoSerialPlotter", "Arduino Serial Plottter", vscode.ViewColumn.Two, {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        });
-        panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
+        const panelHtml = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
+        const panel = await SerialPlotterPanel.createOrShow(panelHtml);
+        const serialMonitor = SerialMonitor.getInstance();
+
+        serialMonitor.serialPlotter.setSendMessageFn(panel.postMessage.bind(panel));
     });
 
     // change board type
@@ -289,7 +290,6 @@ export async function activate(context: vscode.ExtensionContext) {
     // serial monitor commands
     const serialMonitor = SerialMonitor.getInstance();
     context.subscriptions.push(serialMonitor);
-    serialMonitor.serialPlotter.setWebSocketServer(arduinoManagerProvider.getWebSocketServer());
 
     registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null));
     registerNonArduinoCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor());
