@@ -50,6 +50,7 @@
     "onCommand:arduino.showLibraryManager",
     "onCommand:arduino.showExamples",
     "onCommand:arduino.initialize",
+    "onCommand:arduino.openSerialPlotter",
     "onDebug"
   ],
   "main": "./out/src/extension",
@@ -132,6 +133,10 @@
       {
         "command": "arduino.showExamples",
         "title": "Arduino: Examples"
+      },
+      {
+        "command": "arduino.openSerialPlotter",
+        "title": "Arduino: Open Serial Plotter"
       }
     ],
     "menus": {
