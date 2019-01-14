@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import * as WebSocket from "ws";
 
 import { SerialPortCtrl } from "./serialportctrl";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 
 interface IDataFrame {
     time?: number;
@@ -68,7 +69,7 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     private handleSerialLine(line: string): void {
-        const match = line.match(/^PLOT\[(\d+)\]\[(.+?)=(.+?)\]/);
+        const match = line.match(new RegExp(VscodeSettings.getInstance().plotRegex));
 
         if (!match) {
             return;

@@ -484,6 +484,10 @@
         "arduino.defaultBaudRate": {
           "type": "number",
           "default": 115200
+        },
+        "arduino.plotRegex": {
+          "type": "string",
+          "default": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]"
         }
       }
     },

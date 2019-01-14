@@ -77,7 +77,8 @@ The following Visual Studio Code settings are available for the Arduino extensio
         "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json",
         "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
     ],
-    "arduino.defaultBaudRate": 115200
+    "arduino.defaultBaudRate": 115200,
+    "arduino.plotRegex": "/^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]/",
 }
 ```
 *Note:* You only need to set `arduino.path` in Visual Studio Code settings, other options are not required.
