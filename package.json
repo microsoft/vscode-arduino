@@ -492,7 +492,7 @@
         },
         "arduino.plotRegex": {
           "type": "string",
-          "default": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]"
+          "default": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]$"
         }
       }
     },
