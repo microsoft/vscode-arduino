@@ -45,6 +45,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Initialize**: Scaffold a VS Code project with an Arduino sketch.
 - **Arduino: Library Manager**: Explore and manage libraries.
 - **Arduino: Open Serial Monitor**: Open the serial monitor in the integrated output window.
+- **Arduino: Open Serial Plotter**: Open the serial plotter.
 - **Arduino: Select Serial Port**: Change the current serial port.
 - **Arduino: Send Text to Serial Port**: Send a line of text via the current serial port.
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
@@ -78,7 +79,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
         "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
     ],
     "arduino.defaultBaudRate": 115200,
-    "arduino.plotRegex": "/^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]/",
+    "arduino.plotRegex": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]$",
 }
 ```
 *Note:* You only need to set `arduino.path` in Visual Studio Code settings, other options are not required.
@@ -120,6 +121,36 @@ Steps to start debugging:
 4. When your breakpoint is hit, you can see variables and add expression(s) to watch on the Debug Side Bar.
 
 > To learn more about how to debug Arduino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
+
+## Using Serial Plotter
+
+You can start Serial Plotter by calling `Arduino: Open Serial Plotter` from Command Pallete. 
+
+By default, it looks for lines in the following format in the serial input: `PLOT[time][variable=value]`
+
+For example, `PLOT[1234][cos=0.5]` means that we have variable named `cos` with it's value `0.5` in the time `1234`.
+
+You can use snippet below to print variables in such format.
+
+```c
+void plot(String name, float value)
+{
+  String time = String(millis());
+  Serial.println("PLOT[" + time + "][" + name + "=" + value + "]");
+}
+```
+
+Or you can override default regex to specify your own format, but the order will be remain the same: time, variable name, variable value.
+
+```json
+{
+    "arduino.plotRegex": "^(\\d+):(.+?)=(.+?)$"
+}
+```
+
+```
+    1234:cos=0.5
+```
 
 ## Change Log
 See the [Change log](https://github.com/Microsoft/vscode-arduino/blob/master/CHANGELOG.md) for details about the changes in each version.
