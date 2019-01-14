@@ -2,12 +2,12 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.21",
+  "version": "0.2.25",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.23.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -71,11 +71,19 @@
       },
       {
         "command": "arduino.verify",
-        "title": "Arduino: Verify"
+        "title": "Arduino: Verify",
+        "icon": {
+          "dark": "images/ArduinoVerify_inverse_16.svg",
+          "light": "images/ArduinoVerify_16.svg"
+        }
       },
       {
         "command": "arduino.upload",
-        "title": "Arduino: Upload"
+        "title": "Arduino: Upload",
+        "icon": {
+          "dark": "images/ArduinoUpload_inverse_16.svg",
+          "light": "images/ArduinoUpload_16.svg"
+        }
       },
       {
         "command": "arduino.uploadUsingProgrammer",
@@ -126,6 +134,20 @@
         "title": "Arduino: Examples"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceExtname == .ino",
+          "command": "arduino.verify",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .ino",
+          "command": "arduino.upload",
+          "group": "navigation"
+        }
+      ]
+    },
     "views": {
       "explorer": [
         {
@@ -484,9 +506,6 @@
         "id": "cpp",
         "extensions": [
           ".ino"
-        ],
-        "aliases": [
-          "Arduino"
         ]
       }
     ],
@@ -518,6 +537,7 @@
     "ms-vscode.cpptools"
   ],
   "devDependencies": {
+    "@types/compare-versions": "^3.0.0",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "@types/winreg": "^1.2.30",
@@ -541,11 +561,12 @@
     "tslint": "^4.2.0",
     "typemoq": "^1.6.0",
     "typescript": "^2.2.1",
-    "vscode": "^1.1.10",
+    "vscode": "^1.1.22",
     "webpack": "^2.2.1"
   },
   "dependencies": {
     "body-parser": "^1.16.1",
+    "compare-versions": "^3.4.0",
     "eventemitter2": "^4.1.0",
     "express": "^4.14.1",
     "glob": "^7.1.1",

@@ -21,6 +21,7 @@ import { ArduinoDebugConfigurationProvider } from "./debug/configurationProvider
 import { DeviceContext } from "./deviceContext";
 import { CompletionProvider } from "./langService/completionProvider";
 import * as Logger from "./logger/logger";
+import { NSAT } from "./nsat";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 import { UsbDetector } from "./serialmonitor/usbDetector";
 
@@ -73,6 +74,8 @@ export async function activate(context: vscode.ExtensionContext) {
             correlationId: guid,
             duration: timer1.end(),
         });
+
+        NSAT.takeSurvey(context);
     };
     const registerArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
@@ -106,24 +109,41 @@ export async function activate(context: vscode.ExtensionContext) {
         }));
     };
 
-    registerArduinoCommand("arduino.showBoardManager", () => {
-        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Board Manager");
+    registerArduinoCommand("arduino.showBoardManager", async () => {
+        const panel = vscode.window.createWebviewPanel("arduinoBoardManager", "Arduino Board Manager", vscode.ViewColumn.Two, {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        });
+        panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(BOARD_MANAGER_URI);
     });
 
-    registerArduinoCommand("arduino.showLibraryManager", () => {
-        return vscode.commands.executeCommand("vscode.previewHtml", LIBRARY_MANAGER_URI, vscode.ViewColumn.Two, "Arduino Library Manager");
+    registerArduinoCommand("arduino.showLibraryManager", async () => {
+        const panel = vscode.window.createWebviewPanel("arduinoLibraryManager", "Arduino Library Manager", vscode.ViewColumn.Two, {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        });
+        panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(LIBRARY_MANAGER_URI);
     });
 
-    registerArduinoCommand("arduino.showBoardConfig", () => {
-        return vscode.commands.executeCommand("vscode.previewHtml", BOARD_CONFIG_URI, vscode.ViewColumn.Two, "Arduino Board Configuration");
+    registerArduinoCommand("arduino.showBoardConfig", async () => {
+        const panel = vscode.window.createWebviewPanel("arduinoBoardConfiguration", "Arduino Board Configuration", vscode.ViewColumn.Two, {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        });
+        panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(BOARD_CONFIG_URI);
     });
 
-    registerArduinoCommand("arduino.showExamples", (forceRefresh: boolean = false) => {
+    registerArduinoCommand("arduino.showExamples", async (forceRefresh: boolean = false) => {
         vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         if (forceRefresh) {
             vscode.commands.executeCommand("arduino.reloadExample");
         }
-        return vscode.commands.executeCommand("vscode.previewHtml", EXAMPLES_URI, vscode.ViewColumn.Two, "Arduino Examples");
+
+        const panel = vscode.window.createWebviewPanel("arduinoExamples", "Arduino Examples", vscode.ViewColumn.Two, {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        });
+        panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(EXAMPLES_URI);
     });
 
     // change board type

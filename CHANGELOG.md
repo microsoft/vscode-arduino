@@ -1,6 +1,55 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.25
+-Release date: January 10, 2019
+
+### Added
+- Add upload and verify button in action bar [#737](https://github.com/Microsoft/vscode-arduino/pull/737)
+- Add serial port support for Electron 3.0 [#729](https://github.com/Microsoft/vscode-arduino/pull/729), [#730](https://github.com/Microsoft/vscode-arduino/pull/730), [#731](https://github.com/Microsoft/vscode-arduino/pull/731)
+
+Special thanks to [Michael Omiccioli](https://github.com/momiccioli) and [MarNwk](https://github.com/MarNwk),thank you for your feedbacks.
+
+## Version 0.2.24
+-Release date: December 11, 2018
+
+### Added
+- Add debugging support for cmsis-dap with Keil Software vid [#634](https://github.com/Microsoft/vscode-arduino/pull/634)
+
+### Changed
+- Save the selected programmer in Arduino.json [#714](https://github.com/Microsoft/vscode-arduino/pull/714)
+
+### Fixed
+- Fix dependency issue [#716](https://github.com/Microsoft/vscode-arduino/pull/716)
+- Install latest arduino on Mac [#724](https://github.com/Microsoft/vscode-arduino/pull/724)
+
+Special thanks to [Deqing Sun](https://github.com/DeqingSun), thank you for your contributions and feedbacks.
+
+## Version 0.2.23
+-Release date: November 22, 2018
+
+### Added
+- Add debugging support for uno [#685](https://github.com/Microsoft/vscode-arduino/pull/685)
+- Add Wio LTE M1/NB1(BG96) board [#703](https://github.com/Microsoft/vscode-arduino/pull/703)
+- Add contribution guidelines [#665](https://github.com/Microsoft/vscode-arduino/pull/665)
+- Add sketches folder into examples view [#652](https://github.com/Microsoft/vscode-arduino/issues/652)
+
+### Changed
+- Change Arduino langauge ID to C++ [#686](https://github.com/Microsoft/vscode-arduino/issues/686)
+- Use VS Code new webview API [#701](https://github.com/Microsoft/vscode-arduino/issues/701)
+
+### Fixed
+- Fix major grammatical issues & formatting issues [#681](https://github.com/Microsoft/vscode-arduino/pull/681)
+- Spelling and grammar updates to README [#679](https://github.com/Microsoft/vscode-arduino/pull/679)
+
+Special thanks to [Deqing Sun](https://github.com/DeqingSun), [Takashi Matsuoka](https://github.com/matsujirushi), [Chinmay Chandak](https://github.com/CCAtAlvis), [aster94](https://github.com/aster94), [Ajit Panigrahi](https://github.com/AjitZero) and [Konrad Blum](https://github.com/kblum), thank you for your contributions and feedbacks.
+
+## Version 0.2.22
+- Release date: October 18, 2018
+
+### Added
+- Add Net Satisfaction Score survey
+
 ## Version 0.2.21
 - Release date: October 10, 2018
 
@@ -8,7 +57,7 @@ All notable changes to this project will be documented in this file.
 - Fix the output path not exist issue [#641](https://github.com/Microsoft/vscode-arduino/issues/641)
 - Update arduino.path instruction [#635](https://github.com/Microsoft/vscode-arduino/issues/635)
 
-Special thanks to [aster94](https://github.com/aster94),  [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you foryour contributions and feedbacks.
+Special thanks to [aster94](https://github.com/aster94), [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you foryour contributions and feedbacks.
 
 ## Version 0.2.20
 - Release date: August 16, 2018

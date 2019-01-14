@@ -1,12 +1,12 @@
 language: node_js
 
 node_js:
-- '9'
+- '11'
 
 os:
 - linux
 - osx
-dist: trusty # using Ubuntu 14.04.5 LTS
+# dist: trusty # using Ubuntu 14.04.5 LTS
 
 # fixing https://github.com/Microsoft/vscode/issues/33998
 addons:
@@ -29,7 +29,7 @@ env:
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
-    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0 CODE_VERSION=1.20.1;
+    export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0;
     sh -e /etc/init.d/xvfb start;
     sleep 3;
     wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER;
@@ -38,9 +38,10 @@ before_install:
   fi
 # Arduino 1.8.7 has breaking change, Install board package and library will fail
 # https://github.com/arduino/Arduino/issues/8034
+# Arduino 1.8.8 has fixed issue 8034.
 - if [ $TRAVIS_OS_NAME == "osx" ]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-    brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/f908f03d37c981de93af8447b32641551d8bf74e/Casks/arduino.rb;
+    brew cask install arduino;
   fi
 
 install:

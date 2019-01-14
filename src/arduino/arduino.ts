@@ -109,7 +109,12 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
         if (!dc.port) {
-            vscode.window.showErrorMessage("Please specify the upload serial port.");
+            const choice = await vscode.window.showInformationMessage(
+                "Serial port is not specified. Do you want to select a serial port for uploading?",
+                "Yes", "No");
+            if (choice === "Yes") {
+                vscode.commands.executeCommand("arduino.selectSerialPort");
+            }
             return;
         }
 
@@ -185,7 +190,12 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
         if (!dc.port) {
-            vscode.window.showErrorMessage("Please specify the upload serial port.");
+            const choice = await vscode.window.showInformationMessage(
+                "Serial port is not specified. Do you want to select a serial port for uploading?",
+                "Yes", "No");
+            if (choice === "Yes") {
+                vscode.commands.executeCommand("arduino.selectSerialPort");
+            }
             return;
         }
 
