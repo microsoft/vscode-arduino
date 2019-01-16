@@ -148,11 +148,10 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.showSerialPlotter", async () => {
-        const panelHtml = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
-        const panel = await SerialPlotterPanel.createOrShow(panelHtml);
-        const serialMonitor = SerialMonitor.getInstance();
+        const html = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
+        const serialPlotter = SerialMonitor.getInstance().serialPlotter;
 
-        serialMonitor.serialPlotter.setSendMessageFn(panel.postMessage.bind(panel));
+        SerialPlotterPanel.createOrShow({serialPlotter, html});
     });
 
     // change board type

@@ -13,13 +13,28 @@ import { chartConfig } from "./chartConfig";
 
 boost(Highcharts);
 
-interface IDataFrame {
-    time: number;
-    [field: string]: number;
+enum MessageType {
+    Frame = "Frame",
+    Action = "Action",
 }
 
-interface IDataAction {
-    action: string;
+enum Action {
+    Reset = "Reset",
+}
+
+interface IMessage {
+    type: MessageType;
+}
+
+interface IMessageFrame extends IMessage {
+    type: typeof MessageType.Frame;
+    time?: number;
+    [field: string]: string | number;
+}
+
+interface IMessageAction extends IMessage {
+    type: typeof MessageType.Action;
+    action: Action;
 }
 
 interface ISerialPlotterState extends React.Props<any> {
@@ -28,17 +43,15 @@ interface ISerialPlotterState extends React.Props<any> {
 }
 
 class SerialPlotter extends React.Component<void, ISerialPlotterState> {
+    public static DEFAULT_THROTTLING = 100;
+
     public state = {
-        rate: "100",
+        rate: SerialPlotter.DEFAULT_THROTTLING.toString(),
         active: false,
     };
 
-    private _chartRef: HTMLElement;
-    private _chart: Highcharts;
-
-    constructor(props) {
-        super(props);
-    }
+    private _chartRef: HTMLElement = null;
+    private _chart: Highcharts = null;
 
     public componentDidMount() {
         this.initMessageHandler();
@@ -94,11 +107,11 @@ class SerialPlotter extends React.Component<void, ISerialPlotterState> {
         this._chart = Highcharts.stockChart(this._chartRef, chartConfig);
     }
 
-    private addFrame(frame: IDataFrame) {
+    private addFrame(frame: IMessageFrame) {
         const time = frame.time;
 
         for (const field of Object.keys(frame)) {
-            if (field === "time") {
+            if (field === "time" || field === "type") {
                 continue;
             }
 
@@ -119,8 +132,8 @@ class SerialPlotter extends React.Component<void, ISerialPlotterState> {
         }
     }
 
-    private doAction(action: IDataAction) {
-        if (action.action === "RESET") {
+    private doAction(msg: IMessageAction) {
+        if (msg.action === Action.Reset) {
             this.reset();
         }
     }
@@ -138,25 +151,26 @@ class SerialPlotter extends React.Component<void, ISerialPlotterState> {
     }
 
     private reset = () => {
-        while (this._chart.series.length > 0) {
-            this._chart.series[0].remove(false);
-        }
-
-        this._chart.redraw();
+        this.initChart();
     }
 
     private initMessageHandler() {
         window.addEventListener("message", (event) => {
-            const data = event.data;
-
             if (!this.state.active) {
                 return;
             }
 
-            if (data.time) {
-                this.addFrame(data);
-            } else if (data.action) {
-                this.doAction(data);
+            const data: IMessage = event.data;
+
+            switch (data.type) {
+                case MessageType.Frame:
+                    this.addFrame(data as IMessageFrame);
+                    break;
+                case MessageType.Action:
+                    this.doAction(data as IMessageAction);
+                    break;
+                default:
+                    console.warn("Unknown message type", data);
             }
         });
 
@@ -165,14 +179,14 @@ class SerialPlotter extends React.Component<void, ISerialPlotterState> {
         });
     }
 
-    private updatePlotRefreshRate = async () => {
+    private updatePlotRefreshRate = () => {
         const rate = parseInt(this.state.rate, 10);
 
         if (!Number.isFinite(rate)) {
             return;
         }
 
-        await API.updatePlotRefreshRate(rate);
+        API.updatePlotRefreshRate(rate);
     }
 
     private onRateChange = (e) => {

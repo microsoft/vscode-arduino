@@ -4,24 +4,45 @@ import * as vscode from "vscode";
 import { VscodeSettings } from "../arduino/vscodeSettings";
 import { SerialPortCtrl } from "./serialportctrl";
 
-interface IDataFrame {
-    time?: number;
-    [field: string]: number;
+enum MessageType {
+    Frame = "Frame",
+    Action = "Action",
 }
 
-type ISendMessage = (message: {}) => void;
+enum Action {
+    Reset = "Reset",
+}
+
+interface IMessage {
+    type: MessageType;
+}
+
+interface IMessageFrame extends IMessage {
+    type: typeof MessageType.Frame;
+    time?: number;
+    [field: string]: string | number;
+}
+
+interface IMessageAction extends IMessage {
+    type: typeof MessageType.Action;
+    action: Action;
+}
+
+type ISendMessage = (message: IMessage) => void;
 
 export class SerialPlotter implements vscode.Disposable {
-    private _sendMessage: ISendMessage;
-    private _throttling: number = 100;
-    private sendCurrentFrameThrottled;
+    public static DEFAULT_THROTTLING: number = 100;
 
-    private _currentFrame: IDataFrame;
-    private _lastSentTime: number;
+    private _throttling: number = SerialPlotter.DEFAULT_THROTTLING;
+    private _frame: IMessageFrame = null;
+    private _sendMessage: ISendMessage = null;
+
+    private disposableOnLineHandler: vscode.Disposable = null;
+    private sendFrame: () => void = null;
 
     constructor() {
-        this.setThrottling(this._throttling);
-        this._currentFrame = {};
+        this.setThrottling(SerialPlotter.DEFAULT_THROTTLING);
+        this.emptyFrame();
     }
 
     public open() {
@@ -29,10 +50,20 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     public reset() {
-        this.sendMessage({action: "RESET"});
+        this.setThrottling(SerialPlotter.DEFAULT_THROTTLING);
+        this.sendMessage({type: MessageType.Action, action: Action.Reset} as IMessageAction);
+
+        this.emptyFrame();
     }
 
     public dispose() {
+        this._sendMessage = undefined;
+        this._frame = undefined;
+
+        if (this.disposableOnLineHandler) {
+            this.disposableOnLineHandler.dispose();
+            this.disposableOnLineHandler = undefined;
+        }
     }
 
     public setSendMessageFn(sendMessage: ISendMessage) {
@@ -40,25 +71,28 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     public setSerialPortCtrl(serialPortCtrl: SerialPortCtrl) {
-        serialPortCtrl.onLine(this.handleSerialLine.bind(this));
+        if (this.disposableOnLineHandler) {
+            this.disposableOnLineHandler.dispose();
+        }
+
+        this.disposableOnLineHandler = serialPortCtrl.onLine(this.handleSerialLine.bind(this));
     }
 
     public setThrottling(throttling: number): void {
         this._throttling = throttling;
-        this.sendCurrentFrameThrottled = throttle(this.sendCurrentFrame, this._throttling, { leading: false });
+        this.sendFrame = throttle(this._sendFrame, this._throttling, { leading: false });
     }
 
-    private sendCurrentFrame() {
-        if (this._lastSentTime >= this._currentFrame.time) {
+    private _sendFrame() {
+        if (!this._frame) {
             return;
         }
 
-        this.sendMessage(this._currentFrame);
-        this._lastSentTime = this._currentFrame.time;
-        this._currentFrame = {};
+        this.sendMessage(this._frame);
+        this.emptyFrame();
     }
 
-    private sendMessage(msg: {}) {
+    private sendMessage(msg: IMessage) {
         if (!this._sendMessage) {
             return;
         }
@@ -75,12 +109,17 @@ export class SerialPlotter implements vscode.Disposable {
 
         const [, time, field, value] = match;
 
-        this._currentFrame = {
-            ...this._currentFrame,
-            [field]: parseFloat(value),
+        this._frame = {
+            ...this._frame,
+            type: MessageType.Frame,
             time: parseInt(time, 10),
+            [field]: parseFloat(value),
         };
 
-        this.sendCurrentFrameThrottled();
+        this.sendFrame();
+    }
+
+    private emptyFrame() {
+        this._frame = {type: MessageType.Frame};
     }
 }

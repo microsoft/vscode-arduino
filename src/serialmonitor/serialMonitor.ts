@@ -115,11 +115,11 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public dispose() {
+        this._serialPlotter.dispose();
+
         if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
             return this._serialPortCtrl.stop();
         }
-
-        this._serialPlotter.dispose();
     }
 
     public async selectSerialPort(vid: string, pid: string) {
@@ -186,9 +186,9 @@ export class SerialMonitor implements vscode.Disposable {
         }
 
         try {
+            this._serialPlotter.reset();
             await this._serialPortCtrl.open();
             this.updatePortStatus(true);
-            this._serialPlotter.reset();
         } catch (error) {
             Logger.notifyUserWarning("openSerialMonitorError", error,
                 `Failed to open serial port ${this._currentPort} due to error: + ${error.toString()}`);
