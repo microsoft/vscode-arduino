@@ -38,7 +38,7 @@ interface IMessageAction extends IMessage {
 }
 
 interface ISerialPlotterState extends React.Props<any> {
-    rate: string;
+    rate: number;
     active: boolean;
 }
 
@@ -46,7 +46,7 @@ class SerialPlotter extends React.Component<void, ISerialPlotterState> {
     public static DEFAULT_THROTTLING = 100;
 
     public state = {
-        rate: SerialPlotter.DEFAULT_THROTTLING.toString(),
+        rate: SerialPlotter.DEFAULT_THROTTLING,
         active: false,
     };
 
@@ -60,44 +60,35 @@ class SerialPlotter extends React.Component<void, ISerialPlotterState> {
 
     public render() {
         return (
-            <div>
+            <div className="serialplotter">
                 <div ref={(el) => (this._chartRef = el)} />
-                <div>
-                    <FormGroup bsSize="small">
-                        <InputGroup>
-                            <ControlLabel>Refresh rate</ControlLabel>
-                            <FormControl
-                                type="text"
-                                value={this.state.rate}
-                                onChange={this.onRateChange}
-                            />
-                            <InputGroup.Button>
-                                <Button onClick={this.updatePlotRefreshRate}>
-                                    Apply
-                                </Button>
-                            </InputGroup.Button>
-                        </InputGroup>
+                <div className="settings">
+                    <div className="section refresh-rate">
+                        <ControlLabel>Refresh rate</ControlLabel>
+                        <FormControl
+                            type="number"
+                            value={this.state.rate}
+                            onChange={this.onRateChange}
+                        />
+                        <Button
+                            bsSize="small"
+                            onClick={this.updatePlotRefreshRate}
+                        >
+                            Apply
+                        </Button>
+                    </div>
 
-                        <InputGroup>
-                            <InputGroup.Button>
-                                <Button onClick={this.reset}>Reset</Button>
-                            </InputGroup.Button>
-                        </InputGroup>
-
-                        <InputGroup>
-                            <InputGroup.Button>
-                                <Button
-                                    onClick={
-                                        this.state.active
-                                            ? this.pause
-                                            : this.play
-                                    }
-                                >
-                                    {this.state.active ? "Pause" : "Play"}
-                                </Button>
-                            </InputGroup.Button>
-                        </InputGroup>
-                    </FormGroup>
+                    <div className="section actions">
+                        <Button bsSize="small" onClick={this.reset}>
+                            Reset
+                        </Button>
+                        <Button
+                            bsSize="small"
+                            onClick={this.state.active ? this.pause : this.play}
+                        >
+                            {this.state.active ? "Pause" : "Play"}
+                        </Button>
+                    </div>
                 </div>
             </div>
         );
@@ -180,13 +171,7 @@ class SerialPlotter extends React.Component<void, ISerialPlotterState> {
     }
 
     private updatePlotRefreshRate = () => {
-        const rate = parseInt(this.state.rate, 10);
-
-        if (!Number.isFinite(rate)) {
-            return;
-        }
-
-        API.updatePlotRefreshRate(rate);
+        API.updatePlotRefreshRate(this.state.rate);
     }
 
     private onRateChange = (e) => {
