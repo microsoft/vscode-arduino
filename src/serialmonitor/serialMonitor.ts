@@ -51,7 +51,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _endingStatusBar: vscode.StatusBarItem;
 
-    private _openPlotStatusBar: vscode.StatusBarItem;
+    private _plotterStatusBar: vscode.StatusBarItem;
 
     private _serialPortCtrl: SerialPortCtrl = null;
 
@@ -100,11 +100,11 @@ export class SerialMonitor implements vscode.Disposable {
         this._endingStatusBar.tooltip = "Serial Port Line Ending";
         this._endingStatusBar.text = `No line ending`;
 
-        this._openPlotStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_SERIAL_PLOTTER);
-        this._openPlotStatusBar.command = "arduino.openSerialPlotter";
-        this._openPlotStatusBar.tooltip = "Open Serial Plotter";
-        this._openPlotStatusBar.text = "Plotter";
-        this._openPlotStatusBar.show();
+        this._plotterStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_SERIAL_PLOTTER);
+        this._plotterStatusBar.command = "arduino.openSerialPlotter";
+        this._plotterStatusBar.tooltip = "Open Serial Plotter";
+        this._plotterStatusBar.text = "Plotter";
+        this._plotterStatusBar.show();
     }
     public get initialized(): boolean {
         return !!this._outputChannel;
