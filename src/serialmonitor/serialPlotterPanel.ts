@@ -11,7 +11,7 @@ export class SerialPlotterPanel {
             return;
         }
 
-        const panel = vscode.window.createWebviewPanel("arduinoSerialPlotter", "Arduino Serial Plottter", vscode.ViewColumn.Two, {
+        const panel = vscode.window.createWebviewPanel("arduinoSerialPlotter", "Arduino Serial Plotter", vscode.ViewColumn.Two, {
             enableScripts: true,
             retainContextWhenHidden: true,
         });
