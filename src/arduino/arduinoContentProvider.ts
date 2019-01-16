@@ -93,13 +93,16 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                             "&backgroundcolor=" + encodeURIComponent(backgroundcolor.trim()) +
                             "&color=" + encodeURIComponent(color.trim());
 
-                    var iframe = document.getElementById('frame')                            
-                    iframe.src = url;
+                    var iframe = document.getElementById('frame');
 
-                    window.addEventListener('message', msg => {
-                        var data = msg.data;
-                        iframe.contentWindow.postMessage(data, url);
-                    })
+                    iframe.onload = function() {
+                        window.addEventListener('message', msg => {
+                            var data = msg.data;
+                            iframe.contentWindow.postMessage(data, url);
+                        })    
+                    }
+
+                    iframe.src = url;
                 };
             </script>
         </head>
