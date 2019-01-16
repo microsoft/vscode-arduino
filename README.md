@@ -156,8 +156,6 @@ You can override default regex to specify your own format, but the order will be
 }
 ```
 
-
-
 ## Change Log
 See the [Change log](https://github.com/Microsoft/vscode-arduino/blob/master/CHANGELOG.md) for details about the changes in each version.
 
