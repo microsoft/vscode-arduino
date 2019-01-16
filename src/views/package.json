@@ -35,7 +35,6 @@
     "svg-url-loader": "^2.0.2",
     "ts-loader": "^2.0.0",
     "webpack": "^2.2.1",
-    "highcharts": "^6.1.4",
-    "prop-types": "^15.6.0"
+    "highcharts": "^6.1.4"
   }
 }
