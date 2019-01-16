@@ -126,9 +126,9 @@ Steps to start debugging:
 
 You can start Serial Plotter by calling `Arduino: Open Serial Plotter` from Command Pallete. 
 
-By default, it looks for lines in the following format in the serial input: `PLOT[time][variable=value]`
+By default, it looks for lines of the following format in the serial input: `PLOT[time][variable=value]`
 
-For example, `PLOT[1234][cos=0.5]` means that we have variable named `cos` with it's value `0.5` in the time `1234`.
+For example, `PLOT[1234][cos=0.5]` means that we have variable named `cos` with it's value `0.5` at the time `1234`.
 
 You can use snippet below to print variables in such format.
 
@@ -140,7 +140,15 @@ void plot(String name, float value)
 }
 ```
 
-Or you can override default regex to specify your own format, but the order will be remain the same: time, variable name, variable value.
+### Throttling (refresh rate)
+
+This Plotter is not working in real time. It's built using library [https://www.highcharts.com/](https://www.highcharts.com/) for creating interactive charts that's not superfast.
+
+Plotter accumulates data and flushes it to the chart with some periodicity that we will call `throttling` or `refresh rate`. By default it's 100ms, but you can change it as you want. This value was chosen empirically, lower values ​​can lead to noticable lags.
+
+### Override log format
+
+You can override default regex to specify your own format, but the order will be remain the same: time, variable name, variable value.
 
 ```json
 {
@@ -148,9 +156,7 @@ Or you can override default regex to specify your own format, but the order will
 }
 ```
 
-```
-    1234:cos=0.5
-```
+
 
 ## Change Log
 See the [Change log](https://github.com/Microsoft/vscode-arduino/blob/master/CHANGELOG.md) for details about the changes in each version.
