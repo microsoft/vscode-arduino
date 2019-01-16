@@ -79,7 +79,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
         "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
     ],
     "arduino.defaultBaudRate": 115200,
-    "arduino.plotRegex": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]$",
+    "arduino.plotterRegex": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]$",
 }
 ```
 *Note:* You only need to set `arduino.path` in Visual Studio Code settings, other options are not required.
@@ -152,7 +152,7 @@ You can override default regex to specify your own format, but the order will be
 
 ```json
 {
-    "arduino.plotRegex": "^(\\d+):(.+?)=(.+?)$"
+    "arduino.plotterRegex": "^(\\d+):(.+?)=(.+?)$"
 }
 ```
 

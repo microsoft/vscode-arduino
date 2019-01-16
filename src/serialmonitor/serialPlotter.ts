@@ -101,7 +101,7 @@ export class SerialPlotter implements vscode.Disposable {
     }
 
     private handleSerialLine(line: string): void {
-        const match = line.match(new RegExp(VscodeSettings.getInstance().plotRegex));
+        const match = line.match(new RegExp(VscodeSettings.getInstance().plotterRegex));
 
         if (!match) {
             return;

@@ -490,7 +490,7 @@
           "type": "number",
           "default": 115200
         },
-        "arduino.plotRegex": {
+        "arduino.plotterRegex": {
           "type": "string",
           "default": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]$"
         }
