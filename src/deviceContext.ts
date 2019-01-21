@@ -312,6 +312,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             await this.resolveMainSketch();
             if (this.sketch) {
                 await vscode.commands.executeCommand("arduino.changeBoardType");
+                await vscode.commands.executeCommand("arduino.selectSerialPort");
                 vscode.window.showInformationMessage("The workspace is initialized with the Arduino extension support.");
             } else {
                 vscode.window.showInformationMessage("No *.ino sketch file was found or selected, so skip initialize command.");
