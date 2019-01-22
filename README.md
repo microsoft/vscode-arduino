@@ -143,9 +143,13 @@ void plot(String name, float value)
 ### Throttling (refresh rate)
 
 This Plotter is not working in real time. It's built on top of web technologies
-with [highcharts](https://www.highcharts.com/) library to create interactive chart, so it's pretty fast but not instant.
+with [dygraphs](http://dygraphs.com/) library to create interactive chart, so it's pretty fast but not instant.
 
 Plotter accumulates data and flushes it to the chart with some periodicity that we will call `throttling` or `refresh rate`. By default it's 100ms, but you can change it as you want. This value was chosen empirically, lower values ​​can lead to noticable lags.
+
+### Time window
+
+Data is recorded for a specified period of time called `Time window`. By default it's 20 seconds and you can also change it in the way you need. The greater the value, the more resources are required to render chart, and the more lags we have.
 
 ### Override log format
 

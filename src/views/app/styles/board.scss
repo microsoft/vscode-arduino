@@ -218,6 +218,12 @@ a {
 }
 
 .serialplotter {
+    padding: 12px;
+    
+    .graph {
+        width: 100% !important;
+    }
+
     .settings {
         padding: 12px;
         display: flex;
@@ -234,7 +240,12 @@ a {
         padding: 6px;
     }
     
-    .refresh-rate {
+    .parameters {
+        display: grid;
+        grid-auto-columns: auto;
+        grid-auto-flow: row;
+        grid-gap: 6px;
+
         input {
             width: 80px;
         }
