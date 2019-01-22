@@ -52,6 +52,10 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Upload Using Programmer**: Upload using an external programmer.
 - **Arduino: Verify**: Build sketch.
 
+## Keybindings
+- **Arduino: Upload** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>U</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>U</kbd>
+- **Arduino: Verify** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>R</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>R</kbd>
+
 ## Options
 | Option | Description |
 | --- | --- |
@@ -98,7 +102,7 @@ The following settings are as per sketch settings of the Arduino extension. You 
 }
 ```
 - `sketch` - The main sketch file name of Arduino.
-- `port` - Name of the serial port connected to the device. Can be set by the `Arduino: Select Serial Port` command.
+- `port` - Name of the serial port connected to the device. Can be set by the `Arduino: Select Serial Port` command. For Mac users could be "/dev/cu.wchusbserial1420".
 - `board` - Currently selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
