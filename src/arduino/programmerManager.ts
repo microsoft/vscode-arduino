@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import * as util from "../common/util";
 import * as constants from "../common/constants";
+import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
@@ -14,7 +14,7 @@ export class ProgrammerManager {
     private _currentProgrammerName: string;
 
     private _programmerStatusBar: vscode.StatusBarItem;
-    
+
     private _programmers: Map<string, string>;
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
@@ -29,8 +29,7 @@ export class ProgrammerManager {
         return this._programmers.get(this._currentProgrammerName);
     }
 
-    public loadConfig() 
-    {
+    public loadConfig() {
         this.loadProgrammers();
 
         this.updateStatusBar();
@@ -42,14 +41,15 @@ export class ProgrammerManager {
     }
 
     public async selectProgrammer() {
-        const chosen: string | undefined = await vscode.window.showQuickPick(Array.from(this._programmers.keys()), { placeHolder: "Select programmer" });
+        const chosen: string | undefined = await vscode.window.showQuickPick(Array.from(this._programmers.keys()),
+            { placeHolder: "Select programmer" });
 
         if (!chosen) {
             return;
         }
 
         this._currentProgrammerName = chosen;
-        
+
         this._programmerStatusBar.text = this._currentProgrammerName;
         const dc = DeviceContext.getInstance();
         dc.programmer = this._currentProgrammerName;
@@ -60,15 +60,16 @@ export class ProgrammerManager {
         const boardLineRegex = /([^\.]+)\.(\S+)=(.+)/;
 
         this._arduinoApp.boardManager.platforms.forEach(((plat) => {
-            if (plat.rootBoardPath === undefined)
+            if (plat.rootBoardPath === undefined) {
                 return;
+            }
 
             const programmmerFilePath = path.join(plat.rootBoardPath, "programmers.txt");
 
             if (util.fileExistsSync(programmmerFilePath)) {
                 const boardContent = fs.readFileSync(programmmerFilePath, "utf8");
                 const lines = boardContent.split(/[\r|\r\n|\n]/);
-               
+
                 lines.forEach((line) => {
                     // Ignore comments.
                     if (line.startsWith("#")) {
@@ -77,9 +78,8 @@ export class ProgrammerManager {
 
                     const match = boardLineRegex.exec(line);
                     if (match && match.length > 3) {
-                        if (match[2] === "name")
-                        {
-                            this._programmers.set(match[3], match[1])
+                        if (match[2] === "name") {
+                            this._programmers.set(match[3], match[1]);
                         }
                     }
                 });
@@ -88,8 +88,7 @@ export class ProgrammerManager {
     }
 
     private updateStatusBar(show: boolean = true): void {
-        if (show) 
-        {
+        if (show) {
             this._programmerStatusBar.show();
             const dc = DeviceContext.getInstance();
             const selectedProgrammer = this._programmers.get(dc.programmer);
