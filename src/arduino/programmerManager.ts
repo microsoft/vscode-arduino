@@ -1,35 +1,21 @@
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
+import * as util from "../common/util";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
 
-export enum ProgrammerList {
-    "AVR ISP",
-    "AVRISP mkII",
-    "USBtinyISP",
-    "ArduinoISP",
-    "ArduinoISP.org",
-    "USBasp",
-    "Parallel Programmer",
-    "Arduino as ISP",
-    "Arduino Gemma",
-    "BusPirate as ISP",
-    "Atmel STK500 development board",
-    "Atmel JTAGICE3 (ISP mode)",
-    "Atmel JTAGICE3 (JTAG mode)",
-    "Atmel-ICE (AVR)",
-}
-
 export class ProgrammerManager {
 
     private static _programmerManager: ProgrammerManager = null;
 
-    private _currentprogrammer: ProgrammerList;
-
-    private _programmervalue: string;
+    private _currentProgrammerName: string;
 
     private _programmerStatusBar: vscode.StatusBarItem;
+    
+    private _programmers: Map<string, string>;
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._programmerStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PROGRAMMER);
@@ -39,68 +25,84 @@ export class ProgrammerManager {
         this._programmerStatusBar.show();
     }
 
-    public get currentProgrammer(): string {
-        return this._programmervalue;
+    public get currentProgrammerID(): string {
+        return this._programmers.get(this._currentProgrammerName);
+    }
+
+    public loadConfig() 
+    {
+        this.loadProgrammers();
+
+        this.updateStatusBar();
+
+        const dc = DeviceContext.getInstance();
+        dc.onDidChange(() => {
+            this.updateStatusBar();
+        });
     }
 
     public async selectProgrammer() {
-        const chosen: string | undefined = await vscode.window.showQuickPick(Object.keys(ProgrammerList)
-            .filter((key) => {
-                return !isNaN(Number(ProgrammerList[key]));
-            }), { placeHolder: "Select programmer" });
+        const chosen: string | undefined = await vscode.window.showQuickPick(Array.from(this._programmers.keys()), { placeHolder: "Select programmer" });
+
         if (!chosen) {
             return;
         }
-        this._currentprogrammer = ProgrammerList[chosen];
-        this.getProgrammer(this._currentprogrammer);
-        this._programmerStatusBar.text = chosen;
+
+        this._currentProgrammerName = chosen;
+        
+        this._programmerStatusBar.text = this._currentProgrammerName;
         const dc = DeviceContext.getInstance();
-        dc.programmer = chosen;
+        dc.programmer = this._currentProgrammerName;
     }
 
-    public getProgrammer(newProgrammer: ProgrammerList) {
-        switch (newProgrammer) {
-            case ProgrammerList["AVR ISP"]:
-                this._programmervalue = "arduino:avrisp";
-                break;
-            case ProgrammerList["AVRISP mkII"]:
-                this._programmervalue = "arduino:avrispmkii";
-                break;
-            case ProgrammerList.USBtinyISP:
-                this._programmervalue = "arduino:usbtinyisp";
-                break;
-            case ProgrammerList.ArduinoISP:
-                this._programmervalue = "arduino:arduinoisp";
-                break;
-            case ProgrammerList.USBasp:
-                this._programmervalue = "arduino:usbasp";
-                break;
-            case ProgrammerList["Parallel Programmer"]:
-                this._programmervalue = "arduino:parallel";
-                break;
-            case ProgrammerList["Arduino as ISP"]:
-                this._programmervalue = "arduino:arduinoasisp";
-                break;
-            case ProgrammerList["Arduino Gemma"]:
-                this._programmervalue = "arduino:usbGemma";
-                break;
-            case ProgrammerList["BusPirate as ISP"]:
-                this._programmervalue = "arduino:buspirate";
-                break;
-            case ProgrammerList["Atmel STK500 development board"]:
-                this._programmervalue = "arduino:stk500";
-                break;
-            case ProgrammerList["Atmel JTAGICE3 (ISP mode)"]:
-                this._programmervalue = "arduino:jtag3isp";
-                break;
-            case ProgrammerList["Atmel JTAGICE3 (JTAG mode)"]:
-                this._programmervalue = "arduino:jtag3";
-                break;
-            case ProgrammerList["Atmel-ICE (AVR)"]:
-                this._programmervalue = "arduino:atmel_ice";
-                break;
-            default:
-                break;
+    private loadProgrammers() {
+        this._programmers = new Map<string, string>();
+        const boardLineRegex = /([^\.]+)\.(\S+)=(.+)/;
+
+        this._arduinoApp.boardManager.platforms.forEach(((plat) => {
+            if (plat.rootBoardPath === undefined)
+                return;
+
+            const programmmerFilePath = path.join(plat.rootBoardPath, "programmers.txt");
+
+            if (util.fileExistsSync(programmmerFilePath)) {
+                const boardContent = fs.readFileSync(programmmerFilePath, "utf8");
+                const lines = boardContent.split(/[\r|\r\n|\n]/);
+               
+                lines.forEach((line) => {
+                    // Ignore comments.
+                    if (line.startsWith("#")) {
+                        return;
+                    }
+
+                    const match = boardLineRegex.exec(line);
+                    if (match && match.length > 3) {
+                        if (match[2] === "name")
+                        {
+                            this._programmers.set(match[3], match[1])
+                        }
+                    }
+                });
+            }
+        }));
+    }
+
+    private updateStatusBar(show: boolean = true): void {
+        if (show) 
+        {
+            this._programmerStatusBar.show();
+            const dc = DeviceContext.getInstance();
+            const selectedProgrammer = this._programmers.get(dc.programmer);
+
+            if (selectedProgrammer) {
+                this._currentProgrammerName = dc.programmer;
+                this._programmerStatusBar.text = dc.programmer;
+            } else {
+                this._currentProgrammerName = null;
+                this._programmerStatusBar.text = "<Select Programmer>";
+            }
+        } else {
+            this._programmerStatusBar.hide();
         }
     }
 }

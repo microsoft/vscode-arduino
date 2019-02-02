@@ -39,6 +39,7 @@ class ArduinoActivator {
             arduinoApp.libraryManager = new LibraryManager(arduinoSettings, arduinoApp);
             arduinoApp.exampleManager = new ExampleManager(arduinoSettings, arduinoApp);
             arduinoApp.programmerManager = new ProgrammerManager(arduinoSettings, arduinoApp);
+            arduinoApp.programmerManager.loadConfig();
             ArduinoContext.arduinoApp = arduinoApp;
 
             const exampleProvider = new ExampleProvider(arduinoApp.exampleManager, arduinoApp.boardManager);

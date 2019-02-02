@@ -664,7 +664,7 @@ Please make sure the folder is not occupied by other procedures .`);
     }
 
     private getProgrammerString(): string {
-        const selectProgrammer = this.programmerManager.currentProgrammer;
+        const selectProgrammer = this.programmerManager.currentProgrammerID;
         if (!selectProgrammer) {
             Logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
             return;
