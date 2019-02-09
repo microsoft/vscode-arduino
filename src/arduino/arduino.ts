@@ -6,8 +6,8 @@ import * as fs_extra from "fs-extra"; // TODO: Remove to keep only standard fs w
 import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
-import * as vscode from "vscode";
 import * as uuidv4 from "uuid/v4";
+import * as vscode from "vscode";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
@@ -241,7 +241,7 @@ export class ArduinoApp {
         });
     }
 
-    public async verify(output: string = "", export_binary: boolean = false) {
+    public async verify(output: string = "", exportBinary: boolean = false) {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
@@ -293,7 +293,7 @@ export class ArduinoApp {
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
             arduinoChannel.warning(msg);
-            if (export_binary) {
+            if (exportBinary) {
                 const uuid = uuidv4();
                 outputPath = path.join(os.tmpdir(), uuid);
                 args.push("--pref", `build.path=${outputPath}`);
@@ -306,11 +306,11 @@ export class ArduinoApp {
         try {
             await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
-            if (export_binary) {
+            if (exportBinary) {
                 const options = {
                     nodir: true,
                     realpath: true,
-                    absolute: true
+                    absolute: true,
                 };
                 glob(path.join(outputPath, "/*.{hex,bin,elf}"), options, (err, files: string[]) => {
                     if (err) {
@@ -318,16 +318,16 @@ export class ArduinoApp {
                     } else {
                         files.forEach(async (bin) => {
                             // TODO: Replace fs_extra.copy by fs.copyFile when upgrading to Node 8+
-                            await fs_extra.copy(bin, path.join(ArduinoWorkspace.rootPath, path.basename(bin)), (err: Error) => {
-                                if (err) {
-                                    arduinoChannel.warning(`Couldn't copy binary file ${bin}, copy returned ${err}`);
+                            await fs_extra.copy(bin, path.join(ArduinoWorkspace.rootPath, path.basename(bin)), (copyError: Error) => {
+                                if (copyError) {
+                                    arduinoChannel.warning(`Couldn't copy binary file ${bin}, copy returned ${copyError}`);
                                 }
                             });
                         });
                         if (isTmp) {
-                            fs_extra.remove(outputPath, (err: Error) => {
-                                if (err) {
-                                    arduinoChannel.warning(`Couldn't remove temporary build directory ${outputPath}, rm returned ${err}`);
+                            fs_extra.remove(outputPath, (removeError: Error) => {
+                                if (removeError) {
+                                    arduinoChannel.warning(`Couldn't remove temporary build directory ${outputPath}, rm returned ${removeError}`);
                                 }
                             });
                         }
