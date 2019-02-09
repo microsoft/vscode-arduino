@@ -2,10 +2,12 @@
 // Licensed under the MIT license.
 
 import * as fs from "fs";
+import * as fs_extra from "fs-extra"; // TODO: Remove to keep only standard fs when upgrading to Node 8+
 import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
+import * as uuidv4 from "uuid/v4";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
@@ -239,7 +241,7 @@ export class ArduinoApp {
         });
     }
 
-    public async verify(output: string = "") {
+    public async verify(output: string = "", export_binary: boolean = false) {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
@@ -276,8 +278,10 @@ export class ArduinoApp {
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
+        var outputPath;
+        var isTmp = false;
         if (output || dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
+            outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
                 Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
@@ -289,6 +293,12 @@ export class ArduinoApp {
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
             arduinoChannel.warning(msg);
+            if (export_binary) {
+                const uuid = uuidv4();
+                outputPath = path.join(os.tmpdir(), uuid);
+                args.push("--pref", `build.path=${outputPath}`);
+                isTmp = true;
+            }
         }
 
         arduinoChannel.show();
@@ -296,12 +306,44 @@ export class ArduinoApp {
         try {
             await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
+            if (export_binary) {
+                const options = {
+                    nodir: true,
+                    realpath: true,
+                    absolute: true
+                };
+                glob(path.join(outputPath, "/*.{hex,bin,elf}"), options, (err, files: string[]) => {
+                    if (err) {
+                        arduinoChannel.warning(`Couldn't find binary files, glob returned ${err}`);
+                    } else {
+                        files.forEach(async (bin) => {
+                            // TODO: Replace fs_extra.copy by fs.copyFile when upgrading to Node 8+
+                            await fs_extra.copy(bin, path.join(ArduinoWorkspace.rootPath, path.basename(bin)), (err: Error) => {
+                                if (err) {
+                                    arduinoChannel.warning(`Couldn't copy binary file ${bin}, copy returned ${err}`);
+                                }
+                            });
+                        });
+                        if (isTmp) {
+                            fs_extra.remove(outputPath, (err: Error) => {
+                                if (err) {
+                                    arduinoChannel.warning(`Couldn't remove temporary build directory ${outputPath}, rm returned ${err}`);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
             return true;
         } catch (reason) {
             arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
             return false;
         }
 
+    }
+
+    public async exportCompiledBinary(output: string = "") {
+        return this.verify(output, true);
     }
 
     // Add selected library path to the intellisense search path.
