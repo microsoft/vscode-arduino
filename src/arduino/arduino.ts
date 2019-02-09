@@ -278,8 +278,8 @@ export class ArduinoApp {
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
-        var outputPath;
-        var isTmp = false;
+        let outputPath;
+        let isTmp = false;
         if (output || dc.output) {
             outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
             const dirPath = path.dirname(outputPath);
