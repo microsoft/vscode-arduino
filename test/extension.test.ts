@@ -33,6 +33,7 @@ suite("Arduino: Extension Tests", () => {
             return vscode.commands.getCommands(true).then((commands) => {
                 const ARDUINO_COMMANDS = [
                     "arduino.verify",
+                    "arduino.exportCompiledBinary",
                     "arduino.upload",
                     "arduino.uploadUsingProgrammer",
                     "arduino.selectProgrammer",
