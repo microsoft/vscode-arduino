@@ -186,6 +186,24 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: (ArduinoContext.boardManager.currentBoard === null) ? null : ArduinoContext.boardManager.currentBoard.name };
     });
 
+    registerArduinoCommand("arduino.exportCompiledBinary", async () => {
+        if (!status.compile) {
+            status.compile = "verify";
+            try {
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    title: "Arduino: Exporting Compiled Binary...",
+                }, async () => {
+                    await ArduinoContext.arduinoApp.exportCompiledBinary();
+                });
+            } catch (ex) {
+            }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: (ArduinoContext.boardManager.currentBoard === null) ? null : ArduinoContext.boardManager.currentBoard.name };
+    });
+
     registerArduinoCommand("arduino.upload", async () => {
         if (!status.compile) {
             status.compile = "upload";

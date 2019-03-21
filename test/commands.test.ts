@@ -113,4 +113,19 @@ suite("Arduino: Commands Tests", () => {
         }
     });
 
+    // tslint:disable-next-line: only-arrow-functions
+    test("should be able to run command: arduino exportCompiledBinary", function(done) {
+        // Same timeout as verify, being the longest part of the command
+        this.timeout(3 * 60 * 1000);
+        try {
+            // run "Arduino: Export Compiled Binary" command.
+            vscode.commands.executeCommand("arduino.exportCompiledBinary").then((result) => {
+                done();
+            });
+
+        } catch (error) {
+            done(new Error(error));
+        }
+    });
+
 });
