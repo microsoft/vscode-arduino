@@ -304,6 +304,67 @@ export class ArduinoApp {
 
     }
 
+    public tryToUpdateIncludePaths() {
+        const configFilePath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
+        if (!fs.existsSync(configFilePath)) {
+            return;
+        }
+        const cppConfigFile = fs.readFileSync(configFilePath, "utf8");
+        const cppConfig = JSON.parse(cppConfigFile) as {configurations: Array<{includePath: string[], forcedInclude: string[]}>};
+        const libPaths = this.getDefaultPackageLibPaths();
+        const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
+        const configuration = cppConfig.configurations[0];
+
+        let cppConfigFileUpdated = false;
+        // cpp exntension changes \\ to \\\\ in paths in JSON string, revert them first
+        configuration.includePath = configuration.includePath.map((path) => path.replace(/\\\\/g, "\\"));
+        configuration.forcedInclude = configuration.forcedInclude.map((path) => path.replace(/\\\\/g, "\\"));
+
+        for (const libPath of libPaths) {
+            if (configuration.includePath.indexOf(libPath) === -1) {
+                cppConfigFileUpdated = true;
+                configuration.includePath.push(libPath);
+            }
+        }
+        for (const forcedIncludePath of defaultForcedInclude) {
+            if (configuration.forcedInclude.indexOf(forcedIncludePath) === -1) {
+                cppConfigFileUpdated = true;
+                configuration.forcedInclude.push(forcedIncludePath);
+            }
+        }
+
+        // remove all unexisting paths
+        for (let pathIndex = 0; pathIndex < configuration.includePath.length; pathIndex++) {
+            let libPath = configuration.includePath[pathIndex];
+            if (libPath.indexOf("${workspaceFolder}") !== -1) {
+                continue;
+            }
+            if (/\*$/.test(libPath)) {
+                libPath = libPath.match(/^[^\*]*/)[0];
+            }
+            if (!fs.existsSync(libPath)) {
+                cppConfigFileUpdated = true;
+                configuration.includePath.splice(pathIndex, 1);
+                pathIndex--;
+            }
+        }
+        for (let pathIndex = 0; pathIndex < configuration.forcedInclude.length; pathIndex++) {
+            const forcedIncludePath = configuration.forcedInclude[pathIndex];
+            if (forcedIncludePath.indexOf("${workspaceFolder}") !== -1) {
+                continue;
+            }
+            if (!fs.existsSync(forcedIncludePath)) {
+                cppConfigFileUpdated = true;
+                configuration.forcedInclude.splice(pathIndex, 1);
+                pathIndex--;
+            }
+        }
+
+        if (cppConfigFileUpdated) {
+            fs.writeFileSync(configFilePath, JSON.stringify(cppConfig, null, 4));
+        }
+    }
+
     // Add selected library path to the intellisense search path.
     public addLibPath(libraryPath: string) {
         let libPaths;
