@@ -334,31 +334,32 @@ export class ArduinoApp {
         }
 
         // remove all unexisting paths
-        for (let pathIndex = 0; pathIndex < configuration.includePath.length; pathIndex++) {
-            let libPath = configuration.includePath[pathIndex];
-            if (libPath.indexOf("${workspaceFolder}") !== -1) {
-                continue;
-            }
-            if (/\*$/.test(libPath)) {
-                libPath = libPath.match(/^[^\*]*/)[0];
-            }
-            if (!fs.existsSync(libPath)) {
-                cppConfigFileUpdated = true;
-                configuration.includePath.splice(pathIndex, 1);
-                pathIndex--;
-            }
-        }
-        for (let pathIndex = 0; pathIndex < configuration.forcedInclude.length; pathIndex++) {
-            const forcedIncludePath = configuration.forcedInclude[pathIndex];
-            if (forcedIncludePath.indexOf("${workspaceFolder}") !== -1) {
-                continue;
-            }
-            if (!fs.existsSync(forcedIncludePath)) {
-                cppConfigFileUpdated = true;
-                configuration.forcedInclude.splice(pathIndex, 1);
-                pathIndex--;
-            }
-        }
+        // concern mistake removal, comment temporary
+        // for (let pathIndex = 0; pathIndex < configuration.includePath.length; pathIndex++) {
+        //     let libPath = configuration.includePath[pathIndex];
+        //     if (libPath.indexOf("${workspaceFolder}") !== -1) {
+        //         continue;
+        //     }
+        //     if (/\*$/.test(libPath)) {
+        //         libPath = libPath.match(/^[^\*]*/)[0];
+        //     }
+        //     if (!fs.existsSync(libPath)) {
+        //         cppConfigFileUpdated = true;
+        //         configuration.includePath.splice(pathIndex, 1);
+        //         pathIndex--;
+        //     }
+        // }
+        // for (let pathIndex = 0; pathIndex < configuration.forcedInclude.length; pathIndex++) {
+        //     const forcedIncludePath = configuration.forcedInclude[pathIndex];
+        //     if (forcedIncludePath.indexOf("${workspaceFolder}") !== -1) {
+        //         continue;
+        //     }
+        //     if (!fs.existsSync(forcedIncludePath)) {
+        //         cppConfigFileUpdated = true;
+        //         configuration.forcedInclude.splice(pathIndex, 1);
+        //         pathIndex--;
+        //     }
+        // }
 
         if (cppConfigFileUpdated) {
             fs.writeFileSync(configFilePath, JSON.stringify(cppConfig, null, 4));
