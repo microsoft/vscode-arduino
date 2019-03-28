@@ -308,6 +308,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 SerialMonitor.getInstance().initialize();
             }
             ArduinoContext.boardManager.updateStatusBar(true);
+            ArduinoContext.arduinoApp.tryToUpdateIncludePaths();
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
     }
