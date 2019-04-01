@@ -108,7 +108,8 @@ export class ArduinoApp {
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
-        if (!dc.port) {
+
+        if ((!dc.configuration || dc.configuration.indexOf("upload_method=STLink") === -1) && !dc.port) {
             const choice = await vscode.window.showInformationMessage(
                 "Serial port is not specified. Do you want to select a serial port for uploading?",
                 "Yes", "No");
@@ -140,7 +141,11 @@ export class ArduinoApp {
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, appPath];
+        const args = ["--upload", "--board", boardDescriptor];
+        if (dc.port) {
+            args.push("--port", dc.port);
+        }
+        args.push(appPath);
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
