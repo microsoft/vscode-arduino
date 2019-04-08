@@ -109,7 +109,7 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
 
-        if ((!dc.configuration || dc.configuration.indexOf("upload_method=STLink") === -1) && !dc.port) {
+        if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
             const choice = await vscode.window.showInformationMessage(
                 "Serial port is not specified. Do you want to select a serial port for uploading?",
                 "Yes", "No");
