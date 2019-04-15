@@ -11,3 +11,4 @@ tslint.json
 .travis.yml
 gulpfile.js
 *.vsix
+.github/**
