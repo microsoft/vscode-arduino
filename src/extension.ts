@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as fs from "fs";
 import * as path from "path";
 import * as Uuid from "uuid/v4";
 import * as vscode from "vscode";
@@ -296,7 +297,7 @@ export async function activate(context: vscode.ExtensionContext) {
     registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
     registerNonArduinoCommand("arduino.changeEnding", () => serialMonitor.changeEnding());
     registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
-    registerNonArduinoCommand("arduino.closeSerialMonitor", (port) => serialMonitor.closeSerialMonitor(port));
+    registerNonArduinoCommand("arduino.closeSerialMonitor", (port, showWarning = true) => serialMonitor.closeSerialMonitor(port, showWarning));
 
     const completionProvider = new CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
@@ -317,6 +318,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 SerialMonitor.getInstance().initialize();
             }
             ArduinoContext.boardManager.updateStatusBar(true);
+            ArduinoContext.arduinoApp.tryToUpdateIncludePaths();
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
     }
@@ -336,6 +338,30 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         }
     });
+
+    vscode.workspace.onDidOpenTextDocument(async (document) => {
+        if (/\.pde$/.test(document.uri.fsPath)) {
+            const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
+            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            fs.renameSync(document.uri.fsPath, newFsName);
+            await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
+        }
+    });
+
+    vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+        if (!editor) {
+            return;
+        }
+
+        const document = editor.document;
+        if (/\.pde$/.test(document.uri.fsPath)) {
+            const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
+            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            fs.renameSync(document.uri.fsPath, newFsName);
+            await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
+        }
+    });
+
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
