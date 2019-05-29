@@ -11,9 +11,9 @@ All notable changes to this project will be documented in this file.
 - The value of 'Include Path' will be updated automatically when board package is updated
 
 ### Fixed
-- Fix asking to select port when upload via ST-Link issue [#595](https://github.com/microsoft/vscode-arduino/issues/595)
+- Fix the issue of asking to select port when upload via ST-Link [#595](https://github.com/microsoft/vscode-arduino/issues/595)
 
-Special thanks to [Riz-waan](https://github.com/Riz-waan), [LuisAbrantes](https://github.com/LuisAbrantes), [Christopher Schmitz](https://github.com/chris-schmitz), [Christian](https://github.com/ChriD) and [LMtx](https://github.com/LMtx), thank you for your  contributions and feedbacks.
+Special thanks to [Riz-waan](https://github.com/Riz-waan), [LuisAbrantes](https://github.com/LuisAbrantes), [Christopher Schmitz](https://github.com/chris-schmitz), [Christian](https://github.com/ChriD) and [LMtx](https://github.com/LMtx), thanks for your contributions and feedbacks.
 
 ## Version 0.2.25
 -Release date: January 10, 2019
