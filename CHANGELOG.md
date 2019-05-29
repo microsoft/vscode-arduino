@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - The value of 'Include Path' will be updated automatically when board package is updated
 
 ### Fixed
-- Fix the issue of asking to select port when upload via ST-Link [#595](https://github.com/microsoft/vscode-arduino/issues/595)
+- Fix the issue of "ST-Link upload - Please specify the upload serial port" [#595](https://github.com/microsoft/vscode-arduino/issues/595)
 
 Special thanks to [Riz-waan](https://github.com/Riz-waan), [LuisAbrantes](https://github.com/LuisAbrantes), [Christopher Schmitz](https://github.com/chris-schmitz), [Christian](https://github.com/ChriD) and [LMtx](https://github.com/LMtx), thanks for your contributions and feedbacks.
 
