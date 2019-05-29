@@ -1,6 +1,20 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.26
+-Release date: May 30, 2019
+
+### Added
+- Add .pde support
+
+### Changed
+- Include path will update automatically when board package is updated
+
+### Fixed
+- Fix asking to select port when upload via ST-Link issue [#595](https://github.com/microsoft/vscode-arduino/issues/595)
+
+Special thanks to [Riz-waan](https://github.com/Riz-waan), [LuisAbrantes](https://github.com/LuisAbrantes), [Christopher Schmitz](https://github.com/chris-schmitz), [Christian](https://github.com/ChriD) and [LMtx](https://github.com/LMtx), thank you for your feedbacks.
+
 ## Version 0.2.25
 -Release date: January 10, 2019
 
@@ -8,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - Add upload and verify button in action bar [#737](https://github.com/Microsoft/vscode-arduino/pull/737)
 - Add serial port support for Electron 3.0 [#729](https://github.com/Microsoft/vscode-arduino/pull/729), [#730](https://github.com/Microsoft/vscode-arduino/pull/730), [#731](https://github.com/Microsoft/vscode-arduino/pull/731)
 
-Special thanks to [Michael Omiccioli](https://github.com/momiccioli) and [MarNwk](https://github.com/MarNwk),thank you for your feedbacks.
+Special thanks to [Michael Omiccioli](https://github.com/momiccioli) and [MarNwk](https://github.com/MarNwk), thank you for your contributions and feedbacks.
 
 ## Version 0.2.24
 -Release date: December 11, 2018
