@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - Add .pde support
 
 ### Changed
-- Include path will update automatically when board package is updated
+- The value of 'Include Path' will be updated automatically when board package is updated
 
 ### Fixed
 - Fix asking to select port when upload via ST-Link issue [#595](https://github.com/microsoft/vscode-arduino/issues/595)
