@@ -40,6 +40,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.showLibraryManager",
                     "arduino.showBoardConfig",
                     "arduino.showExamples",
+                    "arduino.showSerialPlotter",
                     "arduino.changeBoardType",
                     "arduino.initialize",
                     "arduino.addLibPath",
