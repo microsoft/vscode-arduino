@@ -49,7 +49,7 @@ const formatTime = (time: number) => {
 const getFrameLabels = (msg: IMessageFrame) =>
     Object.keys(msg).filter((label) => !["time", "type"].includes(label));
 
-class SerialPlotter extends React.Component<void, ISerialPlotterState> {
+class SerialPlotter extends React.Component<React.Props<void>, ISerialPlotterState> {
     public static INITIAL_THROTTLING = 100;
     public static INITIAL_TIME_WINDOW = 1000 * 20;
 
