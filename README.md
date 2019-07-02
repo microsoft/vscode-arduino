@@ -32,7 +32,7 @@ ext install vscode-arduino
 You can also install directly from the Marketplace within Visual Studio Code, searching for `Arduino`.
 
 ## Get Started
-You can find code samples and tutorials each time that you connect a supported device. Alternatively you can visit our [IoT Developer Blog Space](https://aka.ms/iotdevblog) or [Get Started Tutorials](https://docs.microsoft.com/azure/iot-hub/iot-hub-arduino-iot-devkit-az3166-get-started).
+You can find code samples and tutorials each time that you connect a supported device. Alternatively you can visit our [IoT Developer Blog Space](https://devblogs.microsoft.com/iotdev/) or [Get Started Tutorials](https://docs.microsoft.com/azure/iot-hub/iot-hub-arduino-iot-devkit-az3166-get-started).
 
 ## Commands
 This extension provides several commands in the Command Palette (<kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) for working with `*.ino` files:
@@ -102,7 +102,7 @@ The following settings are as per sketch settings of the Arduino extension. You 
 - `sketch` - The main sketch file name of Arduino.
 - `port` - Name of the serial port connected to the device. Can be set by the `Arduino: Select Serial Port` command. For Mac users could be "/dev/cu.wchusbserial1420".
 - `board` - Currently selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
-- `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set.
+- `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
 - `prebuild` - External command before building the sketch file. You should only set one `prebuild` command. `command1 && command2` does not work. If you need to run multiple commands before the build, then create a script.
 
