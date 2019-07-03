@@ -225,6 +225,10 @@ export async function activate(context: vscode.ExtensionContext) {
         deviceContext.showStatusBar();
     });
 
+    registerArduinoCommand("arduino.resolveSketchFile", async () => {
+        deviceContext.resolveMainSketch();
+    });
+
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
         if (!status.compile) {
             status.compile = "upload";
