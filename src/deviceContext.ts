@@ -353,6 +353,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     }
                 } else if (fileUris.length === 1) {
                     this.sketch = path.relative(ArduinoWorkspace.rootPath, fileUris[0].fsPath);
+                    this.updateStatusBar()
                 } else if (fileUris.length > 1) {
                     const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>fileUris.map((fileUri): vscode.QuickPickItem => {
                         return <vscode.QuickPickItem>{
@@ -362,6 +363,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     }), { placeHolder: "Select the main sketch file" });
                     if (chosen && chosen.label) {
                         this.sketch = chosen.label;
+                        this.updateStatusBar()
                     }
                 }
             });
