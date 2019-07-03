@@ -191,9 +191,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public showStatusBar() {
-        if (!this._sketch) {
-            return false;
+        if (this._sketch == null) {
+            this._sketchStatusBar.text = "<Set Sketch>";
         }
+        else{
+            this._sketchStatusBar.text = this._sketch;
+        }
+        this._sketchStatusBar.show();
+    }
 
         this._sketchStatusBar.text = this._sketch;
         this._sketchStatusBar.show();
