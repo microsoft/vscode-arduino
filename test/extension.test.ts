@@ -54,6 +54,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.loadPackages",
                     "arduino.installBoard",
                     "arduino.setSketchFile",
+                    "arduino.resolveSketchFile",
                 ];
 
                 const foundArduinoCommands = commands.filter((value) => {
