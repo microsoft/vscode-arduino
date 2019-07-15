@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-const impor = require('impor')(__dirname);
+const impor = require("impor")(__dirname);
 
 import * as fs from "fs";
 import * as path from "path";
-const UuidModule = impor("uuid/v4") as typeof import("uuid/v4");
+const uuidModule = impor("uuid/v4") as typeof import ("uuid/v4");
 import * as vscode from "vscode";
 import * as constants from "./common/constants";
-const ArduinoContentProviderModule =
-        impor('./arduino/arduinoContentProvider') as typeof import('./arduino/arduinoContentProvider');
+const arduinoContentProviderModule =
+    impor("./arduino/arduinoContentProvider") as typeof import ("./arduino/arduinoContentProvider");
 import { IBoard } from "./arduino/package";
-const ArduinoActivatorModule = impor("./arduinoActivator") as typeof import("./arduinoActivator");
-const ArduinoContextModule = impor("./arduinoContext") as typeof import("./arduinoContext");
+const arduinoActivatorModule = impor("./arduinoActivator") as typeof import ("./arduinoActivator");
+const arduinoContextModule = impor("./arduinoContext") as typeof import ("./arduinoContext");
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
     LIBRARY_MANAGER_URI,
@@ -20,20 +20,20 @@ import {
 import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
 import { ArduinoWorkspace } from "./common/workspace";
-const ArduinoDebugConfigurationProviderModule = impor("./debug/configurationProvider") as typeof import("./debug/configurationProvider");
+const arduinoDebugConfigurationProviderModule = impor("./debug/configurationProvider") as typeof import ("./debug/configurationProvider");
 import { DeviceContext } from "./deviceContext";
-const CompletionProviderModule = impor("./langService/completionProvider") as typeof import("./langService/completionProvider");
+const completionProviderModule = impor("./langService/completionProvider") as typeof import ("./langService/completionProvider");
 import * as Logger from "./logger/logger";
 const nsatModule =
-        impor('./nsat') as typeof import('./nsat');
+    impor("./nsat") as typeof import ("./nsat");
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
-const UsbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import("./serialmonitor/usbDetector");
+const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
 const status: any = {};
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
-    const activeGuid = UuidModule().replace(/-/g, "");
+    const activeGuid = uuidModule().replace(/-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     // Show a warning message if the working file is not under the workspace folder.
     // People should know the extension might not work appropriately, they should look for the doc to get started.
@@ -52,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(deviceContext);
 
     const commandExecution = async (command: string, commandBody: (...args: any[]) => any, args: any, getUserData?: () => any) => {
-        const guid = UuidModule().replace(/\-/g, "");
+        const guid = uuidModule().replace(/\-/g, "");
         Logger.traceUserData(`start-command-` + command, { correlationId: guid });
         const timer1 = new Logger.Timer();
         let telemetryResult;
@@ -80,16 +80,16 @@ export async function activate(context: vscode.ExtensionContext) {
     };
     const registerArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
-            if (!ArduinoContextModule.default.initialized) {
-                await ArduinoActivatorModule.default.activate();
+            if (!arduinoContextModule.default.initialized) {
+                await arduinoActivatorModule.default.activate();
             }
 
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
 
-            const arduinoPath = ArduinoContextModule.default.arduinoApp.settings.arduinoPath;
-            const commandPath = ArduinoContextModule.default.arduinoApp.settings.commandPath;
+            const arduinoPath = arduinoContextModule.default.arduinoApp.settings.arduinoPath;
+            const commandPath = arduinoContextModule.default.arduinoApp.settings.commandPath;
             if (!arduinoPath || !validateArduinoPath(arduinoPath)) { // Pop up vscode User Settings page when cannot resolve arduino path.
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
@@ -120,14 +120,17 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Verifying...",
                 }, async () => {
-                    await ArduinoContextModule.default.arduinoApp.verify();
+                    await arduinoContextModule.default.arduinoApp.verify();
                 });
             } catch (ex) {
             }
             delete status.compile;
         }
     }, () => {
-        return { board: (ArduinoContextModule.default.boardManager.currentBoard === null) ? null : ArduinoContextModule.default.boardManager.currentBoard.name };
+        return {
+            board: (arduinoContextModule.default.boardManager.currentBoard === null) ? null :
+                arduinoContextModule.default.boardManager.currentBoard.name,
+        };
     });
 
     registerArduinoCommand("arduino.upload", async () => {
@@ -138,14 +141,14 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Uploading...",
                 }, async () => {
-                    await ArduinoContextModule.default.arduinoApp.upload();
+                    await arduinoContextModule.default.arduinoApp.upload();
                 });
             } catch (ex) {
             }
             delete status.compile;
         }
     }, () => {
-        return { board: ArduinoContextModule.default.boardManager.currentBoard.name };
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.setSketchFile", async () => {
@@ -173,34 +176,37 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await ArduinoContextModule.default.arduinoApp.uploadUsingProgrammer();
+                await arduinoContextModule.default.arduinoApp.uploadUsingProgrammer();
             } catch (ex) {
             }
             delete status.compile;
         }
     }, () => {
-        return { board: ArduinoContextModule.default.boardManager.currentBoard.name };
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.selectProgrammer", async () => {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await ArduinoContextModule.default.arduinoApp.programmerManager.selectProgrammer();
+                await arduinoContextModule.default.arduinoApp.programmerManager.selectProgrammer();
             } catch (ex) {
             }
             delete status.compile;
         }
     }, () => {
-        return { board: (ArduinoContextModule.default.boardManager.currentBoard === null) ? null : ArduinoContextModule.default.boardManager.currentBoard.name };
+        return {
+            board: (arduinoContextModule.default.boardManager.currentBoard === null) ? null :
+                arduinoContextModule.default.boardManager.currentBoard.name,
+        };
     });
 
-    registerArduinoCommand("arduino.addLibPath", (path) => ArduinoContextModule.default.arduinoApp.addLibPath(path));
-    registerArduinoCommand("arduino.openExample", (path) => ArduinoContextModule.default.arduinoApp.openExample(path));
-    registerArduinoCommand("arduino.loadPackages", async () => await ArduinoContextModule.default.boardManager.loadPackages(true));
+    registerArduinoCommand("arduino.addLibPath", (path) => arduinoContextModule.default.arduinoApp.addLibPath(path));
+    registerArduinoCommand("arduino.openExample", (path) => arduinoContextModule.default.arduinoApp.openExample(path));
+    registerArduinoCommand("arduino.loadPackages", async () => await arduinoContextModule.default.boardManager.loadPackages(true));
     registerArduinoCommand("arduino.installBoard", async (packageName, arch, version: string = "") => {
-        let installed =  false;
-        const installedBoards = ArduinoContextModule.default.boardManager.installedBoards;
+        let installed = false;
+        const installedBoards = arduinoContextModule.default.boardManager.installedBoards;
         installedBoards.forEach((board: IBoard, key: string) => {
             let _packageName: string;
             if (board.platform.package && board.platform.package.name) {
@@ -210,15 +216,15 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             if (packageName === _packageName &&
-                    arch === board.platform.architecture &&
-                    (!version || version === board.platform.installedVersion)) {
+                arch === board.platform.architecture &&
+                (!version || version === board.platform.installedVersion)) {
                 installed = true;
             }
         });
 
         if (!installed) {
-            await ArduinoContextModule.default.boardManager.loadPackages(true);
-            await ArduinoContextModule.default.arduinoApp.installBoard(packageName, arch, version);
+            await arduinoContextModule.default.boardManager.loadPackages(true);
+            await arduinoContextModule.default.arduinoApp.installBoard(packageName, arch, version);
         }
         return;
     });
@@ -233,23 +239,24 @@ export async function activate(context: vscode.ExtensionContext) {
     registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
     registerNonArduinoCommand("arduino.closeSerialMonitor", (port, showWarning = true) => serialMonitor.closeSerialMonitor(port, showWarning));
 
-    const completionProvider = new CompletionProviderModule.CompletionProvider();
+    const completionProvider = new completionProviderModule.CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
-    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("arduino", new ArduinoDebugConfigurationProviderModule.ArduinoDebugConfigurationProvider()));
+    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("arduino", new
+        arduinoDebugConfigurationProviderModule.ArduinoDebugConfigurationProvider()));
 
     if (ArduinoWorkspace.rootPath && (
         util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))
         || (openEditor && openEditor.document.fileName.endsWith(".ino")))) {
         (async () => {
-            if (!ArduinoContextModule.default.initialized) {
-                await ArduinoActivatorModule.default.activate();
+            if (!arduinoContextModule.default.initialized) {
+                await arduinoActivatorModule.default.activate();
             }
 
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            ArduinoContextModule.default.boardManager.updateStatusBar(true);
-            ArduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths();
+            arduinoContextModule.default.boardManager.updateStatusBar(true);
+            arduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths();
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
     }
@@ -259,13 +266,13 @@ export async function activate(context: vscode.ExtensionContext) {
             && path.basename(path.dirname(activeEditor.document.fileName)) === ".vscode")
             || activeEditor.document.fileName.endsWith(".ino")
         )) {
-            if (!ArduinoContextModule.default.initialized) {
-                await ArduinoActivatorModule.default.activate();
+            if (!arduinoContextModule.default.initialized) {
+                await arduinoActivatorModule.default.activate();
             }
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            ArduinoContextModule.default.boardManager.updateStatusBar(true);
+            arduinoContextModule.default.boardManager.updateStatusBar(true);
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         }
     });
@@ -296,9 +303,8 @@ export async function activate(context: vscode.ExtensionContext) {
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 
     setTimeout(() => {
-        const arduinoManagerProvider = new ArduinoContentProviderModule.ArduinoContentProvider(context.extensionPath);
+        const arduinoManagerProvider = new arduinoContentProviderModule.ArduinoContentProvider(context.extensionPath);
         context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
-        
         registerArduinoCommand("arduino.showBoardManager", async () => {
             const panel = vscode.window.createWebviewPanel("arduinoBoardManager", "Arduino Board Manager", vscode.ViewColumn.Two, {
                 enableScripts: true,
@@ -306,7 +312,6 @@ export async function activate(context: vscode.ExtensionContext) {
             });
             panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(BOARD_MANAGER_URI);
         });
-    
         registerArduinoCommand("arduino.showLibraryManager", async () => {
             const panel = vscode.window.createWebviewPanel("arduinoLibraryManager", "Arduino Library Manager", vscode.ViewColumn.Two, {
                 enableScripts: true,
@@ -314,7 +319,6 @@ export async function activate(context: vscode.ExtensionContext) {
             });
             panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(LIBRARY_MANAGER_URI);
         });
-    
         registerArduinoCommand("arduino.showBoardConfig", async () => {
             const panel = vscode.window.createWebviewPanel("arduinoBoardConfiguration", "Arduino Board Configuration", vscode.ViewColumn.Two, {
                 enableScripts: true,
@@ -322,50 +326,49 @@ export async function activate(context: vscode.ExtensionContext) {
             });
             panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(BOARD_CONFIG_URI);
         });
-    
         registerArduinoCommand("arduino.showExamples", async (forceRefresh: boolean = false) => {
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
             if (forceRefresh) {
                 vscode.commands.executeCommand("arduino.reloadExample");
             }
-    
             const panel = vscode.window.createWebviewPanel("arduinoExamples", "Arduino Examples", vscode.ViewColumn.Two, {
                 enableScripts: true,
                 retainContextWhenHidden: true,
             });
             panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(EXAMPLES_URI);
         });
-    
         // change board type
         registerArduinoCommand("arduino.changeBoardType", async () => {
             try {
-                await ArduinoContextModule.default.boardManager.changeBoardType();
+                await arduinoContextModule.default.boardManager.changeBoardType();
             } catch (exception) {
                 Logger.error(exception.message);
             }
             arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
             arduinoManagerProvider.update(EXAMPLES_URI);
         }, () => {
-            return { board: ArduinoContextModule.default.boardManager.currentBoard.name };
+            return { board: arduinoContextModule.default.boardManager.currentBoard.name };
         });
-    
         registerArduinoCommand("arduino.reloadExample", () => {
             arduinoManagerProvider.update(EXAMPLES_URI);
         }, () => {
-            return { board: (ArduinoContextModule.default.boardManager.currentBoard === null) ? null : ArduinoContextModule.default.boardManager.currentBoard.name };
+            return {
+                board: (arduinoContextModule.default.boardManager.currentBoard === null) ? null :
+                    arduinoContextModule.default.boardManager.currentBoard.name,
+            };
         });
     }, 100);
 
     setTimeout(() => {
         // delay to detect usb
-        UsbDetectorModule.UsbDetector.getInstance().initialize(context.extensionPath);
-        UsbDetectorModule.UsbDetector.getInstance().startListening();
+        usbDetectorModule.UsbDetector.getInstance().initialize(context.extensionPath);
+        usbDetectorModule.UsbDetector.getInstance().startListening();
     }, 200);
 }
 
 export async function deactivate() {
     const monitor = SerialMonitor.getInstance();
     await monitor.closeSerialMonitor(null, false);
-    UsbDetectorModule.UsbDetector.getInstance().stopListening();
+    usbDetectorModule.UsbDetector.getInstance().stopListening();
     Logger.traceUserData("deactivate-extension");
 }
