@@ -505,8 +505,7 @@
       {
         "id": "cpp",
         "extensions": [
-          ".ino",
-          ".pde"
+          ".ino"
         ]
       }
     ],
