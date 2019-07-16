@@ -329,29 +329,6 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    vscode.workspace.onDidOpenTextDocument(async (document) => {
-        if (/\.pde$/.test(document.uri.fsPath)) {
-            const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
-            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-            fs.renameSync(document.uri.fsPath, newFsName);
-            await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
-        }
-    });
-
-    vscode.window.onDidChangeActiveTextEditor(async (editor) => {
-        if (!editor) {
-            return;
-        }
-
-        const document = editor.document;
-        if (/\.pde$/.test(document.uri.fsPath)) {
-            const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
-            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-            fs.renameSync(document.uri.fsPath, newFsName);
-            await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
-        }
-    });
-
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 }
 
