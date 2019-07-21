@@ -35,9 +35,6 @@
     "svg-url-loader": "^2.0.2",
     "ts-loader": "^2.0.0",
     "webpack": "^2.2.1",
-    "highcharts": "^6.1.4"
-  },
-  "dependencies": {
     "dygraphs": "^2.1.0"
   }
 }
