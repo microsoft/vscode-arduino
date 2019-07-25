@@ -332,7 +332,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const allowPDEFiletype = vscodeSettings.allowPDEFiletype;
 
-    if(allowPDEFiletype){
+    if(allowPDEFiletype) {
         vscode.workspace.onDidOpenTextDocument(async (document) => {
             if (/\.pde$/.test(document.uri.fsPath)) {
                 const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
