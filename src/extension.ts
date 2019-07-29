@@ -11,9 +11,9 @@ import * as constants from "./common/constants";
 const arduinoContentProviderModule =
     impor("./arduino/arduinoContentProvider") as typeof import ("./arduino/arduinoContentProvider");
 import { IBoard } from "./arduino/package";
+import { VscodeSettings } from "./arduino/vscodeSettings";
 const arduinoActivatorModule = impor("./arduinoActivator") as typeof import ("./arduinoActivator");
 const arduinoContextModule = impor("./arduinoContext") as typeof import ("./arduinoContext");
-import { VscodeSettings } from "./arduino/vscodeSettings";
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
     LIBRARY_MANAGER_URI,
