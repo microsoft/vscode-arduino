@@ -13,6 +13,7 @@ const arduinoContentProviderModule =
 import { IBoard } from "./arduino/package";
 const arduinoActivatorModule = impor("./arduinoActivator") as typeof import ("./arduinoActivator");
 const arduinoContextModule = impor("./arduinoContext") as typeof import ("./arduinoContext");
+import { VscodeSettings } from "./arduino/vscodeSettings";
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
     LIBRARY_MANAGER_URI,
@@ -46,7 +47,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 "the arduino extension might not work appropriately.");
         }
     }
-
+    const vscodeSettings = VscodeSettings.getInstance();
     const deviceContext = DeviceContext.getInstance();
     deviceContext.extensionPath = context.extensionPath;
     context.subscriptions.push(deviceContext);
@@ -277,29 +278,31 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    vscode.workspace.onDidOpenTextDocument(async (document) => {
-        if (/\.pde$/.test(document.uri.fsPath)) {
-            const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
-            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-            fs.renameSync(document.uri.fsPath, newFsName);
-            await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
-        }
-    });
+    const allowPDEFiletype = vscodeSettings.allowPDEFiletype;
 
-    vscode.window.onDidChangeActiveTextEditor(async (editor) => {
-        if (!editor) {
-            return;
-        }
+    if (allowPDEFiletype) {
+        vscode.workspace.onDidOpenTextDocument(async (document) => {
+            if (/\.pde$/.test(document.uri.fsPath)) {
+                const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
+                await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+                fs.renameSync(document.uri.fsPath, newFsName);
+                await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
+            }
+        });
 
-        const document = editor.document;
-        if (/\.pde$/.test(document.uri.fsPath)) {
-            const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
-            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-            fs.renameSync(document.uri.fsPath, newFsName);
-            await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
-        }
-    });
-
+        vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+            if (!editor) {
+                return;
+            }
+            const document = editor.document;
+            if (/\.pde$/.test(document.uri.fsPath)) {
+                const newFsName = document.uri.fsPath.replace(/\.pde$/, ".ino");
+                await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+                fs.renameSync(document.uri.fsPath, newFsName);
+                await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(newFsName));
+            }
+        });
+    }
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 
     setTimeout(() => {

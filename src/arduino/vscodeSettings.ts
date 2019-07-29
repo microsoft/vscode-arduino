@@ -9,7 +9,8 @@ const configKeys = {
     ADDITIONAL_URLS: "arduino.additionalUrls",
     LOG_LEVEL: "arduino.logLevel",
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
-    ENABLE_USB_DETECTOIN: "arduino.enableUSBDetection",
+    ALLOW_PDE_FILETYPE: "arduino.allowPDEFiletype",
+    ENABLE_USB_DETECTION: "arduino.enableUSBDetection",
     DISABLE_TESTING_OPEN: "arduino.disableTestingOpen",
     IGNORE_BOARDS: "arduino.ignoreBoards",
     SKIP_HEADER_PROVIDER: "arduino.skipHeaderProvider",
@@ -21,6 +22,7 @@ export interface IVscodeSettings {
     commandPath: string;
     additionalUrls: string | string[];
     logLevel: string;
+    allowPDEFiletype: boolean;
     enableUSBDetection: boolean;
     disableTestingOpen: boolean;
     ignoreBoards: string[];
@@ -57,8 +59,12 @@ export class VscodeSettings implements IVscodeSettings {
         return this.getConfigValue<string>(configKeys.LOG_LEVEL) || "info";
     }
 
+    public get allowPDEFiletype(): boolean {
+        return this.getConfigValue<boolean>(configKeys.ALLOW_PDE_FILETYPE);
+    }
+
     public get enableUSBDetection(): boolean {
-        return this.getConfigValue<boolean>(configKeys.ENABLE_USB_DETECTOIN);
+        return this.getConfigValue<boolean>(configKeys.ENABLE_USB_DETECTION);
     }
 
     public get disableTestingOpen(): boolean {
