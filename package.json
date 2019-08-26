@@ -470,6 +470,11 @@
             "verbose"
           ]
         },
+        "arduino.openPDEFiletype":{
+          "type":"boolean",
+          "default":false,
+          "description": "Allow VSCode Arduino to open PDE sketches, from pre-1.0.0 versions of Arduino"
+        },
         "arduino.enableUSBDetection": {
           "type": "boolean",
           "default": true
@@ -514,8 +519,7 @@
       {
         "id": "cpp",
         "extensions": [
-          ".ino",
-          ".pde"
+          ".ino"
         ]
       }
     ],
