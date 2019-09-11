@@ -140,6 +140,7 @@ gulp.task("test", (done) => {
         if (code === 0) {
             done();
         } else {
+            gutil.log("exit code: " + code);
             done(code);
         }
     });
