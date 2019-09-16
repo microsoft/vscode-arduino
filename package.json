@@ -465,9 +465,9 @@
             "verbose"
           ]
         },
-        "arduino.openPDEFiletype":{
-          "type":"boolean",
-          "default":false,
+        "arduino.openPDEFiletype": {
+          "type": "boolean",
+          "default": false,
           "description": "Allow VSCode Arduino to open PDE sketches, from pre-1.0.0 versions of Arduino"
         },
         "arduino.enableUSBDetection": {
@@ -554,7 +554,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-require-path-exists": "^1.1.7",
     "eslint-plugin-standard": "^3.0.1",
-    "gulp": "^3.9.1",
+    "gulp": "3.9.1",
     "gulp-eslint": "^3.0.1",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^7.0.1",

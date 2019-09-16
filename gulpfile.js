@@ -147,7 +147,7 @@ gulp.task("test", (done) => {
 });
 
 gulp.task("build", (done) => {
-    return runSequence("clean", "ts-compile", "html-webpack", "node_modules-webpack", "copyVendor", done);
+    return runSequence("clean", "ts-compile", "html-webpack", "node_modules-webpack", "copyVendor", "get_gulp_version", done);
 });
 
 gulp.task("build_without_view", (done) => {
@@ -157,4 +157,17 @@ gulp.task("build_without_view", (done) => {
 gulp.task("watch", () => {
     gulp.watch(["./src/**/*", "./test/**/*", "!./src/views/**/*"], ["ts-compile"]);
     gulp.watch(["./src/views/**/*", "!./src/views/node_modules/**"], ["html-webpack"]);
+});
+
+gulp.task("get_gulp_version", (done) => {
+    childProcess.exec('gulp -v', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            done(1);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+        done();
+    });
 });
