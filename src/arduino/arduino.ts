@@ -23,6 +23,7 @@ import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
+import { messages } from './../common/constants';
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -133,7 +134,7 @@ export class ArduinoApp {
             const prebuildargs = dc.prebuild.split(" ");
             const prebuildCommand = prebuildargs.shift();
             try {
-                await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, {shell: true, cwd: ArduinoWorkspace.rootPath});
+                await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, { shell: true, cwd: ArduinoWorkspace.rootPath });
             } catch (ex) {
                 arduinoChannel.error(`Run prebuild failed: \n${ex.error}`);
                 return;
@@ -215,7 +216,7 @@ export class ArduinoApp {
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
-                "--pref", "programmer=" + selectProgrammer, appPath];
+            "--pref", "programmer=" + selectProgrammer, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
@@ -269,7 +270,7 @@ export class ArduinoApp {
             const prebuildargs = dc.prebuild.split(" ");
             const prebuildCommand = prebuildargs.shift();
             try {
-                await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, {shell: true, cwd: ArduinoWorkspace.rootPath});
+                await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, { shell: true, cwd: ArduinoWorkspace.rootPath });
             } catch (ex) {
                 arduinoChannel.error(`Run prebuild failed: \n${ex.error}`);
                 return;
@@ -303,7 +304,12 @@ export class ArduinoApp {
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
             return true;
         } catch (reason) {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            const msg = reason.code ?
+                `Exit with code=${reason.code}${os.EOL}` :
+                reason.message ?
+                    reason.message :
+                    JSON.stringify(reason);
+            arduinoChannel.error(msg);
             return false;
         }
 
@@ -315,7 +321,7 @@ export class ArduinoApp {
             return;
         }
         const cppConfigFile = fs.readFileSync(configFilePath, "utf8");
-        const cppConfig = JSON.parse(cppConfigFile) as {configurations: Array<{includePath: string[], forcedInclude: string[]}>};
+        const cppConfig = JSON.parse(cppConfigFile) as { configurations: Array<{ includePath: string[], forcedInclude: string[] }> };
         const libPaths = this.getDefaultPackageLibPaths();
         const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
         const configuration = cppConfig.configurations[0];
