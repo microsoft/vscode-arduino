@@ -10,7 +10,6 @@ import * as properties from "properties";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
 import { arduinoChannel } from "./outputChannel";
-import { messages } from './constants';
 
 const encodingMapping: object = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../misc", "codepageMapping.json"), "utf8"));
 
@@ -211,10 +210,11 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
         let codepage = "65001";
         if (os.platform() === "win32") {
             try {
-                let chcp = childProcess.execSync("chcp");
+                const chcp = childProcess.execSync("chcp");
                 codepage = chcp.toString().split(":").pop().trim();
             } catch (error) {
-                arduinoChannel.warning(`Defaulting to code page 850 because chcp failed.\rEnsure your path includes %SystemRoot%\\system32\r${error.message}`);
+                arduinoChannel.warning(`Defaulting to code page 850 because chcp failed.\
+                \rEnsure your path includes %SystemRoot%\\system32\r${error.message}`);
                 codepage = "850";
             }
         }

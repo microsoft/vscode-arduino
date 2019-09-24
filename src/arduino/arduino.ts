@@ -23,7 +23,6 @@ import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
-import { messages } from './../common/constants';
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
