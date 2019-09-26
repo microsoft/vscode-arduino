@@ -12,3 +12,7 @@ tslint.json
 gulpfile.js
 *.vsix
 .github/**
+*.log
+webpack.config.js
+node_modules/**
+vendor/**
