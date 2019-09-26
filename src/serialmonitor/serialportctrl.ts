@@ -22,7 +22,7 @@ export enum SerialPortEnding {
 export class SerialPortCtrl {
   public static get serialport(): any {
     if (!SerialPortCtrl._serialport) {
-      SerialPortCtrl._serialport = require("../../../vendor/node-usb-native").SerialPort;
+      SerialPortCtrl._serialport = require("../../vendor/node-usb-native").SerialPort;
     }
     return SerialPortCtrl._serialport;
   }
