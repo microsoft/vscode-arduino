@@ -210,10 +210,10 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
         let codepage = "65001";
         if (os.platform() === "win32") {
             try {
-                const chcp = childProcess.execSync("chcp");
+                const chcp = childProcess.execSync("chcp.com");
                 codepage = chcp.toString().split(":").pop().trim();
             } catch (error) {
-                arduinoChannel.warning(`Defaulting to code page 850 because chcp failed.\
+                arduinoChannel.warning(`Defaulting to code page 850 because chcp.com failed.\
                 \rEnsure your path includes %SystemRoot%\\system32\r${error.message}`);
                 codepage = "850";
             }
