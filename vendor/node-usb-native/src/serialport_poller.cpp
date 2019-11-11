@@ -49,7 +49,7 @@ void SerialportPoller::callCallback(int status) {
 
 
 
-void SerialportPoller::Init(Handle<Object> target) {
+void SerialportPoller::Init(Local<Object> target) {
   Nan::HandleScope scope;
 
   // Prepare constructor template
