@@ -88,7 +88,7 @@ v8::Local<v8::Value> getValueFromObject(v8::Local<v8::Object> options, std::stri
 
 int getIntFromObject(v8::Local<v8::Object> options, std::string key) {
   #if NODE_MAJOR_VERSION >= 10
-    return getValueFromObject(options, key)->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    return Nan::To<v8::Int32>(getValueFromObject(options, key)).ToLocalChecked()->Value();
   #else
     return getValueFromObject(options, key)->ToInt32()->Int32Value();
   #endif
@@ -104,7 +104,7 @@ v8::Local<v8::String> getStringFromObj(v8::Local<v8::Object> options, std::strin
 
 double getDoubleFromObject(v8::Local<v8::Object> options, std::string key) {
   #if NODE_MAJOR_VERSION >= 10
-    return getValueFromObject(options, key)->ToNumber(v8::Isolate::GetCurrent())->NumberValue();
+    return Nan::To<double>(getValueFromObject(options, key)).FromMaybe(0);
   #else
     return getValueFromObject(options, key)->ToNumber()->NumberValue();
   #endif
@@ -181,7 +181,7 @@ void EIO_AfterOpen(uv_work_t* req) {
 
     int fd;
     #if NODE_MAJOR_VERSION >= 10
-      fd = argv[1]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+      fd = argv[1]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
     #else
       fd = argv[1]->ToInt32()->Int32Value();
     #endif
@@ -205,7 +205,7 @@ NAN_METHOD(Update) {
   }
   int fd;
   #if NODE_MAJOR_VERSION >= 10
-    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    fd = info[0]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     fd = info[0]->ToInt32()->Int32Value();
   #endif
@@ -233,7 +233,7 @@ NAN_METHOD(Update) {
 
   baton->fd = fd;
   #if NODE_MAJOR_VERSION >= 10
-    baton->baudRate = Nan::Get(options, Nan::New<v8::String>("baudRate").ToLocalChecked()).ToLocalChecked()->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    baton->baudRate = Nan::Get(options, Nan::New<v8::String>("baudRate").ToLocalChecked()).ToLocalChecked()->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     baton->baudRate = Nan::Get(options, Nan::New<v8::String>("baudRate").ToLocalChecked()).ToLocalChecked()->ToInt32()->Int32Value();
   #endif
@@ -273,7 +273,7 @@ NAN_METHOD(Write) {
   }
   int fd;
   #if NODE_MAJOR_VERSION >= 10
-    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    fd = info[0]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     fd = info[0]->ToInt32()->Int32Value();
   #endif
@@ -394,7 +394,7 @@ NAN_METHOD(Close) {
   CloseBaton* baton = new CloseBaton();
   memset(baton, 0, sizeof(CloseBaton));
   #if NODE_MAJOR_VERSION >= 10
-    baton->fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    baton->fd = info[0]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     baton->fd = info[0]->ToInt32()->Int32Value();
   #endif
@@ -511,7 +511,7 @@ NAN_METHOD(Flush) {
   }
   int fd;
   #if NODE_MAJOR_VERSION >= 10
-    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    fd = info[0]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     fd = info[0]->ToInt32()->Int32Value();
   #endif
@@ -564,7 +564,7 @@ NAN_METHOD(Set) {
   }
   int fd;
   #if NODE_MAJOR_VERSION >= 10
-    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    fd = info[0]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     fd = info[0]->ToInt32()->Int32Value();
   #endif
@@ -626,7 +626,7 @@ NAN_METHOD(Drain) {
   }
   int fd;
   #if NODE_MAJOR_VERSION >= 10
-    fd = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    fd = info[0]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     fd = info[0]->ToInt32()->Int32Value();
   #endif
@@ -697,7 +697,7 @@ SerialPortStopBits NAN_INLINE(ToStopBitEnum(double stopBits)) {
 }
 
 extern "C" {
-  void init_serialport(v8::Handle<v8::Object> target) {
+  void init_serialport( v8::Local<v8::Object> target) {
     Nan::HandleScope scope;
     Nan::SetMethod(target, "set", Set);
     Nan::SetMethod(target, "open", Open);

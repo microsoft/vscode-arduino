@@ -84,7 +84,7 @@ NAN_METHOD(SerialportPoller::New) {
 
   SerialportPoller* obj = new SerialportPoller();
   #if NODE_MAJOR_VERSION >= 10
-    obj->fd_ = info[0]->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    obj->fd_ = info[0]->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     obj->fd_ = info[0]->ToInt32()->Int32Value();
   #endif

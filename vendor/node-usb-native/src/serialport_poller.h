@@ -10,7 +10,7 @@
 
 class SerialportPoller : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> target);
+  static void Init( v8::Local<v8::Object> target);
 
   void callCallback(int status);
 
