@@ -9,11 +9,11 @@
 #include <nan.h>
 
 extern "C" {
-	void init_serialport(v8::Handle<v8::Object> target);
+	void init_serialport( v8::Local<v8::Object> target);
 #ifndef DISABLE_USB_DETECTOR
-	void init_detector(v8::Handle<v8::Object> target);
+	void init_detector( v8::Local<v8::Object> target);
 #endif
-	void initAll(v8::Handle<v8::Object> target) {
+	void initAll( v8::Local<v8::Object> target) {
 		init_serialport(target);
 		#ifndef DISABLE_USB_DETECTOR
 		init_detector(target);

@@ -42,8 +42,8 @@ OpenBatonPlatformOptions* ParsePlatformOptions(const v8::Local<v8::Object>& opti
 
   UnixPlatformOptions* result = new UnixPlatformOptions();
   #if NODE_MAJOR_VERSION >= 10
-    result->vmin = Nan::Get(options, Nan::New<v8::String>("vmin").ToLocalChecked()).ToLocalChecked()->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
-    result->vtime = Nan::Get(options, Nan::New<v8::String>("vtime").ToLocalChecked()).ToLocalChecked()->ToInt32(v8::Isolate::GetCurrent())->Int32Value();
+    result->vmin = Nan::Get(options, Nan::New<v8::String>("vmin").ToLocalChecked()).ToLocalChecked()->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
+    result->vtime = Nan::Get(options, Nan::New<v8::String>("vtime").ToLocalChecked()).ToLocalChecked()->ToInt32(Nan::GetCurrentContext()).ToLocalChecked()->Value();
   #else
     result->vmin = Nan::Get(options, Nan::New<v8::String>("vmin").ToLocalChecked()).ToLocalChecked()->ToInt32()->Int32Value();
     result->vtime = Nan::Get(options, Nan::New<v8::String>("vtime").ToLocalChecked()).ToLocalChecked()->ToInt32()->Int32Value();
