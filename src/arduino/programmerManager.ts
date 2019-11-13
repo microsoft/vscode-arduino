@@ -19,6 +19,7 @@ export enum ProgrammerList {
     "Atmel JTAGICE3 (ISP mode)",
     "Atmel JTAGICE3 (JTAG mode)",
     "Atmel-ICE (AVR)",
+    "Atmel SAM-ICE"
 }
 
 export class ProgrammerManager {
@@ -98,6 +99,9 @@ export class ProgrammerManager {
                 break;
             case ProgrammerList["Atmel-ICE (AVR)"]:
                 this._programmervalue = "arduino:atmel_ice";
+                break;
+            case ProgrammerList["Atmel SAM-ICE"]:
+                this._programmervalue = "arduino:sam_ice";
                 break;
             default:
                 break;
