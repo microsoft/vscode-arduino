@@ -19,7 +19,7 @@ export enum ProgrammerList {
     "Atmel JTAGICE3 (ISP mode)",
     "Atmel JTAGICE3 (JTAG mode)",
     "Atmel-ICE (AVR)",
-    "Atmel SAM-ICE"
+    "Atmel SAM-ICE",
 }
 
 export class ProgrammerManager {
