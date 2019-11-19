@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.28
+
+- Release data: November 15, 2019
+
+### Fixed
+
+- Optimize activation time  of Arduino Extension.
+- Bump mixin-deep from 1.3.1 to 1.3.2.
+- Remove Processing Filetype (.PDE extension).
+- Fix the issue of "Unable to select serial port" [[#918]](https://github.com/microsoft/vscode-arduino/issues/918)
+- Fix Travis CI build failure [[#900]](https://github.com/microsoft/vscode-arduino/issues/900)
+- Fix issue of "Exit with code=undefined" [[#869]](https://github.com/microsoft/vscode-arduino/issues/869)
+- Fix issue of "spawn: Use explicit chcp.com" [[#910]](https://github.com/microsoft/vscode-arduino/pull/910)
+- Fix wording & typos.
+
+Special thanks to [Peter Wone](https://github.com/PeterWone), [Dre West](https://github.com/Dotrar),[Lucas Schneider](https://github.com/schneider8357) for your contributions and feedbacks.
+
 ## Version 0.2.27
 
 - Release date: July 8, 2019
