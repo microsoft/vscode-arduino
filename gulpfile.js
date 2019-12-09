@@ -1,13 +1,12 @@
 const gulp = require("gulp");
 const eslint = require('gulp-eslint');
 const tslint = require("gulp-tslint");
-const gutil = require("gulp-util");
+const PluginError = require('plugin-error');
+const log = require('fancy-log');
 const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
 const webpack = require("webpack");
-const runSequence = require('run-sequence');
 const del = require('del');
-
 const fs = require("fs");
 const fsp = require('fs-plus');
 const path = require("path");
@@ -16,8 +15,8 @@ const childProcess = require("child_process");
 //...
 gulp.task("tslint", () => {
     return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./src/views/node_modules/**"])
-        .pipe(tslint())
-        .pipe(tslint.report());
+    .pipe(tslint())
+    .pipe(tslint.report());
 });
 
 gulp.task("eslint", () => {
@@ -34,12 +33,12 @@ gulp.task("html-webpack", (done) => {
         const statsJson = stats.toJson();
         if (err || (statsJson.errors && statsJson.errors.length)) {
             statsJson.errors.forEach(webpackError => {
-                gutil.log(gutil.colors.red(`Error (webpack): ${webpackError}`));
+                log.error(`Error (webpack): ${webpackError}`);
             });
 
-            throw new gutil.PluginError('webpack', JSON.stringify(err || statsJson.errors));
+            throw new PluginError('webpack', JSON.stringify(err || statsJson.errors));
         }
-        gutil.log('[webpack]', stats.toString());
+        log('[webpack]', stats.toString());
         done();
     });
 });
@@ -51,12 +50,12 @@ gulp.task("node_modules-webpack", (done) => {
         const statsJson = stats.toJson();
         if (err || (statsJson.errors && statsJson.errors.length)) {
             statsJson.errors.forEach(webpackError => {
-                gutil.log(gutil.colors.red(`Error (webpack): ${webpackError}`));
+                log.error(`Error (webpack): ${webpackError}`);
             });
 
-            throw new gutil.PluginError('webpack', JSON.stringify(err || statsJson.errors));
+            throw new PluginError('webpack', JSON.stringify(err || statsJson.errors));
         }
-        gutil.log('[webpack]', stats.toString());
+        log('[webpack]', stats.toString());
         done();
     });
 });
@@ -92,7 +91,8 @@ gulp.task("genAikey", (done) => {
         fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
         done();
     } else {
-        gutil.log("Skipping genAiKey");
+        log("Skipping genAiKey");
+        done();
     }
 });
 
@@ -124,15 +124,15 @@ gulp.task("test", (done) => {
     });
 
     child.stdout.on("data", (data) => {
-        gutil.log(data.toString().trim());
+        log(data.toString().trim());
     });
 
     child.stderr.on("data", (data) => {
-        gutil.log(gutil.colors.red(data.toString().trim()));
+        log.error(data.toString().trim());
     });
 
     child.on("error", (error) => {
-        gutil.log(gutil.colors.red(error));
+        log.error(error);
     });
 
     child.on("exit", (code) => {
@@ -140,19 +140,15 @@ gulp.task("test", (done) => {
         if (code === 0) {
             done();
         } else {
-            gutil.log("exit code: " + code);
+            log.error("exit code: " + code);
             done(code);
         }
     });
 });
 
-gulp.task("build", (done) => {
-    return runSequence("clean", "ts-compile", "html-webpack", "node_modules-webpack", "copyVendor", done);
-});
+gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack", "copyVendor"));
 
-gulp.task("build_without_view", (done) => {
-    return runSequence("clean", "ts-compile", done);
-});
+gulp.task("build_without_view", gulp.series("clean", "ts-compile"));
 
 gulp.task("watch", () => {
     gulp.watch(["./src/**/*", "./test/**/*", "!./src/views/**/*"], ["ts-compile"]);
