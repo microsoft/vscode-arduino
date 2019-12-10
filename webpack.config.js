@@ -45,7 +45,7 @@ function getDependeciesFromNpm(mod) {
 /**@type {import('webpack').Configuration}*/
 const config = {
     target: 'node',
-    mode: "development",
+    
     entry: getEntry(),
     output: {
         path: path.resolve(__dirname, 'out/node_modules'),

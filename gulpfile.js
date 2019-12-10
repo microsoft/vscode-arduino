@@ -11,12 +11,13 @@ const fs = require("fs");
 const fsp = require('fs-plus');
 const path = require("path");
 const childProcess = require("child_process");
+const argv = require('minimist')(process.argv.slice(2));
 
 //...
 gulp.task("tslint", () => {
     return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./src/views/node_modules/**"])
-    .pipe(tslint())
-    .pipe(tslint.report());
+        .pipe(tslint())
+        .pipe(tslint.report());
 });
 
 gulp.task("eslint", () => {
@@ -29,6 +30,7 @@ gulp.task("eslint", () => {
 gulp.task("html-webpack", (done) => {
     const config = require("./src/views/webpack.config.js");
     config.context = `${__dirname}/src/views`;
+    config.mode = argv.mode ? argv.mode : 'production';
     return webpack(config, (err, stats) => {
         const statsJson = stats.toJson();
         if (err || (statsJson.errors && statsJson.errors.length)) {
@@ -46,6 +48,7 @@ gulp.task("html-webpack", (done) => {
 gulp.task("node_modules-webpack", (done) => {
     const config = require("./webpack.config.js");
     config.context = `${__dirname}`;
+    config.mode = argv.mode ? argv.mode : 'production';
     return webpack(config, (err, stats) => {
         const statsJson = stats.toJson();
         if (err || (statsJson.errors && statsJson.errors.length)) {
