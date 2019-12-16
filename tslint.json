@@ -32,6 +32,16 @@
             true,
             150
         ], 
-        "no-angle-bracket-type-assertion": false
+        "no-angle-bracket-type-assertion": false,
+        "no-implicit-dependencies": [true, "dev"],
+        "no-string-literal": false,
+        "no-object-literal-type-assertion": false,
+        "no-invalid-template-strings": false,
+        "no-submodule-imports": false,
+        "prefer-conditional-expression": false,
+        "no-return-await": false,
+        "no-shadowed-variable": false,
+        "no-duplicate-imports": false,
+        "array-type": false
     }
 }
