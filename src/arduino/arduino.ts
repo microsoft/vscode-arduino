@@ -670,7 +670,7 @@ Please make sure the folder is not occupied by other procedures .`);
                 // Arduino custom package tools
                 includePath.push(path.join(os.homedir(), "Documents", "Arduino", "hardware", "tools", "**"));
                 // Arduino custom libraries
-                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "libraries", "**"));
+                includePath.push(path.join(this._settings.sketchbookPath, "libraries", "**"));
 
                 const forcedInclude = this.getDefaultForcedIncludeFiles();
 
