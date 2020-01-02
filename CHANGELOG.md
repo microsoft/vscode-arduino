@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.2.29
+
+- Release date: January 2, 2020
+
+### Changed
+- Dependency upgrade
+
 ## Version 0.2.28
 
 - Release data: November 15, 2019
