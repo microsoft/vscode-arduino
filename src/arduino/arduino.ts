@@ -668,7 +668,7 @@ Please make sure the folder is not occupied by other procedures .`);
                 // Arduino built-in libraries
                 includePath.push(path.join(this._settings.arduinoPath, "libraries", "**"));
                 // Arduino custom package tools
-                includePath.push(path.join(os.homedir(), "Documents", "Arduino", "hardware", "tools", "**"));
+                includePath.push(path.join(this._settings.sketchbookPath, "hardware", "tools", "**"));
                 // Arduino custom libraries
                 includePath.push(path.join(this._settings.sketchbookPath, "libraries", "**"));
 
