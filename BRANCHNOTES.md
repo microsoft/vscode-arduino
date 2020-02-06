@@ -52,7 +52,7 @@ src/arduino/arduino.ts
 `*` not committed to branch yet
 
 ## Motivation
-I write a lot of code for Arduino, especially libraries. The Arduino IDE is not suited for more complex projects and I tried several alternatives. The old and dysfunct Arduino CDT extension for eclipse somehow stalled (even if it was promising), Sloeber could be an option but the maintainer is disillusioned and the project is more or less dead. Platform IO IDE's license is very [restrictive](https://community.platformio.org/t/what-part-of-platformio-is-open-source-licenced/1447/2).
+I write a lot of code for Arduino, especially libraries. The Arduino IDE is not suited for more complex projects and I tried several alternatives. The old and dysfunctional Arduino CDT extension for eclipse somehow stalled (even if it was promising), Sloeber could be an option but the maintainer is disillusioned and the project is more or less dead. Platform IO IDE's license is very [restrictive](https://community.platformio.org/t/what-part-of-platformio-is-open-source-licenced/1447/2).
 
 Then remains vscode-arduino. It seems that it isn't completely dead - but almost. Most of the core functionality seems to work (I used it a few days now). But the biggest show stopper is the bad IntelliSense support.
 
@@ -81,7 +81,7 @@ I will list every supporter here, thanks!
 
 ## Future Work
 * Proper interactive serial terminal (this is the second major show stopper in my opinion)
-* Lots of redundand code
+* Lots of redundant code
   * e.g. "upload is a superset of "verify"
   * general lack of modularity - the above is the result 
 * It seems that this extension is pretty chaotic. Most probably some refactoring is necessary.
@@ -98,7 +98,7 @@ Just searching the compiler installation directory with something like
 ```bash
 find  ~/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/ -name "include*"
 ```
-won't do since not all include directorys are named `include`. Fortunately gcc can be queried about its configuration ([source](https://stackoverflow.com/a/6666338)):
+won't do since not all include directories are named `include`. Fortunately gcc can be queried about its configuration ([source](https://stackoverflow.com/a/6666338)):
 ```bash
 # generally for C++
 gcc -xc++ -E -v -
