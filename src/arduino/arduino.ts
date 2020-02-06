@@ -94,6 +94,33 @@ export class ArduinoApp {
         }
     }
 
+    /** Runs the pre build command.
+     * Usually before one of
+     *  * verify
+     *  * upload
+     *  * upload using programmer
+     * @param dc Device context prepared during one of the above actions
+     * @returns True if successful, false on error.
+     */
+    protected async runPreBuildCommand(dc:DeviceContext): Promise<boolean>
+    {
+        if (dc.prebuild) {
+            arduinoChannel.info(`Running pre-build command: ${dc.prebuild}`);
+            const prebuildargs = dc.prebuild.split(" ");
+            const prebuildCommand = prebuildargs.shift();
+            try {
+                await util.spawn(prebuildCommand,
+                                 arduinoChannel.channel,
+                                 prebuildargs,
+                                 { shell: true, cwd: ArduinoWorkspace.rootPath });
+            } catch (ex) {
+                arduinoChannel.error(`Running pre-build command failed: ${os.EOL}${ex.error}`);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public async upload() {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
@@ -129,16 +156,8 @@ export class ArduinoApp {
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
-        if (dc.prebuild) {
-            arduinoChannel.info(`Run prebuild command: ${dc.prebuild}`);
-            const prebuildargs = dc.prebuild.split(" ");
-            const prebuildCommand = prebuildargs.shift();
-            try {
-                await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, { shell: true, cwd: ArduinoWorkspace.rootPath });
-            } catch (ex) {
-                arduinoChannel.error(`Run prebuild failed: \n${ex.error}`);
-                return;
-            }
+        if (!this.runPreBuildCommand(dc)) {
+            return;
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
@@ -214,6 +233,10 @@ export class ArduinoApp {
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
+        if (!this.runPreBuildCommand(dc)) {
+            return;
+        }
+
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
             "--pref", "programmer=" + selectProgrammer, appPath];
@@ -265,16 +288,8 @@ export class ArduinoApp {
 
         arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
 
-        if (dc.prebuild) {
-            arduinoChannel.info(`Run prebuild command: ${dc.prebuild}`);
-            const prebuildargs = dc.prebuild.split(" ");
-            const prebuildCommand = prebuildargs.shift();
-            try {
-                await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, { shell: true, cwd: ArduinoWorkspace.rootPath });
-            } catch (ex) {
-                arduinoChannel.error(`Run prebuild failed: \n${ex.error}`);
-                return;
-            }
+        if (!this.runPreBuildCommand(dc)) {
+            return;
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
