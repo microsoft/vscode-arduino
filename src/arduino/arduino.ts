@@ -23,6 +23,7 @@ import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
+import { CompilerCmdParserEngineGcc, CompilerCmdParser, CCppProperties } from "./intellisense";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -299,7 +300,27 @@ export class ArduinoApp {
         arduinoChannel.show();
         // we need to return the result of verify
         try {
-            await util.spawn(this._settings.commandPath, arduinoChannel.channel, args);
+            var gccParserEngine = new CompilerCmdParserEngineGcc(dc.sketch);
+            let compilerParser = new CompilerCmdParser([gccParserEngine]);
+
+            await util.spawn(this._settings.commandPath,
+                             arduinoChannel.channel,
+                             args,
+                             {},
+                             compilerParser.callback);
+
+            // Write compiler command parser result to IntelliSense
+            // configuration file in case parsing was successful.
+            if (compilerParser.result) {
+                var cppPropsPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
+                var cppProps = new CCppProperties(cppPropsPath);
+                cppProps.merge(compilerParser.result);
+                cppProps.write();
+                arduinoChannel.info("IntelliSense configuration generated successfully.");
+            } else {
+                arduinoChannel.warning("Failed to generate IntelliSense configuration.");
+            }
+
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
             return true;
         } catch (reason) {
@@ -311,7 +332,6 @@ export class ArduinoApp {
             arduinoChannel.error(msg);
             return false;
         }
-
     }
 
     public tryToUpdateIncludePaths() {

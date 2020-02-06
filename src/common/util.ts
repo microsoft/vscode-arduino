@@ -200,7 +200,9 @@ export function isArduinoFile(filePath): boolean {
     return fileExistsSync(filePath) && (path.extname(filePath) === ".ino" || path.extname(filePath) === ".pde");
 }
 
-export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<object> {
+type StdOutCallback = (msg: string)=>void;
+
+export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}, stdoutCallback?: StdOutCallback): Thenable<object> {
     return new Promise((resolve, reject) => {
         const stdout = "";
         const stderr = "";
@@ -221,7 +223,11 @@ export function spawn(command: string, outputChannel: vscode.OutputChannel, args
 
         if (outputChannel) {
             child.stdout.on("data", (data: Buffer) => {
-                outputChannel.append(decodeData(data, codepage));
+                let decoded = decodeData(data, codepage);
+                outputChannel.append(decoded);
+                if (stdoutCallback) {
+                    stdoutCallback(decoded);
+                }
             });
             child.stderr.on("data", (data: Buffer) => {
                 outputChannel.append(decodeData(data, codepage));
