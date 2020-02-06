@@ -206,7 +206,7 @@ export class CompilerCmdParserEngineGcc
                 const match = child.stdout.match(includeregex);
                 if (match) {
                     // Split list by newlines. Should be platform independent
-                    let lines = match[1].split(/\s*(?:\r|\n)\s*/);
+                    let lines = match[1].split(/\s*(?:\r|\r\n|\n)\s*/);
                     // Filter out empty elements (in most cases only the last element)
                     lines = lines.filter((val: string) => val !== "");
                     // Add built-in includes to command line includes
