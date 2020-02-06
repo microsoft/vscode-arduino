@@ -1,6 +1,6 @@
 # IntelliSense Autoconfiguration Branch
 ## Problem
-This branch more or less adresses [these](https://github.com/microsoft/vscode-arduino/issues?utf8=%E2%9C%93&q=intellisense+is%3Aopen) issues.
+This branch more or less addresses [these](https://github.com/microsoft/vscode-arduino/issues?utf8=%E2%9C%93&q=intellisense+is%3Aopen) issues (about seven).
 
 It implements a parser which parses the output from Arduino's build process to generate a very precise `c_cpp_properties.json` which in turn hopefully renders any user interaction with this file obsolete
 
@@ -24,6 +24,7 @@ src/arduino/arduino.ts
 ```
 
 ### Status
+**2020-02-05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)
 
 |      | Tasks   |
 |-----:|:--------|
@@ -35,6 +36,7 @@ src/arduino/arduino.ts
 |                                       | :heavy_check_mark: Basic file input*  |
 |                                       | :heavy_check_mark: Basic file output* |
 |                                       | :white_check_mark: Merging of parsing result and existing file content |
+|                                       | :white_check_mark: Getting intrinsic gcc include paths (partly done)|
 | **Configuration flags**               | :white_check_mark: |
 | **Unit tests**                        | :white_check_mark: Basic parser |
 |                                       | :white_check_mark: JSON input |
@@ -80,6 +82,50 @@ I will list every supporter here, thanks!
 ----
 
 ## Implementation
+
+### `c_cpp_properties.json` Generator
+#### Intrinsic Include Paths
+Some include paths are built into gcc and don't have to be specified on the command line. This requires that we have to get them from the compiler.
+
+Just searching the compiler installation directory with something like
+```bash
+find  ~/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/ -name "include*"
+```
+won't do since not all include directorys are named `include`. Fortunately gcc can be queried about its configuration ([source](https://stackoverflow.com/a/6666338)):
+```bash
+# generally for C++
+gcc -xc++ -E -v -
+# for esp32
+~/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/xtensa-esp32-elf-gcc -xc++ -E -v - < /dev/null 2>&1 | tee xtensa-esp32-elf-gcc_built_in_specs.txt
+# avr
+~/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino5/bin/avr-gcc -xc++ -E -v - < /dev/null 2>&1 | tee avr-gcc_built_in_specs.txt
+```
+The result can be inspected here:
+* [xtensa-esp32-elf-gcc_built_in_specs.txt](doc/intellisense/compilerinfo/xtensa-esp32-elf-gcc_built_in_specs.txt)
+* [avr-gcc_built_in_specs.txt](doc/intellisense/compilerinfo/avr-gcc_built_in_specs.txt)
+To show the most interesting section in the output of the above commands, for ESP32:
+```
+#include "..." search starts here:
+#include <...> search starts here:
+ /home/uli/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/../../../../xtensa-esp32-elf/include/c++/5.2.0
+ /home/uli/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/../../../../xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf
+ /home/uli/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/../../../../xtensa-esp32-elf/include/c++/5.2.0/backward
+ /home/uli/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/include
+ /home/uli/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/include-fixed
+ /home/uli/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/../lib/gcc/xtensa-esp32-elf/5.2.0/../../../../xtensa-esp32-elf/include
+ /home/uli/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/../xtensa-esp32-elf/sysroot/usr/include
+End of search list.
+```
+for AVR:
+```
+#include "..." search starts here:
+#include <...> search starts here:
+ /home/uli/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino5/bin/../lib/gcc/avr/7.3.0/include
+ /home/uli/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino5/bin/../lib/gcc/avr/7.3.0/include-fixed
+ /home/uli/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino5/bin/../lib/gcc/avr/7.3.0/../../../../avr/include
+End of search list.
+```
+As one can see with the ESP32-gcc not all include directories are named `include`. Parsing of this output is pretty trivial though.
 
 ### Settings
 Global user settings, on linux under `~/.config/Code/User/settings.json`, for instance:
