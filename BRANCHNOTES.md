@@ -26,6 +26,7 @@ src/arduino/arduino.ts
 ### Status
 **2020-02-05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)  
 **2020-02-06** Got it fully working (with built-in include directories) for AVR, ESP32, ESP8266. Rewrote the backend to facilitate writing of further parser engines in the future.
+
 |      | Tasks   |
 |-----:|:--------|
 | **Build output parser**               | :heavy_check_mark: Basic parser working |
@@ -47,6 +48,7 @@ src/arduino/arduino.ts
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` |
+
 `*` not committed to branch yet
 
 ## Motivation
