@@ -48,6 +48,7 @@ src/arduino/arduino.ts
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` |
+|                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies |
 
 `*` not committed to branch yet
 
@@ -150,7 +151,7 @@ Global user settings, on linux under `~/.config/Code/User/settings.json`, for in
 }
 ```
 Project settings in `.vscode/arduino.json`
-```
+```json
 {
     "board": "arduino:avr:nano",
     "configuration": "cpu=atmega328old",
@@ -158,5 +159,10 @@ Project settings in `.vscode/arduino.json`
     "port": "/dev/ttyUSB0"
 }
 ```
-
+The global settings are [here](src/arduino/vscodeSettings.ts)
+```ts
+if (VscodeSettings.getInstance().logLevel === "verbose") {
+    args.push("--verbose");
+}
+```
 ### Global Tasks in vscode-arduino
