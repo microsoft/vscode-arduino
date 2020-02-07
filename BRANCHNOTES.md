@@ -49,10 +49,12 @@ src/arduino/arduino.ts
 |                                       | :white_check_mark: JSON input |
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
+|                                       | :white_check_mark: Write configuration on change only |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` |
 |                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? |
 |                                       | :white_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) |
+|                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
 
