@@ -255,29 +255,19 @@ export class ArduinoApp {
         }
 
         arduinoChannel.show();
-        // we need to return the result of verify
+
         try {
-            const gccParserEngine = new CompilerCmdParserEngineGcc(dc.sketch);
-            const compilerParser = new CompilerCmdParser([gccParserEngine]);
+            const compilerParserContext = this.makeCompilerParserContext(dc);
 
             await util.spawn(this._settings.commandPath,
                              arduinoChannel.channel,
                              args,
                              undefined,
-                             compilerParser.callback);
+                             compilerParserContext.callback);
 
-            // Write compiler command parser result to IntelliSense
-            // configuration file in case parsing was successful.
-            if (compilerParser.result) {
-                const cppPropsPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
-                const cppProps = new CCppProperties(cppPropsPath);
-                cppProps.merge(compilerParser.result);
-                cppProps.write();
-                arduinoChannel.info("IntelliSense configuration generated successfully.");
-            } else {
-                arduinoChannel.warning("Failed to generate IntelliSense configuration.");
+            if (compilerParserContext.conclude) {
+                compilerParserContext.conclude();
             }
-
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
             return true;
         } catch (reason) {
@@ -802,6 +792,44 @@ export class ArduinoApp {
         return this._settings.useArduinoCli;
         // return VscodeSettings.getInstance().useArduinoCli;
     }
+
+    /**
+     * Creates a context which is used for compiler command parsing
+     * during building (verify, upload, ...).
+     *
+     * This context makes sure that it can be used in those sections
+     * without having to check whether this feature is en- or disabled
+     * and keeps the calling context more readable.
+     *
+     * @param dc The device context of the caller.
+     */
+    private makeCompilerParserContext(dc: DeviceContext)
+        : { callback: (s: string) => void; conclude: () => void; } {
+        if (!VscodeSettings.getInstance().disableIntelliSenseAutoGen) {
+
+            // setup the parser with its engines
+            const gccParserEngine = new CompilerCmdParserEngineGcc(dc.sketch);
+            const compilerParser = new CompilerCmdParser([gccParserEngine]);
+
+            // set up the function to be called after parsing
+            const _conclude = () => {
+                const cppPropsPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
+                if (compilerParser.processResult(cppPropsPath)) {
+                    arduinoChannel.info("IntelliSense configuration generated successfully.");
+                } else {
+                    arduinoChannel.warning("Failed to generate IntelliSense configuration.");
+                }
+            };
+            return {
+                callback: compilerParser.callback,
+                conclude: _conclude,
+            };
+        }
+        return {
+            callback: undefined,
+            conclude: undefined,
+        }
+    };
 
     private getProgrammerString(): string {
         const selectProgrammer = this.programmerManager.currentProgrammer;

@@ -504,6 +504,11 @@
         "arduino.defaultBaudRate": {
           "type": "number",
           "default": 115200
+        },
+        "arduino.disableIntelliSenseAutoGen": {
+          "type": "boolean",
+          "default": false,
+          "description": "When disabled vscode-arduino will not auto-generate an IntelliSense configuration (i.e. c_cpp_properties.json) by analyzing the compiler output."
         }
       }
     },

@@ -40,7 +40,9 @@ src/arduino/arduino.ts
 |                                       | :heavy_check_mark: Basic file output |
 |                                       | :white_check_mark: Merging of parsing result and existing file content |
 |                                       | :white_check_mark: Handling inexistent files and folders |
-| **Configuration flags**               | :white_check_mark: |
+| **Configuration flags**               | :heavy_check_mark: Disable flag for IntelliSense auto-config |
+|                                       | :white_check_mark: Perhaps a general IntelliSense flag `{off/manual, auto, oldstyle}` whereas the old can be removed at some point |
+|                                       | :white_check_mark: Fine grained IntelliSense control: Global en-/disable and project override. This is probably more useful since the most boards will hopefully work and for the very special cases the user can disable the feature for this single project but still can enjoy it within his regular projects. |
 | **Unit tests**                        | :white_check_mark: Basic parser (known boards, match/no match)|
 |                                       | :white_check_mark: Querying of compiler built-in includes |
 |                                       | :white_check_mark: Throwing arbitrary data at parser engines |
@@ -48,7 +50,7 @@ src/arduino/arduino.ts
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` |
-|                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies |
+|                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? |
 
 `*` not committed to branch yet
 
@@ -139,30 +141,31 @@ As one can see with the ESP32-gcc not all include directories are named `include
 
 
 ### Settings
-Global user settings, on linux under `~/.config/Code/User/settings.json`, for instance:
+#### Global Settings
+Under linux at `~/.config/Code/User/settings.json`, for instance:
 ```json
 {
     "arduino.additionalUrls": "",
     "arduino.logLevel": "verbose",
-    "C_Cpp.default.cppStandard": "c++11",
-    "C_Cpp.default.cStandard": "c11",
     "arduino.disableTestingOpen": true,
     "workbench.editor.enablePreview": false
 }
 ```
-Project settings in `.vscode/arduino.json`
+Code: [src/arduino/arduinoSettings.ts](src/arduino/arduinoSettings.ts)
+Code: [src/arduino/vscodeSettings.ts](src/arduino/vscodeSettings.ts)
+Validator: [package.json](package.json)
+
+#### Project Settings
+Path in project `.vscode/arduino.json`
 ```json
 {
-    "board": "arduino:avr:nano",
-    "configuration": "cpu=atmega328old",
-    "sketch": "examples/lcdpong-butenc/lcdpong-butenc.ino",
-    "port": "/dev/ttyUSB0"
+  "board": "arduino:avr:nano",
+  "configuration": "cpu=atmega328old",
+  "sketch": "examples/lcdpong-butenc/lcdpong-butenc.ino",
+  "port": "/dev/ttyUSB0"
 }
 ```
-The global settings are [here](src/arduino/vscodeSettings.ts)
-```ts
-if (VscodeSettings.getInstance().logLevel === "verbose") {
-    args.push("--verbose");
-}
-```
+Code: [src/deviceContext.ts](src/deviceContext.ts)
+Validator: [misc/arduinoValidator.json](misc/arduinoValidator.json)
+
 ### Global Tasks in vscode-arduino

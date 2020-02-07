@@ -26,7 +26,7 @@ export class CompilerCmdParserResult {
     public defines: Array<string> = [];
     public options: Array<string> = [];
     public compiler: string = "";
-    /** Dropped arguments like -c -Ox */
+    /** Dropped arguments like -c -Ox -o, the input and output file. */
     public trash: Array<string> = [];
 };
 
@@ -275,6 +275,15 @@ export class CompilerCmdParser {
                 this.parse(line);
             }
         }
+    }
+    public processResult(configPath: string): boolean {
+        if (this._result) {
+            const cppProps = new CCppProperties(configPath);
+            cppProps.merge(this._result);
+            cppProps.write();
+            return true;
+        }
+        return false;
     }
 }
 
