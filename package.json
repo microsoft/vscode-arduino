@@ -243,7 +243,7 @@
               },
               "targetArchitecture": {
                 "type": "string",
-                "description": "The architecture of the debuggee.",
+                "description": "The architecture of the debugger.",
                 "default": "arm"
               },
               "cwd": {
