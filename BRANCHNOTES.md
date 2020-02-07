@@ -40,6 +40,7 @@ src/arduino/arduino.ts
 |                                       | :heavy_check_mark: Basic file output |
 |                                       | :white_check_mark: Merging of parsing result and existing file content |
 |                                       | :white_check_mark: Handling inexistent files and folders |
+|                                       | :white_check_mark: Write configuration on change only |
 | **Configuration flags**               | :heavy_check_mark: Disable flag for IntelliSense auto-config |
 |                                       | :white_check_mark: Perhaps a general IntelliSense flag `{off/manual, auto, oldstyle}` whereas the old can be removed at some point |
 |                                       | :white_check_mark: Fine grained IntelliSense control: Global en-/disable and project override. This is probably more useful since the most boards will hopefully work and for the very special cases the user can disable the feature for this single project but still can enjoy it within his regular projects. |
@@ -49,7 +50,6 @@ src/arduino/arduino.ts
 |                                       | :white_check_mark: JSON input |
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
-|                                       | :white_check_mark: Write configuration on change only |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` |
 |                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? |
 |                                       | :white_check_mark: Document configuration settings in [README.md](README.md) |
