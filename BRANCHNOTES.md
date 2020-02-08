@@ -48,16 +48,19 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: Auto-run verify after a) *setting a board* b) *changing the sketch*. We have to generate a valid `c_cpp_properties.json` to keep IntelliSense working in such situations. Identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? -> Good moment would be after the workbench initialization -> message in arduino channel |
 |                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) (partially done) |
-|                                       | :white_check_mark: How to handle compilation failure? Only set if more comprehensive |
+|                                       | :heavy_check_mark: Try to auto-generate even if verify (i.e. compilation) fails |
 |                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
 
 ## Motivation
-I write a lot of code for Arduino, especially libraries. The Arduino IDE is not suited for more complex projects and I tried several alternatives. The old and dysfunctional Arduino CDT extension for eclipse somehow stalled (even if it was promising), Sloeber could be an option but the maintainer is disillusioned and the project is more or less dead. Platform IO IDE's license is very [restrictive](https://community.platformio.org/t/what-part-of-platformio-is-open-source-licenced/1447/2).
+I write a lot of code for Arduino, especially libraries. The Arduino IDE is not suited for more complex projects and I tried several alternatives:
+* The old and dysfunctional Arduino CDT extension for eclipse somehow stalled (even if it was promising)
+* Sloeber could be an option but the maintainer is disillusioned and the project is more or less dead. Furthermore Eclipse is pretty heavy and less accessible to beginners
+* Platform IO IDE's license is very [restrictive](https://community.platformio.org/t/what-part-of-platformio-is-open-source-licenced/1447/2).
 
-Then remains vscode-arduino. It seems that it isn't completely dead - but almost. Most of the core functionality seems to work (I used it a few days now). But the biggest show stopper is the bad IntelliSense support.
+Then remains vscode-arduino. It seems that it isn't completely dead - but almost. Most of the core functionality seems to work (I used it a few days now). But the biggest show stopper is the bad IntelliSense support -- which I'll address here now.
 
 ## Beer Money :beers:
 You can chip in some beer money to keep me motivated - this is really appreciated.
