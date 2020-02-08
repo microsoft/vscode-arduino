@@ -17,7 +17,9 @@ Provide a configuration flag which allows the user to turn this feature off - th
 
 ### Status
 **2020-02-05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)  
-**2020-02-06** Got it fully working (with built-in include directories) for AVR, ESP32, ESP8266. Rewrote the backend to facilitate writing of further parser engines in the future.
+**2020-02-06** Got it fully working (with built-in include directories) for AVR, ESP32, ESP8266. Rewrote the backend to facilitate writing of further parser engines in the future.  
+**2020-02-07** Wrote compiler command parser npm package [cocopa](https://www.npmjs.com/package/cocopa) and began writing a test framework for it. Added a global configuration switch which allows the IntelliSense configuration generation to be turned off.  
+**2020-02-08** Integrated `cocopa` into vscode-arduino. Added project configuration flag which can override the global flag in both ways (forced off, forced on). Made code tslint compliant. Began some documentation in [README.md](README.md)  
 
 |      | Tasks   |
 |-----:|:--------|
@@ -35,7 +37,7 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: Write configuration on change only |
 |                                       | :white_check_mark: Option to backup old configurations? |
 | **Configuration flags**               | :heavy_check_mark: Provide global disable flag for IntelliSense auto-config |
-|                                       | :white_check_mark: Provide project specific override for the global flag - most users will likely use the default setup and disable auto-generation for very specific projects |
+|                                       | :heavy_check_mark: Provide project specific override for the global flag - most users will likely use the default setup and disable auto-generation for very specific projects |
 | **Unit tests**                        | :heavy_check_mark: Basic parser (known boards, match/no match)|
 |                                       | :heavy_check_mark: Querying of compiler built-in includes (Note: to be changed to generic compiler such that Arduino is not necessary for unit testing) |
 |                                       | :white_check_mark: Throwing arbitrary data at parser engines |
@@ -43,9 +45,9 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense. (Partially done - documented in the [General Tasks](#General-Tasks) section |
-|                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? -> Good moment would be after the workbench initialization -> message in arduino channel |
-|                                       | :white_check_mark: Document configuration settings in [README.md](README.md) |
-|                                       | :white_check_mark: Document features in [README.md](README.md) |
+|                                       | :white_check_mark: Auto-run verify after a) *setting a board* b) *changing the sketch*. We have to generate a valid `c_cpp_properties.json` to keep IntelliSense working in such situations. Identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? -> Good moment would be after the workbench initialization -> message in arduino channel |
+|                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
+|                                       | :white_check_mark: Document features in [README.md](README.md) (partially done) |
 |                                       | :white_check_mark: How to handle compilation failure? Only set if more comprehensive |
 |                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
@@ -67,7 +69,7 @@ I will list every supporter here, thanks!
 
 ### Supporters
 5$ -> 1 :beer:  
-1h coding -> 20$ -> 4 :beers:  
+1h coding -> 20$ -> 4 :beers: (very moderate wage though)  
 2020-02-04 Elektronik Workshop: 32 :beers: (8h coding)  
 2020-02-05 Elektronik Workshop: 40 :beers: (10h coding)  
 2020-02-06 Elektronik Workshop: 36 :beers: (9h coding)  
@@ -193,4 +195,9 @@ Remove these as they are helpless attempts to get IntelliSense working:
 
 ```
 Remove this as this messes in an unpredictable and helpless way with Intellisense
-[src/langService/completionProvider.ts](src/langService/completionProvider.ts)
+[src/langService/completionProvider.ts](src/langService/completionProvider.ts)  
+  
+Remove this folder as this is not necessary when Intellisense works properly:
+```
+syntaxes/
+```
