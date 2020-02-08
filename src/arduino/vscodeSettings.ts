@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 
 const configKeys = {
+    USE_ACTIVE_SKETCH: "arduino.useActiveSketch",
     ARDUINO_PATH: "arduino.path",
     ARDUINO_COMMAND_PATH: "arduino.commandPath",
     ADDITIONAL_URLS: "arduino.additionalUrls",
@@ -18,6 +19,7 @@ const configKeys = {
 };
 
 export interface IVscodeSettings {
+    useActiveSketch: boolean;
     arduinoPath: string;
     commandPath: string;
     additionalUrls: string | string[];
@@ -41,6 +43,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     private static _instance: IVscodeSettings;
     private constructor() {
+    }
+
+    public get useActiveSketch(): boolean {
+        return this.getConfigValue<boolean>(configKeys.USE_ACTIVE_SKETCH);
     }
 
     public get arduinoPath(): string {
