@@ -256,20 +256,17 @@ export class ArduinoApp {
 
         arduinoChannel.show();
 
-        try {
-            const compilerParserContext = this.makeCompilerParserContext(dc);
+        let verifyResult: boolean;
+        const compilerParserContext = this.makeCompilerParserContext(dc);
 
+        try {
             await util.spawn(this._settings.commandPath,
                              arduinoChannel.channel,
                              args,
                              undefined,
                              compilerParserContext.callback);
-
-            if (compilerParserContext.conclude) {
-                compilerParserContext.conclude();
-            }
-            arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
-            return true;
+            arduinoChannel.end(`Finished verifying sketch - ${dc.sketch}${os.EOL}`);
+            verifyResult = true;
         } catch (reason) {
             const msg = reason.code ?
                 `Exit with code=${reason.code}${os.EOL}` :
@@ -277,8 +274,14 @@ export class ArduinoApp {
                     reason.message :
                     JSON.stringify(reason);
             arduinoChannel.error(msg);
-            return false;
+            verifyResult = false;
         }
+
+        if (compilerParserContext.conclude) {
+            compilerParserContext.conclude();
+        }
+
+        return verifyResult;
     }
 
     public tryToUpdateIncludePaths() {
