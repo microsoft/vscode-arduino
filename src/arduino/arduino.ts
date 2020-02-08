@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as ccp from "cocopa";
 import * as fs from "fs";
 import * as glob from "glob";
 import * as os from "os";
@@ -22,7 +23,6 @@ import { arduinoChannel } from "../common/outputChannel";
 import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
-import { CCppProperties, CompilerCmdParser, CompilerCmdParserEngineGcc } from "./intellisense";
 import { ProgrammerManager } from "./programmerManager";
 
 /**
@@ -808,8 +808,8 @@ export class ArduinoApp {
         if (!VscodeSettings.getInstance().disableIntelliSenseAutoGen) {
 
             // setup the parser with its engines
-            const gccParserEngine = new CompilerCmdParserEngineGcc(dc.sketch);
-            const compilerParser = new CompilerCmdParser([gccParserEngine]);
+            const gccParserEngine = new ccp.ParserGcc(dc.sketch);
+            const compilerParser = new ccp.Runner([gccParserEngine]);
 
             // set up the function to be called after parsing
             const _conclude = () => {
@@ -821,7 +821,7 @@ export class ArduinoApp {
                 }
             };
             return {
-                callback: compilerParser.callback,
+                callback: compilerParser.callback(),
                 conclude: _conclude,
             };
         }
