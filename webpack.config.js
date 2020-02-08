@@ -21,6 +21,16 @@ function getEntry() {
 
   const list = getDependenciesFromNpm(mod);
   const moduleList = list.filter((value, index, self) => {
+    /* Earlier versions of cocopa contains incorrect nodejs dependencies. Remove this workaround after updating to version v0.0.7.
+     * Resulted in webpack errors like:
+     *    Unhandled rejection Error in plugin "webpack"
+     *    Message:
+     *    ["Entry module not found: Error: Can't resolve './node_modules/child_process' in ...
+     *    ... "Entry module not found: Error: Can't resolve './node_modules/fs' in ...
+     */
+    if (value === "fs" || value === "child_process") {
+      return false;
+    }
     return self.indexOf(value) === index && unbundledModule.indexOf(value) === -1 && !/^@types\//.test(value);
   });
 

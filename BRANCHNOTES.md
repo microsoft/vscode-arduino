@@ -36,8 +36,8 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: Option to backup old configurations? |
 | **Configuration flags**               | :heavy_check_mark: Provide global disable flag for IntelliSense auto-config |
 |                                       | :white_check_mark: Provide project specific override for the global flag - most users will likely use the default setup and disable auto-generation for very specific projects |
-| **Unit tests**                        | :white_check_mark: Basic parser (known boards, match/no match)|
-|                                       | :white_check_mark: Querying of compiler built-in includes |
+| **Unit tests**                        | :heavy_check_mark: Basic parser (known boards, match/no match)|
+|                                       | :heavy_check_mark: Querying of compiler built-in includes (Note: to be changed to generic compiler such that Arduino is not necessary for unit testing) |
 |                                       | :white_check_mark: Throwing arbitrary data at parser engines |
 |                                       | :white_check_mark: JSON input |
 |                                       | :white_check_mark: JSON output |
@@ -47,7 +47,7 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) |
 |                                       | :white_check_mark: How to handle compilation failure? Only set if more comprehensive |
-|                                       | :white_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and tests can be run without the heavy vscode-arduino rucksack |
+|                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
