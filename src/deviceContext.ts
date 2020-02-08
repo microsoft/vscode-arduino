@@ -8,6 +8,7 @@ import * as constants from "./common/constants";
 import * as util from "./common/util";
 import * as Logger from "./logger/logger";
 
+import { VscodeSettings } from "./arduino/vscodeSettings";
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
 import { ArduinoWorkspace } from "./common/workspace";
 
@@ -95,6 +96,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _prebuild: string;
 
     private _programmer: string;
+
+    private _vscodeSettings = VscodeSettings.getInstance();
 
     /**
      * @constructor
@@ -361,4 +364,17 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 }
             });
     }
+
+    public trySetOpenedFileAsSketch() {
+        if (this._vscodeSettings.useActiveSketch) {
+            const openedFile = vscode.window.activeTextEditor.document.fileName
+                .slice(vscode.workspace.rootPath.length + 1);
+            if (/\.((ino)|(cpp)|c)$/.test(openedFile.trim())) {
+                this._sketch = openedFile;
+                this.saveContext();
+                return true;
+            }
+        }
+        return false;
+    };
 }
