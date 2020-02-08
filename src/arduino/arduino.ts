@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as ccp from "cocopa";
 import * as fs from "fs";
 import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-import * as ccp from "cocopa";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
@@ -92,33 +92,6 @@ export class ArduinoApp {
                 ["--pref", `${key}=${value}`, "--save-prefs"]);
         } catch (ex) {
         }
-    }
-
-    /** Runs the pre build command.
-     * Usually before one of
-     *  * verify
-     *  * upload
-     *  * upload using programmer
-     * @param dc Device context prepared during one of the above actions
-     * @returns True if successful, false on error.
-     */
-    protected async runPreBuildCommand(dc:DeviceContext): Promise<boolean>
-    {
-        if (dc.prebuild) {
-            arduinoChannel.info(`Running pre-build command: ${dc.prebuild}`);
-            const prebuildargs = dc.prebuild.split(" ");
-            const prebuildCommand = prebuildargs.shift();
-            try {
-                await util.spawn(prebuildCommand,
-                                 arduinoChannel.channel,
-                                 prebuildargs,
-                                 { shell: true, cwd: ArduinoWorkspace.rootPath });
-            } catch (ex) {
-                arduinoChannel.error(`Running pre-build command failed: ${os.EOL}${ex.error}`);
-                return false;
-            }
-        }
-        return true;
     }
 
     public async upload() {
@@ -315,7 +288,7 @@ export class ArduinoApp {
         arduinoChannel.show();
 
         try {
-            let compilerParserContext = this.makeCompilerParserContext(dc);
+            const compilerParserContext = this.makeCompilerParserContext(dc);
 
             await util.spawn(this._settings.commandPath,
                              arduinoChannel.channel,
@@ -323,8 +296,9 @@ export class ArduinoApp {
                              {},
                              compilerParserContext.callback);
 
-            compilerParserContext.conclude();
-
+            if (compilerParserContext.conclude) {
+                compilerParserContext.conclude();
+            }
             arduinoChannel.end(`Finished verify sketch - ${dc.sketch}${os.EOL}`);
             return true;
         } catch (reason) {
@@ -337,44 +311,6 @@ export class ArduinoApp {
             return false;
         }
     }
-
-    /** Creates a context which is used for compiler command parsing
-     * during building (verify, upload, ...).
-     * 
-     * This context makes sure that it can be used in those sections
-     * without having to check whether this feature is en- or disabled
-     * and keeps the calling context more readable.
-     * 
-     * @param dc The device context of the caller.
-     */
-    private makeCompilerParserContext(dc: DeviceContext)
-        : { callback: (s:string)=>void; conclude: ()=>void; }
-    {
-        if (!VscodeSettings.getInstance().disableIntelliSenseAutoGen) {
-
-            // setup the parser with its engines
-            let gccParserEngine = new ccp.ParserGcc(dc.sketch);
-            let compilerParser = new ccp.Runner([gccParserEngine]);
-            
-            // set up the function to be called after parsing
-            let _conclude = () => {
-                let cppPropsPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
-                if (compilerParser.processResult(cppPropsPath)) {
-                    arduinoChannel.info("IntelliSense configuration generated successfully.");
-                } else {
-                    arduinoChannel.warning("Failed to generate IntelliSense configuration.");
-                }
-            };
-            return {
-                callback: compilerParser.callback(),
-                conclude: _conclude,
-            };
-        }
-        return {
-            callback: undefined,
-            conclude: ()=>void{},
-        };
-    };
 
     public tryToUpdateIncludePaths() {
         const configFilePath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
@@ -796,6 +732,72 @@ Please make sure the folder is not occupied by other procedures .`);
     public set programmerManager(value: ProgrammerManager) {
         this._programmerManager = value;
     }
+
+    /**
+     * Runs the pre build command.
+     * Usually before one of
+     *  * verify
+     *  * upload
+     *  * upload using programmer
+     * @param dc Device context prepared during one of the above actions
+     * @returns True if successful, false on error.
+     */
+    protected async runPreBuildCommand(dc: DeviceContext): Promise<boolean> {
+        if (dc.prebuild) {
+            arduinoChannel.info(`Running pre-build command: ${dc.prebuild}`);
+            const prebuildargs = dc.prebuild.split(" ");
+            const prebuildCommand = prebuildargs.shift();
+            try {
+                await util.spawn(prebuildCommand,
+                                 arduinoChannel.channel,
+                                 prebuildargs,
+                                 { shell: true, cwd: ArduinoWorkspace.rootPath });
+            } catch (ex) {
+                arduinoChannel.error(`Running pre-build command failed: ${os.EOL}${ex.error}`);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Creates a context which is used for compiler command parsing
+     * during building (verify, upload, ...).
+     *
+     * This context makes sure that it can be used in those sections
+     * without having to check whether this feature is en- or disabled
+     * and keeps the calling context more readable.
+     *
+     * @param dc The device context of the caller.
+     */
+    private makeCompilerParserContext(dc: DeviceContext)
+        : { callback: (s: string) => void; conclude: () => void; } {
+        if (!VscodeSettings.getInstance().disableIntelliSenseAutoGen) {
+
+            // setup the parser with its engines
+            const gccParserEngine = new ccp.ParserGcc(dc.sketch);
+            const compilerParser = new ccp.Runner([gccParserEngine]);
+
+            // set up the function to be called after parsing
+            const _conclude = () => {
+                const cppPropsPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
+                if (compilerParser.processResult(cppPropsPath)) {
+                    arduinoChannel.info("IntelliSense configuration generated successfully.");
+                } else {
+                    arduinoChannel.warning("Failed to generate IntelliSense configuration.");
+                }
+            };
+            return {
+                callback: compilerParser.callback(),
+                conclude: _conclude,
+            }
+        }
+//        const donothing = () => void {};
+        return {
+            callback: undefined,
+            conclude: undefined,
+        }
+    };
 
     private getProgrammerString(): string {
         const selectProgrammer = this.programmerManager.currentProgrammer;
