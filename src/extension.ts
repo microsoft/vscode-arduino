@@ -153,24 +153,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.setSketchFile", async () => {
-        const sketchFileName = deviceContext.sketch;
-        const newSketchFileName = await vscode.window.showInputBox({
-            placeHolder: sketchFileName,
-            validateInput: (value) => {
-                if (value && /\.((ino)|(cpp)|c)$/.test(value.trim())) {
-                    return null;
-                } else {
-                    return "Invalid sketch file name. Should be *.ino/*.cpp/*.c";
-                }
-            },
-        });
-
-        if (!newSketchFileName) {
-            return;
-        }
-
-        deviceContext.sketch = newSketchFileName;
-        deviceContext.showStatusBar();
+        await deviceContext.resolveMainSketch();
     });
 
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
