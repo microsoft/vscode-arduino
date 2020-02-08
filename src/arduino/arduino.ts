@@ -6,6 +6,7 @@ import * as glob from "glob";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
+import * as ccp from "cocopa";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
@@ -23,7 +24,6 @@ import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
-import { CompilerCmdParserEngineGcc, CompilerCmdParser, CCppProperties } from "./intellisense";
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -353,8 +353,8 @@ export class ArduinoApp {
         if (!VscodeSettings.getInstance().disableIntelliSenseAutoGen) {
 
             // setup the parser with its engines
-            let gccParserEngine = new CompilerCmdParserEngineGcc(dc.sketch);
-            let compilerParser = new CompilerCmdParser([gccParserEngine]);
+            let gccParserEngine = new ccp.ParserGcc(dc.sketch);
+            let compilerParser = new ccp.Runner([gccParserEngine]);
             
             // set up the function to be called after parsing
             let _conclude = () => {
@@ -366,7 +366,7 @@ export class ArduinoApp {
                 }
             };
             return {
-                callback: compilerParser.callback,
+                callback: compilerParser.callback(),
                 conclude: _conclude,
             };
         }
