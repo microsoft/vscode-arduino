@@ -14,14 +14,6 @@ The generator takes the parser's output and transforms it into a valid `c_cpp_pr
 Provide a configuration flag which allows the user to turn this feature off - this is useful for the cases in which this magic fails or the user has a very specific setup. Although this branch tries to eliminate most of the latter cases.
 
 ### Global Tasks in vscode-arduino
-Places where `c_cpp_properties.json` gets altered (list in progress)
-```
-src/extension.ts 
-  260, 53: arduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths(); 
-src/arduino/arduino.ts 
-  328, 12:     public tryToUpdateIncludePaths() { 
-
-```
 
 ### Status
 **2020-02-05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)  
@@ -41,19 +33,21 @@ src/arduino/arduino.ts
 |                                       | :white_check_mark: Merging of parsing result and existing file content |
 |                                       | :white_check_mark: Handling inexistent files and folders |
 |                                       | :white_check_mark: Write configuration on change only |
-| **Configuration flags**               | :heavy_check_mark: Disable flag for IntelliSense auto-config |
-|                                       | :white_check_mark: Perhaps a general IntelliSense flag `{off/manual, auto, oldstyle}` whereas the old can be removed at some point |
-|                                       | :white_check_mark: Fine grained IntelliSense control: Global en-/disable and project override. This is probably more useful since the most boards will hopefully work and for the very special cases the user can disable the feature for this single project but still can enjoy it within his regular projects. |
+|                                       | :white_check_mark: Option to backup old configurations? |
+| **Configuration flags**               | :heavy_check_mark: Provide global disable flag for IntelliSense auto-config |
+|                                       | :white_check_mark: Provide project specific override for the global flag - most users will likely use the default setup and disable auto-generation for very specific projects |
 | **Unit tests**                        | :white_check_mark: Basic parser (known boards, match/no match)|
 |                                       | :white_check_mark: Querying of compiler built-in includes |
 |                                       | :white_check_mark: Throwing arbitrary data at parser engines |
 |                                       | :white_check_mark: JSON input |
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
-| **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` |
-|                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? |
+| **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense. (Partially done - documented in the [General Tasks](#General-Tasks) section |
+|                                       | :white_check_mark: Auto-run verify after setting a board to generate a valid `c_cpp_properties.json`, identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? -> Good moment would be after the workbench initialization -> message in arduino channel |
 |                                       | :white_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) |
+|                                       | :white_check_mark: How to handle compilation failure? Only set if more comprehensive |
+|                                       | :white_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and tests can be run without the heavy vscode-arduino rucksack |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
@@ -85,27 +79,35 @@ I will list every supporter here, thanks!
 * [`c_cpp_properties.json` reference](https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference)
 * [Interactive regex debugger](https://regex101.com/)
 * [Git branch management](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/)
+* [Collapsible Markdown](https://gist.githubusercontent.com/joyrexus/16041f2426450e73f5df9391f7f7ae5f/raw/f774f242feff6bae4a5be7d6c71aa5df2e3fcb0e/README.md)
 
+## Issues Concerning this Project
+ * https://github.com/Microsoft/vscode-cpptools/issues/1750
+ * Problems with IntelliSense itself https://github.com/microsoft/vscode-cpptools/issues/1034
+ * Logging for IntelliSense https://code.visualstudio.com/docs/cpp/enable-logging-cpp
 ## Future Work
 * Proper interactive serial terminal (this is the second major show stopper in my opinion)
 * Lots of redundant code
   * e.g. "upload is a superset of "verify"
   * general lack of modularity - the above is the result 
 * It seems that this extension is pretty chaotic. Most probably some refactoring is necessary.
-
+* Possibility to jump to compilation errors from compiler output and highlight compiler errors
 ----
 
 ## Implementation
+**Note** Check this vscode feature:
+```
+Configuration provider
+The ID of a VS Code extension that can provide IntelliSense configuration information for source files. For example, use the VS Code extension ID ms-vscode.cmake-tools to provide configuration information from the CMake Tools extension.
+```
 
 ### Build Output Parser
 #### Intrinsic Include Paths
-Some include paths are built into gcc and don't have to be specified on the command line. This requires that we have to get them from the compiler.
-
-Just searching the compiler installation directory with something like
+Some include paths are built into gcc and don't have to be specified on the command line. Just searching the compiler installation directory with something like
 ```bash
 find  ~/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/ -name "include*"
 ```
-won't do since not all include directories are named `include`. Fortunately gcc can be queried about its configuration ([source](https://stackoverflow.com/a/6666338)):
+won't do since not all include directories are named `include`. Fortunately gcc can be queried about its configuration ([source](https://stackoverflow.com/a/6666338)) -- built-in include paths are part of it:
 ```bash
 # generally for C++
 gcc -xc++ -E -v -
@@ -117,6 +119,7 @@ gcc -xc++ -E -v -
 The result can be inspected here:
 * [xtensa-esp32-elf-gcc_built_in_specs.txt](doc/intellisense/compilerinfo/xtensa-esp32-elf-gcc_built_in_specs.txt)
 * [avr-gcc_built_in_specs.txt](doc/intellisense/compilerinfo/avr-gcc_built_in_specs.txt)
+
 To show the most interesting section in the output of the above commands, for ESP32:
 ```
 #include "..." search starts here:
@@ -155,9 +158,9 @@ Under linux at `~/.config/Code/User/settings.json`, for instance:
     "workbench.editor.enablePreview": false
 }
 ```
-Code: [src/arduino/arduinoSettings.ts](src/arduino/arduinoSettings.ts)
-Code: [src/arduino/vscodeSettings.ts](src/arduino/vscodeSettings.ts)
-Validator: [package.json](package.json)
+Code: [src/arduino/arduinoSettings.ts](src/arduino/arduinoSettings.ts)  
+Code: [src/arduino/vscodeSettings.ts](src/arduino/vscodeSettings.ts)  
+Validator: [package.json](package.json)  
 
 #### Project Settings
 Path in project `.vscode/arduino.json`
@@ -169,7 +172,24 @@ Path in project `.vscode/arduino.json`
   "port": "/dev/ttyUSB0"
 }
 ```
-Code: [src/deviceContext.ts](src/deviceContext.ts)
-Validator: [misc/arduinoValidator.json](misc/arduinoValidator.json)
+Code: [src/deviceContext.ts](src/deviceContext.ts)  
+Validator: [misc/arduinoValidator.json](misc/arduinoValidator.json)  
 
-### Global Tasks in vscode-arduino
+### General Tasks
+#### Removing existing Attempts which mess with c_cpp_properties.json or Intellisense
+
+Remove these as they are helpless attempts to get IntelliSense working:
+```ts
+//src/arduino/arduino.ts
+  tryToUpdateIncludePaths()
+  addLibPath(libraryPath: string)
+  getDefaultForcedIncludeFiles()
+  // parts in
+  openExample()
+
+  //probably not needed anymore:
+  getDefaultPackageLibPaths()
+
+```
+Remove this as this messes in an unpredictable and helpless way with Intellisense
+[src/langService/completionProvider.ts](src/langService/completionProvider.ts)
