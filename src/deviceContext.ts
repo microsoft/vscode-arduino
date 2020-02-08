@@ -57,6 +57,11 @@ export interface IDeviceContext {
      */
     configuration: string;
 
+    /**
+     * IntelliSense configuration auto-generation project override.
+     */
+    disableIntelliSenseAutoGen: string;
+
     onDidChange: vscode.Event<void>;
 
     initialize(): void;
@@ -81,6 +86,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _output: string;
 
     private _debugger: string;
+
+    private _disableIntelliSenseAutoGen: string;
 
     private _configuration: string;
 
@@ -151,6 +158,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._configuration = deviceConfigJson.configuration;
                         this._output = deviceConfigJson.output;
                         this._debugger = deviceConfigJson["debugger"];
+                        this._disableIntelliSenseAutoGen = deviceConfigJson.disableIntelliSenseAutoGen;
                         this._onDidChange.fire();
                         this._prebuild = deviceConfigJson.prebuild;
                         this._programmer = deviceConfigJson.programmer;
@@ -164,6 +172,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._configuration = null;
                     this._output = null;
                     this._debugger = null;
+                    this._disableIntelliSenseAutoGen = null;
                     this._onDidChange.fire();
                     this._prebuild = null;
                     this._programmer = null;
@@ -182,6 +191,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 this._configuration = null;
                 this._output = null;
                 this._debugger = null;
+                this._disableIntelliSenseAutoGen = null;
                 this._onDidChange.fire();
                 this._prebuild = null;
                 this._programmer = null;
@@ -217,6 +227,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         deviceConfigJson.board = this.board;
         deviceConfigJson.output = this.output;
         deviceConfigJson["debugger"] = this.debugger_;
+        deviceConfigJson.disableIntelliSenseAutoGen = this.disableIntelliSenseAutoGen;
         deviceConfigJson.configuration = this.configuration;
         deviceConfigJson.programmer = this.programmer;
 
@@ -279,6 +290,15 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set debugger_(value: string) {
         this._debugger = value;
+        this.saveContext();
+    }
+
+    public get disableIntelliSenseAutoGen() {
+        return this._disableIntelliSenseAutoGen;
+    }
+
+    public set disableIntelliSenseAutoGen(value: string) {
+        this._disableIntelliSenseAutoGen = value;
         this.saveContext();
     }
 

@@ -772,7 +772,12 @@ Please make sure the folder is not occupied by other procedures .`);
      */
     private makeCompilerParserContext(dc: DeviceContext)
         : { callback: (s: string) => void; conclude: () => void; } {
-        if (!VscodeSettings.getInstance().disableIntelliSenseAutoGen) {
+
+        const globalDisable = VscodeSettings.getInstance().disableIntelliSenseAutoGen;
+        const project = dc.disableIntelliSenseAutoGen;
+
+        if (project !== "disable" && !globalDisable ||
+            project === "enable") {
 
             // setup the parser with its engines
             const gccParserEngine = new ccp.ParserGcc(dc.sketch);

@@ -67,6 +67,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
 | `arduino.defaultBaudRate` | Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000 |
+| `arduino.disableIntelliSenseAutoGen` | When `true` vscode-arduino will not auto-generate an IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`) by analyzing Arduino's compiler output. |
 
 The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
 
@@ -98,7 +99,8 @@ The following settings are as per sketch settings of the Arduino extension. You 
     "board": "adafruit:samd:adafruit_feather_m0",
     "output": "../build",
     "debugger": "jlink",
-    "prebuild": "bash prebuild.sh"
+    "prebuild": "bash prebuild.sh",
+    "disableIntelliSenseAutoGen": "global"
 }
 ```
 - `sketch` - The main sketch file name of Arduino.
@@ -107,6 +109,14 @@ The following settings are as per sketch settings of the Arduino extension. You 
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
 - `prebuild` - External command before building the sketch file. You should only set one `prebuild` command. `command1 && command2` does not work. If you need to run multiple commands before the build, then create a script.
+- `disableIntelliSenseAutoGen` - Override the global auto-generation of the IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`). Three options are available:
+  - `"global"`: Use the global settings (default)
+  - `"disable"`: Disable the auto-generation even if globally enabled
+  - `"enable"`: Enable the auto-generation even if globally disabled
+
+## IntelliSense
+vscode-arduino auto-configures IntelliSense by default. vscode-arduino analyzes Arduino's compiler output during verify and generates the corresponding configuration file at `.vscode/c_cpp_properties.json` and tries as hard as possible to keep things up to date, e.g. running verify when switching the board or the sketch.
+It doesn't makes sense though to run verify repeatedly. Therefore if the workspace reports problems (for instance after adding new includes to a new library) run *verify* such that IntelliSense knows of the new include directories (since the Arduino-backend performs the library resolution externally).
 
 ## Debugging Arduino Code <sup>preview</sup>
 Before you start to debug your Arduino code, please read [this document](https://code.visualstudio.com/docs/editor/debugging) to learn about the basic mechanisms of debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for further reference.
