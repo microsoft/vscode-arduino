@@ -115,6 +115,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             this._sketchStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.SKETCH);
             this._sketchStatusBar.command = "arduino.setSketchFile";
             this._sketchStatusBar.tooltip = "Sketch File";
+            vscode.window.onDidChangeActiveTextEditor(() => {
+                this.trySetOpenedFileAsSketch();
+            })
         }
     }
 
@@ -194,6 +197,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     }
 
     public showStatusBar() {
+        if (this.trySetOpenedFileAsSketch()) {
+            return;
+        }
+
         if (!this._sketch) {
             return false;
         }
