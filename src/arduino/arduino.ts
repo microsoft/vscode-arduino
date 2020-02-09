@@ -838,14 +838,24 @@ export class ArduinoApp {
         }
     };
 
+    /**
+     *
+     * @param dc
+     */
     private makeCompilerParserEngines(dc: DeviceContext) {
+
+        let sketch = path.basename(dc.sketch);
+        const dotcpp = sketch.endsWith(".ino") ? ".cpp" : "";
+        sketch = `-o\\s+\\S*${ccp.regExEscape(sketch)}${dotcpp}\\.o`;
+
         const matchPattern = [
             // trigger parser when compiling the main sketch
-            ` ${path.basename(dc.sketch)}.cpp.o`,
+            RegExp(sketch),
         ];
+
         const dontMatchPattern = [
             // make sure Arduino's not testing libraries
-            /-o\s\/dev\/null/,
+            /-o\s+\/dev\/null/,
         ];
 
         // setup the parser with its engines
