@@ -782,44 +782,62 @@ Please make sure the folder is not occupied by other procedures .`);
         if (project !== "disable" && !globalDisable ||
             project === "enable") {
 
-            const parserEngines = this.makeCompilerParserEngines(dc);
-            const compilerParser = new ccp.Runner(parserEngines);
+            const engines = this.makeCompilerParserEngines(dc);
+            const runner = new ccp.Runner(engines);
 
             // set up the function to be called after parsing
             const _conclude = () => {
-                const cppPropsPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
-                if (compilerParser.processResult(cppPropsPath)) {
-                    arduinoChannel.info("IntelliSense configuration generated successfully.");
-                } else {
+                if (!runner.result) {
                     arduinoChannel.warning("Failed to generate IntelliSense configuration.");
+                    return;
+                }
+                const pPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
+                // TODO: check what kind of result we've got: gcc or other architecture:
+                //  and instantiate content accordingly (to be implemented within cocopa)
+                const content = new ccp.CCppPropertiesContentResult(runner.result,
+                                                                    "Arduino",
+                                                                    ccp.CCppPropertiesISMode.Gcc_X64,
+                                                                    ccp.CCppPropertiesCStandard.C11,
+                                                                    // as of 1.8.11 arduino is on C++11
+                                                                    ccp.CCppPropertiesCppStandard.Cpp11);
+                const prop = new ccp.CCppProperties();
+                prop.read(pPath);
+                prop.merge(content);
+                if (prop.write(pPath)) {
+                    arduinoChannel.info("IntelliSense configuration updated.");
+                } else {
+                    arduinoChannel.info("IntelliSense configuration already up to date.");
                 }
             };
             return {
-                callback: compilerParser.callback(),
+                callback: runner.callback(),
                 conclude: _conclude,
             }
         }
-
         return {
             callback: undefined,
             conclude: undefined,
         }
-    };      
+    };
     /**
-     * 
-     * @param dc 
+     *
+     * @param dc
      */
     private makeCompilerParserEngines(dc: DeviceContext) {
 
         let sketch = path.basename(dc.sketch);
-        const dotcpp= sketch.endsWith(".ino") ? ".cpp" : "";
+        const dotcpp = sketch.endsWith(".ino") ? ".cpp" : "";
         sketch = `-o\\s+\\S*${ccp.regExEscape(sketch)}${dotcpp}\\.o`;
 
         const matchPattern = [
+            // make sure we're running g++
+            /(?:^|-)g\+\+\s+/,
+            // make sure we're compiling
+            /\s+-c\s+/,
             // trigger parser when compiling the main sketch
             RegExp(sketch),
         ];
-        
+
         const dontMatchPattern = [
             // make sure Arduino's not testing libraries
             /-o\s+\/dev\/null/,
