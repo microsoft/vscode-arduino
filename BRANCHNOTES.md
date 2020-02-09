@@ -19,7 +19,7 @@ Provide a configuration flag which allows the user to turn this feature off - th
 **2020-02-05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)  
 **2020-02-06** Got it fully working (with built-in include directories) for AVR, ESP32, ESP8266. Rewrote the backend to facilitate writing of further parser engines in the future.  
 **2020-02-07** Wrote compiler command parser npm package [cocopa](https://www.npmjs.com/package/cocopa) and began writing a test framework for it. Added a global configuration switch which allows the IntelliSense configuration generation to be turned off.  
-**2020-02-08** Integrated `cocopa` into vscode-arduino. Added project configuration flag which can override the global flag in both ways (forced off, forced on). Made code tslint compliant. Began some documentation in [README.md](README.md)  
+**2020-02-08** Integrated `cocopa` into vscode-arduino. Added project configuration flag which can override the global flag in both ways (forced off, forced on). Made code tslint compliant. Began some documentation in [README.md](README.md). vscode-arduino now tries to generate an IntelliSense configuration even if compilation (verify) should fail. vscode-arduino now tries to generate a IntelliSense configuration even if Arduino's verify failed (if the main sketch compilation was invoked before anything failed)  
 
 |      | Tasks   |
 |-----:|:--------|
