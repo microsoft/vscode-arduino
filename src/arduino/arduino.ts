@@ -815,9 +815,8 @@ export class ArduinoApp {
         if (project !== "disable" && !globalDisable ||
             project === "enable") {
 
-            // setup the parser with its engines
-            const gccParserEngine = new ccp.ParserGcc(dc.sketch);
-            const compilerParser = new ccp.Runner([gccParserEngine]);
+            const parserEngines = this.makeCompilerParserEngines(dc);
+            const compilerParser = new ccp.Runner(parserEngines);
 
             // set up the function to be called after parsing
             const _conclude = () => {
@@ -838,6 +837,21 @@ export class ArduinoApp {
             conclude: undefined,
         }
     };
+
+    private makeCompilerParserEngines(dc: DeviceContext) {
+        const matchPattern = [
+            // trigger parser when compiling the main sketch
+            ` ${path.basename(dc.sketch)}.cpp.o`,
+        ];
+        const dontMatchPattern = [
+            // make sure Arduino's not testing libraries
+            /-o\s\/dev\/null/,
+        ];
+
+        // setup the parser with its engines
+        const gccParserEngine = new ccp.ParserGcc(matchPattern, dontMatchPattern);
+        return [gccParserEngine];
+    }
 
     private getProgrammerString(): string {
         const selectProgrammer = this.programmerManager.currentProgrammer;
