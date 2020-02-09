@@ -44,15 +44,17 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: JSON input |
 |                                       | :white_check_mark: JSON output |
 |                                       | :white_check_mark: Configuration merging |
+|                                       | :white_check_mark: Test with cpp sketches |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense. (Partially done - documented in the [General Tasks](#General-Tasks) section |
-|                                       | :white_check_mark: Auto-run verify after a) *setting a board* b) *changing the sketch*. We have to generate a valid `c_cpp_properties.json` to keep IntelliSense working in such situations. Identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? -> Good moment would be after the workbench initialization -> message in arduino channel |
+|                                       | :white_check_mark: Auto-run verify after a) *setting a board* b) *changing the sketch* c) *workbench initialized and no `c_cpp_properties.json` has been found*. We have to generate a valid `c_cpp_properties.json` to keep IntelliSense working in such situations. Identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? -> Good moment would be after the workbench initialization -> message in arduino channel |
 |                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) (partially done) |
 |                                       | :heavy_check_mark: Try to auto-generate even if verify (i.e. compilation) fails |
 |                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
-`*` not committed to branch yet
+`*` not committed to branch yet  
+`>` most of the actual parsing and configuration generation is part of [cocopa](https://github.com/elektronikworkshop/cocopa/) ([here](https://www.npmjs.com/package/cocopa)'s the npm package)
 
 ## Motivation
 I write a lot of code for Arduino, especially libraries. The Arduino IDE is not suited for more complex projects and I tried several alternatives:
@@ -93,6 +95,25 @@ I will list every supporter here, thanks!
  * Logging for IntelliSense https://code.visualstudio.com/docs/cpp/enable-logging-cpp
 ## Future Work
 * Proper interactive serial terminal (this is the second major show stopper in my opinion)
+  * Command history option
+  * From https://github.com/microsoft/vscode-arduino/issues/463#issuecomment-583846263 and following:
+    * allow input on the serial monitor in a convenient way - ie just type and hit return, just like the Arduino IDE
+    * have the serial monitor window NOT keep turning off autoscroll (there is a separate ticket for this)
+    * have the option of the serial monitor and/or compile window auto clear each time the sketch is compiled
+    * Plus there is the annoying default where the compile runs in verbose mode and we have to manually edit config files to turn off the trace output
+    * Plus plus... Is there a way to automatically select the right serial port?
+    * Oh and one more. I want the serial output and perhaps compile windows to be undocked or at least I want them to sit to the right of my code window but they seem rigidly stuck at the bottom of the screen.
+    * And I would probably prioritize ease of use over better editing/intelligence.
+  * Being able to set baud rate within monitor
+  * Possible implementation hooks
+    * run node program in native terminal and connect it to extension
+      * https://github.com/serialport/node-serialport
+        * [General](https://serialport.io/docs/guide-about)
+        * [CLI](https://serialport.io/docs/guide-cli)
+        * [API](https://serialport.io/docs/guide-usage)
+    * write a [debugger extension](https://code.visualstudio.com/api/extension-guides/debugger-extension) with a [mock](https://github.com/Microsoft/vscode-mock-debug) which communicates with the serial
+
+Plus plus... Is there a way to automatically select the right serial port?
 * Lots of redundant code
   * e.g. "upload is a superset of "verify"
   * general lack of modularity - the above is the result
