@@ -802,7 +802,7 @@ Please make sure the folder is not occupied by other procedures .`);
                                                                     ccp.CCppPropertiesCppStandard.Cpp11);
                 const prop = new ccp.CCppProperties();
                 prop.read(pPath);
-                prop.merge(content);
+                prop.merge(content, ccp.CCppPropertiesMergeMode.ReplaceSameNames);
                 if (prop.write(pPath)) {
                     arduinoChannel.info("IntelliSense configuration updated.");
                 } else {
