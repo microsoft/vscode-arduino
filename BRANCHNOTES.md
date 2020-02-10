@@ -97,11 +97,11 @@ I will list every supporter here, thanks!
 * Proper interactive serial terminal (this is the second major show stopper in my opinion)
   * Command history option
   * From https://github.com/microsoft/vscode-arduino/issues/463#issuecomment-583846263 and following:
-    * allow input on the serial monitor in a convenient way - ie just type and hit return, just like the Arduino IDE
-    * have the serial monitor window NOT keep turning off autoscroll (there is a separate ticket for this)
-    * have the option of the serial monitor and/or compile window auto clear each time the sketch is compiled
-    * Plus there is the annoying default where the compile runs in verbose mode and we have to manually edit config files to turn off the trace output
-    * Plus plus... Is there a way to automatically select the right serial port?
+    * Allow input on the serial monitor in a convenient way - ie just type and hit return, just like the Arduino IDE
+    * Have the serial monitor window NOT keep turning off autoscroll (there is a separate ticket for this)
+    * Have the option of the serial monitor and/or compile window auto clear each time the sketch is compiled
+    * There is the annoying default where the compile runs in verbose mode and we have to manually edit config files to turn off the trace output
+    * Is there a way to automatically select the right serial port?
     * Oh and one more. I want the serial output and perhaps compile windows to be undocked or at least I want them to sit to the right of my code window but they seem rigidly stuck at the bottom of the screen.
     * And I would probably prioritize ease of use over better editing/intelligence.
   * Being able to set baud rate within monitor
@@ -112,8 +112,6 @@ I will list every supporter here, thanks!
         * [CLI](https://serialport.io/docs/guide-cli)
         * [API](https://serialport.io/docs/guide-usage)
     * write a [debugger extension](https://code.visualstudio.com/api/extension-guides/debugger-extension) with a [mock](https://github.com/Microsoft/vscode-mock-debug) which communicates with the serial
-
-Plus plus... Is there a way to automatically select the right serial port?
 * Lots of redundant code
   * e.g. "upload is a superset of "verify"
   * general lack of modularity - the above is the result
