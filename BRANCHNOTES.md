@@ -49,6 +49,7 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: Document features in [README.md](README.md) (partially done) |
 |                                       | :heavy_check_mark: Try to auto-generate even if verify (i.e. compilation) fails |
 |                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
+|                                       | :white_check_mark: Parser only works when arduino is set to `verbose`, since this is the only way we get the compiler invocation command. This has to be fixed. |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet  
@@ -79,6 +80,7 @@ I will list every supporter here, thanks!
 2020-02-07 Elektronik Workshop: 48 :beers: (12h coding)  
 2020-02-08 Elektronik Workshop: 52 :beers: (13h coding)  
 2020-02-09 Elektronik Workshop: 40 :beers: (10h coding)  
+2020-02-10 Elektronik Workshop: 32 :beers: (8h coding)  
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -88,6 +90,7 @@ I will list every supporter here, thanks!
 * [Interactive regex debugger](https://regex101.com/)
 * [Git branch management](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/)
 * [Collapsible Markdown](https://gist.githubusercontent.com/joyrexus/16041f2426450e73f5df9391f7f7ae5f/raw/f774f242feff6bae4a5be7d6c71aa5df2e3fcb0e/README.md)
+* [Arduino CLI manpage](https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc)
 
 ## Issues Concerning this Project
  * https://github.com/Microsoft/vscode-cpptools/issues/1750
