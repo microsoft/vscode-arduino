@@ -163,6 +163,7 @@ git status
 # install module dependencies
 npm install
 # install gulp builder globally to make it available to the path (requires relaunching your shell)
+# there's another option below, see ./launchcode.sh
 npm install -g gulp
 # to make sure that gulp is actually working type
 gulp --tasks
@@ -172,7 +173,18 @@ code .
 ```
 Making sure that gulp  is on your `$PATH` is essential. As long this isn't the case the following steps must not be carried out.
 
-Then hit F5 to debug or select it from the *Debug* menu. vscode will then complain that there's *No task defined* and you let it generate the configuration for you by clicking the button *Configure Task*. After configuring the tasks debug (`F5`) or build (`Ctrl + Shift + B`) should work.
+Another option to launch code with gulp on your path is (within bash or similar)
+```bash
+# create launch script
+echo "PATH=./node_modules/.bin:$PATH code ." > launchcode
+# make it executable
+chmod +x launchcode
+# now you can launch vscode like this
+./launchcode
+```
+This way you don't have to install gulp globally anymore (no `npm install -g gulp`). The path to the vscode dependency module binary is set as temporary environment variable when launching vscode.
+
+When everything's fine and vscode running, hit F5 to debug or select it from the *Debug* menu. vscode will then complain that there's *No task defined* and you let it generate the configuration for you by clicking the button *Configure Task*. After configuring the tasks debug (`F5`) or build (`Ctrl + Shift + B`) should work.
 
 As soon as you've got it up and running (`F5` spawns a new window), just navigate to your Arduino project. Configure in the vscode-arduino global settings the build output to `verbose` and run verify (`Ctrl + Alt + R`) as you know it. This will then generate a fresh `c_cpp_properties.json`. As long as I haven't removed the generator from the current maintainers you'll have to regenerate it as soon as you see those double asterisk-paths like `whatever/path/**` - if I get to it today, I'll give it a try and will remove/disable it for testing. You can then pull my changes in by running
 ```bash
