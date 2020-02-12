@@ -122,6 +122,63 @@ I will list every supporter here, thanks!
 * Possibility to jump to compilation errors from compiler output and highlight compiler errors
 ----
 
+## How to beta test cutting edge code from the repo
+
+*I wrote the follwing for @iFreilicht, if anyone has some additional findings please let me know to keep this documentation up to date*
+
+that's the reason I embarked on this project. Great if you'd like to help out - this comes in really handy. Getting the stuff rock solid is one of my central objectives and testing is one cornerstones here.
+
+Currently my work is at the following state:
+* Parsing works
+* Enable/disable via global or project flags
+* You can have personal configurations which aren't overwritten
+
+But I'm not fully there yet. Things which are yet to be done are:
+
+* Move the parser/configuration-generator out of the "verify" code, since it requires the build to be run with `--verbose` flag enabled which most probably few like (except for me :) I always switch on all warnings and set it to verbose).
+  This is something I can implement pretty fast
+* I have not removed the original "IntelliSense configurator" which ruins the `c_cpp_properties.json` every now and then but that's one of my next tasks as well. And you can simply delete the file as you can re-generate the perfect version with my analyzer/generator by simply verifying your sketch 
+* My development system runs on Ubuntu-GNU/linux and I haven't done any work for Windows yet but that's one of the next steps. The chances that it works on OSX "out of the box" are pretty good
+
+To run the development version clone my [repository](https://github.com/elektronikworkshop/vscode-arduino) and checkout the `intellisense-autoconfig` branch
+
+The following steps requires you to have `git`, `vscode`, `npm` and `nodejs` at recent versions. On my Ubuntu system I don't use the versions supplied by my package manager (`apt`) as they are usually pretty outdated - I usually install `nodejs` and `npm` from their respective/official websites. If you're on Windows you'll have to be a bit more patient since I haven't set up a virtual machine yet for testing and Windows is definitely not my domain. But I'll document the setup process as soon as I'll get to it.
+
+```bash
+git clone https://github.com/elektronikworkshop/vscode-arduino
+cd vscode-arduino
+# switch to the feature branch (not necessary probably because this branch is set to default)
+git checkout intellisense-autoconfig
+# check if you're on the right branch
+git status
+# install module dependencies
+npm install
+# install gulp builder globally to make it available to the path (requires relaunching your shell)
+npm install -g gulp
+# to make sure that gulp is actually working type
+gulp --tasks
+# if not -> configure your $PATH and open a new terminal to make sure it's added, then
+# open vscode
+code .
+```
+Making sure that gulp  is on your `$PATH` is essential. As long this isn't the case the following steps must not be carried out.
+
+Then hit F5 to debug or select it from the *Debug* menu. vscode will then complain that there's *No task defined* and you let it generate the configuration for you by clicking the button *Configure Task*. After configuring the tasks debug (`F5`) or build (`Ctrl + Shift + B`) should work.
+
+As soon as you've got it up and running (`F5` spawns a new window), just navigate to your Arduino project. Configure in the vscode-arduino global settings the build output to `verbose` and run verify (`Ctrl + Alt + R`) as you know it. This will then generate a fresh `c_cpp_properties.json`. As long as I haven't removed the generator from the current maintainers you'll have to regenerate it as soon as you see those double asterisk-paths like `whatever/path/**` - if I get to it today, I'll give it a try and will remove/disable it for testing. You can then pull my changes in by running
+```bash
+git pull
+```
+from within your terminal inside vscode (and your `vscode-arduino` folder).
+
+Different IntelliSense configurations can be selected in vscode in the lower right. The configuration my branch generates is called *Arduino* as depicted here:
+
+![74001156-cfce8280-496a-11ea-9b9d-7d30c83765c1](https://user-images.githubusercontent.com/21954933/74351237-2696ea80-4db7-11ea-9f7a-1bfc652ad5f5.png)
+
+Sometimes IntelliSense has problems within the extension host (which you're running when launching it with `F5`) and fails to resolve some header paths. This is a problem of vscode and not the extension. Then just restart. The extension host is a bit buggy if you ask me, so I hope I can provide some development snapshots in the future which will render all the steps above superfluous and let you run the latest development version with your regular vscode.
+
+----
+
 ## Implementation
 **Note** Check this vscode feature:
 ```
