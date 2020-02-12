@@ -124,7 +124,16 @@ I will list every supporter here, thanks!
 
 ## How to beta test cutting edge code from the repo
 
+For development and testing of this fork/branch I've set up a dedicated chat room:  
+
+[![Gitter](https://badges.gitter.im/vscode-arduino-ew-fork/community.svg)](https://gitter.im/vscode-arduino-ew-fork/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)  
+
+**Note:** the topic is strictly development and testing of this feature enhancement branch. It's not a place where you can ask for help on your Arduino problems. There are dedicated forums for that and I'll delete any question of this type.
+
+
 *I wrote the follwing for @iFreilicht, if anyone has some additional findings please let me know to keep this documentation up to date*
+
+ > I'd love to try this out and give feedback. It would be a huge quality of life improvement if this was to work. Could you point me to a resource that helps me install your version of the extension?
 
 that's the reason I embarked on this project. Great if you'd like to help out - this comes in really handy. Getting the stuff rock solid is one of my central objectives and testing is one cornerstones here.
 
