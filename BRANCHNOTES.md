@@ -81,6 +81,9 @@ I will list every supporter here, thanks!
 2020-02-08 Elektronik Workshop: 52 :beers: (13h coding)  
 2020-02-09 Elektronik Workshop: 40 :beers: (10h coding)  
 2020-02-10 Elektronik Workshop: 32 :beers: (8h coding)  
+2020-02-11 Elektronik Workshop: 16 :beers: (4h coding)  
+2020-02-12 Elektronik Workshop: 32 :beers: (8h coding)  
+2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -91,6 +94,8 @@ I will list every supporter here, thanks!
 * [Git branch management](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/)
 * [Collapsible Markdown](https://gist.githubusercontent.com/joyrexus/16041f2426450e73f5df9391f7f7ae5f/raw/f774f242feff6bae4a5be7d6c71aa5df2e3fcb0e/README.md)
 * [Arduino CLI manpage](https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc)
+* [Install extensions from file](https://vscode-docs.readthedocs.io/en/stable/extensions/install-extension/)
+* [Publish extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
 
 ## Issues Concerning this Project
  * https://github.com/Microsoft/vscode-cpptools/issues/1750
