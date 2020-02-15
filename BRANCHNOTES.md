@@ -81,6 +81,9 @@ I will list every supporter here, thanks!
 2020-02-08 Elektronik Workshop: 52 :beers: (13h coding)
 2020-02-09 Elektronik Workshop: 40 :beers: (10h coding)
 2020-02-10 Elektronik Workshop: 32 :beers: (8h coding)
+2020-02-11 Elektronik Workshop: 16 :beers: (4h coding)
+2020-02-12 Elektronik Workshop: 32 :beers: (8h coding)
+2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -91,6 +94,8 @@ I will list every supporter here, thanks!
 * [Git branch management](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/)
 * [Collapsible Markdown](https://gist.githubusercontent.com/joyrexus/16041f2426450e73f5df9391f7f7ae5f/raw/f774f242feff6bae4a5be7d6c71aa5df2e3fcb0e/README.md)
 * [Arduino CLI manpage](https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc)
+* [Install extensions from file](https://vscode-docs.readthedocs.io/en/stable/extensions/install-extension/)
+* [Publish extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
 
 ## Issues Concerning this Project
  * https://github.com/Microsoft/vscode-cpptools/issues/1750
@@ -124,9 +129,9 @@ I will list every supporter here, thanks!
 
 ## How to beta test cutting edge code from the repo
 
-For development and testing of this fork/branch I've set up a dedicated chat room:  
+For development and testing of this fork/branch I've set up a dedicated chat room:
 
-[![Gitter](https://badges.gitter.im/vscode-arduino-ew-fork/community.svg)](https://gitter.im/vscode-arduino-ew-fork/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)  
+[![Gitter](https://badges.gitter.im/vscode-arduino-ew-fork/community.svg)](https://gitter.im/vscode-arduino-ew-fork/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 **Note:** the topic is strictly development and testing of this feature enhancement branch. It's not a place where you can ask for help on your Arduino problems. There are dedicated forums for that and I'll delete any question of this type.
 
@@ -146,7 +151,7 @@ But I'm not fully there yet. Things which are yet to be done are:
 
 * Move the parser/configuration-generator out of the "verify" code, since it requires the build to be run with `--verbose` flag enabled which most probably few like (except for me :) I always switch on all warnings and set it to verbose).
   This is something I can implement pretty fast
-* I have not removed the original "IntelliSense configurator" which ruins the `c_cpp_properties.json` every now and then but that's one of my next tasks as well. And you can simply delete the file as you can re-generate the perfect version with my analyzer/generator by simply verifying your sketch 
+* I have not removed the original "IntelliSense configurator" which ruins the `c_cpp_properties.json` every now and then but that's one of my next tasks as well. And you can simply delete the file as you can re-generate the perfect version with my analyzer/generator by simply verifying your sketch
 * My development system runs on Ubuntu-GNU/linux and I haven't done any work for Windows yet but that's one of the next steps. The chances that it works on OSX "out of the box" are pretty good
 
 To run the development version clone my [repository](https://github.com/elektronikworkshop/vscode-arduino) and checkout the `intellisense-autoconfig` branch
