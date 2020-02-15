@@ -14,15 +14,28 @@ The generator takes the parser's output and transforms it into a valid `c_cpp_pr
 Provide a configuration flag which allows the user to turn this feature off - this is useful for the cases in which this magic fails or the user has a very specific setup. Although this branch tries to eliminate most of the latter cases.
 
 ### Global Tasks in vscode-arduino
+See table below.
+
+### Branch Log
+**2020 02 05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)
+**2020 02 06** Got it fully working (with built-in include directories) for AVR, ESP32, ESP8266. Rewrote the backend to facilitate writing of further parser engines in the future.
+**2020 02 07** Wrote compiler command parser npm package [cocopa](https://www.npmjs.com/package/cocopa) and began writing a test framework for it. Added a global configuration switch which allows the IntelliSense configuration generation to be turned off.
+**2020 02 08** Integrated `cocopa` into vscode-arduino. Added project configuration flag which can override the global flag in both ways (forced off, forced on). Made code tslint compliant. Began some documentation in [README.md](README.md). vscode-arduino now tries to generate an IntelliSense configuration even if compilation (verify) should fail. vscode-arduino now tries to generate a IntelliSense configuration even if Arduino's verify failed (if the main sketch compilation was invoked before anything failed)
+**2020 02 09** Moved vscode-arduino specific from cocopa over (to keep cocopa as generic as possible). More unit testing within cocopa. Some research regarding future serial monitor implementation. Implemented c_cpp_properties merging -> compiler analysis results are merged into existing configuration and will preserve configurations of different name than the vscode-studio default configuration name (currently "Arduino"). This opens up the possibility for users to write their own configurations without having to disable the autogeneration. Implemented "write on change" - `c_cpp_properties.json` will only be written if a new configuration has been detected. Now loads of tests have to be written for cocopa.
+**2020 02 10-12** Worked primarily on cocopa and test cases, fixed some npm and build errors on vscode-arduino within my setup.
+**2020 02 15** Merged `upload` `uploadUsingProgrammer` and `verify` into a single function since they shared mostly the same code
+* Better readability
+* Better maintainability
+* Less code redundancy -> less code -> less bugs
+* Keeps the calls to the Arduino build CLI at a single location
+
+During merging I found some bugs within those functions - mainly due to the above problem. The most notable were:
+* The serial monitor state wasn't restored when something went wrong
+* In one of the `upload` functions the original authors forgot to invoke the "pre build command"
+* Error message formatting was fixed within `verify` only
+* No consistent return values within `verify` (when it bailed out early it returned `void`)
 
 ### Status
-**2020-02-05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)
-**2020-02-06** Got it fully working (with built-in include directories) for AVR, ESP32, ESP8266. Rewrote the backend to facilitate writing of further parser engines in the future.
-**2020-02-07** Wrote compiler command parser npm package [cocopa](https://www.npmjs.com/package/cocopa) and began writing a test framework for it. Added a global configuration switch which allows the IntelliSense configuration generation to be turned off.
-**2020-02-08** Integrated `cocopa` into vscode-arduino. Added project configuration flag which can override the global flag in both ways (forced off, forced on). Made code tslint compliant. Began some documentation in [README.md](README.md). vscode-arduino now tries to generate an IntelliSense configuration even if compilation (verify) should fail. vscode-arduino now tries to generate a IntelliSense configuration even if Arduino's verify failed (if the main sketch compilation was invoked before anything failed)
-**2020-02-09** Moved vscode-arduino specific from cocopa over (to keep cocopa as generic as possible). More unit testing within cocopa. Some research regarding future serial monitor implementation. Implemented c_cpp_properties merging -> compiler analysis results are merged into existing configuration and will preserve configurations of different name than the vscode-studio default configuration name (currently "Arduino"). This opens up the possibility for users to write their own configurations without having to disable the autogeneration. Implemented "write on change" - `c_cpp_properties.json` will only be written if a new configuration has been detected. Now loads of tests have to be written for cocopa.
-
-
 |      | Tasks   |
 |-----:|:--------|
 | **Build output parser**               | :heavy_check_mark: Basic parser working |
@@ -44,12 +57,13 @@ Provide a configuration flag which allows the user to turn this feature off - th
 |                                       | :white_check_mark: All unit tests in cocopa |
 |                                       | :white_check_mark: Test with cpp sketches |
 | **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense. (Partially done - documented in the [General Tasks](#General-Tasks) section |
-|                                       | :white_check_mark: Auto-run verify after a) *setting a board* b) *changing the sketch* c) *workbench initialized and no `c_cpp_properties.json` has been found*. We have to generate a valid `c_cpp_properties.json` to keep IntelliSense working in such situations. Identify other occasions where this applies (usually when adding new libraries), hint the user to run *verify*? -> Good moment would be after the workbench initialization -> message in arduino channel |
+|                                       | :white_check_mark: Auto-run verify after a) *setting a board* b) *changing the sketch* c) *workbench initialized and no `c_cpp_properties.json` has been found*. We have to generate a valid `c_cpp_properties.json` to keep IntelliSense working in such situations. Identify other occasions where this applies (usually when adding new libraries), hint the user to run *Arduino: Rebuild IntelliSense Configuration*? -> Good moment would be after the workbench initialization -> message in arduino channel |
 |                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) (partially done) |
 |                                       | :heavy_check_mark: Try to auto-generate even if verify (i.e. compilation) fails |
 |                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
-|                                       | :white_check_mark: Parser only works when arduino is set to `verbose`, since this is the only way we get the compiler invocation command. This has to be fixed. |
+|                                       | :heavy_check_mark: Parser only works when arduino is set to `verbose`, since this is the only way we get the compiler invocation command - this has to be fixed (done, see next item) |
+|                                       | :heavy_check_mark: Implement a *Rebuild IntelliSense Configuration* command which runs verify verbosely internally and therefore allows us to find and parse the compiler command |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
@@ -84,6 +98,7 @@ I will list every supporter here, thanks!
 2020-02-11 Elektronik Workshop: 16 :beers: (4h coding)
 2020-02-12 Elektronik Workshop: 32 :beers: (8h coding)
 2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)
+2020-02-15 Elektronik Workshop: 28 :beers: (7h coding)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
