@@ -41,7 +41,6 @@
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
-    "onCommand:arduino.addLibPath",
     "onCommand:arduino.openSerialMonitor",
     "onCommand:arduino.sendMessageToSerialPort",
     "onCommand:arduino.closeSerialMonitor",

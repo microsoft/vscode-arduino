@@ -38,8 +38,10 @@ suite("Arduino: Commands Tests", () => {
         }
     });
 
+    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
     // Arduino: Library Manager: Add library to include path.
     // tslint:disable-next-line: only-arrow-functions
+    /*
     test("should be able to run command: arduino.addLibPath", function(done) {
         this.timeout(60 * 1000);
         try {
@@ -52,6 +54,7 @@ suite("Arduino: Commands Tests", () => {
             done(new Error(error));
         }
     });
+    */
 
     // Arduino: Boards Manager : Manage packages for boards
     // tslint:disable-next-line: only-arrow-functions

@@ -123,7 +123,8 @@ export class BoardManager {
         this._currentBoard = targetBoard;
         dc.configuration = this._currentBoard.customConfig;
         this._boardConfigStatusBar.text = targetBoard.name;
-        this._arduinoApp.addLibPath(null);
+        // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
+        //this._arduinoApp.addLibPath(null);
 
         this._onBoardTypeChanged.fire();
     }
