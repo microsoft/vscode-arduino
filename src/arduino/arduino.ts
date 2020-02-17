@@ -317,6 +317,8 @@ export class ArduinoApp {
         return success;
     }
 
+    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
+    /*
     public tryToUpdateIncludePaths() {
         const configFilePath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
         if (!fs.existsSync(configFilePath)) {
@@ -358,6 +360,7 @@ export class ArduinoApp {
                 configuration.defines.push(define);
             }
         }
+    */
         // remove all unexisting paths
         // concern mistake removal, comment temporary
         // for (let pathIndex = 0; pathIndex < configuration.includePath.length; pathIndex++) {
@@ -385,12 +388,15 @@ export class ArduinoApp {
         //         pathIndex--;
         //     }
         // }
-
+    /*
         if (cppConfigFileUpdated) {
             fs.writeFileSync(configFilePath, JSON.stringify(cppConfig, null, 4));
         }
     }
+    */
 
+    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
+    /*
     // Add selected library path to the intellisense search path.
     public addLibPath(libraryPath: string) {
         let libPaths;
@@ -466,7 +472,7 @@ export class ArduinoApp {
 
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
     }
-
+    */
     // Include the *.h header files from selected library to the arduino sketch.
     public async includeLibrary(libraryPath: string) {
         if (!ArduinoWorkspace.rootPath) {
@@ -610,6 +616,8 @@ export class ArduinoApp {
         arduinoChannel.end(`Removed library - ${libName}${os.EOL}`);
     }
 
+    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
+    /*
     public getDefaultPackageLibPaths(): string[] {
         const result = [];
         const boardDescriptor = this._boardManager.currentBoard;
@@ -644,8 +652,10 @@ export class ArduinoApp {
             result.push(path.normalize(path.join(toolPath, "**")));
         }
         return result;
-    }
+    }*/
 
+    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
+    /*
     public getDefaultForcedIncludeFiles(): string[] {
         const result = [];
         const boardDescriptor = this._boardManager.currentBoard;
@@ -665,6 +675,7 @@ export class ArduinoApp {
         result.push("USBCON");
         return result;
     }
+    */
 
     public openExample(example) {
         function tmpName(name) {
@@ -705,6 +716,7 @@ export class ArduinoApp {
                 const dc = DeviceContext.getInstance();
                 const arduinoJson = {
                     sketch: sketchFile,
+                    // TODO: COM1 is Windows specific - what about OSX and Linux users?
                     port: dc.port || "COM1",
                     board: dc.board,
                     configuration: dc.configuration,
@@ -713,6 +725,8 @@ export class ArduinoApp {
                 util.mkdirRecursivelySync(path.dirname(arduinoConfigFilePath));
                 fs.writeFileSync(arduinoConfigFilePath, JSON.stringify(arduinoJson, null, 4));
 
+                // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
+                /*
                 // Generate cpptools intellisense config
                 const cppConfigFilePath = path.join(destExample, constants.CPP_CONFIG_FILE);
 
@@ -749,6 +763,7 @@ export class ArduinoApp {
                 };
                 util.mkdirRecursivelySync(path.dirname(cppConfigFilePath));
                 fs.writeFileSync(cppConfigFilePath, JSON.stringify(cppConfig, null, 4));
+                */
             }
 
             // Step 3: Open the arduino project at a new vscode window.

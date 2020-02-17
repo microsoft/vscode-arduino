@@ -35,6 +35,8 @@ During merging I found some bugs within those functions - mainly due to the abov
 * Error message formatting was fixed within `verify` only
 * No consistent return values within `verify` (when it bailed out early it returned `void`)
 
+**2020 02 17** Disabled and marked all previous implementations of IntelliSense support for later removal.
+
 ### Status
 |      | Tasks   |
 |-----:|:--------|
@@ -99,6 +101,7 @@ I will list every supporter here, thanks!
 2020-02-12 Elektronik Workshop: 32 :beers: (8h coding)
 2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)
 2020-02-15 Elektronik Workshop: 28 :beers: (7h coding)
+2020-02-16 Elektronik Workshop: x :beers: (xh coding)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -116,6 +119,7 @@ I will list every supporter here, thanks!
  * https://github.com/Microsoft/vscode-cpptools/issues/1750
  * Problems with IntelliSense itself https://github.com/microsoft/vscode-cpptools/issues/1034
  * Logging for IntelliSense https://code.visualstudio.com/docs/cpp/enable-logging-cpp
+
 ## Future Work
 * Proper interactive serial terminal (this is the second major show stopper in my opinion)
   * Command history option
@@ -140,6 +144,22 @@ I will list every supporter here, thanks!
   * general lack of modularity - the above is the result
 * It seems that this extension is pretty chaotic. Most probably some refactoring is necessary.
 * Possibility to jump to compilation errors from compiler output and highlight compiler errors
+
+## Non-categorized Notes
+### Integrate upstream changes into fork
+```bash
+git remote add upstream https://github.com/microsoft/vscode-arduino.git
+git remote -v
+git fetch upstream
+# make sure your working directory is clean, then
+git checkout master
+git merge upstream/master
+git push origin master
+# to pull the changes into you feature branch:
+git checkout intellisense-autoconfig
+git merge master
+git push origin intellisense-autoconfig
+```
 ----
 
 ## How to beta test cutting edge code from the repo
