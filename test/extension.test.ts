@@ -45,7 +45,9 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.showExamples",
                     "arduino.changeBoardType",
                     "arduino.initialize",
-                    "arduino.addLibPath",
+                    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
+                    //         note: it has been removed from package.json commands already
+                    // "arduino.addLibPath",
                     "arduino.selectSerialPort",
                     "arduino.openSerialMonitor",
                     "arduino.changeBaudRate",

@@ -13,6 +13,7 @@ import { arduinoChannel } from "./outputChannel";
 
 const encodingMapping: object = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../misc", "codepageMapping.json"), "utf8"));
 
+// IS-REMOVE: to be removed completely when IntelliSense implementation is merged
 /**
  * This function will return the VSCode C/C++ extesnion compatible platform literals.
  * @function getCppConfigPlatform
