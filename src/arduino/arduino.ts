@@ -9,21 +9,28 @@ import * as vscode from "vscode";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
-import * as Logger from "../logger/logger";
+import * as logger from "../logger/logger";
 
 import { DeviceContext } from "../deviceContext";
 import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
+import { ICoCoPaContext, isCompilerParserEnabled, makeCompilerParserContext } from "./intellisense";
 import { LibraryManager } from "./libraryManager";
+import { ProgrammerManager } from "./programmerManager";
 import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
-import { ProgrammerManager } from "./programmerManager";
-import { makeCompilerParserContext } from "./intellisense";
+
+export enum BuildMode {
+    Verify = "Verifying",
+    Analyze = "Analyzing",
+    Upload = "Uploading",
+    UploadProgrammer = "Uploading (programmer)",
+};
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -94,225 +101,167 @@ export class ArduinoApp {
         }
     }
 
-    public async upload() {
+    /**
+     * Runs the arduino builder to build/compile and - if necessary - upload
+     * the current sketch.
+     * @param mode Build mode. BuildMode.Upload: Compile and upload,
+     * BuildMode.UploadProgrammer: Compile and upload using the user selectable
+     * programmer, BuildMode.Analyze: Compile, analyze the output and generate
+     * IntelliSense configuration from it, BuildMode.Verify: Just compile.
+     * @param buildDir Override the build directory set by the project settings
+     * with the given directory.
+     */
+    public async build(mode: BuildMode, buildDir?: string): Promise<boolean> {
+
         const dc = DeviceContext.getInstance();
+        const args: string[] = [];
+        let restoreSerialMonitor: boolean = false;
+        let cocopa: ICoCoPaContext;
+
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
-            return;
+            return false;
         }
+        args.push("--board", boardDescriptor);
 
         if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Cannot find the sketch file.");
-            return;
+            return false;
         }
 
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
             await this.getMainSketch(dc);
         }
 
-        if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+        const selectSerial = async () => {
             const choice = await vscode.window.showInformationMessage(
                 "Serial port is not specified. Do you want to select a serial port for uploading?",
                 "Yes", "No");
             if (choice === "Yes") {
                 vscode.commands.executeCommand("arduino.selectSerialPort");
             }
-            return;
         }
 
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
-
-        const serialMonitor = SerialMonitor.getInstance();
-
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-        UsbDetector.getInstance().pauseListening();
-        await vscode.workspace.saveAll(false);
-
-        if (!this.runPreBuildCommand(dc)) {
-            return;
-        }
-
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor];
-        if (dc.port) {
-            args.push("--port", dc.port);
-        }
-        args.push(appPath);
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        if (dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
-            const dirPath = path.dirname(outputPath);
-            if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
-                return;
+        if (mode === BuildMode.Upload) {
+            if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+                await selectSerial();
+                return false;
             }
+            args.push("--upload");
+            if (dc.port) {
+                args.push("--port", dc.port);
+            }
+        } else if (mode === BuildMode.UploadProgrammer) {
+            const programmer = this.getProgrammerString();
+            if (!programmer) {
+                return false;
+            }
+            if (!dc.port) {
+                await selectSerial();
+                return false;
+            }
+            args.push("--upload",
+                      "--port", dc.port,
+                      "--useprogrammer",
+                      "--pref", "programmer=" + programmer);
 
-            args.push("--pref", `build.path=${outputPath}`);
-            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+        } else if (mode === BuildMode.Analyze) {
+            if (!isCompilerParserEnabled()) {
+                return false;
+            }
+            cocopa = makeCompilerParserContext(dc);
+            args.push("--verify", "--verbose");
         } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            arduinoChannel.warning(msg);
-        }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
-            UsbDetector.getInstance().resumeListening();
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
-    }
-
-    public async uploadUsingProgrammer() {
-        const dc = DeviceContext.getInstance();
-        const boardDescriptor = this.getBoardBuildString();
-        if (!boardDescriptor) {
-            return;
+            args.push("--verify");
         }
 
-        const selectProgrammer = this.getProgrammerString();
-        if (!selectProgrammer) {
-            return;
-        }
-
-        if (!ArduinoWorkspace.rootPath) {
-            vscode.window.showWarningMessage("Cannot find the sketch file.");
-            return;
-        }
-
-        if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
-            await this.getMainSketch(dc);
-        }
-        if (!dc.port) {
-            const choice = await vscode.window.showInformationMessage(
-                "Serial port is not specified. Do you want to select a serial port for uploading?",
-                "Yes", "No");
-            if (choice === "Yes") {
-                vscode.commands.executeCommand("arduino.selectSerialPort");
-            }
-            return;
-        }
-
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
-
-        const serialMonitor = SerialMonitor.getInstance();
-
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-        UsbDetector.getInstance().pauseListening();
-        await vscode.workspace.saveAll(false);
-
-        if (!this.runPreBuildCommand(dc)) {
-            return;
-        }
-
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
-            "--pref", "programmer=" + selectProgrammer, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
+        const verbose = VscodeSettings.getInstance().logLevel === "verbose";
+        if (mode !== BuildMode.Analyze && verbose) {
             args.push("--verbose");
-        }
-        if (dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
-            const dirPath = path.dirname(outputPath);
-            if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
-                return;
-            }
-
-            args.push("--pref", `build.path=${outputPath}`);
-            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
-        } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            arduinoChannel.warning(msg);
-        }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
-            UsbDetector.getInstance().resumeListening();
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
-    }
-
-    public async verify(output: string = "") {
-        const dc = DeviceContext.getInstance();
-        const boardDescriptor = this.getBoardBuildString();
-        if (!boardDescriptor) {
-            return;
-        }
-
-        if (!ArduinoWorkspace.rootPath) {
-            vscode.window.showWarningMessage("Cannot find the sketch file.");
-            return;
-        }
-
-        if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
-            await this.getMainSketch(dc);
         }
 
         await vscode.workspace.saveAll(false);
 
-        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+        arduinoChannel.show();
+        arduinoChannel.start(`${mode} sketch '${dc.sketch}'`);
 
-        if (!this.runPreBuildCommand(dc)) {
-            return;
+        if (!await this.runPreBuildCommand(dc)) {
+            return false;
         }
 
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--verify", "--board", boardDescriptor, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        if (output || dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
+        if (buildDir || dc.output) {
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
+                logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return;
             }
 
             args.push("--pref", `build.path=${outputPath}`);
-            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+            arduinoChannel.info(`Please see the build logs in output path: ${outputPath}`);
         } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
+            const msg = "Output path is not specified. Unable to reuse previously compiled files. Build will be slower. See README.";
             arduinoChannel.warning(msg);
         }
 
-        arduinoChannel.show();
+        // stop serial monitor when everything is prepared and good
+        // what makes restoring of its previous state easier
+        if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
+            restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
+            UsbDetector.getInstance().pauseListening();
+        }
 
-        let verifyResult: boolean;
-        const compilerParserContext = makeCompilerParserContext(dc);
+        // Push sketch as last argument
+        args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
-        try {
-            await util.spawn(this._settings.commandPath,
-                             arduinoChannel.channel,
-                             args,
-                             {},
-                             compilerParserContext.callback);
-            arduinoChannel.end(`Finished verifying sketch - ${dc.sketch}${os.EOL}`);
-            verifyResult = true;
-        } catch (reason) {
+        let success = false;
+
+        const cleanup = async () => {
+            if (cocopa) {
+                cocopa.conclude();
+            }
+            if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
+                UsbDetector.getInstance().resumeListening();
+                if (restoreSerialMonitor) {
+                    await SerialMonitor.getInstance().openSerialMonitor();
+                }
+            }
+        }
+
+        // TODO: Get rid of spawn's channel parameter and just support
+        // stdout and stderr callbacks
+        const stdoutCallback = (line: string) => {
+            if (cocopa) {
+                cocopa.callback(line);
+                if (verbose) {
+                    arduinoChannel.channel.append(line);
+                }
+            } else {
+                arduinoChannel.channel.append(line);
+            }
+        }
+
+        await util.spawn(
+            this._settings.commandPath,
+            arduinoChannel.channel,
+            args,
+            undefined,
+            stdoutCallback,
+        ).then(async () => {
+            await cleanup();
+            arduinoChannel.end(`${mode} sketch '${dc.sketch}${os.EOL}`);
+            success = true;
+        }, async (reason) => {
+            await cleanup();
             const msg = reason.code ?
-                `Exit with code=${reason.code}${os.EOL}` :
+                `Exit with code=${reason.code}` :
                 reason.message ?
                     reason.message :
                     JSON.stringify(reason);
-            arduinoChannel.error(msg);
-            verifyResult = false;
-        }
+            arduinoChannel.error(`${mode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
+        });
 
-        if (compilerParserContext.conclude) {
-            compilerParserContext.conclude();
-        }
-
-        return verifyResult;
+        return success;
     }
 
     public tryToUpdateIncludePaths() {
@@ -400,7 +349,7 @@ export class ArduinoApp {
             deviceContext = util.tryParseJSON(fs.readFileSync(configFilePath, "utf8"));
         }
         if (!deviceContext) {
-            Logger.notifyAndThrowUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
+            logger.notifyAndThrowUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
         }
 
         deviceContext.configurations = deviceContext.configurations || [];
@@ -766,7 +715,7 @@ Please make sure the folder is not occupied by other procedures .`);
     private getProgrammerString(): string {
         const selectProgrammer = this.programmerManager.currentProgrammer;
         if (!selectProgrammer) {
-            Logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
+            logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
             return;
         }
         return selectProgrammer;
@@ -775,7 +724,7 @@ Please make sure the folder is not occupied by other procedures .`);
     private getBoardBuildString(): string {
         const selectedBoard = this.boardManager.currentBoard;
         if (!selectedBoard) {
-            Logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
+            logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
         }
         return selectedBoard.getBuildConfig();

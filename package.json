@@ -37,6 +37,7 @@
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.uploadUsingProgrammer",
+    "onCommand:arduino.rebuildIntelliSenseConfig",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
@@ -96,6 +97,10 @@
       {
         "command": "arduino.uploadUsingProgrammer",
         "title": "Arduino: Upload Using Programmer"
+      },
+      {
+        "command": "arduino.rebuildIntelliSenseConfig",
+        "title": "Arduino: Rebuild IntelliSense Configuration"
       },
       {
         "command": "arduino.selectProgrammer",
@@ -436,6 +441,11 @@
         "command": "arduino.upload",
         "key": "ctrl+alt+u",
         "mac": "cmd+alt+u"
+      },
+      {
+        "command": "arduino.rebuildIntelliSenseConfig",
+        "key": "ctrl+alt+i",
+        "mac": "cmd+alt+i"
       }
     ],
     "configuration": {

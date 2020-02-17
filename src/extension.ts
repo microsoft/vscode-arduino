@@ -22,6 +22,7 @@ import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
 import { ArduinoWorkspace } from "./common/workspace";
 const arduinoDebugConfigurationProviderModule = impor("./debug/configurationProvider") as typeof import ("./debug/configurationProvider");
+import { BuildMode } from "./arduino/arduino";
 import { DeviceContext } from "./deviceContext";
 const completionProviderModule = impor("./langService/completionProvider") as typeof import ("./langService/completionProvider");
 import * as Logger from "./logger/logger";
@@ -43,8 +44,8 @@ export async function activate(context: vscode.ExtensionContext) {
         const workingFile = path.normalize(openEditor.document.fileName);
         const workspaceFolder = (vscode.workspace && ArduinoWorkspace.rootPath) || "";
         if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
-            vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
-                "the arduino extension might not work appropriately.");
+            vscode.window.showWarningMessage(`The open file "${workingFile}" is not inside the workspace folder, ` +
+                "the arduino extension might not work properly.");
         }
     }
     const vscodeSettings = VscodeSettings.getInstance();
@@ -121,7 +122,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Verifying...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.verify();
+                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify);
                 });
             } catch (ex) {
             }
@@ -142,7 +143,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Uploading...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.upload();
+                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
                 });
             } catch (ex) {
             }
@@ -176,10 +177,28 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
         if (!status.compile) {
             status.compile = "upload";
+            // TODO: no progress indicator
+            //       and: exceptions should be handled within build
+            //            function
             try {
-                await arduinoContextModule.default.arduinoApp.uploadUsingProgrammer();
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer);
             } catch (ex) {
             }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.rebuildIntelliSenseConfig", async () => {
+        if (!status.compile) {
+            status.compile = "intellisenserebuild";
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Rebuilding IS Configuration...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Analyze);
+            });
             delete status.compile;
         }
     }, () => {

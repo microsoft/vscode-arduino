@@ -37,6 +37,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.verify",
                     "arduino.upload",
                     "arduino.uploadUsingProgrammer",
+                    "arduino.rebuildIntelliSenseConfig",
                     "arduino.selectProgrammer",
                     "arduino.showBoardManager",
                     "arduino.showLibraryManager",
