@@ -1,22 +1,54 @@
 # IntelliSense Autoconfiguration Branch
 ## Problem
-This branch more or less addresses [these](https://github.com/microsoft/vscode-arduino/issues?utf8=%E2%9C%93&q=intellisense+is%3Aopen) issues (about seven).
+This branch more or less addresses the following issues:
+| # | Issue | Title | Comment |
+|--:|:------|:------------|:--------|
+|  1| [#438](https://github.com/microsoft/vscode-arduino/issues/438) | **The Extension should automagically fill the c_cpp_properties.json, so intellisense works out of the box** | This is the issue to which I usually report news concerning the progress of this project |
+|  2| [#876](https://github.com/microsoft/vscode-arduino/issues/876) | **Missing #define ARDUINO 10808 logic?** | Marked as bug but it's just the same problem again |
+|  3| [#829](https://github.com/microsoft/vscode-arduino/issues/829) | **`Arduino.h` and ESP8266 includes have squiggles** | Stale issue |
+|  4| [#969](https://github.com/microsoft/vscode-arduino/issues/969) | **INO Files defines undefined but can jump to definition**  |  |
+|  5| [#959](https://github.com/microsoft/vscode-arduino/issues/959) | **Update board type command does not update intellisense config automatically**  |  |
+|  6| [#892](https://github.com/microsoft/vscode-arduino/issues/892) | **Default IntelliSense config** |  |
+|  7| [#850](https://github.com/microsoft/vscode-arduino/issues/850) | **How to prevent modifications of c_cpp_properties.json by the extension?**  | Asks if the current implementation can be turned off, because it overwrites a user's config with non working IS config -- this is sad. |
+|  8| [#833](https://github.com/microsoft/vscode-arduino/issues/833) | **Allow C_Cpp.intelliSenseEngine to be set to "Default" instead of "Tag Parser" for better code completion/suggestions**  |  |
+|  9| [#808](https://github.com/microsoft/vscode-arduino/issues/808) | **Identifier "Serial" is undefined**  |  |
+| 10| [#474](https://github.com/microsoft/vscode-arduino/issues/474) | **Enrich device develop experience**  |  |
 
-It implements a parser which parses the output from Arduino's build process to generate a very precise `c_cpp_properties.json` which in turn hopefully renders any user interaction with this file obsolete
+<!-- | 11| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
+<!-- | 12| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
+<!-- | 13| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
+<!-- | 14| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
+
+-- the list is probably incomplete - I didn't search exhaustively and didn't consider closed issues as long as I didn't stumble upon one. New duplicates are popping up at a rate of about one per week.
+
+Further related issues
+* [vscode-arduino issue search for IntelliSense](https://github.com/microsoft/vscode-arduino/issues?utf8=%E2%9C%93&q=intellisense+is%3Aopen)
+* [Wrongly attributed to vscode instead of vscode-arduino](https://github.com/Microsoft/vscode-cpptools/issues/1750)
+* [Problems with IntelliSense itself](https://github.com/microsoft/vscode-cpptools/issues/1034)
+
+## Solution
+Implement and add a a parser which parses the output from Arduino's build process and generate a very precise `c_cpp_properties.json` which in turn hopefully renders any user interaction with this file obsolete.
+
+This mechanism should try it's best to detect situations in which the setup changes (board changed, sketch changed and so forth) and re-generate this configuration. For all other situations I'll provide a command to manually re-generate it.
 
 ## Branch Goals
 ### Build Output Parser
-The parser which parses the relevant includes, defines, compiler paths and flags from Arduino's build output
+The parser which identifies the main compilation command from Arduino's build output. It then parses the relevant includes, defines, compiler paths and flags from it.
+
 ### `c_cpp_properties.json` Generator
-The generator takes the parser's output and transforms it into a valid `c_cpp_properties.json` file.
+The generator takes the parser's output and transforms it into a valid `c_cpp_properties.json` file. It merges the generated configuration with the existing (e.g. user-) configurations and writes it back to the configuration file.
 
 ### Configuration Flags
-Provide a configuration flag which allows the user to turn this feature off - this is useful for the cases in which this magic fails or the user has a very specific setup. Although this branch tries to eliminate most of the latter cases.
+Provide a global configuration flag which allows the user to turn this feature off. A project- (sketch-) specific override will be provided which allows the user to turn it off or on - regardless of the global setting.
+This is useful for the rare cases for which this magic should fail or the user has a very exotic setup. This branch tries to eliminate most of the latter cases though. Especially it will always write to the `Arduino` configuration. If the user sets up a custom configuration she/he must simply name it differently, e.g. `John's Custom Config`, and the generator won't touch it.
 
 ### Global Tasks in vscode-arduino
-See table below.
+* Integrate it into vscode-arduino's build mechanics
+* Install event trigger generation/handling to run the analysis as soon as something changes
+* Remove the current implementation
+For more details see table below.
 
-### Branch Log
+## Branch Log
 **2020 02 05** Currently I'm able to generate error free IntelliSense setups for AVR and ESP32 using the preliminary implementation. For ESP32 I just had to add the intrinsic compiler paths manually. A solution has to be found for these ... which there is, see [here](https://stackoverflow.com/a/6666338)
 **2020 02 06** Got it fully working (with built-in include directories) for AVR, ESP32, ESP8266. Rewrote the backend to facilitate writing of further parser engines in the future.
 **2020 02 07** Wrote compiler command parser npm package [cocopa](https://www.npmjs.com/package/cocopa) and began writing a test framework for it. Added a global configuration switch which allows the IntelliSense configuration generation to be turned off.
@@ -36,8 +68,9 @@ During merging I found some bugs within those functions - mainly due to the abov
 * No consistent return values within `verify` (when it bailed out early it returned `void`)
 
 **2020 02 17** Disabled and marked all previous implementations of IntelliSense support for later removal using `IS-REMOVE`. Pulled changes from upstream and merged them into the intellisense feature branch. Began to work on event handling/generation: vscode-arduino should detect when sketch/board/configuration and so on has changed, then re-analyze the current setup and set the IntelliSense configuration accordingly. This works more or less but there's a lot to fix in the current implementation which kept me busy till late today (I need some sleep now). Cleanup and commits follow tomorrow. Approaching alpha version for curious testers. OSX and Linux comes first, Windows will follow later.
+**2020 02 18** Finished basic event triggering. Rewrote `DeviceContext` for proper settings modification detection (trigger events only on actual change) and generation of setting specific events (e.g. board changed) instead of one global event (aka. "something in the settings changed").
 
-### Status
+## Status
 |      | Tasks   |
 |-----:|:--------|
 | **Build output parser**               | :heavy_check_mark: Basic parser working |
@@ -58,15 +91,23 @@ During merging I found some bugs within those functions - mainly due to the abov
 | **Unit tests**                        | :heavy_check_mark: Basic parser (known boards, match/no match)|
 |                                       | :white_check_mark: All unit tests in cocopa |
 |                                       | :white_check_mark: Test with cpp sketches |
-| **General**                           | :white_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense. (Partially done - documented in the [General Tasks](#General-Tasks) section |
-|                                       | :white_check_mark: Auto-run verify after a) *setting a board* b) *changing the sketch* c) *workbench initialized and no `c_cpp_properties.json` has been found*. We have to generate a valid `c_cpp_properties.json` to keep IntelliSense working in such situations. Identify other occasions where this applies (usually when adding new libraries), hint the user to run *Arduino: Rebuild IntelliSense Configuration*? -> Good moment would be after the workbench initialization -> message in arduino channel |
+| **General**                           | :heavy_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense (documented in the [General Tasks](#General-Tasks) section) `*` |
+|                                       | :white_check_mark: *Auto-run verify when* |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: a) setting a board `*` |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: b) changing the board's configuration `*` |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: c) changing the sketch `*` |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: d) workbench initialized and no `c_cpp_properties.json` found |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: e) Identify other occasions where this applies (usually when adding new libraries) |
+|                                       | :white_check_mark: Hint the user to run *Arduino: Rebuild IntelliSense Configuration*? -> Good moment would be after the workbench initialization -> message in arduino channel |
+|                                       | :white_check_mark: Better build management such that regular builds and analyze builds do not interfere |
+|                                       | :white_check_mark: Analyze task queue which fits in the latter |
 |                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) (partially done) |
 |                                       | :heavy_check_mark: Try to auto-generate even if verify (i.e. compilation) fails |
-|                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
+|                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack -- done, see [cocopa](https://www.npmjs.com/package/cocopa) |
 |                                       | :heavy_check_mark: Parser only works when arduino is set to `verbose`, since this is the only way we get the compiler invocation command - this has to be fixed (done, see next item) |
 |                                       | :heavy_check_mark: Implement a *Rebuild IntelliSense Configuration* command which runs verify verbosely internally and therefore allows us to find and parse the compiler command |
-|                                       | :white_check_mark: Implement proper event generation for `DeviceContext`. a) Events should be issued only when something actually changes, b) Events should be issued for each setting separately |
+|                                       | :heavy_check_mark: Implement proper event generation for `DeviceContext`. a) Events should be issued only when something actually changes, b) Events should be issued for each setting separately `*`|
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
@@ -80,8 +121,8 @@ I write a lot of code for Arduino, especially libraries. The Arduino IDE is not 
 
 Then remains vscode-arduino. It seems that it isn't completely dead - but almost. Most of the core functionality seems to work (I used it a few days now). But the biggest show stopper is the bad IntelliSense support -- which I'll address here now.
 
-## Beer Money :beers:
-You can chip in some beer money to keep me motivated - this is really appreciated.
+## Beer Money :beers: -- Support
+You can chip in some beer money to keep me motivated - this is *really* appreciated.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=PVLCSRZHBJ28G&source=url)
 
@@ -103,24 +144,20 @@ I will list every supporter here, thanks!
 2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)
 2020-02-15 Elektronik Workshop: 28 :beers: (7h coding)
 2020-02-17 Elektronik Workshop: 52 :beers: (13h coding)
+2020-02-18 Elektronik Workshop: xx :beers: (xxh coding)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
 ## Useful Links
-* [IntelliSense issues on vscode-arduino](https://github.com/microsoft/vscode-arduino/issues?utf8=%E2%9C%93&q=intellisense+is%3Aopen)
 * [`c_cpp_properties.json` reference](https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference)
 * [Interactive regex debugger](https://regex101.com/)
 * [Git branch management](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/)
 * [Collapsible Markdown](https://gist.githubusercontent.com/joyrexus/16041f2426450e73f5df9391f7f7ae5f/raw/f774f242feff6bae4a5be7d6c71aa5df2e3fcb0e/README.md)
 * [Arduino CLI manpage](https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc)
 * [Install extensions from file](https://vscode-docs.readthedocs.io/en/stable/extensions/install-extension/)
-* [Publish extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
-* [Arduino Dev Tools](https://playground.arduino.cc/Main/DevelopmentTools/)
-
-## Issues Concerning this Project
- * https://github.com/Microsoft/vscode-cpptools/issues/1750
- * Problems with IntelliSense itself https://github.com/microsoft/vscode-cpptools/issues/1034
- * Logging for IntelliSense https://code.visualstudio.com/docs/cpp/enable-logging-cpp
+* [Publish vscode extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
+* [Debug logging for IntelliSense](https://code.visualstudio.com/docs/cpp/enable-logging-cpp)
+* [Arduino Dev Tools](https://playground.arduino.cc/Main/DevelopmentTools/) (obsolete/outdated)
 
 ## Future Work
 * Proper interactive serial terminal (this is the second major show stopper in my opinion)
@@ -244,15 +281,11 @@ Sometimes IntelliSense has problems within the extension host (which you're runn
 
 ----
 
-## Implementation
-**Note** Check this vscode feature:
-```
-Configuration provider
-The ID of a VS Code extension that can provide IntelliSense configuration information for source files. For example, use the VS Code extension ID ms-vscode.cmake-tools to provide configuration information from the CMake Tools extension.
-```
+# Implementation
+Here are some implementation notes. Probably only of interest to me.
 
-### Build Output Parser
-#### Intrinsic Include Paths
+## Build Output Parser
+### Intrinsic Include Paths
 Some include paths are built into gcc and don't have to be specified on the command line. Just searching the compiler installation directory with something like
 ```bash
 find  ~/.arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/ -name "include*"
@@ -294,11 +327,11 @@ End of search list.
 ```
 As one can see with the ESP32-gcc not all include directories are named `include`. Parsing of this output is pretty trivial though.
 
-### `c_cpp_properties.json` Generator
+## `c_cpp_properties.json` Generator
 
 
-### Settings
-#### Global Settings
+## Settings
+### Global Settings
 Under linux at `~/.config/Code/User/settings.json`, for instance:
 ```json
 {
@@ -312,7 +345,7 @@ Code: [src/arduino/arduinoSettings.ts](src/arduino/arduinoSettings.ts)
 Code: [src/arduino/vscodeSettings.ts](src/arduino/vscodeSettings.ts)
 Validator: [package.json](package.json)
 
-#### Project Settings
+### Project Settings
 Path in project `.vscode/arduino.json`
 ```json
 {
@@ -325,8 +358,8 @@ Path in project `.vscode/arduino.json`
 Code: [src/deviceContext.ts](src/deviceContext.ts)
 Validator: [misc/arduinoValidator.json](misc/arduinoValidator.json)
 
-### General Tasks
-#### Removing existing Attempts which mess with c_cpp_properties.json or Intellisense
+## General Tasks
+### Removing existing Attempts which mess with c_cpp_properties.json or Intellisense
 
 Remove these as they are helpless attempts to get IntelliSense working:
 ```ts
@@ -344,7 +377,14 @@ Remove these as they are helpless attempts to get IntelliSense working:
 Remove this as this messes in an unpredictable and helpless way with Intellisense
 [src/langService/completionProvider.ts](src/langService/completionProvider.ts)
 
-Remove this folder as this is not necessary when Intellisense works properly:
+Review this folder as some of this is probably obsolete when Intellisense works properly:
 ```
-syntaxes/
+syntaxes/arduino.configuration.json
+syntaxes/arduino.tmLanguage
+# Within package.json
+  {
+    "language": "cpp",
+    "path": "./syntaxes/arduino.tmLanguage",
+    "scopeName": "source.cpp.arduino"
+  },
 ```
