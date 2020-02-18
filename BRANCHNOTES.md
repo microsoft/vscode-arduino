@@ -35,7 +35,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 * Error message formatting was fixed within `verify` only
 * No consistent return values within `verify` (when it bailed out early it returned `void`)
 
-**2020 02 17** Disabled and marked all previous implementations of IntelliSense support for later removal.
+**2020 02 17** Disabled and marked all previous implementations of IntelliSense support for later removal using `IS-REMOVE`. Pulled changes from upstream and merged them into the intellisense feature branch. Began to work on event handling/generation: vscode-arduino should detect when sketch/board/configuration and so on has changed, then re-analyze the current setup and set the IntelliSense configuration accordingly. This works more or less but there's a lot to fix in the current implementation which kept me busy till late today (I need some sleep now). Cleanup and commits follow tomorrow. Approaching alpha version for curious testers. OSX and Linux comes first, Windows will follow later.
 
 ### Status
 |      | Tasks   |
@@ -66,6 +66,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 |                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack. Done, see [cocopa](https://www.npmjs.com/package/cocopa) |
 |                                       | :heavy_check_mark: Parser only works when arduino is set to `verbose`, since this is the only way we get the compiler invocation command - this has to be fixed (done, see next item) |
 |                                       | :heavy_check_mark: Implement a *Rebuild IntelliSense Configuration* command which runs verify verbosely internally and therefore allows us to find and parse the compiler command |
+|                                       | :white_check_mark: Implement proper event generation for `DeviceContext`. a) Events should be issued only when something actually changes, b) Events should be issued for each setting separately |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet  
@@ -99,9 +100,9 @@ I will list every supporter here, thanks!
 2020-02-10 Elektronik Workshop: 32 :beers: (8h coding)  
 2020-02-11 Elektronik Workshop: 16 :beers: (4h coding)  
 2020-02-12 Elektronik Workshop: 32 :beers: (8h coding)  
-2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)
+2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)  
 2020-02-15 Elektronik Workshop: 28 :beers: (7h coding)  
-2020-02-16 Elektronik Workshop: x :beers: (xh coding)
+2020-02-17 Elektronik Workshop: 52 :beers: (13h coding)  
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -114,6 +115,7 @@ I will list every supporter here, thanks!
 * [Arduino CLI manpage](https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc)
 * [Install extensions from file](https://vscode-docs.readthedocs.io/en/stable/extensions/install-extension/)
 * [Publish extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
+* [Arduino Dev Tools](https://playground.arduino.cc/Main/DevelopmentTools/)
 
 ## Issues Concerning this Project
  * https://github.com/Microsoft/vscode-cpptools/issues/1750
@@ -144,6 +146,8 @@ I will list every supporter here, thanks!
   * general lack of modularity - the above is the result 
 * It seems that this extension is pretty chaotic. Most probably some refactoring is necessary.
 * Possibility to jump to compilation errors from compiler output and highlight compiler errors
+* Further IntelliSense enhancements/features:
+  * When having adding a library folder to the workspace IntelliSense should use the same configuration for it to enable library navigation and code completion.
 
 ## Non-categorized Notes
 ### Integrate upstream changes into fork
