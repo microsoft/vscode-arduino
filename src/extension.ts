@@ -31,8 +31,6 @@ const nsatModule =
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
-const status: any = {};
-
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = uuidModule().replace(/-/g, "");
@@ -115,18 +113,13 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
 
     registerArduinoCommand("arduino.verify", async () => {
-        if (!status.compile) {
-            status.compile = "verify";
-            try {
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Verifying...",
-                }, async () => {
-                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify);
-                });
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Verifying...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify);
+            });
         }
     }, () => {
         return {
@@ -136,18 +129,13 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.upload", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
-            try {
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Uploading...",
-                }, async () => {
-                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
-                });
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
@@ -175,44 +163,38 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
-            // TODO: no progress indicator
-            //       and: exceptions should be handled within build
-            //            function
-            try {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading (programmer)...",
+            }, async () => {
                 await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer);
-            } catch (ex) {
-            }
-            delete status.compile;
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.rebuildIntelliSenseConfig", async () => {
-        if (!status.compile) {
-            status.compile = "intellisenserebuild";
+        if (!arduinoContextModule.default.arduinoApp.building) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Rebuilding IS Configuration...",
             }, async () => {
                 await arduinoContextModule.default.arduinoApp.build(BuildMode.Analyze);
             });
-            delete status.compile;
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.selectProgrammer", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
+        // TODO EW: this guard does not prevent building when setting the programmer
+        if (!arduinoContextModule.default.arduinoApp.building) {
             try {
                 await arduinoContextModule.default.arduinoApp.programmerManager.selectProgrammer();
             } catch (ex) {
             }
-            delete status.compile;
         }
     }, () => {
         return {
@@ -222,7 +204,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-    //registerArduinoCommand("arduino.addLibPath", (path) => arduinoContextModule.default.arduinoApp.addLibPath(path));
+    // registerArduinoCommand("arduino.addLibPath", (path) => arduinoContextModule.default.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => arduinoContextModule.default.arduinoApp.openExample(path));
     registerArduinoCommand("arduino.loadPackages", async () => await arduinoContextModule.default.boardManager.loadPackages(true));
     registerArduinoCommand("arduino.installBoard", async (packageName, arch, version: string = "") => {
@@ -278,7 +260,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             arduinoContextModule.default.boardManager.updateStatusBar(true);
             // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-            //arduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths();
+            // arduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths();
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
     }

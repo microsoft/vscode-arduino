@@ -14,7 +14,7 @@ import { ArduinoWorkspace } from "../common/workspace";
 
 /**
  * Provides completions for library header includes.
- * 
+ *
  * NOTE: With the new IntelliSense auto-configuration this doesn't make
  * much sense in its current state, since it tries to fetch includes
  * from the wrongly guessed include paths. And it tries to fetch includes
@@ -22,14 +22,13 @@ import { ArduinoWorkspace } from "../common/workspace";
  * files already included -> therefore the user already included the header
  * and doesn't need a completion. Furthermore IntelliSense knows the location
  * as well and can complete it too.
- * 
+ *
  * To make this useful it has to parse the actual library folders and then
  * it makes only sense if it reads the library information and checks if
  * the individual libraries are actually compatible with the current board
  * before offering a completion.
- * 
- * EW
- * 2020-02-17
+ *
+ * EW, 2020-02-17
  */
 export class CompletionProvider implements vscode.CompletionItemProvider {
 

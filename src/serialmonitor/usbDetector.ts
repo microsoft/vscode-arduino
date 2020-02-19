@@ -74,6 +74,9 @@ export class UsbDetector {
                 if (!SerialMonitor.getInstance().initialized) {
                     SerialMonitor.getInstance().initialize();
                 }
+
+                // TODO EW: this is board manager code which should be moved into board manager
+
                 let bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
                 if (!bd) {
                     ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackageContent) => {
