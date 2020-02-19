@@ -73,7 +73,10 @@ export class BoardManager {
         this._boardConfigStatusBar.show();
 
         const dc = DeviceContext.getInstance();
-        dc.onDidChange(() => {
+        dc.onChangeBoard(() => {
+            this.updateStatusBar();
+        });
+        dc.onChangeConfiguration(() => {
             this.updateStatusBar();
         });
     }

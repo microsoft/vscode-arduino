@@ -31,8 +31,6 @@ import { BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
-const status: any = {};
-
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
     const activeGuid = uuidModule().replace(/-/g, "");
@@ -117,18 +115,13 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
 
     registerArduinoCommand("arduino.verify", async () => {
-        if (!status.compile) {
-            status.compile = "verify";
-            try {
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Verifying...",
-                }, async () => {
-                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify, true);
-                });
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Verifying...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify, true);
+            });
         }
     }, () => {
         return {
@@ -138,36 +131,26 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.upload", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
-            try {
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Uploading...",
-                }, async () => {
-                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, true);
-                });
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, true);
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.cliUpload", async () => {
-        if (!status.compile) {
-            status.compile = "cliUpload";
-            try {
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Using CLI to upload...",
-                }, async () => {
-                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, false);
-                });
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Using CLI to upload...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, false);
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
@@ -195,57 +178,51 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
-            // TODO: no progress indicator
-            //       and: exceptions should be handled within build
-            //            function
-            try {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading (programmer)...",
+            }, async () => {
                 await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, true);
-            } catch (ex) {
-            }
-            delete status.compile;
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.cliUploadUsingProgrammer", async () => {
-        if (!status.compile) {
-            status.compile = "cliUpload";
-            try {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Using CLI to upload (programmer)...",
+            }, async () => {
                 await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, false);
-            } catch (ex) {
-            }
-            delete status.compile;
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.rebuildIntelliSenseConfig", async () => {
-        if (!status.compile) {
-            status.compile = "intellisenserebuild";
+        if (!arduinoContextModule.default.arduinoApp.building) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Rebuilding IS Configuration...",
             }, async () => {
                 await arduinoContextModule.default.arduinoApp.build(BuildMode.Analyze, true);
             });
-            delete status.compile;
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.selectProgrammer", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
+        // TODO EW: this guard does not prevent building when setting the programmer
+        if (!arduinoContextModule.default.arduinoApp.building) {
             try {
                 await arduinoContextModule.default.arduinoApp.programmerManager.selectProgrammer();
             } catch (ex) {
             }
-            delete status.compile;
         }
     }, () => {
         return {

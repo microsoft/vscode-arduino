@@ -33,7 +33,7 @@
             "type": "string",
             "minLength": 1
         },
-        "disableIntelliSenseAutoGen": {
+        "intelliSenseGen": {
             "description": "Disable/enable the automatic generation of the IntelliSense configuration file (c_cpp_properties.json) for this project (overrides the global setting). When set to \"global\" the global extension settings will be used.",
             "type": "string",
             "default": "global",
