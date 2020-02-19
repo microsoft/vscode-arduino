@@ -69,6 +69,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 
 **2020 02 17** Disabled and marked all previous implementations of IntelliSense support for later removal using `IS-REMOVE`. Pulled changes from upstream and merged them into the intellisense feature branch. Began to work on event handling/generation: vscode-arduino should detect when sketch/board/configuration and so on has changed, then re-analyze the current setup and set the IntelliSense configuration accordingly. This works more or less but there's a lot to fix in the current implementation which kept me busy till late today (I need some sleep now). Cleanup and commits follow tomorrow. Approaching alpha version for curious testers. OSX and Linux comes first, Windows will follow later.
 **2020 02 18** Finished basic event triggering. Rewrote `DeviceContext` for proper settings modification detection (trigger events only on actual change) and generation of setting specific events (e.g. board changed) instead of one global event (aka. "something in the settings changed").
+**2020 02 19** Implemented proper build scheduling for analysis build by writing an `AnalysisManager` class. This class collects multiple changes (e.g. board and configuration, which often are changed shortly after another) before running an analysis. In case another build or analysis is in progress it postpones newly filed analysis requests until the other build has completed.
 
 ## Status
 |      | Tasks   |
@@ -95,12 +96,12 @@ During merging I found some bugs within those functions - mainly due to the abov
 |                                       | :white_check_mark: *Auto-run verify when* |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: a) setting a board `*` |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: b) changing the board's configuration `*` |
-|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: c) changing the sketch `*` |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: c) selecting another sketch `*` |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: d) workbench initialized and no `c_cpp_properties.json` found |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: e) Identify other occasions where this applies (usually when adding new libraries) |
 |                                       | :white_check_mark: Hint the user to run *Arduino: Rebuild IntelliSense Configuration*? -> Good moment would be after the workbench initialization -> message in arduino channel |
-|                                       | :white_check_mark: Better build management such that regular builds and analyze builds do not interfere |
-|                                       | :white_check_mark: Analyze task queue which fits in the latter |
+|                                       | :heavy_check_mark: Better build management such that regular builds and analyze builds do not interfere (done, 2020-02-19) `*` |
+|                                       | :heavy_check_mark: Analyze task queue which fits in the latter  (done, 2020-02-19) `*` |
 |                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :white_check_mark: Document features in [README.md](README.md) (partially done) |
 |                                       | :heavy_check_mark: Try to auto-generate even if verify (i.e. compilation) fails |
@@ -144,7 +145,8 @@ I will list every supporter here, thanks!
 2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)
 2020-02-15 Elektronik Workshop: 28 :beers: (7h coding)
 2020-02-17 Elektronik Workshop: 52 :beers: (13h coding)
-2020-02-18 Elektronik Workshop: xx :beers: (xxh coding)
+2020-02-18 Elektronik Workshop: 36 :beers: (9h coding)
+2020-02-19 Elektronik Workshop: x :beers: (xh coding)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -185,6 +187,7 @@ I will list every supporter here, thanks!
 * Possibility to jump to compilation errors from compiler output and highlight compiler errors
 * Further IntelliSense enhancements/features:
   * When having adding a library folder to the workspace IntelliSense should use the same configuration for it to enable library navigation and code completion.
+  * Optimization: Abort analysis build as soon as compiler statement has been found
 
 ## Non-categorized Notes
 ### Integrate upstream changes into fork
