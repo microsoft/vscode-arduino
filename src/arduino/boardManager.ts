@@ -73,7 +73,10 @@ export class BoardManager {
         this._boardConfigStatusBar.show();
 
         const dc = DeviceContext.getInstance();
-        dc.onDidChange(() => {
+        dc.onChangeBoard(() => {
+            this.updateStatusBar();
+        });
+        dc.onChangeConfiguration(() => {
             this.updateStatusBar();
         });
     }
@@ -124,7 +127,7 @@ export class BoardManager {
         dc.configuration = this._currentBoard.customConfig;
         this._boardConfigStatusBar.text = targetBoard.name;
         // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-        //this._arduinoApp.addLibPath(null);
+        // this._arduinoApp.addLibPath(null);
 
         this._onBoardTypeChanged.fire();
     }

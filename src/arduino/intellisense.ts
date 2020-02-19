@@ -1,3 +1,6 @@
+// Copyright (c) Elektronik Workshop. All rights reserved.
+// Licensed under the MIT license.
+
 import * as ccp from "cocopa";
 import * as path from "path";
 
@@ -23,7 +26,7 @@ export function isCompilerParserEnabled(dc?: DeviceContext) {
         dc = DeviceContext.getInstance();
     }
     const globalDisable = VscodeSettings.getInstance().disableIntelliSenseAutoGen;
-    const projectSetting = dc.disableIntelliSenseAutoGen;
+    const projectSetting = dc.intelliSenseGen;
     return projectSetting !== "disable" && !globalDisable ||
            projectSetting === "enable";
 }
@@ -93,6 +96,8 @@ function makeCompilerParserEngines(dc: DeviceContext) {
     const dotcpp = sketch.endsWith(".ino") ? ".cpp" : "";
     sketch = `-o\\s+\\S*${ccp.regExEscape(sketch)}${dotcpp}\\.o`;
 
+    // TODO: handle other architectures here
+    
     const matchPattern = [
         // make sure we're running g++
         /(?:^|-)g\+\+\s+/,
@@ -110,4 +115,193 @@ function makeCompilerParserEngines(dc: DeviceContext) {
     // setup the parser with its engines
     const gccParserEngine = new ccp.ParserGcc(matchPattern, dontMatchPattern);
     return [gccParserEngine];
+}
+
+/**
+ * Possible states of AnalysisManager's state machine.
+ */
+enum AnalysisState {
+    /**
+     * No analysis request pending.
+     */
+    Idle = "idle",
+    /**
+     * Analysis request pending. Waiting for the time out to expire or for
+     * another build to complete.
+     */
+    Waiting = "waiting",
+    /**
+     * Analysis in progress.
+     */
+    Analyzing = "analyzing",
+    /**
+     * Analysis in progress with yet another analysis request pending.
+     * As soon as the current analysis completes the manager will directly
+     * enter the Waiting state.
+     */
+    AnalyzingWaiting = "analyzing and waiting",
+}
+
+/**
+ * Events (edges) which cause state changes within AnalysisManager.
+ */
+enum AnalysisEvent {
+    /**
+     * The only external event. Requests an analysis to be run.
+     */
+    AnalysisRequest,
+    /**
+     * The internal wait timeout expired.
+     */
+    WaitTimeout,
+    /**
+     * The current analysis build finished.
+     */
+    AnalysisBuildDone,
+}
+
+/**
+ * This class manages analysis builds for the automatic IntelliSense
+ * configuration synthesis. Its primary purposes are:
+ * 
+ *  * delaying analysis requests caused by DeviceContext setting change
+ *      events such that multiple subsequent requests don't cause
+ *      multiple analysis builds
+ *  * make sure that an analysis request is postponed when another build
+ *      is currently in progress
+ *
+ * TODO: initialization sequence: make sure events generated
+ *   during initialization are not lost
+ *
+ * TODO: check time of c_cpp_properties.json and compare it with
+ * * arduino.json
+ * * main sketch file
+ * This way we can perhaps optimize this further. But be aware
+ * that settings events fire before their corresponding values
+ * are actually written to arduino.json -> time of arduino.json
+ * is outdated if no countermeasure is taken.
+ */
+export class AnalysisManager {
+
+    /** The manager's state. */
+    private _state: AnalysisState = AnalysisState.Idle;
+    /** A callback used by the manager to query if the build backend is busy. */
+    private _isBuilding: () => boolean;
+    /** A callback used by the manager to initiate an analysis build. */
+    private _doBuild: () => Promise<void>;
+    /** Timeout for the timeouts/delays in milliseconds. */
+    private _waitPeriodMs: number;
+    /** The internal timer used to implement the above timeouts and delays. */
+    private _timer: NodeJS.Timer;
+
+    /**
+     * Constructor.
+     * @param isBuilding Provide a callback which returns true if another build
+     * is currently in progress.
+     * @param doBuild Provide a callback which runs the analysis build.
+     * @param waitPeriodMs The delay the manger should wait for potential new
+     * analysis request. This delay is used as polling interval as well when
+     * checking for ongoing builds.
+     */
+    constructor(isBuilding:() => boolean,
+                doBuild: () => Promise<void>,
+                waitPeriodMs: number = 1000) {
+        this._isBuilding = isBuilding;
+        this._doBuild = doBuild;
+        this._waitPeriodMs = waitPeriodMs;
+    }
+
+    /**
+     * File an analysis request.
+     * The analysis will be delayed until no further requests are filed
+     * within a wait period or until any build in progress has terminated.
+     */
+    public async requestAnalysis() {
+        console.log("requesting analysis");
+        await this.update(AnalysisEvent.AnalysisRequest);
+    }
+
+    /**
+     * Update the manager's state machine.
+     * @param event The event which will cause the state transition.
+     * 
+     * Implementation note: asynchronous edge actions must be called after
+     * setting the new state since they don't return immediately. 
+     */
+    private async update(event: AnalysisEvent) {
+
+        switch (this._state) {
+
+            case AnalysisState.Idle:
+                if (event == AnalysisEvent.AnalysisRequest) {
+                    this._state = AnalysisState.Waiting;
+                    this.startWaitTimeout();
+                }
+                break;
+
+            case AnalysisState.Waiting:
+                if (event == AnalysisEvent.AnalysisRequest) {
+                    // every new request restarts timer
+                    this.startWaitTimeout();
+                } else if (event == AnalysisEvent.WaitTimeout) {
+                    if (this._isBuilding()) {
+                        // another build in progress, continue waiting
+                        this.startWaitTimeout();
+                    } else {
+                        // no other build in progress -> launch analysis
+                        this._state = AnalysisState.Analyzing;
+                        await this.startAnalysis();
+                    }
+                }
+                break;
+
+            case AnalysisState.Analyzing:
+                if (event == AnalysisEvent.AnalysisBuildDone) {
+                    this._state = AnalysisState.Idle;
+                } else if (event == AnalysisEvent.AnalysisRequest) {
+                    this._state = AnalysisState.AnalyzingWaiting;
+                }
+                break;
+
+            case AnalysisState.AnalyzingWaiting:
+                if (event == AnalysisEvent.AnalysisBuildDone) {
+                    // emulate the transition from idle to waiting
+                    // (we don't care if this adds an additional
+                    // timeout - event driven analysis is not time-
+                    // critical)
+                    this._state = AnalysisState.Idle;
+                    await this.update(AnalysisEvent.AnalysisRequest);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Starts the wait timeout timer.
+     * If it's already running, the current timer is stopped and restarted.
+     * The timeout callback will then update the state machine.
+     */
+    private startWaitTimeout() {
+        if (this._timer) {
+            clearTimeout(this._timer);
+        }
+        this._timer = setTimeout(() => {
+            this.update(AnalysisEvent.WaitTimeout);
+            this._timer = undefined;
+        }, this._waitPeriodMs);
+    }
+
+    /**
+     * Starts the analysis build.
+     * When done, the callback will update the state machine.
+     */
+    private async startAnalysis() {
+        await this._doBuild()
+        .then(() => {
+            this.update(AnalysisEvent.AnalysisBuildDone);
+        })
+        .catch((reason) => {
+            this.update(AnalysisEvent.AnalysisBuildDone);
+        });
+    }
 }

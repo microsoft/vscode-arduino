@@ -29,7 +29,7 @@ suite("Arduino: Board Manager.", () => {
         arduinoApp.setup((x) => x.setPref(TypeMoq.It.isAny(), TypeMoq.It.isAny()));
         arduinoApp.setup((x) => x.initialize(TypeMoq.It.isAny()));
         // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-        //arduinoApp.setup((x) => x.addLibPath(TypeMoq.It.isAny()));
+        // arduinoApp.setup((x) => x.addLibPath(TypeMoq.It.isAny()));
 
         try {
             boardManager = new BoardManager(arduinoSettings.object, arduinoApp.object);
