@@ -11,7 +11,7 @@ This branch more or less addresses the following issues:
 |  6| [#850](https://github.com/microsoft/vscode-arduino/issues/850) | **How to prevent modifications of `c_cpp_properties.json` by the extension?**  | Asks if the current implementation can be turned off, because it overwrites a user's config with non working IS config -- this is sad. |
 |  7| [#833](https://github.com/microsoft/vscode-arduino/issues/833) | **Allow C_Cpp.intelliSenseEngine to be set to "Default" instead of "Tag Parser" for better code completion/suggestions**  |  |
 |  8| [#831](https://github.com/microsoft/vscode-arduino/issues/831) | **IntelliSenseEngine doesn't work as default** |  |
-|  9| [#839](https://github.com/microsoft/vscode-arduino/issues/829) | **`Arduino.h` and ESP8266 includes have squiggles** | Closed due to inactivity - not because it has been fixed |
+|  9| [#829](https://github.com/microsoft/vscode-arduino/issues/829) | **`Arduino.h` and ESP8266 includes have squiggles** | Stale issue |
 | 10| [#823](https://github.com/microsoft/vscode-arduino/issues/823) | **Intellisense is not highlighting code** | Stale issue |
 | 11| [#818](https://github.com/microsoft/vscode-arduino/issues/818) | **Warning with default includePath after initialize, cannot open source file `avr/pgmspace.h`** | Stale issue |
 | 12| [#808](https://github.com/microsoft/vscode-arduino/issues/808) | **Identifier `Serial` is undefined**  |  |
