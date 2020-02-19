@@ -359,6 +359,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this.sketch = chosen.label;
                     }
                 }
+            })
+            .then(() => {
+                this.showStatusBar();
             });
     }
 }
