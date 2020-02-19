@@ -1,3 +1,6 @@
+// Copyright (c) Elektronik Workshop. All rights reserved.
+// Licensed under the MIT license.
+
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -106,7 +109,7 @@ export class DeviceSettings {
     public sketch = new StrSetting();
     public output = new StrSetting();
     public debugger = new StrSetting();
-    public disableIntelliSenseAutoGen = new StrSetting();
+    public intelliSenseGen = new StrSetting();
     public configuration = new StrSetting();
     public prebuild = new StrSetting();
     public programmer = new StrSetting();
@@ -121,7 +124,7 @@ export class DeviceSettings {
                this.sketch.modified ||
                this.output.modified ||
                this.debugger.modified ||
-               this.disableIntelliSenseAutoGen.modified ||
+               this.intelliSenseGen.modified ||
                this.configuration.modified ||
                this.prebuild.modified ||
                this.programmer.modified;
@@ -135,7 +138,7 @@ export class DeviceSettings {
         this.sketch.commit();
         this.output.commit();
         this.debugger.commit();
-        this.disableIntelliSenseAutoGen.commit();
+        this.intelliSenseGen.commit();
         this.configuration.commit();
         this.prebuild.commit();
         this.programmer.commit();
@@ -151,7 +154,7 @@ export class DeviceSettings {
         this.sketch.reset();
         this.output.reset();
         this.debugger.reset();
-        this.disableIntelliSenseAutoGen.reset();
+        this.intelliSenseGen.reset();
         this.configuration.reset();
         this.prebuild.reset();
         this.programmer.reset();
@@ -176,7 +179,7 @@ export class DeviceSettings {
             this.configuration.value = settings.configuration;
             this.output.value = settings.output;
             this.debugger.value = settings.debugger;
-            this.disableIntelliSenseAutoGen.value = settings.disableIntelliSenseAutoGen;
+            this.intelliSenseGen.value = settings.intelliSenseGen;
             this.prebuild.value = settings.prebuild;
             this.programmer.value = settings.programmer;
             if (commit) {
@@ -220,7 +223,7 @@ export class DeviceSettings {
         settings.board = this.board.value;
         settings.output = this.output.value;
         settings.debugger = this.debugger.value;
-        settings.disableIntelliSenseAutoGen = this.disableIntelliSenseAutoGen.value;
+        settings.intelliSenseGen = this.intelliSenseGen.value;
         settings.configuration = this.configuration.value;
         settings.programmer = this.programmer.value;
 

@@ -277,7 +277,7 @@ export function tryParseJSON(jsonString: string) {
         }
     } catch (ex) { }
 
-    return false;
+    return undefined;
 }
 
 export function isJunk(filename: string): boolean {

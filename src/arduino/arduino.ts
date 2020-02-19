@@ -15,7 +15,10 @@ import { DeviceContext } from "../deviceContext";
 import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
-import { ICoCoPaContext, isCompilerParserEnabled, makeCompilerParserContext } from "./intellisense";
+import { AnalysisManager,
+         ICoCoPaContext,
+         isCompilerParserEnabled,
+         makeCompilerParserContext } from "./intellisense";
 import { LibraryManager } from "./libraryManager";
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -25,6 +28,11 @@ import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
 
+/**
+ * Supported build modes. For further explanation see the documentation
+ * of ArduinoApp.build().
+ * The strings are used for status reporting within the above function.
+ */
 export enum BuildMode {
     Verify = "Verifying",
     Analyze = "Analyzing",
@@ -46,9 +54,29 @@ export class ArduinoApp {
     private _programmerManager: ProgrammerManager;
 
     /**
+     * IntelliSense analysis manager.
+     * Makes sure that analysis builds and regular builds go along
+     * and that multiple subsequent analysis requests - as triggered
+     * by board/board-configuration changes - are bundled to a single
+     * analysis build run.
+     */
+    private _analysisManager: AnalysisManager;
+
+    /**
+     * Indicates if a build is currently in progress.
+     * If so any call to this.build() will return false immediately.
+     */
+    private _building: boolean = false;
+
+    /**
      * @param {IArduinoSettings} _settings ArduinoSetting object.
      */
     constructor(private _settings: IArduinoSettings) {
+        const analysisDelayMs = 1000 * 3;
+        this._analysisManager = new AnalysisManager(
+            () => this._building,
+            async () => { await this.build(BuildMode.Analyze, true); },
+            analysisDelayMs);
     }
 
     /**
@@ -71,6 +99,17 @@ export class ArduinoApp {
             } catch (ex) {
             }
         }
+
+        // set up event handling for IntelliSense analysis
+        const requestAnalysis = async () => {
+            if (isCompilerParserEnabled()) {
+                await this._analysisManager.requestAnalysis();
+            }
+        };
+        const dc = DeviceContext.getInstance();
+        dc.onChangeBoard(requestAnalysis);
+        dc.onChangeConfiguration(requestAnalysis);
+        dc.onChangeSketch(requestAnalysis);
     }
 
     /**
@@ -102,37 +141,95 @@ export class ArduinoApp {
     }
 
     /**
+     * Returns true if a build is currently in progress.
+     */
+    public get building() {
+        return this._building;
+    }
+
+    /**
      * Runs the arduino builder to build/compile and - if necessary - upload
      * the current sketch.
-     * @param buildMode Build mode. BuildMode.Upload: Compile and upload,
-     * BuildMode.UploadProgrammer: Compile and upload using the user selectable
-     * programmer, BuildMode.Analyze: Compile, analyze the output and generate
-     * IntelliSense configuration from it, BuildMode.Verify: Just compile.
+     * @param buildMode Build mode.
+     *  * BuildMode.Upload: Compile and upload
+     *  * BuildMode.UploadProgrammer: Compile and upload using the user
+     *     selectable programmer
+     *  * BuildMode.Analyze: Compile, analyze the output and generate
+     *     IntelliSense configuration from it.
+     *  * BuildMode.Verify: Just compile.
+     * All build modes except for BuildMode.Analyze run interactively, i.e. if
+     * something is missing, it tries to query the user for the missing piece
+     * of information (sketch, board, etc.). Analyze runs non interactively and
+     * just returns false.
      * @param {bool} compile - Indicates whether to compile the code when using the CLI to upload
      * @param buildDir Override the build directory set by the project settings
      * with the given directory.
+     * @returns true on success, false if
+     *  * another build is currently in progress
+     *  * board- or programmer-manager aren't initialized yet
+     *  * or something went wrong during the build
      */
-    public async build(buildMode: BuildMode, compile: boolean, buildDir?: string): Promise<boolean> {
+    public async build(buildMode: BuildMode, compile: boolean, buildDir?: string) {
+
+        if (!this._boardManager || !this._programmerManager || this._building) {
+            return false;
+        }
+
+        this._building = true;
+
+        return await this._build(buildMode, compile, buildDir)
+        .then((ret) => {
+            this._building = false;
+            return ret;
+        })
+        .catch((reason) => {
+            this._building = false;
+            // TODO EW, 2020-02-19: Report unhandled error (Logger?)
+            return false;
+        });
+    }
+
+// Not moving _build around in the file (yet?) because it would create too much merge/rebase problems.
+/* tslint:disable:member-ordering */
+
+    /**
+     * Private implementation. Not to be called directly. The wrapper build()
+     * manages the build state.
+     * @param buildMode See build()
+     * @param buildDir See build()
+     */
+    public async _build(buildMode: BuildMode, compile: boolean, buildDir?: string): Promise<boolean> {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
         let cocopa: ICoCoPaContext;
 
-        const boardDescriptor = this.getBoardBuildString();
-        if (!boardDescriptor) {
+        if (!this.boardManager.currentBoard) {
+            if (buildMode !== BuildMode.Analyze) {
+                logger.notifyUserError("boardManager.currentBoard", new Error(constants.messages.NO_BOARD_SELECTED));
+            }
             return false;
         }
+        const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
+
         if (!this.useArduinoCli()) {
             args.push("--board", boardDescriptor);
         }
 
         if (!ArduinoWorkspace.rootPath) {
-            vscode.window.showWarningMessage("Cannot find the sketch file.");
+            vscode.window.showWarningMessage("Workspace doesn't seem to have a folder added to it yet.");
             return false;
         }
 
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
-            await this.getMainSketch(dc);
+            if (buildMode === BuildMode.Analyze) {
+                // Analyze runs non interactively
+                return false;
+            }
+            if (!await dc.resolveMainSketch()) {
+                vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
+                return false;
+            }
         }
 
         const selectSerial = async () => {
@@ -171,8 +268,9 @@ export class ArduinoApp {
                 args.push("--port", dc.port);
             }
         } else if (buildMode === BuildMode.UploadProgrammer) {
-            const programmer = this.getProgrammerString();
+            const programmer = this.programmerManager.currentProgrammer;
             if (!programmer) {
+                logger.notifyUserError("programmerManager.currentProgrammer", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
                 return false;
             }
             if (!dc.port) {
@@ -205,9 +303,6 @@ export class ArduinoApp {
 
             args.push("--port", dc.port);
         } else if (buildMode === BuildMode.Analyze) {
-            if (!isCompilerParserEnabled()) {
-                return false;
-            }
             cocopa = makeCompilerParserContext(dc);
             if (!this.useArduinoCli()) {
                 args.push("--verify", "--verbose");
@@ -229,6 +324,8 @@ export class ArduinoApp {
 
         await vscode.workspace.saveAll(false);
 
+        // we prepare the channel here since all following code will
+        // or at leas can possibly output to it
         arduinoChannel.show();
         arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
@@ -716,7 +813,7 @@ export class ArduinoApp {
                 const dc = DeviceContext.getInstance();
                 const arduinoJson = {
                     sketch: sketchFile,
-                    // TODO: COM1 is Windows specific - what about OSX and Linux users?
+                    // TODO EW, 2020-02-18: COM1 is Windows specific - what about OSX and Linux users?
                     port: dc.port || "COM1",
                     board: dc.board,
                     configuration: dc.configuration,
@@ -818,14 +915,15 @@ export class ArduinoApp {
      * @returns True if successful, false on error.
      */
     protected async runPreBuildCommand(dc: DeviceContext): Promise<boolean> {
-        if (dc.prebuild) {
-            arduinoChannel.info(`Running pre-build command: ${dc.prebuild}`);
-            const prebuildargs = dc.prebuild.split(" ");
-            const prebuildCommand = prebuildargs.shift();
+        const prebuildcmdline = dc.prebuild;
+        if (prebuildcmdline) {
+            arduinoChannel.info(`Running pre-build command: ${prebuildcmdline}`);
+            const args = prebuildcmdline.split(/\s+/);
+            const cmd = args.shift();
             try {
-                await util.spawn(prebuildCommand,
+                await util.spawn(cmd,
                                  arduinoChannel.channel,
-                                 prebuildargs,
+                                 args,
                                  { shell: true, cwd: ArduinoWorkspace.rootPath });
             } catch (ex) {
                 arduinoChannel.error(`Running pre-build command failed: ${os.EOL}${ex.error}`);
@@ -843,30 +941,5 @@ export class ArduinoApp {
         return this._settings.useArduinoCli;
         // return VscodeSettings.getInstance().useArduinoCli;
     }
-
-    private getProgrammerString(): string {
-        const selectProgrammer = this.programmerManager.currentProgrammer;
-        if (!selectProgrammer) {
-            logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
-            return;
-        }
-        return selectProgrammer;
-    }
-
-    private getBoardBuildString(): string {
-        const selectedBoard = this.boardManager.currentBoard;
-        if (!selectedBoard) {
-            logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
-            return;
-        }
-        return selectedBoard.getBuildConfig();
-    }
-
-    private async getMainSketch(dc: DeviceContext) {
-        await dc.resolveMainSketch();
-        if (!dc.sketch) {
-            vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
-            throw new Error("No sketch file was found.");
-        }
-    }
+/* tslint:enable:member-ordering */
 }

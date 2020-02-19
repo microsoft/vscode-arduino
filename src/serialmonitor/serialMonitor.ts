@@ -48,18 +48,6 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _outputChannel: vscode.OutputChannel;
 
-    private constructor() {
-        const dc = DeviceContext.getInstance();
-        dc.onDidChange(() => {
-            if (dc.port) {
-                if (!this.initialized) {
-                    this.initialize();
-                }
-                this.updatePortListStatus(null);
-            }
-        });
-    }
-
     public initialize() {
         let defaultBaudRate;
         if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
@@ -85,6 +73,11 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = defaultBaudRate.toString();
         this.updatePortListStatus(null);
+
+        const dc = DeviceContext.getInstance();
+        dc.onChangePort(() => {
+            this.updatePortListStatus(null);
+        });
     }
     public get initialized(): boolean {
         return !!this._outputChannel;
@@ -185,15 +178,15 @@ export class SerialMonitor implements vscode.Disposable {
         const rates = SerialMonitor.listBaudRates();
         const chosen = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
         if (!chosen) {
-            Logger.warn("No rate is selected, keep baud rate no changed.");
+            Logger.warn("No baud rate selected, keeping previous baud rate.");
             return;
         }
         if (!parseInt(chosen, 10)) {
-            Logger.warn("Invalid baud rate, keep baud rate no changed.", { value: chosen });
+            Logger.warn("Invalid baud rate, keeping previous baud rate.", { value: chosen });
             return;
         }
         if (!this._serialPortCtrl) {
-            Logger.warn("Serial Monitor have not been started.");
+            Logger.warn("Serial Monitor has not been started.");
             return;
         }
         const selectedRate: number = parseInt(chosen, 10);
@@ -217,6 +210,7 @@ export class SerialMonitor implements vscode.Disposable {
         }
     }
 
+    // TODO EW: use default value for port function parameter and change all updatePortListStatus(null) calls accordingly
     private updatePortListStatus(port: string) {
         const dc = DeviceContext.getInstance();
         if (port) {

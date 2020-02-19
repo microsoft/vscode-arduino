@@ -28,8 +28,7 @@ import { ArduinoWorkspace } from "../common/workspace";
  * the individual libraries are actually compatible with the current board
  * before offering a completion.
  *
- * EW
- * 2020-02-17
+ * EW, 2020-02-17
  */
 export class CompletionProvider implements vscode.CompletionItemProvider {
 
