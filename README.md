@@ -119,7 +119,7 @@ The following settings are as per sketch settings of the Arduino extension. You 
 ## IntelliSense
 vscode-arduino auto-configures IntelliSense by default. vscode-arduino analyzes Arduino's compiler output by running a separate build and generates the corresponding configuration file at `.vscode/c_cpp_properties.json`. vscode-arduino tries as hard as possible to keep things up to date, e.g. it runs the analysis when switching the board or the sketch.
 
-It doesn't makes sense though to analyse repeatedly. Therefore if the workspace reports problems - for instance after adding new includes from a new library - run the analysis manually.
+It doesn't makes sense though to run the analysis repeatedly. Therefore if the workspace reports problems ("squiggles") - for instance after adding new includes from a new library - run the analysis manually:
 
 Manual rebuild: **Arduino: Rebuild IntelliSense Configuration**,  
 Keybindings: <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
