@@ -102,7 +102,7 @@ The following settings are as per sketch settings of the Arduino extension. You 
     "output": "../build",
     "debugger": "jlink",
     "prebuild": "bash prebuild.sh",
-    "disableIntelliSenseAutoGen": "global"
+    "intelliSenseGen": "global"
 }
 ```
 - `sketch` - The main sketch file name of Arduino.
@@ -111,21 +111,27 @@ The following settings are as per sketch settings of the Arduino extension. You 
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
 - `prebuild` - External command before building the sketch file. You should only set one `prebuild` command. `command1 && command2` does not work. If you need to run multiple commands before the build, then create a script.
-- `disableIntelliSenseAutoGen` - Override the global auto-generation of the IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`). Three options are available:
+- `intelliSenseGen` - Override the global setting for auto-generation of the IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`). Three options are available:
   - `"global"`: Use the global settings (default)
   - `"disable"`: Disable the auto-generation even if globally enabled
   - `"enable"`: Enable the auto-generation even if globally disabled
 
 ## IntelliSense
-*TODO: Rewrite this section*
-vscode-arduino auto-configures IntelliSense by default. vscode-arduino analyzes Arduino's compiler output during verify and generates the corresponding configuration file at `.vscode/c_cpp_properties.json` and tries as hard as possible to keep things up to date, e.g. running verify when switching the board or the sketch.
-It doesn't makes sense though to run verify repeatedly. Therefore if the workspace reports problems (for instance after adding new includes to a new library) run *verify* such that IntelliSense knows of the new include directories (since the Arduino-backend performs the library resolution externally).
+vscode-arduino auto-configures IntelliSense by default. vscode-arduino analyzes Arduino's compiler output by running a separate build and generates the corresponding configuration file at `.vscode/c_cpp_properties.json`. vscode-arduino tries as hard as possible to keep things up to date, e.g. it runs the analysis when switching the board or the sketch.
 
-TODO: Note about configuration selection in lower right.
+It doesn't makes sense though to analyse repeatedly. Therefore if the workspace reports problems - for instance after adding new includes from a new library - run the analysis manually.
 
-Manual rebuild: **Ardino: Rebuild IntelliSense Configuration**,  
-Keybindings: **Arduino: Rebuild IntelliSense Configuration** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
+Manual rebuild: **Arduino: Rebuild IntelliSense Configuration**,  
+Keybindings: <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
 
+When the analysis is invoked manually it overrides global and project specific settings.
+
+### IntelliSense Configurations
+vscode-arduino's analysis stores the result as a dedicated IntelliSense-configuration named `Arduino`. You have to select it from the far right of the status bar when you're in one of your source files as shown here:
+
+![74001156-cfce8280-496a-11ea-9b9d-7d30c83765c1](https://user-images.githubusercontent.com/21954933/74351237-2696ea80-4db7-11ea-9f7a-1bfc652ad5f5.png)
+
+This system allows you to setup and use own IntelliSense configurations in parallel to the automatically generated configurations provided through vscode-arduino. Just add your configuration to `c_cpp_properties.json` and name it differently from the default configuration (`Arduino`), e.g. `My awesome configuration` and select it from the status bar or via the command palette command **C/C++: Select a Configuration...**
 
 ## Debugging Arduino Code <sup>preview</sup>
 Before you start to debug your Arduino code, please read [this document](https://code.visualstudio.com/docs/editor/debugging) to learn about the basic mechanisms of debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for further reference.
