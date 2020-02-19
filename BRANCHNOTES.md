@@ -3,26 +3,45 @@
 This branch more or less addresses the following issues:
 | # | Issue | Title | Comment |
 |--:|:------|:------------|:--------|
-|  1| [#438](https://github.com/microsoft/vscode-arduino/issues/438) | **The Extension should automagically fill the c_cpp_properties.json, so intellisense works out of the box** | This is the issue to which I usually report news concerning the progress of this project |
-|  2| [#876](https://github.com/microsoft/vscode-arduino/issues/876) | **Missing #define ARDUINO 10808 logic?** | Marked as bug but it's just the same problem again |
-|  3| [#829](https://github.com/microsoft/vscode-arduino/issues/829) | **`Arduino.h` and ESP8266 includes have squiggles** | Stale issue |
-|  4| [#969](https://github.com/microsoft/vscode-arduino/issues/969) | **INO Files defines undefined but can jump to definition**  |  |
-|  5| [#959](https://github.com/microsoft/vscode-arduino/issues/959) | **Update board type command does not update intellisense config automatically**  |  |
-|  6| [#892](https://github.com/microsoft/vscode-arduino/issues/892) | **Default IntelliSense config** |  |
-|  7| [#850](https://github.com/microsoft/vscode-arduino/issues/850) | **How to prevent modifications of c_cpp_properties.json by the extension?**  | Asks if the current implementation can be turned off, because it overwrites a user's config with non working IS config -- this is sad. |
-|  8| [#833](https://github.com/microsoft/vscode-arduino/issues/833) | **Allow C_Cpp.intelliSenseEngine to be set to "Default" instead of "Tag Parser" for better code completion/suggestions**  |  |
-|  9| [#808](https://github.com/microsoft/vscode-arduino/issues/808) | **Identifier "Serial" is undefined**  |  |
-| 10| [#474](https://github.com/microsoft/vscode-arduino/issues/474) | **Enrich device develop experience**  |  |
+|  1| [#438](https://github.com/microsoft/vscode-arduino/issues/438) | **The Extension should automagically fill the `c_cpp_properties.json`, so intellisense works out of the box** | This is the issue to which I usually report news concerning the progress of this project |
+|  2| [#969](https://github.com/microsoft/vscode-arduino/issues/969) | **INO Files defines undefined but can jump to definition**  |  |
+|  3| [#959](https://github.com/microsoft/vscode-arduino/issues/959) | **Update board type command does not update intellisense config automatically**  |  |
+|  4| [#892](https://github.com/microsoft/vscode-arduino/issues/892) | **Default IntelliSense config** |  |
+|  5| [#876](https://github.com/microsoft/vscode-arduino/issues/876) | **Missing #define ARDUINO 10808 logic?** | Marked as bug but it's just the same problem again |
+|  6| [#850](https://github.com/microsoft/vscode-arduino/issues/850) | **How to prevent modifications of `c_cpp_properties.json` by the extension?**  | Asks if the current implementation can be turned off, because it overwrites a user's config with non working IS config -- this is sad. |
+|  7| [#833](https://github.com/microsoft/vscode-arduino/issues/833) | **Allow C_Cpp.intelliSenseEngine to be set to "Default" instead of "Tag Parser" for better code completion/suggestions**  |  |
+|  8| [#831](https://github.com/microsoft/vscode-arduino/issues/831) | **IntelliSenseEngine doesn't work as default** |  |
+|  9| [#829](https://github.com/microsoft/vscode-arduino/issues/829) | **`Arduino.h` and ESP8266 includes have squiggles** | Stale issue |
+| 10| [#823](https://github.com/microsoft/vscode-arduino/issues/823) | **Intellisense is not highlighting code** | Stale issue |
+| 11| [#818](https://github.com/microsoft/vscode-arduino/issues/818) | **Warning with default includePath after initialize, cannot open source file `avr/pgmspace.h`** | Stale issue |
+| 12| [#808](https://github.com/microsoft/vscode-arduino/issues/808) | **Identifier `Serial` is undefined**  |  |
+| 13| [#776](https://github.com/microsoft/vscode-arduino/issues/776) | **Can not open source file `omp.h` (dependency of `ESP8266WiFi.h`** |  |
+| 14| [#772](https://github.com/microsoft/vscode-arduino/issues/772) | **How to fix red squiggles under constants like D2 (upload works fine)** |  |
+| 15| [#761](https://github.com/microsoft/vscode-arduino/issues/761) | **When creating the `c_cpp_properties.json` it should include the libraries folder as well as all of the other folders.** |  |
+| 16| [#749](https://github.com/microsoft/vscode-arduino/issues/749) | **Non-fatal error on Adafruit Feather M0: cannot open source file `sam.h`** | Stale issue |
+| 17| [#727](https://github.com/microsoft/vscode-arduino/issues/727) | **Intellisense for Arduino Tabs** | Stale issue |
+| 18| [#684](https://github.com/microsoft/vscode-arduino/issues/684) | **Default C/C++ configuration uses MSVC for IntelliSense rather than GCC** | Stale issue |
+| 19| [#678](https://github.com/microsoft/vscode-arduino/issues/678) | **Dependency error `avr32/io.h`** | Stale issue |
+| 20| [#645](https://github.com/microsoft/vscode-arduino/issues/645) | **Should IntelliSense suggest only built in function?** | Stale issue |
+| 21| [#613](https://github.com/microsoft/vscode-arduino/issues/613) | **Read content of `keywords.txt` for text highlights** | This will become obsolete as well since `keywords.txt` is a dirty workaround for the arduino IDE which doesn't have IntelliSense at all. |
+| 22| [#563](https://github.com/microsoft/vscode-arduino/issues/563) | **Support of intellisence for library Wire(sam)** |  |
+| 23| [#525](https://github.com/microsoft/vscode-arduino/issues/525) | **`#include` errors detected - Tag Parser.** | Closed but still not fixed properly |
+| 24| [#474](https://github.com/microsoft/vscode-arduino/issues/474) | **Enrich device develop experience**  |  |
+| 25| [#127](https://github.com/microsoft/vscode-arduino/issues/127) | **Syntax highlighting for some of the Classes/Instances is missing** | Closed but still not fixed properly |
+| 26| [#126](https://github.com/microsoft/vscode-arduino/issues/126) | **Syntax highlighting for some of the Macros is missing** | Closed but still not fixed properly |
+| 27| [#125](https://github.com/microsoft/vscode-arduino/issues/125) | **Missing syntax highlighting for partial arduino constants** | Closed but still not fixed properly |
+| 28| [#115](https://github.com/microsoft/vscode-arduino/issues/115) | **Dot prompting the methods doesn't work on Mac** | Closed but still not fixed properly |
 
-<!-- | 11| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
-<!-- | 12| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
-<!-- | 13| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
-<!-- | 14| [#](https://github.com/microsoft/vscode-arduino/issues/) |  |  | -->
+<!-- |   | [#](https://github.com/microsoft/vscode-arduino/issues/) | **** |  | -->
+<!-- |   | [#](https://github.com/microsoft/vscode-arduino/issues/) | **** |  | -->
+<!-- |   | [#](https://github.com/microsoft/vscode-arduino/issues/) | **** |  | -->
+<!-- |   | [#](https://github.com/microsoft/vscode-arduino/issues/) | **** |  | -->
 
 -- the list is probably incomplete - I didn't search exhaustively and didn't consider closed issues as long as I didn't stumble upon one. New duplicates are popping up at a rate of about one per week.
 
-Further related issues
+Some issue searches and other related issues
 * [vscode-arduino issue search for IntelliSense](https://github.com/microsoft/vscode-arduino/issues?utf8=%E2%9C%93&q=intellisense+is%3Aopen)
+* [vscode-arduino issue search for intellisense label](https://github.com/microsoft/vscode-arduino/issues?utf8=%E2%9C%93&q=label%3Aintellisense)
 * [Wrongly attributed to vscode instead of vscode-arduino](https://github.com/Microsoft/vscode-cpptools/issues/1750)
 * [Problems with IntelliSense itself](https://github.com/microsoft/vscode-cpptools/issues/1034)
 
