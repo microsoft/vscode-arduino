@@ -124,7 +124,7 @@ It doesn't makes sense though to run the analysis repeatedly. Therefore if the w
 Manual rebuild: **Arduino: Rebuild IntelliSense Configuration**,  
 Keybindings: <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
 
-When the analysis is invoked manually it overrides global and project specific settings.
+When the analysis is invoked manually it ignores any global and project specific disable.
 
 ### IntelliSense Configurations
 vscode-arduino's analysis stores the result as a dedicated IntelliSense-configuration named `Arduino`. You have to select it from the far right of the status bar when you're in one of your source files as shown here:
