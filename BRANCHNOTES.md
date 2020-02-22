@@ -90,6 +90,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 **2020 02 18** Finished basic event triggering. Rewrote `DeviceContext` for proper settings modification detection (trigger events only on actual change) and generation of setting specific events (e.g. board changed) instead of one global event (aka. "something in the settings changed").
 **2020 02 19** Implemented proper build scheduling for analysis build by writing an `AnalysisManager` class. This class collects multiple changes (e.g. board and configuration, which often are changed shortly after another) before running an analysis. In case another build or analysis is in progress it postpones newly filed analysis requests until the other build has completed. Updated and completed the documentation for the IntelliSense usage within [README](README.md). Alpha test builds of the extension containing the latest implemented features and fixes are now available from the following [Dropbox folder](https://www.dropbox.com/sh/whmcdt26chyjgby/AAB1Ld2fzZ9Z_NfM3CRay17wa). Please note, that Windows is currently not supported yet. Reviewed, documented/commented all changes and committed the automatic analysis integration changes.
 **2020 02 20** Windows support - what a PITA. This OS is so foobar'ed... The only positive outcome from this experience: I found some substantial bugs in the parser which - of course (Murphy) - didn't affect me up to now. The parser should be much more resistant against strange paths and escapes now: Added proper command line lexer to cocopa and worked around several ridiculous Windows shortcomings (Microsoft owes me at least 50 crates of beer). The whole mess is not cleaned up and committed yet so please don't build from the repository and use the alpha release packages as outlined above.
+**2020 02 21** Discovered problems and bugs in the current official releas from Microsoft: Fixed event handling within board manager. Added validity checks when loading board configurations from arduino.json. Better error handling and code locality, for details see commit.
 
 ## Status
 |      | Tasks   |
@@ -168,6 +169,7 @@ I will list every supporter here, thanks!
 2020-02-18 Elektronik Workshop: 36 :beers: (9h coding)
 2020-02-19 Elektronik Workshop: 48 :beers: (12h coding)
 2020-02-20 Elektronik Workshop: 56 :beers: (14h coding)
+2020-02-21 Elektronik Workshop: 48 :beers: (12h coding)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -209,6 +211,7 @@ I will list every supporter here, thanks!
 * Further IntelliSense enhancements/features:
   * When having adding a library folder to the workspace IntelliSense should use the same configuration for it to enable library navigation and code completion.
   * Optimization: Abort analysis build as soon as compiler statement has been found
+* Non-IDE unit testing - to eliminate dependency injection use ts-mock-imports for instance
 
 ## Non-categorized Notes
 ### Integrate upstream changes into fork
