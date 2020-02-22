@@ -48,6 +48,9 @@ export function isCompilerParserEnabled(dc?: DeviceContext) {
  *     Arduino currently sets the C++ standard during compilation with the
  *     flag -std=gnu++11
  *
+ * * Order of includes: Perhaps insert the internal includes at the front
+ *     as at least for the forcedIncludes IntelliSense seems to take the
+ *     order into account.
  */
 export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
 
@@ -60,7 +63,10 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
             arduinoChannel.warning("Failed to generate IntelliSense configuration.");
             return;
         }
-        const pPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
+
+        // Normalize compiler and include paths (resolve ".." and ".")
+        runner.result.normalize();
+
         // TODO: check what kind of result we've got: gcc or other architecture:
         //  and instantiate content accordingly (to be implemented within cocopa)
         const content = new ccp.CCppPropertiesContentResult(runner.result,
@@ -70,6 +76,7 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
                                                             // as of 1.8.11 arduino is on C++11
                                                             ccp.CCppPropertiesCppStandard.Cpp11);
         try {
+            const pPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
             const prop = new ccp.CCppProperties();
             prop.read(pPath);
             prop.merge(content, ccp.CCppPropertiesMergeMode.ReplaceSameNames);
