@@ -40,6 +40,14 @@ export function isCompilerParserEnabled(dc?: DeviceContext) {
  * and keeps the calling context more readable.
  *
  * @param dc The device context of the caller.
+ *
+ * Possible enhancements:
+ *
+ * * Parse c++ standard from arduino command line
+ *
+ *     Arduino currently sets the C++ standard during compilation with the
+ *     flag -std=gnu++11
+ *
  */
 export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
 
@@ -92,29 +100,9 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
  * @param dc Current device context used to generate the engines.
  */
 function makeCompilerParserEngines(dc: DeviceContext) {
-
-    let sketch = path.basename(dc.sketch);
-    const dotcpp = sketch.endsWith(".ino") ? ".cpp" : "";
-    sketch = `-o\\s+\\S*${ccp.regExEscape(sketch)}${dotcpp}\\.o`;
-
-    // TODO: handle other architectures here
-
-    const matchPattern = [
-        // make sure we're running g++
-        /(?:^|-)g\+\+\s+/,
-        // make sure we're compiling
-        /\s+-c\s+/,
-        // trigger parser when compiling the main sketch
-        RegExp(sketch),
-    ];
-
-    const dontMatchPattern = [
-        // make sure Arduino's not testing libraries
-        /-o\s+\/dev\/null/,
-    ];
-
-    // setup the parser with its engines
-    const gccParserEngine = new ccp.ParserGcc(matchPattern, dontMatchPattern);
+    const sketch = path.basename(dc.sketch);
+    const trigger = ccp.getTriggerForArduinoGcc(sketch);
+    const gccParserEngine = new ccp.ParserGcc(trigger);
     return [gccParserEngine];
 }
 
@@ -286,8 +274,10 @@ export class AnalysisManager {
             clearTimeout(this._timer);
         }
         this._timer = setTimeout(() => {
-            this.update(AnalysisEvent.WaitTimeout);
+            // reset timer variable first - calling update can cause
+            // the timer to be restarted.
             this._timer = undefined;
+            this.update(AnalysisEvent.WaitTimeout);
         }, this._waitPeriodMs);
     }
 
