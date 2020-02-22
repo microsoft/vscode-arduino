@@ -8,6 +8,7 @@ import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
+import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
 import LocalWebServer from "./localWebServer";
 
@@ -262,6 +263,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         } else {
             try {
                 ArduinoContext.boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
+                const dc = DeviceContext.getInstance();
+                dc.configuration = ArduinoContext.boardManager.currentBoard.customConfig;
                 return res.json({
                     status: "OK",
                 });
