@@ -11,6 +11,7 @@ import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
 import LocalWebServer from "./localWebServer";
 import { VscodeSettings } from "./vscodeSettings";
+import { DeviceContext } from "../deviceContext";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
@@ -263,6 +264,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         } else {
             try {
                 ArduinoContext.boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
+                const dc = DeviceContext.getInstance();
+                dc.configuration = ArduinoContext.boardManager.currentBoard.customConfig;
                 return res.json({
                     status: "OK",
                 });
