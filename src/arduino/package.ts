@@ -179,7 +179,7 @@ export interface IBoard {
 
     /**
      * Reference to the platform that contains this board.
-     * @prop {IPlatform}
+     * @property {IPlatform}
      */
     platform: IPlatform;
 
