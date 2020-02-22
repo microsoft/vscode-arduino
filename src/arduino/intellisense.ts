@@ -68,7 +68,7 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
         runner.result.normalize();
 
         // TODO: check what kind of result we've got: gcc or other architecture:
-        //  and instantiate content accordingly (to be implemented within cocopa)        
+        //  and instantiate content accordingly (to be implemented within cocopa)
         const content = new ccp.CCppPropertiesContentResult(runner.result,
                                                             "Arduino",
                                                             ccp.CCppPropertiesISMode.Gcc_X64,
