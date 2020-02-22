@@ -153,6 +153,35 @@ export interface IBoardConfigItem {
 }
 
 /**
+ * Return values of calls to IBoard.loadConfig() and IBoard.updateConfig().
+ */
+export enum BoardConfigResult {
+    /**
+     * Setting configuration value(s) was successful
+     */
+    Success,
+    /**
+     * Setting configuration value(s) was successful. All or some items
+     * were already set to the requested values.
+     */
+    SuccessNoChange,
+    /**
+     * One or more configuration keys were invalid.
+     */
+    InvalidConfigID,
+    /**
+     * One or more options were invalid.
+     */
+    InvalidOptionID,
+    /**
+     * Can only happen when calling IBoard.loadConfig() and when
+     * the raw configuration string did contain invalid/unparsable
+     * elements.
+     */
+    InvalidFormat,
+}
+
+/**
  * Interface for classes that represent an Arduino supported board.
  *
  * @interface
@@ -206,14 +235,32 @@ export interface IBoard {
     getBuildConfig(): string;
 
     /**
-     * Load default configuration from saved context.
+     * Load configuration from saved context.
+     * Parses the configuration string and tries to set the individual
+     * configuration values. It will bail out on any error.
+     * @param {string} configString The configuration string from the
+     * configuration file.
+     * @returns {BoardConfigResult} Result of the operation - for more
+     * information see documentation of BoardConfigResult.
      */
-    loadConfig(configString: string): void;
+    loadConfig(configString: string): BoardConfigResult;
 
     /**
-     * Update the configuration
+     * Set configuration value.
+     * This function makes sure, that the configuration ID and the option ID
+     * are actually valid. It will bail out on any error
+     * @param {string} configId The ID of the configuration value
+     * @param {string} optionId The ID to which the option of the configuration
+     * value should be set to.
+     * @returns {BoardConfigResult} Result of the operation - for more
+     * information see documentation of BoardConfigResult.
      */
-    updateConfig(configId: string, optionId: string): boolean;
+    updateConfig(configId: string, optionId: string): BoardConfigResult;
+
+    /**
+     * Reset configuration to defaults and update configuration file.
+     */
+    resetConfig();
 
     /**
      * Get the board package name
