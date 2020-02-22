@@ -257,7 +257,6 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            arduinoContextModule.default.boardManager.updateStatusBar(true);
             // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
             // arduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths();
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
@@ -275,7 +274,6 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            arduinoContextModule.default.boardManager.updateStatusBar(true);
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         }
     });
