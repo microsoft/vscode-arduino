@@ -108,20 +108,19 @@ During merging I found some bugs within those functions - mainly due to the abov
 |                                       | :heavy_check_mark: Merging of parsing result and existing file content |
 |                                       | :heavy_check_mark: Handling inexistent files and folders |
 |                                       | :heavy_check_mark: Write configuration on change only |
-|                                       | :white_check_mark: Option to backup old configurations? |
 | **Configuration flags**               | :heavy_check_mark: Provide global disable flag for IntelliSense auto-config |
 |                                       | :heavy_check_mark: Provide project specific override for the global flag - most users will likely use the default setup and disable auto-generation for very specific projects |
 | **Unit tests**                        | :heavy_check_mark: Basic parser (known boards, match/no match)|
 |                                       | :white_check_mark: All unit tests in cocopa |
 |                                       | :white_check_mark: Test with cpp sketches |
 | **General**                           | :heavy_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense (documented in the [General Tasks](#General-Tasks) section) `*` |
-|                                       | :white_check_mark: *Auto-run verify when* |
+|                                       | :heavy_check_mark: *Auto-run verify when* |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: a) setting a board `*` |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: b) changing the board's configuration `*` |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: c) selecting another sketch `*` |
-|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: d) workbench initialized and no `c_cpp_properties.json` found |
-|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: e) Identify other occasions where this applies (usually when adding new libraries) |
-|                                       | :white_check_mark: Hint the user to run *Arduino: Rebuild IntelliSense Configuration*? -> Good moment would be after the workbench initialization -> message in arduino channel |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: d) ~~workbench initialized and no `c_cpp_properties.json` found~~ obsolete: when board and board configuration is loaded on start up the analysis is triggered anyways |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: e) Identify other occasions where this applies (usually when adding new libraries) -- any suggestions? |
+|                                       | :heavy_check_mark: Hint the user to run *Arduino: Rebuild IntelliSense Configuration* -> printing message after each build (verify, upload, ...) |
 |                                       | :heavy_check_mark: Better build management such that regular builds and analyze builds do not interfere (done, 2020-02-19) `*` |
 |                                       | :heavy_check_mark: Analyze task queue which fits in the latter  (done, 2020-02-19) `*` |
 |                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
@@ -214,6 +213,9 @@ I will list every supporter here, thanks!
   * When having adding a library folder to the workspace IntelliSense should use the same configuration for it to enable library navigation and code completion.
   * Optimization: Abort analysis build as soon as compiler statement has been found
 * Non-IDE unit testing - to eliminate dependency injection use ts-mock-imports for instance
+* Hardcoded and scattered constants:
+  * Load package.json and use values from therein instead of hard coding redundant values like shortcuts (like I did for the IntelliSense message in `arduino.ts`)
+  * Scan code for other hard coded stuff and take appropriate countermeasures
 
 ## Non-categorized Notes
 ### Integrate upstream changes into fork
