@@ -774,7 +774,7 @@ Please make sure the folder is not occupied by other procedures .`);
 
         const cleanup = async () => {
             if (cocopa) {
-                cocopa.conclude();
+                await cocopa.conclude();
             }
             if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
@@ -805,15 +805,21 @@ Please make sure the folder is not occupied by other procedures .`);
             stdoutCallback,
         ).then(async () => {
             await cleanup();
+            if (mode != BuildMode.Analyze) {
+                const cmd = os.platform() == "darwin"
+                    ? "Cmd + Alt + I"
+                    : "Ctrl + Alt + I";
+                arduinoChannel.info(`To rebuild your IntelliSense configuration run "${cmd}"`);
+            }
             arduinoChannel.end(`${mode} sketch '${dc.sketch}${os.EOL}`);
             success = true;
         }, async (reason) => {
             await cleanup();
-            const msg = reason.code ?
-                `Exit with code=${reason.code}` :
-                reason.message ?
-                    reason.message :
-                    JSON.stringify(reason);
+            const msg = reason.code
+                ? `Exit with code=${reason.code}`
+                : reason.message
+                    ? reason.message
+                    : JSON.stringify(reason);
             arduinoChannel.error(`${mode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
         });
 

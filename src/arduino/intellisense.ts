@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 import * as ccp from "cocopa";
+import * as fs from "fs";
 import * as path from "path";
+import * as tp from "typed-promisify";
 
 import * as constants from "../common/constants";
 import { arduinoChannel } from "../common/outputChannel";
@@ -13,7 +15,7 @@ import { VscodeSettings } from "./vscodeSettings";
 
 export interface ICoCoPaContext {
     callback: (s: string) => void;
-    conclude: () => void;
+    conclude: () => Promise<void>;
 };
 
 /**
@@ -58,7 +60,7 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
     const runner = new ccp.Runner(engines);
 
     // Set up the callback to be called after parsing
-    const _conclude = () => {
+    const _conclude = async () => {
         if (!runner.result) {
             arduinoChannel.warning("Failed to generate IntelliSense configuration.");
             return;
@@ -67,6 +69,17 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
         // Normalize include paths (resolve ".." and ".")
         runner.result.normalize();
 
+        // Search for Arduino.h in the include paths - we need it for a
+        // forced include - users expect Arduino symbols to be available
+        // in main sketch without having to include the header explicitly
+        const ardHeader = await locateArduinoHeader(runner.result.includes);
+        const forcedIncludes = ardHeader
+            ? [ ardHeader ]
+            : undefined;
+        if (!ardHeader) {
+            arduinoChannel.warning("Unable to locate \"Arduino.h\" within IntelliSense include paths.");
+        }
+
         // TODO: check what kind of result we've got: gcc or other architecture:
         //  and instantiate content accordingly (to be implemented within cocopa)
         const content = new ccp.CCppPropertiesContentResult(runner.result,
@@ -74,7 +87,8 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
                                                             ccp.CCppPropertiesISMode.Gcc_X64,
                                                             ccp.CCppPropertiesCStandard.C11,
                                                             // as of 1.8.11 arduino is on C++11
-                                                            ccp.CCppPropertiesCppStandard.Cpp11);
+                                                            ccp.CCppPropertiesCppStandard.Cpp11,
+                                                            forcedIncludes);
         try {
             const pPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
             const prop = new ccp.CCppProperties();
@@ -111,6 +125,50 @@ function makeCompilerParserEngines(dc: DeviceContext) {
     const trigger = ccp.getTriggerForArduinoGcc(sketch);
     const gccParserEngine = new ccp.ParserGcc(trigger);
     return [gccParserEngine];
+}
+
+/**
+ * Search directories recursively for a file.
+ * @param dir Directory where the search should begin.
+ * @param what The file we're looking for.
+ * @returns The path of the directory which contains the file else undefined.
+ */
+async function findDirContaining(dir: string, what: string): Promise<string | undefined> {
+    const readdir = tp.promisify(fs.readdir);
+    const fsstat = tp.promisify(fs.stat);
+    
+    for (const entry of await readdir(dir)) {
+        const p = path.join(dir, entry);
+        const s = await fsstat(p);
+        console.log(p);
+        if (s.isDirectory()) {
+            const result = await findDirContaining(p, what);
+            if (result) {
+                return result;
+            }
+        } else if (entry === what) {
+            return dir;
+        }
+    }
+    return undefined;
+};
+
+/**
+ * Tries to find the main Arduino header (i.e. Arduino.h) in the given include
+ * paths.
+ * @param includes Array containing all include paths in which we should look
+ * for Arduino.h
+ * @returns The full path of the main Arduino header.
+ */
+async function locateArduinoHeader(includes: string[]) {
+    const header = "Arduino.h";
+    for (const i of includes) {
+        const result = await findDirContaining(i, header);
+        if (result) {
+            return path.join(result, header);
+        }
+    }
+    return undefined;
 }
 
 /**
