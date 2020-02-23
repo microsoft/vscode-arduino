@@ -296,11 +296,11 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                             /* TODO (EW, 2020-02-18):
                              * is 'c' actually allowed? Also found on within other files.
                              * And the regular expression doesn't need the intenal groups.
-                             * The outer group can be an anonymous group. 
+                             * The outer group can be an anonymous group.
                              * And \w doesn't match dashes - so any sketch containing dashes
                              * will not be found.
                              * The correct expression therefore would be something like this:
-                             * 
+                             *
                              *   /^[\w\-]+\.(?:ino|cpp)$/
                              *
                              * I'd recommend to define such regular expressions (including)
