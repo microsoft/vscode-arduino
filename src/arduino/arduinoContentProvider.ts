@@ -10,7 +10,6 @@ import * as Constants from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import * as Logger from "../logger/logger";
 import LocalWebServer from "./localWebServer";
-import { VscodeSettings } from "./vscodeSettings";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
