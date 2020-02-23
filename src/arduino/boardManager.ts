@@ -291,7 +291,7 @@ export class BoardManager {
                 // setting partially valid configurations can lead to nasty
                 // surprises. When setting a new board this is acceptable
                 const r = this._currentBoard.loadConfig(dc.configuration);
-                if (r != BoardConfigResult.Success && r != BoardConfigResult.SuccessNoChange) {
+                if (r !== BoardConfigResult.Success && r !== BoardConfigResult.SuccessNoChange) {
                     this._currentBoard.resetConfig();
                     // we don't reset dc.configuration to give the user a
                     // chance to fix her/his configuration
@@ -317,7 +317,7 @@ export class BoardManager {
         const dc = DeviceContext.getInstance();
         if (this._currentBoard) {
             const r = this._currentBoard.loadConfig(dc.configuration);
-            if (r != BoardConfigResult.Success && r != BoardConfigResult.SuccessNoChange) {
+            if (r !== BoardConfigResult.Success && r !== BoardConfigResult.SuccessNoChange) {
                 this._currentBoard.resetConfig();
                 // We reset the configuration here but do not write it back
                 // to the configuration file - this can be annoying when
@@ -328,17 +328,17 @@ export class BoardManager {
         }
     }
 
-    public invalidConfigWarning(result: BoardConfigResult) {
+    private invalidConfigWarning(result: BoardConfigResult) {
         let what = "";
         switch (result) {
             case BoardConfigResult.InvalidFormat:
-                what = ': Invalid format must be of the form "key1=value2,key1=value2,..."';
+                what = ": Invalid format must be of the form \"key1=value2,key1=value2,...\"";
                 break;
             case BoardConfigResult.InvalidConfigID:
-                what = ': Invalid configuration key';
+                what = ": Invalid configuration key";
                 break;
             case BoardConfigResult.InvalidOptionID:
-                what = ': Invalid configuration value';
+                what = ": Invalid configuration value";
                 break;
         }
         vscode.window.showWarningMessage(`Invalid board configuration detected in configuration file${what}. Falling back to defaults.`);

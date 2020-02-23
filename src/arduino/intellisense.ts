@@ -121,7 +121,7 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
  */
 function makeCompilerParserEngines(dc: DeviceContext) {
 
-    let sketch = path.basename(dc.sketch);
+    const sketch = path.basename(dc.sketch);
     const trigger = ccp.getTriggerForArduinoGcc(sketch);
     const gccParserEngine = new ccp.ParserGcc(trigger);
     return [gccParserEngine];
@@ -136,11 +136,10 @@ function makeCompilerParserEngines(dc: DeviceContext) {
 async function findDirContaining(dir: string, what: string): Promise<string | undefined> {
     const readdir = tp.promisify(fs.readdir);
     const fsstat = tp.promisify(fs.stat);
-    
+
     for (const entry of await readdir(dir)) {
         const p = path.join(dir, entry);
         const s = await fsstat(p);
-        console.log(p);
         if (s.isDirectory()) {
             const result = await findDirContaining(p, what);
             if (result) {
@@ -217,7 +216,7 @@ enum AnalysisEvent {
 /**
  * This class manages analysis builds for the automatic IntelliSense
  * configuration synthesis. Its primary purposes are:
- * 
+ *
  *  * delaying analysis requests caused by DeviceContext setting change
  *      events such that multiple subsequent requests don't cause
  *      multiple analysis builds
@@ -257,7 +256,7 @@ export class AnalysisManager {
      * analysis request. This delay is used as polling interval as well when
      * checking for ongoing builds.
      */
-    constructor(isBuilding:() => boolean,
+    constructor(isBuilding: () => boolean,
                 doBuild: () => Promise<void>,
                 waitPeriodMs: number = 1000) {
         this._isBuilding = isBuilding;
@@ -271,33 +270,32 @@ export class AnalysisManager {
      * within a wait period or until any build in progress has terminated.
      */
     public async requestAnalysis() {
-        console.log("requesting analysis");
         await this.update(AnalysisEvent.AnalysisRequest);
     }
 
     /**
      * Update the manager's state machine.
      * @param event The event which will cause the state transition.
-     * 
+     *
      * Implementation note: asynchronous edge actions must be called after
-     * setting the new state since they don't return immediately. 
+     * setting the new state since they don't return immediately.
      */
     private async update(event: AnalysisEvent) {
 
         switch (this._state) {
 
             case AnalysisState.Idle:
-                if (event == AnalysisEvent.AnalysisRequest) {
+                if (event === AnalysisEvent.AnalysisRequest) {
                     this._state = AnalysisState.Waiting;
                     this.startWaitTimeout();
                 }
                 break;
 
             case AnalysisState.Waiting:
-                if (event == AnalysisEvent.AnalysisRequest) {
+                if (event === AnalysisEvent.AnalysisRequest) {
                     // every new request restarts timer
                     this.startWaitTimeout();
-                } else if (event == AnalysisEvent.WaitTimeout) {
+                } else if (event === AnalysisEvent.WaitTimeout) {
                     if (this._isBuilding()) {
                         // another build in progress, continue waiting
                         this.startWaitTimeout();
@@ -310,15 +308,15 @@ export class AnalysisManager {
                 break;
 
             case AnalysisState.Analyzing:
-                if (event == AnalysisEvent.AnalysisBuildDone) {
+                if (event === AnalysisEvent.AnalysisBuildDone) {
                     this._state = AnalysisState.Idle;
-                } else if (event == AnalysisEvent.AnalysisRequest) {
+                } else if (event === AnalysisEvent.AnalysisRequest) {
                     this._state = AnalysisState.AnalyzingWaiting;
                 }
                 break;
 
             case AnalysisState.AnalyzingWaiting:
-                if (event == AnalysisEvent.AnalysisBuildDone) {
+                if (event === AnalysisEvent.AnalysisBuildDone) {
                     // emulate the transition from idle to waiting
                     // (we don't care if this adds an additional
                     // timeout - event driven analysis is not time-

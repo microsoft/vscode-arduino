@@ -17,10 +17,10 @@ import * as logger from "./logger/logger";
  * to prevent invalid or badly formatted values to enter your settings.
  */
 class Setting<T> {
+    /** The setting's default value. */
+    public readonly default: T;
     /** The actual value of the setting. */
     private _value: T | undefined;
-    /** The setting's default value. */
-    readonly default: T;
     /** Indicates if the value was changed since the last call to this.commit(). */
     private _modified: boolean;
     /** Event emitter which fires when the value is changed. */
@@ -51,7 +51,7 @@ class Setting<T> {
      * To clear the modified flag call commit().
      */
     public get modified() {
-        return this._modified;        
+        return this._modified;
     }
     /** Returns the modified-event emitter. */
     public get emitter() {
@@ -104,15 +104,15 @@ class StrSetting extends Setting<string> {
  * provides common operations on them.
  */
 export class DeviceSettings {
-    port: StrSetting = new StrSetting();
-    board: StrSetting = new StrSetting();
-    sketch: StrSetting = new StrSetting();
-    output: StrSetting = new StrSetting();
-    debugger: StrSetting = new StrSetting();
-    intelliSenseGen: StrSetting = new StrSetting();
-    configuration: StrSetting = new StrSetting();
-    prebuild: StrSetting = new StrSetting();
-    programmer: StrSetting = new StrSetting();
+    public port: StrSetting = new StrSetting();
+    public board: StrSetting = new StrSetting();
+    public sketch: StrSetting = new StrSetting();
+    public output: StrSetting = new StrSetting();
+    public debugger: StrSetting = new StrSetting();
+    public intelliSenseGen: StrSetting = new StrSetting();
+    public configuration: StrSetting = new StrSetting();
+    public prebuild: StrSetting = new StrSetting();
+    public programmer: StrSetting = new StrSetting();
 
     /**
      * @returns true if any of the settings values has its modified flag

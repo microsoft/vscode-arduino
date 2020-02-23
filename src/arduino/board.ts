@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { IBoard, IBoardConfigItem, IPlatform, BoardConfigResult } from "./package";
+import { BoardConfigResult, IBoard, IBoardConfigItem, IPlatform } from "./package";
 
 export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): Map<string, IBoard> {
     const boardLineRegex = /([^\.]+)\.(\S+)=(.+)/;
@@ -142,7 +142,7 @@ export class Board implements IBoard {
         for (const o of targetConfig.options) {
             // Make sure that we only set valid options, e.g. when loading
             // from config files.
-            if (o.id == optionId) {
+            if (o.id === optionId) {
                 if (targetConfig.selectedOption !== optionId) {
                     targetConfig.selectedOption = optionId;
                     return BoardConfigResult.Success;

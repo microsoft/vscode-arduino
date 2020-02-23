@@ -74,7 +74,7 @@ export class ArduinoApp {
     constructor(private _settings: IArduinoSettings) {
         const analysisDelayMs = 1000 * 3;
         this._analysisManager = new AnalysisManager(
-            () => { return this._building; },
+            () => this._building,
             async () => { await this.build(BuildMode.Analyze); },
             analysisDelayMs);
     }
@@ -633,7 +633,7 @@ Please make sure the folder is not occupied by other procedures .`);
      * @returns True if successful, false on error.
      */
     protected async runPreBuildCommand(dc: DeviceContext): Promise<boolean> {
-        const prebuildcmdline = dc.prebuild; 
+        const prebuildcmdline = dc.prebuild;
         if (prebuildcmdline) {
             arduinoChannel.info(`Running pre-build command: ${prebuildcmdline}`);
             const args = prebuildcmdline.split(/\s+/);
@@ -679,14 +679,14 @@ Please make sure the folder is not occupied by other procedures .`);
         }
 
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
-            if (mode == BuildMode.Analyze) {
+            if (mode === BuildMode.Analyze) {
                 // Analyze runs non interactively
                 return false;
             }
             if (!await dc.resolveMainSketch()) {
                 vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
                 return false;
-            }    
+            }
         }
 
         const selectSerial = async () => {
@@ -805,8 +805,8 @@ Please make sure the folder is not occupied by other procedures .`);
             stdoutCallback,
         ).then(async () => {
             await cleanup();
-            if (mode != BuildMode.Analyze) {
-                const cmd = os.platform() == "darwin"
+            if (mode !== BuildMode.Analyze) {
+                const cmd = os.platform() === "darwin"
                     ? "Cmd + Alt + I"
                     : "Ctrl + Alt + I";
                 arduinoChannel.info(`To rebuild your IntelliSense configuration run "${cmd}"`);
