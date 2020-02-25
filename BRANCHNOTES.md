@@ -93,6 +93,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 **2020 02 21** Discovered problems and bugs in the current official release from Microsoft: Fixed event handling within board manager. Added validity checks when loading board configurations from arduino.json. Better error handling and code locality, for details see commit.  
 **2020 02 22** Worked on cocopa unit tests: restored broken tests and added platform test for built-in parser. Added path normalizing for include paths for both cocopa and vscode-arduino. Verified correct behaviour on Windows with latest release (alpha tester claimed it not to be working)  
 **2020 02 23** Several tests, fixes and improvements within cocopa. `Arduino.h` now added to forced includes. Fixed code which wasn't linted up to now. Added hint to end of build how to rebuild the IntelliSense configuration. Added missing version field to `c_cpp_properties.json`.  
+**2020 02 25** Implemented and tested support for `.cpp`-sketches. Done implementing the most relevant unit tests in cocopa. Two independent alpha testers confirm proper working of the previous alpha releases. Updated to the latest revision of cocopa.  
 
 ## Status
 |      | Tasks   |
@@ -112,8 +113,8 @@ During merging I found some bugs within those functions - mainly due to the abov
 | **Configuration flags**               | :heavy_check_mark: Provide global disable flag for IntelliSense auto-config |
 |                                       | :heavy_check_mark: Provide project specific override for the global flag - most users will likely use the default setup and disable auto-generation for very specific projects |
 | **Unit tests**                        | :heavy_check_mark: Basic parser (known boards, match/no match)|
-|                                       | :white_check_mark: All unit tests in cocopa |
-|                                       | :white_check_mark: Test with cpp sketches |
+|                                       | :heavy_check_mark: All unit tests in cocopa |
+|                                       | :heavy_check_mark: Test with cpp sketches |
 | **General**                           | :heavy_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense (documented in the [General Tasks](#General-Tasks) section) `*` |
 |                                       | :heavy_check_mark: *Auto-run verify when* |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: a) setting a board `*` |
@@ -173,6 +174,7 @@ I will list every supporter here, thanks!
 2020-02-21 Elektronik Workshop: 48 :beers: (12h coding)  
 2020-02-22 Elektronik Workshop: 44 :beers: (11h coding)  
 2020-02-23 Elektronik Workshop: 20 :beers: (5h coding)  
+2020-02-25 Elektronik Workshop: 12 :beers: (3h coding)  
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -219,7 +221,13 @@ I will list every supporter here, thanks!
   * Load package.json and use values from therein instead of hard coding redundant values like shortcuts (like I did for the IntelliSense message in `arduino.ts`)
   * Line splitting and other regexes
   * Scan code for other hard coded stuff and take appropriate countermeasures
-
+* Write good documentation/manual
+  * Integration of Arduino
+  * Project structure
+  * How does the compiling work
+  * Build/Arduino Backend
+  * Include paths
+  * Relation of IntelliSense and build
 ## Non-categorized Notes
 ### Integrate upstream changes into fork
 ```bash
