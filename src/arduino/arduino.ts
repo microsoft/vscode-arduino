@@ -567,7 +567,7 @@ Please make sure the folder is not occupied by other procedures .`);
             {
                 channel: !cocopa || cocopa && verbose ? arduinoChannel.channel : undefined,
                 stdout: cocopa ? cocopa.callback : undefined,
-            }
+            },
         ).then(async () => {
             await cleanup();
             if (mode !== BuildMode.Analyze) {
