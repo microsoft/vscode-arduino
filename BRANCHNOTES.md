@@ -176,6 +176,7 @@ I will list every supporter here, thanks!
 2020-02-22 Elektronik Workshop: 44 :beers: (11h coding)
 2020-02-23 Elektronik Workshop: 20 :beers: (5h coding)
 2020-02-25 Elektronik Workshop: 12 :beers: (3h coding)
+2020-02-26 Elektronik Workshop: 16 :beers: (4h coding)
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
