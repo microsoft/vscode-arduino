@@ -231,8 +231,6 @@ export async function activate(context: vscode.ExtensionContext) {
         };
     });
 
-    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-    // registerArduinoCommand("arduino.addLibPath", (path) => arduinoContextModule.default.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => arduinoContextModule.default.arduinoApp.openExample(path));
     registerArduinoCommand("arduino.loadPackages", async () => await arduinoContextModule.default.boardManager.loadPackages(true));
     registerArduinoCommand("arduino.installBoard", async (packageName, arch, version: string = "") => {
@@ -285,8 +283,6 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-            // arduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths();
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
     }

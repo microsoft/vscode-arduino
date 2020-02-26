@@ -83,12 +83,6 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
         }
         this._libPaths.clear();
         this._headerFiles.clear();
-        // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-        /*
-        ArduinoContext.arduinoApp.getDefaultPackageLibPaths().forEach((defaultPath) => {
-            this._libPaths.add(defaultPath);
-        });
-        */
         if (fs.existsSync(this._cppConfigFile)) {
             const deviceConfig = util.tryParseJSON(fs.readFileSync(this._cppConfigFile, "utf8"));
             if (deviceConfig) {
@@ -99,9 +93,8 @@ export class CompletionProvider implements vscode.CompletionItemProvider {
                     }
                 }
                 if (deviceConfig.configurations) {
-                    const plat = util.getCppConfigPlatform();
                     deviceConfig.configurations.forEach((configSection) => {
-                        if (configSection.name === plat && Array.isArray(configSection.includePath)) {
+                        if (configSection.name === constants.C_CPP_PROPERTIES_CONFIG_NAME && Array.isArray(configSection.includePath)) {
                             configSection.includePath.forEach((includePath) => {
                                 this._libPaths.add(path.normalize(includePath));
                             });

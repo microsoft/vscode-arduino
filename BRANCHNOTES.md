@@ -94,6 +94,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 **2020 02 22** Worked on cocopa unit tests: restored broken tests and added platform test for built-in parser. Added path normalizing for include paths for both cocopa and vscode-arduino. Verified correct behaviour on Windows with latest release (alpha tester claimed it not to be working)
 **2020 02 23** Several tests, fixes and improvements within cocopa. `Arduino.h` now added to forced includes. Fixed code which wasn't linted up to now. Added hint to end of build how to rebuild the IntelliSense configuration. Added missing version field to `c_cpp_properties.json`.
 **2020 02 25** Implemented and tested support for `.cpp`-sketches. Done implementing the most relevant unit tests in cocopa. Two independent alpha testers confirm proper working of the previous alpha releases. Updated to the latest revision of cocopa.
+**2020 02 26** Preparing for pull request: Removed all code marked `IS-REMOVE` and dead code which I was able to identify.
 
 ## Status
 |      | Tasks   |
@@ -115,23 +116,23 @@ During merging I found some bugs within those functions - mainly due to the abov
 | **Unit tests**                        | :heavy_check_mark: Basic parser (known boards, match/no match)|
 |                                       | :heavy_check_mark: All unit tests in cocopa |
 |                                       | :heavy_check_mark: Test with cpp sketches |
-| **General**                           | :heavy_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense (documented in the [General Tasks](#General-Tasks) section) `*` |
+| **General**                           | :heavy_check_mark: Review and remove previous attempts messing with `c_cpp_properties.json` or IntelliSense (documented in the [General Tasks](#General-Tasks) section)  |
 |                                       | :heavy_check_mark: *Auto-run verify when* |
-|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: a) setting a board `*` |
-|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: b) changing the board's configuration `*` |
-|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: c) selecting another sketch `*` |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: a) setting a board  |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: b) changing the board's configuration  |
+|                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: c) selecting another sketch  |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:heavy_check_mark: d) ~~workbench initialized and no `c_cpp_properties.json` found~~ obsolete: when board and board configuration is loaded on start up the analysis is triggered anyways |
 |                                       | &nbsp;&nbsp;&nbsp;&nbsp;:white_check_mark: e) Identify other occasions where this applies (usually when adding new libraries) -- any suggestions? |
 |                                       | :heavy_check_mark: Hint the user to run *Arduino: Rebuild IntelliSense Configuration* -> printing message after each build (verify, upload, ...) |
-|                                       | :heavy_check_mark: Better build management such that regular builds and analyze builds do not interfere (done, 2020-02-19) `*` |
-|                                       | :heavy_check_mark: Analyze task queue which fits in the latter  (done, 2020-02-19) `*` |
+|                                       | :heavy_check_mark: Better build management such that regular builds and analyze builds do not interfere (done, 2020-02-19)  |
+|                                       | :heavy_check_mark: Analyze task queue which fits in the latter  (done, 2020-02-19)  |
 |                                       | :heavy_check_mark: Document configuration settings in [README.md](README.md) |
 |                                       | :heavy_check_mark: Document features in [README.md](README.md) |
 |                                       | :heavy_check_mark: Try to auto-generate even if verify (i.e. compilation) fails |
 |                                       | :heavy_check_mark: Extract compiler command parser from vscode-arduino and [publish](https://itnext.io/step-by-step-building-and-publishing-an-npm-typescript-package-44fe7164964c) it as a separate package which will allow reusage and easy testing without heavy vscode-arduino rucksack -- done, see [cocopa](https://www.npmjs.com/package/cocopa) |
 |                                       | :heavy_check_mark: Parser only works when arduino is set to `verbose`, since this is the only way we get the compiler invocation command - this has to be fixed (done, see next item) |
 |                                       | :heavy_check_mark: Implement a *Rebuild IntelliSense Configuration* command which runs verify verbosely internally and therefore allows us to find and parse the compiler command |
-|                                       | :heavy_check_mark: Implement proper event generation for `DeviceContext`. a) Events should be issued only when something actually changes, b) Events should be issued for each setting separately `*`|
+|                                       | :heavy_check_mark: Implement proper event generation for `DeviceContext`. a) Events should be issued only when something actually changes, b) Events should be issued for each setting separately |
 |                                       | :white_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
@@ -217,6 +218,9 @@ I will list every supporter here, thanks!
   * When having adding a library folder to the workspace IntelliSense should use the same configuration for it to enable library navigation and code completion.
   * Optimization: Abort analysis build as soon as compiler statement has been found
 * Non-IDE unit testing - to eliminate dependency injection use ts-mock-imports for instance
+* Remove dead code
+* Identify bad code and rework it
+  * all those auxiliary functions in `src/common/util.ts` should be reviewed as they violate every guideline of good coding (try-catch clauses without error handling etc.)
 * Hardcoded and scattered constants:
   * Load package.json and use values from therein instead of hard coding redundant values like shortcuts (like I did for the IntelliSense message in `arduino.ts`)
   * Line splitting and other regexes
