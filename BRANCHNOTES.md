@@ -94,7 +94,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 **2020 02 22** Worked on cocopa unit tests: restored broken tests and added platform test for built-in parser. Added path normalizing for include paths for both cocopa and vscode-arduino. Verified correct behaviour on Windows with latest release (alpha tester claimed it not to be working)
 **2020 02 23** Several tests, fixes and improvements within cocopa. `Arduino.h` now added to forced includes. Fixed code which wasn't linted up to now. Added hint to end of build how to rebuild the IntelliSense configuration. Added missing version field to `c_cpp_properties.json`.
 **2020 02 25** Implemented and tested support for `.cpp`-sketches. Done implementing the most relevant unit tests in cocopa. Two independent alpha testers confirm proper working of the previous alpha releases. Updated to the latest revision of cocopa.
-**2020 02 26** Preparing for pull request: Removed all code marked `IS-REMOVE` and dead code which I was able to identify.
+**2020 02 26** Preparing for pull request: Removed all code marked `IS-REMOVE` and dead code which I was able to identify. Reviewed all TODOs and resolved those which can be fixed without having to bother the maintainers. Left the unresolved on grounds of documentation.
 
 ## Status
 |      | Tasks   |
@@ -133,7 +133,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 |                                       | :heavy_check_mark: Parser only works when arduino is set to `verbose`, since this is the only way we get the compiler invocation command - this has to be fixed (done, see next item) |
 |                                       | :heavy_check_mark: Implement a *Rebuild IntelliSense Configuration* command which runs verify verbosely internally and therefore allows us to find and parse the compiler command |
 |                                       | :heavy_check_mark: Implement proper event generation for `DeviceContext`. a) Events should be issued only when something actually changes, b) Events should be issued for each setting separately |
-|                                       | :white_check_mark: Finally: go through my code and look for TODOs |
+|                                       | :heavy_check_mark: Finally: go through my code and look for TODOs |
 
 `*` not committed to branch yet
 `>` most of the actual parsing and configuration generation is part of [cocopa](https://github.com/elektronikworkshop/cocopa/) ([here](https://www.npmjs.com/package/cocopa)'s the npm package)
