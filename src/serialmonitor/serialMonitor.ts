@@ -72,11 +72,11 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.command = "arduino.changeBaudRate";
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = defaultBaudRate.toString();
-        this.updatePortListStatus(null);
+        this.updatePortListStatus();
 
         const dc = DeviceContext.getInstance();
         dc.onChangePort(() => {
-            this.updatePortListStatus(null);
+            this.updatePortListStatus();
         });
     }
     public get initialized(): boolean {
@@ -210,8 +210,7 @@ export class SerialMonitor implements vscode.Disposable {
         }
     }
 
-    // TODO EW: use default value for port function parameter and change all updatePortListStatus(null) calls accordingly
-    private updatePortListStatus(port: string) {
+    private updatePortListStatus(port?: string) {
         const dc = DeviceContext.getInstance();
         if (port) {
             dc.port = port;
