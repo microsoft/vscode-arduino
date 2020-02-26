@@ -207,8 +207,6 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { libraryPath } parameters!");
         } else {
             try {
-                // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-                // await ArduinoContext.arduinoApp.addLibPath(req.body.libraryPath);
                 await ArduinoContext.arduinoApp.includeLibrary(req.body.libraryPath);
                 return res.json({
                     status: "OK",

@@ -136,9 +136,6 @@ export class BoardManager {
         // correct board and configuration. We know that it will trigger - we
         // made sure above that the boards actually differ
         dc.board = targetBoard.key;
-
-        // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-        // this._arduinoApp.addLibPath(null);
     }
 
     public get packages(): IPackage[] {
