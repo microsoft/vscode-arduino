@@ -361,8 +361,6 @@ export class ArduinoApp {
             UsbDetector.getInstance().pauseListening();
         }
 
-        let success = false;
-
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
@@ -378,25 +376,14 @@ export class ArduinoApp {
             }
         }
 
-        // TODO: Get rid of spawn's channel parameter and just support
-        // stdout and stderr callbacks
-        const stdoutCallback = (line: string) => {
-            if (cocopa) {
-                cocopa.callback(line);
-                if (verbose) {
-                    arduinoChannel.channel.append(line);
-                }
-            } else {
-                arduinoChannel.channel.append(line);
-            }
-        }
-
-        await util.spawn(
+        return await util.spawn(
             this._settings.commandPath,
-            arduinoChannel.channel,
             args,
             undefined,
-            stdoutCallback,
+            {
+                channel: !cocopa || cocopa && verbose ? arduinoChannel.channel : undefined,
+                stdout: cocopa ? cocopa.callback : undefined,
+            },
         ).then(async () => {
             await cleanup();
             if (buildMode !== BuildMode.Analyze) {
@@ -406,18 +393,15 @@ export class ArduinoApp {
                 arduinoChannel.info(`To rebuild your IntelliSense configuration run "${cmd}"`);
             }
             arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
-            success = true;
+            return true;
         }, async (reason) => {
             await cleanup();
             const msg = reason.code
                 ? `Exit with code=${reason.code}`
-                : reason.message
-                    ? reason.message
-                    : JSON.stringify(reason);
+                : JSON.stringify(reason);
             arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
+            return false;
         });
-
-        return success;
     }
 
     // Include the *.h header files from selected library to the arduino sketch.
@@ -481,14 +465,17 @@ export class ArduinoApp {
         }
         arduinoChannel.info(`${packageName}${arch && ":" + arch}${version && ":" + version}`);
         try {
-            this.useArduinoCli() ?
+            if (this.useArduinoCli()) {
                 await util.spawn(this._settings.commandPath,
-                    showOutput ? arduinoChannel.channel : null,
-                    ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`]) :
+                    ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`],
+                    undefined,
+                    { channel: showOutput ? arduinoChannel.channel : null });
+            } else {
                 await util.spawn(this._settings.commandPath,
-                    showOutput ? arduinoChannel.channel : null,
-                    ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`]);
-
+                    ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`],
+                    undefined,
+                    { channel: showOutput ? arduinoChannel.channel : null });
+            }
             if (updatingIndex) {
                 arduinoChannel.end("Updated package index files.");
             } else {
@@ -530,14 +517,17 @@ export class ArduinoApp {
             arduinoChannel.start(`Install library - ${libName}`);
         }
         try {
-            this.useArduinoCli() ?
-            await  util.spawn(this._settings.commandPath,
-                showOutput ? arduinoChannel.channel : null,
-                ["lib", "install", `${libName}${version && "@" + version}`]) :
-            await util.spawn(this._settings.commandPath,
-                showOutput ? arduinoChannel.channel : null,
-                ["--install-library", `${libName}${version && ":" + version}`]);
-
+            if (this.useArduinoCli()) {
+                await  util.spawn(this._settings.commandPath,
+                    ["lib", "install", `${libName}${version && "@" + version}`],
+                    undefined,
+                    { channel: showOutput ? arduinoChannel.channel : undefined });
+            } else {
+                await util.spawn(this._settings.commandPath,
+                    ["--install-library", `${libName}${version && ":" + version}`],
+                    undefined,
+                    { channel: showOutput ? arduinoChannel.channel : undefined });
+            }
             if (updatingIndex) {
                 arduinoChannel.end("Updated library index files.");
             } else {
@@ -671,9 +661,9 @@ export class ArduinoApp {
             const cmd = args.shift();
             try {
                 await util.spawn(cmd,
-                                 arduinoChannel.channel,
                                  args,
-                                 { shell: true, cwd: ArduinoWorkspace.rootPath });
+                                 { shell: true, cwd: ArduinoWorkspace.rootPath },
+                                 { channel: arduinoChannel.channel });
             } catch (ex) {
                 arduinoChannel.error(`Running pre-build command failed: ${os.EOL}${ex.error}`);
                 return false;
