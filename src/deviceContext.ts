@@ -135,12 +135,12 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      *
      * TODO EW, 2020-02-18:
      * A problem I discovered: here you try to find the config file location
-     * and when you're writing below, you use a hardcoded location. When
+     * and when you're writing below, you use a hard-coded location. When
      * resorting to "find", you have to store the file's location at least and
      * reuse it when saving.
      * But I think the intention is: load a config file from anywhere and save
      * it under .vscode/arduino.json. But then the initial load has to use find
-     * and afterwards it must not use it anymore.
+     * and afterwards it must not use find anymore.
      */
     public loadContext(): Thenable<object> {
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
@@ -295,7 +295,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         validateInput: (value) => {
                             /* TODO (EW, 2020-02-18):
                              * is 'c' actually allowed? Also found on within other files.
-                             * And the regular expression doesn't need the intenal groups.
+                             * And the regular expression doesn't need the internal groups.
                              * The outer group can be an anonymous group.
                              * And \w doesn't match dashes - so any sketch containing dashes
                              * will not be found.
