@@ -189,7 +189,11 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.selectProgrammer", async () => {
-        // TODO EW: this guard does not prevent building when setting the programmer
+        // Note: this guard does not prevent building while setting the
+        // programmer. But when looking at the code of selectProgrammer
+        // it seems not to be possible to trigger building while setting
+        // the programmer. If the timed IntelliSense analysis is triggered
+        // this is not a problem, since it doesn't use the programmer.
         if (!arduinoContextModule.default.arduinoApp.building) {
             try {
                 await arduinoContextModule.default.arduinoApp.programmerManager.selectProgrammer();
