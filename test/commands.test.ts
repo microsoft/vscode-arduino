@@ -38,24 +38,6 @@ suite("Arduino: Commands Tests", () => {
         }
     });
 
-    // IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-    // Arduino: Library Manager: Add library to include path.
-    // tslint:disable-next-line: only-arrow-functions
-    /*
-    test("should be able to run command: arduino.addLibPath", function(done) {
-        this.timeout(60 * 1000);
-        try {
-            // Library Manager: Add library to include path.
-            vscode.commands.executeCommand("arduino.addLibPath", "#include <AzureIoTHub.h>").then((result)  => {
-                done();
-            });
-
-        } catch (error) {
-            done(new Error(error));
-        }
-    });
-    */
-
     // Arduino: Boards Manager : Manage packages for boards
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to run command: arduino.showBoardManager", function(done) {
