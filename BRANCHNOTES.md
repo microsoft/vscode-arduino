@@ -1,4 +1,7 @@
 # IntelliSense Autoconfiguration Branch
+
+**TL;DR:** Alpha version of this extension of this branch with the latest features and fixes are available from the following [Dropbox folder](https://www.dropbox.com/sh/whmcdt26chyjgby/AAB1Ld2fzZ9Z_NfM3CRay17wa).
+
 ## Problem
 This branch more or less addresses the following issues:
 | # | Issue | Title | Comment |
