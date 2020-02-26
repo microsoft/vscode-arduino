@@ -40,6 +40,7 @@
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
+    "onCommand:arduino.changeEnding",
     "onCommand:arduino.addLibPath",
     "onCommand:arduino.openSerialMonitor",
     "onCommand:arduino.sendMessageToSerialPort",
@@ -100,6 +101,10 @@
       {
         "command": "arduino.changeBaudRate",
         "title": "Arduino: Change Baud Rate"
+      },
+      {
+        "command": "arduino.changeEnding",
+        "title": "Arduino: Change Line Ending"
       },
       {
         "command": "arduino.openSerialMonitor",

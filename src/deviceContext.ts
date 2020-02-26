@@ -10,6 +10,7 @@ import * as Logger from "./logger/logger";
 
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
 import { ArduinoWorkspace } from "./common/workspace";
+import { SerialPortEnding } from "./serialmonitor/serialportctrl";
 
 /**
  * Interface that represents the arduino context information.
@@ -21,6 +22,18 @@ export interface IDeviceContext {
      * @property {string}
      */
     port: string;
+
+    /**
+     * Baud Rate connect to the device
+     * @property {number}
+     */
+    baud: number;
+
+    /**
+     * Line ending
+     * @property {SerialPortEnding}
+     */
+    ending: SerialPortEnding;
 
     /**
      * Current selected Arduino board alias.
@@ -73,6 +86,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _onDidChange = new vscode.EventEmitter<void>();
 
     private _port: string;
+
+    private _baud: number;
+
+    private _ending: SerialPortEnding;
 
     private _board: string;
 
@@ -141,11 +158,15 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
                 let deviceConfigJson: any = {};
+                let baud: number = null;
+                let ending: string = null;
                 if (files && files.length > 0) {
                     const configFile = files[0];
                     deviceConfigJson = util.tryParseJSON(fs.readFileSync(configFile.fsPath, "utf8"));
                     if (deviceConfigJson) {
                         this._port = deviceConfigJson.port;
+                        baud = deviceConfigJson.baud;
+                        ending = deviceConfigJson.ending;
                         this._board = deviceConfigJson.board;
                         this._sketch = deviceConfigJson.sketch;
                         this._configuration = deviceConfigJson.configuration;
@@ -157,8 +178,25 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
+                    Logger.info(`baud is ${baud}`);
+                    Logger.info(`ending  is ${ending}`);
+                    // Sanitize line ending
+                    if ((ending) && (ending !== SerialPortEnding[SerialPortEnding[ending]])) {
+                        vscode.window.showErrorMessage(`Unsupported ending ${ending}, using default.`);
+                        ending = null;
+                    }
+                    // Sanitize baud rate
+                    if ((baud) && (constants.SUPPORTED_BAUD_RATES.indexOf(baud) === -1)) {
+                        vscode.window.showErrorMessage(`Unsupported baud rate ${baud}, using default.`);
+                        baud = null;
+                    }
+                    this._baud = baud;
+                    this._ending = (ending) ? SerialPortEnding[ending] : null;
+
                 } else {
                     this._port = null;
+                    this._baud = null;
+                    this._ending = null;
                     this._board = null;
                     this._sketch = null;
                     this._configuration = null;
@@ -177,6 +215,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
                  // Workaround for change in API, populate required props for arduino.json
                 this._port = null;
+                this._baud = null;
+                this._ending = null;
                 this._board = null;
                 this._sketch = null;
                 this._configuration = null;
@@ -214,6 +254,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         }
         deviceConfigJson.sketch = this.sketch;
         deviceConfigJson.port = this.port;
+        deviceConfigJson.baud = this.baud;
+        deviceConfigJson.ending = (this.ending != null) ? SerialPortEnding[this.ending] : undefined;
         deviceConfigJson.board = this.board;
         deviceConfigJson.output = this.output;
         deviceConfigJson["debugger"] = this.debugger_;
@@ -239,6 +281,24 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set port(value: string) {
         this._port = value;
+        this.saveContext();
+    }
+
+    public get baud() {
+        return this._baud;
+    }
+
+    public set baud(value: number) {
+        this._baud = value;
+        this.saveContext();
+    }
+
+    public get ending() {
+        return this._ending;
+    }
+
+    public set ending(value: SerialPortEnding) {
+        this._ending = value;
         this.saveContext();
     }
 

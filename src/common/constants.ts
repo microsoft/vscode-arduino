@@ -33,11 +33,15 @@ export const messages = {
 };
 
 export const statusBarPriority = {
-    PORT: 20,
-    OPEN_PORT: 30,
-    BAUD_RATE: 40,
-    BOARD: 60,
-    ENDING: 70,
+    ENDING: 20,
+    BAUD_RATE: 21,
+    PORT: 22,
+    OPEN_PORT: 23,
+    BOARD: 70,
     SKETCH: 80,
     PROGRAMMER: 90,
 };
+
+export const DEFAULT_BAUD_RATE: number = 115200;
+export const SUPPORTED_BAUD_RATES: number[] = [ 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000 ];
+export const DEFAULT_LINE_ENDING = "No line ending";

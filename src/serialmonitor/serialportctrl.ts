@@ -50,6 +50,7 @@ export class SerialPortCtrl {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
     this._ending = ending;
+
   }
 
   public get isActive(): boolean {
@@ -61,7 +62,8 @@ export class SerialPortCtrl {
   }
 
   public open(): Promise<any> {
-    this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
+    this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort} @ ${this._currentBaudRate} baud.`);
+    this._outputChannel.appendLine(`[Info] Line Ending is ${SerialPortEnding[this._ending]}`);
     return new Promise((resolve, reject) => {
       if (this._currentSerialPort && this._currentSerialPort.isOpen()) {
         this._currentSerialPort.close((err) => {
@@ -101,7 +103,7 @@ export class SerialPortCtrl {
         });
 
         this._currentSerialPort.on("error", (_error) => {
-          this._outputChannel.appendLine("[Error]" + _error.toString());
+          this._outputChannel.appendLine("[Error] " + _error.toString());
         });
       }
     });
@@ -154,7 +156,7 @@ export class SerialPortCtrl {
       }
       this._currentSerialPort.close((err) => {
         if (this._outputChannel) {
-          this._outputChannel.appendLine(`[Done] Closed the serial port ${os.EOL}`);
+          this._outputChannel.appendLine(`[Done] Closed the serial port ${this._currentPort} ${os.EOL}`);
         }
         this._currentSerialPort = null;
         if (err) {
@@ -166,6 +168,8 @@ export class SerialPortCtrl {
     });
   }
   public changeBaudRate(newRate: number): Promise<any> {
+
+    this._outputChannel.appendLine(`[Info] Baud Rate set to ${newRate}`);
     return new Promise((resolve, reject) => {
       this._currentBaudRate = newRate;
       if (!this._currentSerialPort || !this.isActive) {
@@ -182,6 +186,7 @@ export class SerialPortCtrl {
     });
   }
   public changeEnding(newEnding: SerialPortEnding) {
+    this._outputChannel.appendLine(`[Info] Line Endings set to ${SerialPortEnding[newEnding]}`);
     this._ending = newEnding;
   }
 }

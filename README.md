@@ -62,7 +62,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.commandPath` | Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for windows,`Contents/MacOS/Arduino` for Mac and `arduino` for Linux, You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux. |
 | `arduino.additionalUrls` | Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma(`,`) as separator, or have a string array. The default value is empty. |
 | `arduino.logLevel` | CLI output log level. Could be info or verbose. The default value is `"info"`. |
-| `arduino.allowPDEFiletype` | Allow the VSCode Arduino extension to open .pde files from pre-1.0.0 versions of Ardiuno. Note that this will break Processing code. Default value is `false`. | 
+| `arduino.allowPDEFiletype` | Allow the VSCode Arduino extension to open .pde files from pre-1.0.0 versions of Ardiuno. Note that this will break Processing code. Default value is `false`. |
 | `arduino.enableUSBDetection` | Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport `npm install -g serialport` `serialport-list -f jsonline`|
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
@@ -75,7 +75,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
     "arduino.path": "C:/Program Files (x86)/Arduino",
     "arduino.commandPath": "arduino_debug.exe",
     "arduino.logLevel": "info",
-    "arduino.allowPDEFiletype": false, 
+    "arduino.allowPDEFiletype": false,
     "arduino.enableUSBDetection": true,
     "arduino.disableTestingOpen": false,
     "arduino.skipHeaderProvider": false,
@@ -95,6 +95,8 @@ The following settings are as per sketch settings of the Arduino extension. You 
 {
     "sketch": "example.ino",
     "port": "COM5",
+    "baud": 115200,
+    "ending": "No line ending",
     "board": "adafruit:samd:adafruit_feather_m0",
     "output": "../build",
     "debugger": "jlink",
@@ -103,6 +105,8 @@ The following settings are as per sketch settings of the Arduino extension. You 
 ```
 - `sketch` - The main sketch file name of Arduino.
 - `port` - Name of the serial port connected to the device. Can be set by the `Arduino: Select Serial Port` command. For Mac users could be "/dev/cu.wchusbserial1420".
+- `baud` - Baud rate for the serial port connected to the device, defaults to 115200. Can be any of the supported rates:  300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000.
+- `ending` - Line ending used for the serial monitor.  Can be any of the following: "No line ending", "Newline", "Carriage return", "Both NL & CR"
 - `board` - Currently selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
@@ -157,6 +161,11 @@ To *run and develop*, do the following:
 - Press <kbd>F5</kbd> to debug.
 
 To *test*, press <kbd>F5</kbd> in VS Code with the "Launch Tests" debug configuration.
+
+Debugging:
+
+- Logger outputs messages higher than info to the file `arduino.log` in the root of your git repository.
+- `console.log("message")` will output messages to the Debug Console of the initial Visual Studio Code instance.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct). For more information please see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/#howadopt) or contact opencode@microsoft.com with any additional questions or comments.

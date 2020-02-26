@@ -6,6 +6,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
 import * as util from "../common/util";
+import * as constants from "../common/constants";
 
 import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
 
@@ -219,9 +220,8 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     private async tryGetDefaultBaudRate(): Promise<void> {
-        const supportBaudRates = [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
         const configValue = VscodeSettings.getInstance().defaultBaudRate;
-        if (!configValue || supportBaudRates.indexOf(configValue) === -1) {
+        if (!configValue || constants.SUPPORTED_BAUD_RATES.indexOf(configValue) === -1) {
             this._defaultBaudRate = 0;
         } else {
             this._defaultBaudRate = configValue;
