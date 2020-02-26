@@ -244,9 +244,9 @@ Please make sure the folder is not occupied by other procedures .`);
         }
         try {
             await util.spawn(this._settings.commandPath,
-                showOutput ? arduinoChannel.channel : null,
-                ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`]);
-
+                             ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`],
+                             undefined,
+                             { channel: showOutput ? arduinoChannel.channel : null });
             if (updatingIndex) {
                 arduinoChannel.end("Updated package index files.");
             } else {
@@ -282,9 +282,9 @@ Please make sure the folder is not occupied by other procedures .`);
         }
         try {
             await util.spawn(this._settings.commandPath,
-                showOutput ? arduinoChannel.channel : null,
-                ["--install-library", `${libName}${version && ":" + version}`]);
-
+                             ["--install-library", `${libName}${version && ":" + version}`],
+                             undefined,
+                             { channel: showOutput ? arduinoChannel.channel : undefined });
             if (updatingIndex) {
                 arduinoChannel.end("Updated library index files.");
             } else {
@@ -418,9 +418,9 @@ Please make sure the folder is not occupied by other procedures .`);
             const cmd = args.shift();
             try {
                 await util.spawn(cmd,
-                                 arduinoChannel.channel,
                                  args,
-                                 { shell: true, cwd: ArduinoWorkspace.rootPath });
+                                 { shell: true, cwd: ArduinoWorkspace.rootPath },
+                                 { channel: arduinoChannel.channel });
             } catch (ex) {
                 arduinoChannel.error(`Running pre-build command failed: ${os.EOL}${ex.error}`);
                 return false;
@@ -548,8 +548,6 @@ Please make sure the folder is not occupied by other procedures .`);
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
-        let success = false;
-
         const cleanup = async () => {
             if (cocopa) {
                 await cocopa.conclude();
@@ -562,25 +560,14 @@ Please make sure the folder is not occupied by other procedures .`);
             }
         }
 
-        // TODO: Get rid of spawn's channel parameter and just support
-        // stdout and stderr callbacks
-        const stdoutCallback = (line: string) => {
-            if (cocopa) {
-                cocopa.callback(line);
-                if (verbose) {
-                    arduinoChannel.channel.append(line);
-                }
-            } else {
-                arduinoChannel.channel.append(line);
-            }
-        }
-
-        await util.spawn(
+        return await util.spawn(
             this._settings.commandPath,
-            arduinoChannel.channel,
             args,
             undefined,
-            stdoutCallback,
+            {
+                channel: !cocopa || cocopa && verbose ? arduinoChannel.channel : undefined,
+                stdout: cocopa ? cocopa.callback : undefined,
+            }
         ).then(async () => {
             await cleanup();
             if (mode !== BuildMode.Analyze) {
@@ -590,17 +577,14 @@ Please make sure the folder is not occupied by other procedures .`);
                 arduinoChannel.info(`To rebuild your IntelliSense configuration run "${cmd}"`);
             }
             arduinoChannel.end(`${mode} sketch '${dc.sketch}${os.EOL}`);
-            success = true;
+            return true;
         }, async (reason) => {
             await cleanup();
             const msg = reason.code
                 ? `Exit with code=${reason.code}`
-                : reason.message
-                    ? reason.message
-                    : JSON.stringify(reason);
+                : JSON.stringify(reason);
             arduinoChannel.error(`${mode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
+            return false;
         });
-
-        return success;
     }
 }
