@@ -185,8 +185,6 @@ export function isArduinoFile(filePath): boolean {
     return fileExistsSync(filePath) && (path.extname(filePath) === ".ino" || path.extname(filePath) === ".pde");
 }
 
-// TODO: remove output channel and just provide callback hooks for stdout and
-// stderr
 /**
  * Send a command to arduino
  * @param {string} command - base command path (either Arduino IDE or CLI)
@@ -197,14 +195,13 @@ export function isArduinoFile(filePath): boolean {
  */
 export function spawn(
     command: string,
-    outputChannel: vscode.OutputChannel,
     args: string[] = [],
     options: any = {},
-    stdoutCallback?: (s: string) => void,
+    output?: {channel?: vscode.OutputChannel,
+              stdout?: (s: string) => void,
+              stderr?: (s: string) => void},
 ): Thenable<object> {
     return new Promise((resolve, reject) => {
-        const stdout = "";
-        const stderr = "";
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
         const child = childProcess.spawn(command, args, options);
 
@@ -220,27 +217,37 @@ export function spawn(
             }
         }
 
-        if (outputChannel) {
-            child.stdout.on("data", (data: Buffer) => {
-                const decoded = decodeData(data, codepage);
-                if (stdoutCallback) {
-                    stdoutCallback(decoded);
-                } else {
-                    outputChannel.append(decoded);
-                }
-            });
-            child.stderr.on("data", (data: Buffer) => {
-                outputChannel.append(decodeData(data, codepage));
-            });
+        if (output) {
+            if (output.channel || output.stdout) {
+                child.stdout.on("data", (data: Buffer) => {
+                    const decoded = decodeData(data, codepage);
+                    if (output.stdout) {
+                        output.stdout(decoded);
+                    }
+                    if (output.channel) {
+                        output.channel.append(decoded);
+                    }
+                });
+            }
+            if (output.channel || output.stderr) {
+                child.stderr.on("data", (data: Buffer) => {
+                    const decoded = decodeData(data, codepage);
+                    if (output.stderr) {
+                        output.stderr(decoded);
+                    }
+                    if (output.channel) {
+                        output.channel.append(decoded);
+                    }
+                });
+            }
         }
 
-        child.on("error", (error) => reject({ error, stderr, stdout }));
-
+        child.on("error", (error) => reject({ error }));
         child.on("exit", (code) => {
             if (code === 0) {
-                resolve({ code, stdout, stderr });
+                resolve({ code });
             } else {
-                reject({ code, stdout, stderr });
+                reject({ code });
             }
         });
     });
