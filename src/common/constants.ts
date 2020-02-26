@@ -7,6 +7,8 @@ import * as vscode from "vscode";
 export const ARDUINO_CONFIG_FILE = path.join(".vscode", "arduino.json");
 
 export const CPP_CONFIG_FILE = path.join(".vscode", "c_cpp_properties.json");
+/** The name of the intellisense configuration managed by vscode-arduino. */
+export const C_CPP_PROPERTIES_CONFIG_NAME = "Arduino";
 
 export const ARDUINO_MODE: vscode.DocumentSelector = [
     { language: "cpp", scheme: "file" },

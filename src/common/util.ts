@@ -13,22 +13,6 @@ import { arduinoChannel } from "./outputChannel";
 
 const encodingMapping: object = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../misc", "codepageMapping.json"), "utf8"));
 
-// IS-REMOVE: to be removed completely when IntelliSense implementation is merged
-/**
- * This function will return the VSCode C/C++ extesnion compatible platform literals.
- * @function getCppConfigPlatform
- */
-export function getCppConfigPlatform(): string {
-    const plat = os.platform();
-    if (plat === "linux") {
-        return "Linux";
-    } else if (plat === "darwin") {
-        return "Mac";
-    } else if (plat === "win32") {
-        return "Win32";
-    }
-}
-
 /**
  * This function will detect the file existing in the sync mode.
  * @function fileExistsSync
