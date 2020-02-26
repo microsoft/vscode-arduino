@@ -223,9 +223,6 @@ enum AnalysisEvent {
  *  * make sure that an analysis request is postponed when another build
  *      is currently in progress
  *
- * TODO: initialization sequence: make sure events generated
- *   during initialization are not lost
- *
  * TODO: check time of c_cpp_properties.json and compare it with
  * * arduino.json
  * * main sketch file
