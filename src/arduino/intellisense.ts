@@ -66,7 +66,7 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
             return;
         }
 
-        // Normalize include paths (resolve ".." and ".")
+        // Normalize compiler and include paths (resolve ".." and ".")
         runner.result.normalize();
 
         // Search for Arduino.h in the include paths - we need it for a
@@ -100,7 +100,8 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
                 arduinoChannel.info("IntelliSense configuration already up to date.");
             }
         } catch (e) {
-            // TODO: some debug trace as this shouldn't happen
+            const estr = JSON.stringify(e);
+            arduinoChannel.error(`Failed to read or write IntelliSense configuration: ${estr}`);
         }
     };
     return {
@@ -222,9 +223,6 @@ enum AnalysisEvent {
  *      multiple analysis builds
  *  * make sure that an analysis request is postponed when another build
  *      is currently in progress
- *
- * TODO: initialization sequence: make sure events generated
- *   during initialization are not lost
  *
  * TODO: check time of c_cpp_properties.json and compare it with
  * * arduino.json
