@@ -56,6 +56,17 @@ export function isCompilerParserEnabled(dc?: DeviceContext) {
  */
 export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
 
+    // TODO: callback for local setting: when IG gen is re-enabled file
+    //   analysis trigger. Perhaps for global possible as well?
+    if (!isCompilerParserEnabled(dc)) {
+        return {
+            callback: undefined,
+            conclude: async () => {
+                arduinoChannel.info("IntelliSense auto-configuration disabled.");
+            },
+        };
+    }
+
     const engines = makeCompilerParserEngines(dc);
     const runner = new ccp.Runner(engines);
 
