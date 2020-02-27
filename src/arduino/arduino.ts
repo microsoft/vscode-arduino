@@ -433,6 +433,7 @@ Please make sure the folder is not occupied by other procedures .`);
      * manages the build state.
      * @param mode See build()
      * @param buildDir See build()
+     * @see https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc
      */
     private async _build(mode: BuildMode, buildDir?: string): Promise<boolean> {
         const dc = DeviceContext.getInstance();
@@ -504,7 +505,10 @@ Please make sure the folder is not occupied by other procedures .`);
         }
 
         // We always build verbosely but filter the output based on the settings
-        args.push("--verbose");
+        args.push("--verbose-build");
+        if (verbose) {
+            args.push("--verbose-upload");
+        }
 
         await vscode.workspace.saveAll(false);
 
@@ -559,12 +563,31 @@ Please make sure the folder is not occupied by other procedures .`);
         const stderrcb = (line: string) => {
             if (os.platform() === "win32") {
                 line = line.trim();
-                if (line.length && !line.startsWith("DEBUG ") && !line.startsWith("TRACE ") && !line.startsWith("INFO ")) {
-                    arduinoChannel.channel.append(`${line}${os.EOL}`);
+                if (line.length <= 0) {
+                    return;
                 }
-            } else {
-                arduinoChannel.channel.append(line);
+                line = `${line}${os.EOL}`;
             }
+            if (!verbose) {
+                // Don't spill log with spurious info from the backend
+                // This list could be fetched from a config file to
+                // accommodate messages of unknown board packages, newer
+                // backend revisions etc.
+                const filters = [
+                    /^Picked\sup\sJAVA_TOOL_OPTIONS:\s+/,
+                    /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\sINFO\s/,
+                    /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\sWARN\s/,
+                    /^DEBUG\s+/,
+                    /^TRACE\s+/,
+                    /^INFO\s+/,
+                ];
+                for (const f of filters) {
+                    if (line.match(f)) {
+                        return;
+                    }
+                }
+            }
+            arduinoChannel.channel.append(line);
         }
 
         return await util.spawn(
