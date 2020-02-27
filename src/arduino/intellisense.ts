@@ -69,6 +69,8 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
         // Normalize compiler and include paths (resolve ".." and ".")
         runner.result.normalize();
 
+        runner.result.includes = await removeInvalidDirs(runner.result.includes);
+
         // Search for Arduino.h in the include paths - we need it for a
         // forced include - users expect Arduino symbols to be available
         // in main sketch without having to include the header explicitly
@@ -90,29 +92,50 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
                                                             ccp.CCppPropertiesCppStandard.Cpp11,
                                                             forcedIncludes);
         try {
+            const cmd = os.platform() === "darwin"
+                ? "Cmd + Alt + I"
+                : "Ctrl + Alt + I";
+            const help = `To manually rebuild your IntelliSense configuration run "${cmd}"`;
             const pPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
             const prop = new ccp.CCppProperties();
             prop.read(pPath);
             prop.merge(content, ccp.CCppPropertiesMergeMode.ReplaceSameNames);
             if (prop.write(pPath)) {
-                arduinoChannel.info("IntelliSense configuration updated.");
+                arduinoChannel.info(`IntelliSense configuration updated. ${help}`);
             } else {
-                arduinoChannel.info("IntelliSense configuration already up to date.");
+                arduinoChannel.info(`IntelliSense configuration already up to date. ${help}`);
             }
         } catch (e) {
             const estr = JSON.stringify(e);
             arduinoChannel.error(`Failed to read or write IntelliSense configuration: ${estr}`);
         }
-        const cmd = os.platform() === "darwin"
-            ? "Cmd + Alt + I"
-            : "Ctrl + Alt + I";
-        arduinoChannel.info(`To manually rebuild your IntelliSense configuration run "${cmd}"`);
     };
     return {
         callback: runner.callback(),
         conclude: _conclude,
     }
 };
+
+// TODO: move to cocopa
+/**
+ * Filter directory list by directories by their existence.
+ * @param dirs Directories to be checked.
+ * @returns The list of directories which exist.
+ */
+async function removeInvalidDirs(dirs: string[]) {
+    const fsstat = tp.promisify(fs.stat);
+    const res: string[] = [];
+    for (const d of dirs) {
+        try {
+            const s = await fsstat(d);
+            if (s.isDirectory()) {
+                res.push(d);
+            }
+        } catch (e) {
+        }
+    }
+    return res;
+}
 
 /**
  * Assembles compiler parser engines which then will be used to find the main
