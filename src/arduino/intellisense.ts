@@ -141,7 +141,13 @@ async function findDirContaining(dir: string, what: string): Promise<string | un
     const readdir = tp.promisify(fs.readdir);
     const fsstat = tp.promisify(fs.stat);
 
-    for (const entry of await readdir(dir)) {
+    let entries: string[];
+    try {
+        entries = await readdir(dir);
+    } catch (e) {
+        return undefined;
+    }
+    for (const entry of entries) {
         const p = path.join(dir, entry);
         const s = await fsstat(p);
         if (s.isDirectory()) {
