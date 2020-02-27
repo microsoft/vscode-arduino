@@ -16,7 +16,6 @@ import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
 import { AnalysisManager,
-         ICoCoPaContext,
          isCompilerParserEnabled,
          makeCompilerParserContext } from "./intellisense";
 import { LibraryManager } from "./libraryManager";
@@ -202,7 +201,8 @@ export class ArduinoApp {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
-        let cocopa: ICoCoPaContext;
+        const cocopa = makeCompilerParserContext(dc);
+        const verbose = VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose;
 
         if (!this.boardManager.currentBoard) {
             if (buildMode !== BuildMode.Analyze) {
@@ -277,7 +277,6 @@ export class ArduinoApp {
                 await selectSerial();
                 return false;
             }
-
             if (!compile && !this.useArduinoCli()) {
                 arduinoChannel.error("This command is only available when using the Arduino CLI");
                 return false;
@@ -302,12 +301,10 @@ export class ArduinoApp {
             }
 
             args.push("--port", dc.port);
-        } else if (buildMode === BuildMode.Analyze) {
-            cocopa = makeCompilerParserContext(dc);
             if (!this.useArduinoCli()) {
-                args.push("--verify", "--verbose");
+                args.push("--verify");
             } else {
-                args.push("compile", "--verbose", "-b", boardDescriptor);
+                args.push("compile", "-b", boardDescriptor);
             }
         } else {
             if (!this.useArduinoCli()) {
@@ -317,10 +314,8 @@ export class ArduinoApp {
             }
         }
 
-        const verbose = VscodeSettings.getInstance().logLevel === "verbose";
-        if (buildMode !== BuildMode.Analyze && verbose) {
-            args.push("--verbose");
-        }
+        // We always build verbosely but filter the output based on the settings
+        args.push("--verbose");
 
         await vscode.workspace.saveAll(false);
 
@@ -365,9 +360,7 @@ export class ArduinoApp {
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
         const cleanup = async () => {
-            if (cocopa) {
-                await cocopa.conclude();
-            }
+            await cocopa.conclude();
             if (buildMode === BuildMode.Upload || buildMode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
                 if (restoreSerialMonitor) {
@@ -375,23 +368,23 @@ export class ArduinoApp {
                 }
             }
         }
+        const stdoutcb = (line: string) => {
+            cocopa.callback(line);
+            if (verbose) {
+                arduinoChannel.channel.append(line);
+            }
+        }
+        const stderrcb = (line: string) => {
+            arduinoChannel.channel.append(line);
+        }
 
         return await util.spawn(
             this._settings.commandPath,
             args,
             undefined,
-            {
-                channel: !cocopa || cocopa && verbose ? arduinoChannel.channel : undefined,
-                stdout: cocopa ? cocopa.callback : undefined,
-            },
+            { stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             await cleanup();
-            if (buildMode !== BuildMode.Analyze) {
-                const cmd = os.platform() === "darwin"
-                    ? "Cmd + Alt + I"
-                    : "Ctrl + Alt + I";
-                arduinoChannel.info(`To rebuild your IntelliSense configuration run "${cmd}"`);
-            }
             arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
             return true;
         }, async (reason) => {

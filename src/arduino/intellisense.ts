@@ -3,6 +3,7 @@
 
 import * as ccp from "cocopa";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as tp from "typed-promisify";
 
@@ -10,7 +11,6 @@ import * as constants from "../common/constants";
 import { arduinoChannel } from "../common/outputChannel";
 import { ArduinoWorkspace } from "../common/workspace";
 import { DeviceContext } from "../deviceContext";
-
 import { VscodeSettings } from "./vscodeSettings";
 
 export interface ICoCoPaContext {
@@ -103,6 +103,10 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
             const estr = JSON.stringify(e);
             arduinoChannel.error(`Failed to read or write IntelliSense configuration: ${estr}`);
         }
+        const cmd = os.platform() === "darwin"
+            ? "Cmd + Alt + I"
+            : "Ctrl + Alt + I";
+        arduinoChannel.info(`To manually rebuild your IntelliSense configuration run "${cmd}"`);
     };
     return {
         callback: runner.callback(),
