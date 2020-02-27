@@ -181,6 +181,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public get onChangeISAutoGen() { return this._settings.intelliSenseGen.emitter.event }
     public get onChangeConfiguration() { return this._settings.configuration.emitter.event }
     public get onChangePrebuild() { return this._settings.prebuild.emitter.event }
+    public get onChangePostbuild() { return this._settings.postbuild.emitter.event }
     public get onChangeProgrammer() { return this._settings.programmer.emitter.event }
 
     public get port() {
@@ -212,6 +213,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public get prebuild() {
         return this._settings.prebuild.value;
+    }
+
+    public get postbuild() {
+        return this._settings.postbuild.value;
     }
 
     public get output() {

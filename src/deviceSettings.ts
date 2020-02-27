@@ -112,6 +112,7 @@ export class DeviceSettings {
     public intelliSenseGen = new StrSetting();
     public configuration = new StrSetting();
     public prebuild = new StrSetting();
+    public postbuild = new StrSetting();
     public programmer = new StrSetting();
 
     /**
@@ -127,6 +128,7 @@ export class DeviceSettings {
                this.intelliSenseGen.modified ||
                this.configuration.modified ||
                this.prebuild.modified ||
+               this.postbuild.modified ||
                this.programmer.modified;
     }
     /**
@@ -141,6 +143,7 @@ export class DeviceSettings {
         this.intelliSenseGen.commit();
         this.configuration.commit();
         this.prebuild.commit();
+        this.postbuild.commit();
         this.programmer.commit();
     }
     /**
@@ -157,6 +160,7 @@ export class DeviceSettings {
         this.intelliSenseGen.reset();
         this.configuration.reset();
         this.prebuild.reset();
+        this.postbuild.reset();
         this.programmer.reset();
         if (commit) {
             this.commit();
@@ -181,6 +185,7 @@ export class DeviceSettings {
             this.debugger.value = settings.debugger;
             this.intelliSenseGen.value = settings.intelliSenseGen;
             this.prebuild.value = settings.prebuild;
+            this.postbuild.value = settings.postbuild;
             this.programmer.value = settings.programmer;
             if (commit) {
                 this.commit();
