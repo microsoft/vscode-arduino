@@ -566,6 +566,7 @@ Please make sure the folder is not occupied by other procedures .`);
                 if (line.length <= 0) {
                     return;
                 }
+                line = line.replace(/(?:\r|\r\n|\n)+/g, os.EOL);
                 line = `${line}${os.EOL}`;
             }
             if (!verbose) {
