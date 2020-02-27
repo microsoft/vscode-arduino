@@ -9,6 +9,7 @@ import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 
 import { VscodeSettings } from "../arduino/vscodeSettings";
+import * as constants from "../common/constants";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { ArduinoWorkspace } from "../common/workspace";
@@ -77,7 +78,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
             await ArduinoActivator.activate();
         }
 
-        if (VscodeSettings.getInstance().logLevel === "verbose" && !config.logging) {
+        if (VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose && !config.logging) {
             config = {
                 ...config, logging: {
                     engineLogging: true,
