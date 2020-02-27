@@ -384,6 +384,7 @@ export class ArduinoApp {
                 if (line.length <= 0) {
                     return;
                 }
+                line = line.replace(/(?:\r|\r\n|\n)+/g, os.EOL);
                 line = `${line}${os.EOL}`;
             }
             if (!verbose) {
