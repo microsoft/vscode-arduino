@@ -555,7 +555,9 @@ Please make sure the folder is not occupied by other procedures .`);
             }
         }
         const stdoutcb = (line: string) => {
-            cocopa.callback(line);
+            if (cocopa.callback) {
+                cocopa.callback(line);
+            }
             if (verbose) {
                 arduinoChannel.channel.append(line);
             }
