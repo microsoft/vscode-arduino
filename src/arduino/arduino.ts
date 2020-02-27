@@ -401,19 +401,27 @@ Please make sure the folder is not occupied by other procedures .`);
     }
 
     /**
-     * Runs the pre build command.
+     * Runs the pre or post build command.
      * Usually before one of
      *  * verify
      *  * upload
      *  * upload using programmer
      * @param dc Device context prepared during one of the above actions
+     * @param what "pre" if the pre-build command should be run, "post" if the
+     * post-build command should be run.
      * @returns True if successful, false on error.
      */
-    protected async runPreBuildCommand(dc: DeviceContext): Promise<boolean> {
-        const prebuildcmdline = dc.prebuild;
-        if (prebuildcmdline) {
-            arduinoChannel.info(`Running pre-build command: ${prebuildcmdline}`);
-            const args = prebuildcmdline.split(/\s+/);
+    protected async runPrePostBuildCommand(dc: DeviceContext,
+                                           what: "pre" | "post"): Promise<boolean> {
+        const cmdline = what === "pre"
+            ? dc.prebuild
+            : dc.postbuild;
+
+        if (cmdline) {
+            arduinoChannel.info(`Running ${what}-build command: "${cmdline}"`);
+            // TODO 2020-02-27, EW: We could call bash -c "cmd" here at least for
+            //   UNIX systems. Windows users must live with their poor system :)
+            const args = cmdline.split(/\s+/);
             const cmd = args.shift();
             try {
                 await util.spawn(cmd,
@@ -421,7 +429,12 @@ Please make sure the folder is not occupied by other procedures .`);
                                  { shell: true, cwd: ArduinoWorkspace.rootPath },
                                  { channel: arduinoChannel.channel });
             } catch (ex) {
-                arduinoChannel.error(`Running pre-build command failed: ${os.EOL}${ex.error}`);
+                const msg = ex.error
+                    ? `${ex.error}`
+                    : ex.code
+                        ? `Exit code = ${ex.code}`
+                        : JSON.stringify(ex);
+                arduinoChannel.error(`Running ${what}-build command failed: ${os.EOL}${msg}`);
                 return false;
             }
         }
@@ -517,7 +530,10 @@ Please make sure the folder is not occupied by other procedures .`);
         arduinoChannel.show();
         arduinoChannel.start(`${mode} sketch '${dc.sketch}'`);
 
-        if (!await this.runPreBuildCommand(dc)) {
+        // TODO EW: What should we do with pre-/post build commands when running
+        //   analysis? Some could use it to generate/manipulate code which could
+        //   be a prerequisite for a successful build
+        if (!await this.runPrePostBuildCommand(dc, "pre")) {
             return false;
         }
 
@@ -545,7 +561,10 @@ Please make sure the folder is not occupied by other procedures .`);
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
-        const cleanup = async () => {
+        const cleanup = async (result: "ok" | "error") => {
+            if (result === "ok") {
+                await this.runPrePostBuildCommand(dc, "post");
+            }
             await cocopa.conclude();
             if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
@@ -599,11 +618,11 @@ Please make sure the folder is not occupied by other procedures .`);
             undefined,
             { stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
-            await cleanup();
+            await cleanup("ok");
             arduinoChannel.end(`${mode} sketch '${dc.sketch}${os.EOL}`);
             return true;
         }, async (reason) => {
-            await cleanup();
+            await cleanup("error");
             const msg = reason.code
                 ? `Exit with code=${reason.code}`
                 : JSON.stringify(reason);
