@@ -375,7 +375,14 @@ export class ArduinoApp {
             }
         }
         const stderrcb = (line: string) => {
-            arduinoChannel.channel.append(line);
+            if (os.platform() === "win32") {
+                line = line.trim();
+                if (line.length && !line.startsWith("DEBUG ") && !line.startsWith("TRACE ") && !line.startsWith("INFO ")) {
+                    arduinoChannel.channel.append(`${line}${os.EOL}`);
+                }
+            } else {
+                arduinoChannel.channel.append(line);
+            }
         }
 
         return await util.spawn(
