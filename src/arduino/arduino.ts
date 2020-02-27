@@ -16,7 +16,6 @@ import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
 import { AnalysisManager,
-         ICoCoPaContext,
          isCompilerParserEnabled,
          makeCompilerParserContext } from "./intellisense";
 import { LibraryManager } from "./libraryManager";
@@ -558,7 +557,12 @@ Please make sure the folder is not occupied by other procedures .`);
             }
         }
         const stderrcb = (line: string) => {
-            arduinoChannel.channel.append(line);
+            if (os.platform() == "win32") {
+                line = line.trim();
+                if (line.length && !line.startsWith("DEBUG ") && !line.startsWith("TRACE ") && !line.startsWith("INFO ")) {
+                    arduinoChannel.channel.append(`${line}${os.EOL}`);
+                }
+            }
         }
 
         return await util.spawn(
