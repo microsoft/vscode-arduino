@@ -439,7 +439,8 @@ Please make sure the folder is not occupied by other procedures .`);
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
-        let cocopa: ICoCoPaContext;
+        const cocopa = makeCompilerParserContext(dc);
+        const verbose = VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose;
 
         if (!this.boardManager.currentBoard) {
             if (mode !== BuildMode.Analyze) {
@@ -499,18 +500,12 @@ Please make sure the folder is not occupied by other procedures .`);
                       "--port", dc.port,
                       "--useprogrammer",
                       "--pref", "programmer=" + programmer);
-
-        } else if (mode === BuildMode.Analyze) {
-            cocopa = makeCompilerParserContext(dc);
-            args.push("--verify", "--verbose");
         } else {
             args.push("--verify");
         }
 
-        const verbose = VscodeSettings.getInstance().logLevel === "verbose";
-        if (mode !== BuildMode.Analyze && verbose) {
-            args.push("--verbose");
-        }
+        // We always build verbosely but filter the output based on the settings
+        args.push("--verbose");
 
         await vscode.workspace.saveAll(false);
 
@@ -530,7 +525,6 @@ Please make sure the folder is not occupied by other procedures .`);
                 logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return false;
             }
-
             args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in output path: ${outputPath}`);
         } else {
@@ -549,9 +543,7 @@ Please make sure the folder is not occupied by other procedures .`);
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
         const cleanup = async () => {
-            if (cocopa) {
-                await cocopa.conclude();
-            }
+            await cocopa.conclude();
             if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
                 if (restoreSerialMonitor) {
@@ -559,23 +551,23 @@ Please make sure the folder is not occupied by other procedures .`);
                 }
             }
         }
+        const stdoutcb = (line: string) => {
+            cocopa.callback(line);
+            if (verbose) {
+                arduinoChannel.channel.append(line);
+            }
+        }
+        const stderrcb = (line: string) => {
+            arduinoChannel.channel.append(line);
+        }
 
         return await util.spawn(
             this._settings.commandPath,
             args,
             undefined,
-            {
-                channel: !cocopa || cocopa && verbose ? arduinoChannel.channel : undefined,
-                stdout: cocopa ? cocopa.callback : undefined,
-            },
+            { stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             await cleanup();
-            if (mode !== BuildMode.Analyze) {
-                const cmd = os.platform() === "darwin"
-                    ? "Cmd + Alt + I"
-                    : "Ctrl + Alt + I";
-                arduinoChannel.info(`To rebuild your IntelliSense configuration run "${cmd}"`);
-            }
             arduinoChannel.end(`${mode} sketch '${dc.sketch}${os.EOL}`);
             return true;
         }, async (reason) => {
