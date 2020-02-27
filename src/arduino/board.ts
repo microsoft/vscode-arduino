@@ -148,8 +148,6 @@ export class Board implements IBoard {
                     return BoardConfigResult.Success;
                 }
                 return BoardConfigResult.SuccessNoChange;
-            } else {
-                return BoardConfigResult.InvalidOptionID;
             }
         }
         return BoardConfigResult.InvalidOptionID;
