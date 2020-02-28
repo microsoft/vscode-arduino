@@ -43,11 +43,6 @@ export function isCompilerParserEnabled(dc?: DeviceContext) {
  *
  * Possible enhancements:
  *
- * * Parse c++ standard from arduino command line
- *
- *     Arduino currently sets the C++ standard during compilation with the
- *     flag -std=gnu++11
- *
  * * Order of includes: Perhaps insert the internal includes at the front
  *     as at least for the forcedIncludes IntelliSense seems to take the
  *     order into account.
@@ -91,14 +86,11 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
             arduinoChannel.warning("Unable to locate \"Arduino.h\" within IntelliSense include paths.");
         }
 
-        // TODO: check what kind of result we've got: gcc or other architecture:
-        //  and instantiate content accordingly (to be implemented within cocopa)
-        //  -> move result to the parser engine itself
+        // The C++ standard is set to the following default value if no compiler flag has been found.
         const content = new ccp.CCppPropertiesContentResult(runner.result,
                                                             constants.C_CPP_PROPERTIES_CONFIG_NAME,
                                                             ccp.CCppPropertiesISMode.Gcc_X64,
                                                             ccp.CCppPropertiesCStandard.C11,
-                                                            // as of 1.8.11 arduino is on C++11
                                                             ccp.CCppPropertiesCppStandard.Cpp11,
                                                             forcedIncludes);
         try {
@@ -135,7 +127,6 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
  * @param dc Current device context used to generate the engines.
  */
 function makeCompilerParserEngines(dc: DeviceContext) {
-
     const sketch = path.basename(dc.sketch);
     const trigger = ccp.getTriggerForArduinoGcc(sketch);
     const gccParserEngine = new ccp.ParserGcc(trigger);
