@@ -141,6 +141,9 @@ During merging I found some bugs within those functions - mainly due to the abov
 `*` not committed to branch yet
 `>` most of the actual parsing and configuration generation is part of [cocopa](https://github.com/elektronikworkshop/cocopa/) ([here](https://www.npmjs.com/package/cocopa)'s the npm package)
 
+## Additional Stuff this Branch addresses
+* Support for `postbuild` commands, see [#786](https://github.com/microsoft/vscode-arduino/issues/786)
+
 ## Motivation
 I write a lot of code for Arduino, especially libraries. The Arduino IDE is not suited for more complex projects and I tried several alternatives:
 * The old and dysfunctional Arduino CDT extension for eclipse somehow stalled (even if it was promising)
