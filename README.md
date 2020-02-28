@@ -101,8 +101,8 @@ The following settings are as per sketch settings of the Arduino extension. You 
     "board": "adafruit:samd:adafruit_feather_m0",
     "output": "../build",
     "debugger": "jlink",
-    "prebuild": "bash prebuild.sh",
-    "postbuild": "bash postbuild.sh",
+    "prebuild": "./prebuild.sh",
+    "postbuild": "./postbuild.sh",
     "intelliSenseGen": "global"
 }
 ```
@@ -111,12 +111,43 @@ The following settings are as per sketch settings of the Arduino extension. You 
 - `board` - Currently selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
-- `prebuild` - External command which will be invoked before any sketch build (verify, upload). You must only set one `prebuild` command. `command1 && command2` does not work. If you need to run multiple commands before the build, then create a script.
-- `postbuild` - External command to be run after the sketch has been built successfully. Same rules as for `prebuild` apply. <!-- TODO: note about cwd would be a good thing -->
+- `prebuild` - External command which will be invoked before any sketch build (verify, upload, ...). For details see the [Pre- and Post-Build Commands](#Pre--and-Post-Build-Commands) section.
+- `postbuild` - External command to be run after the sketch has been built successfully. See the afore mentioned section for more details.
 - `intelliSenseGen` - Override the global setting for auto-generation of the IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`). Three options are available:
   - `"global"`: Use the global settings (default)
   - `"disable"`: Disable the auto-generation even if globally enabled
   - `"enable"`: Enable the auto-generation even if globally disabled
+
+## Pre- and Post-Build Commands
+On Windows the commands run within a `cmd`-, on Linux and OSX within a `bash`-instance. Therefore your command can be anything what you can run within those shells. Instead of running a command you can invoke a script. This makes writing more complex pre-/post-build mechanisms much easier and opens up the possibility to run python or other scripting languages.
+The commands run within the workspace root directory and vscode-arduino sets the following environment variables:  
+**`VSCA_BUILD_MODE`** The current build mode, one of `Verifying`, `Uploading`, `Uploading (programmer)` or `Analyzing`. This allows you to run your script on certain build modes only.  
+**`VSCA_SKETCH`** The sketch file relative to your workspace root directory.  
+**`VSCA_BOARD`** Your board and configuration, e.g. `arduino:avr:nano:cpu=atmega328`.  
+**`VSCA_WORKSPACE_DIR`** The absolute path of your workspace root directory.  
+**`VSCA_LOG_LEVEL`** The current log level. This allows you to control the verbosity of your scripts.  
+**`VSCA_SERIAL`** The serial port used for uploading. Not set if you haven't set one in your `arduino.json`.  
+**`VSCA_BUILD_DIR`** The build directory. Not set if you haven't set one in your `arduino.json`.  
+
+For example under Windows the following `arduino.json` setup
+```json
+{
+    "board": "arduino:avr:nano",
+    "sketch": "test.ino",
+    "configuration": "cpu=atmega328",
+    "prebuild": "IF \"%VSCA_BUILD_MODE%\"==\"Verifying\" (echo VSCA_BUILD_MODE=%VSCA_BUILD_MODE% && echo VSCA_BOARD=%VSCA_BOARD%)"
+}
+```
+will produce
+```
+[Starting] Verifying sketch 'test.ino'
+Running pre-build command: "IF "%VSCA_BUILD_MODE%"=="Verifying" (echo VSCA_BUILD_MODE=%VSCA_BUILD_MODE% && echo VSCA_BOARD=%VSCA_BOARD%)"
+VSCA_BUILD_MODE=Verifying 
+VSCA_BOARD=arduino:avr:nano:cpu=atmega328
+Loading configuration...
+<...>
+```
+when verifying.
 
 ## IntelliSense
 vscode-arduino auto-configures IntelliSense by default. vscode-arduino analyzes Arduino's compiler output by running a separate build and generates the corresponding configuration file at `.vscode/c_cpp_properties.json`. vscode-arduino tries as hard as possible to keep things up to date, e.g. it runs the analysis when switching the board or the sketch.
