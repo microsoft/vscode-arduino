@@ -182,7 +182,9 @@ export class ArduinoApp {
         })
         .catch((reason) => {
             this._building = false;
-            // TODO EW, 2020-02-19: Report unhandled error (Logger?)
+            logger.notifyUserError("ArduinoApp.build",
+                                   reason,
+                                   `Unhandled exception when cleaning up build (${mode}).`);
             return false;
         });
     }
@@ -457,7 +459,7 @@ Please make sure the folder is not occupied by other procedures .`);
 
         if (!this.boardManager.currentBoard) {
             if (mode !== BuildMode.Analyze) {
-                logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
+                logger.notifyUserError("boardManager.currentBoard", new Error(constants.messages.NO_BOARD_SELECTED));
             }
             return false;
         }
@@ -530,13 +532,6 @@ Please make sure the folder is not occupied by other procedures .`);
         arduinoChannel.show();
         arduinoChannel.start(`${mode} sketch '${dc.sketch}'`);
 
-        // TODO EW: What should we do with pre-/post build commands when running
-        //   analysis? Some could use it to generate/manipulate code which could
-        //   be a prerequisite for a successful build
-        if (!await this.runPrePostBuildCommand(dc, "pre")) {
-            return false;
-        }
-
         if (buildDir || dc.output) {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);
             const dirPath = path.dirname(outputPath);
@@ -551,6 +546,13 @@ Please make sure the folder is not occupied by other procedures .`);
             arduinoChannel.warning(msg);
         }
 
+        // TODO EW: What should we do with pre-/post build commands when running
+        //   analysis? Some could use it to generate/manipulate code which could
+        //   be a prerequisite for a successful build
+        if (!await this.runPrePostBuildCommand(dc, "pre")) {
+            return false;
+        }
+
         // stop serial monitor when everything is prepared and good
         // what makes restoring of its previous state easier
         if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
@@ -562,8 +564,9 @@ Please make sure the folder is not occupied by other procedures .`);
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
         const cleanup = async (result: "ok" | "error") => {
+            let ret = true;
             if (result === "ok") {
-                await this.runPrePostBuildCommand(dc, "post");
+                ret = await this.runPrePostBuildCommand(dc, "post");
             }
             await cocopa.conclude();
             if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
@@ -572,6 +575,7 @@ Please make sure the folder is not occupied by other procedures .`);
                     await SerialMonitor.getInstance().openSerialMonitor();
                 }
             }
+            return ret;
         }
         const stdoutcb = (line: string) => {
             if (cocopa.callback) {
@@ -591,17 +595,13 @@ Please make sure the folder is not occupied by other procedures .`);
                 line = `${line}${os.EOL}`;
             }
             if (!verbose) {
-                // Don't spill log with spurious info from the backend
-                // This list could be fetched from a config file to
-                // accommodate messages of unknown board packages, newer
-                // backend revisions etc.
+                // Don't spill log with spurious info from the backend. This
+                // list could be fetched from a config file to accommodate
+                // messages of unknown board packages, newer backend revisions
                 const filters = [
                     /^Picked\sup\sJAVA_TOOL_OPTIONS:\s+/,
-                    /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\sINFO\s/,
-                    /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\sWARN\s/,
-                    /^DEBUG\s+/,
-                    /^TRACE\s+/,
-                    /^INFO\s+/,
+                    /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\s(?:INFO|WARN)\s/,
+                    /^(?:DEBUG|TRACE|INFO)\s+/,
                 ];
                 for (const f of filters) {
                     if (line.match(f)) {
@@ -618,9 +618,11 @@ Please make sure the folder is not occupied by other procedures .`);
             undefined,
             { stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
-            await cleanup("ok");
-            arduinoChannel.end(`${mode} sketch '${dc.sketch}'${os.EOL}`);
-            return true;
+            const ret = await cleanup("ok"); 
+            if (ret) {
+                arduinoChannel.end(`${mode} sketch '${dc.sketch}'${os.EOL}`);
+            }
+            return ret;
         }, async (reason) => {
             await cleanup("error");
             const msg = reason.code
