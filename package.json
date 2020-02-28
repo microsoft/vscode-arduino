@@ -594,7 +594,6 @@
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
     "properties": "^1.2.1",
-    "typed-promisify": "^0.4.0",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.18",
     "winreg": "^1.2.3",
