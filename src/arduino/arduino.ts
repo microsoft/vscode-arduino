@@ -714,11 +714,10 @@ export class ArduinoApp {
             let cmd: string;
             let args: string[];
             // pre-/post-build commands feature full bash support on UNIX systems.
-            // Windows users must live with their poor system unless someone is
-            // willing to fight with the annoying Windows cmd escaping -- good luck!
+            // On Windows you have full cmd support.
             if (os.platform() === "win32") {
-                args = cmdline.split(/\s+/);
-                cmd = args.shift();
+                args = [];
+                cmd = cmdline;
             } else {
                 args = ["-c", cmdline];
                 cmd = "bash";
