@@ -133,8 +133,7 @@ export class ArduinoApp {
     public async setPref(key, value) {
         try {
             await util.spawn(this._settings.commandPath,
-                null,
-                ["--pref", `${key}=${value}`, "--save-prefs"]);
+                             ["--pref", `${key}=${value}`, "--save-prefs"]);
         } catch (ex) {
         }
     }
@@ -414,6 +413,7 @@ Please make sure the folder is not occupied by other procedures .`);
      * @returns True if successful, false on error.
      */
     protected async runPrePostBuildCommand(dc: DeviceContext,
+                                           environment: any,
                                            what: "pre" | "post"): Promise<boolean> {
         const cmdline = what === "pre"
             ? dc.prebuild
@@ -421,14 +421,26 @@ Please make sure the folder is not occupied by other procedures .`);
 
         if (cmdline) {
             arduinoChannel.info(`Running ${what}-build command: "${cmdline}"`);
-            // TODO 2020-02-27, EW: We could call bash -c "cmd" here at least for
-            //   UNIX systems. Windows users must live with their poor system :)
-            const args = cmdline.split(/\s+/);
-            const cmd = args.shift();
+            let cmd: string;
+            let args: string[];
+            // pre-/post-build commands feature full bash support on UNIX systems.
+            // Windows users must live with their poor system unless someone is
+            // willing to fight with the annoying Windows cmd escaping -- good luck!
+            if (os.platform() === "win32") {
+                args = cmdline.split(/\s+/);
+                cmd = args.shift();
+            } else {
+                args = ["-c", cmdline];
+                cmd = "bash";
+            }
             try {
                 await util.spawn(cmd,
                                  args,
-                                 { shell: true, cwd: ArduinoWorkspace.rootPath },
+                                 {
+                                     shell: os.platform() === "win32",
+                                     cwd: ArduinoWorkspace.rootPath,
+                                     env: {...environment},
+                                 },
                                  { channel: arduinoChannel.channel });
             } catch (ex) {
                 const msg = ex.error
@@ -533,23 +545,38 @@ Please make sure the folder is not occupied by other procedures .`);
         arduinoChannel.start(`${mode} sketch '${dc.sketch}'`);
 
         if (buildDir || dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);
-            const dirPath = path.dirname(outputPath);
+            buildDir = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);
+            const dirPath = path.dirname(buildDir);
             if (!util.directoryExistsSync(dirPath)) {
-                logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
+                logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + buildDir));
                 return false;
             }
-            args.push("--pref", `build.path=${outputPath}`);
-            arduinoChannel.info(`Please see the build logs in output path: ${outputPath}`);
+            args.push("--pref", `build.path=${buildDir}`);
+            arduinoChannel.info(`Please see the build logs in output path: ${buildDir}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Build will be slower. See README.";
             arduinoChannel.warning(msg);
         }
 
+        // Environment variables passed to pre- and post-build commands
+        const env = {
+            VSCA_BUILD_MODE: mode,
+            VSCA_SKETCH: dc.sketch,
+            VSCA_BOARD: boardDescriptor,
+            VSCA_WORKSPACE_DIR: ArduinoWorkspace.rootPath,
+            VSCA_LOG_LEVEL: verbose ? constants.LogLevel.Verbose : constants.LogLevel.Info,
+        };
+        if (dc.port) {
+            env["VSCA_SERIAL"] = dc.port;
+        }
+        if (buildDir) {
+            env["VSCA_BUILD_DIR"] = buildDir;
+        }
+
         // TODO EW: What should we do with pre-/post build commands when running
         //   analysis? Some could use it to generate/manipulate code which could
         //   be a prerequisite for a successful build
-        if (!await this.runPrePostBuildCommand(dc, "pre")) {
+        if (!await this.runPrePostBuildCommand(dc, env, "pre")) {
             return false;
         }
 
@@ -566,7 +593,7 @@ Please make sure the folder is not occupied by other procedures .`);
         const cleanup = async (result: "ok" | "error") => {
             let ret = true;
             if (result === "ok") {
-                ret = await this.runPrePostBuildCommand(dc, "post");
+                ret = await this.runPrePostBuildCommand(dc, env, "post");
             }
             await cocopa.conclude();
             if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
@@ -618,7 +645,7 @@ Please make sure the folder is not occupied by other procedures .`);
             undefined,
             { stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
-            const ret = await cleanup("ok"); 
+            const ret = await cleanup("ok");
             if (ret) {
                 arduinoChannel.end(`${mode} sketch '${dc.sketch}'${os.EOL}`);
             }
