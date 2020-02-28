@@ -600,7 +600,6 @@
     "impor": "^0.1.1",
     "node-usb-native": "^0.0.18",
     "properties": "^1.2.1",
-    "typed-promisify": "^0.4.0",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.1.6",
     "winreg": "^1.2.3",
