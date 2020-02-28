@@ -619,7 +619,7 @@ Please make sure the folder is not occupied by other procedures .`);
             { stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             await cleanup("ok");
-            arduinoChannel.end(`${mode} sketch '${dc.sketch}${os.EOL}`);
+            arduinoChannel.end(`${mode} sketch '${dc.sketch}'${os.EOL}`);
             return true;
         }, async (reason) => {
             await cleanup("error");
