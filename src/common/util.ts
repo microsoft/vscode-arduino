@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as childProcess from "child_process";
+import * as child_process from "child_process";
 import * as fs from "fs";
 import * as iconv from "iconv-lite";
 import * as os from "os";
@@ -196,19 +196,19 @@ export function isArduinoFile(filePath): boolean {
 export function spawn(
     command: string,
     args: string[] = [],
-    options: any = {},
+    options: child_process.SpawnOptions = {},
     output?: {channel?: vscode.OutputChannel,
               stdout?: (s: string) => void,
               stderr?: (s: string) => void},
 ): Thenable<object> {
     return new Promise((resolve, reject) => {
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
-        const child = childProcess.spawn(command, args, options);
+        const child = child_process.spawn(command, args, options);
 
         let codepage = "65001";
         if (os.platform() === "win32") {
             try {
-                const chcp = childProcess.execSync("chcp.com");
+                const chcp = child_process.execSync("chcp.com");
                 codepage = chcp.toString().split(":").pop().trim();
             } catch (error) {
                 arduinoChannel.warning(`Defaulting to code page 850 because chcp.com failed.\
