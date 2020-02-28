@@ -2,10 +2,8 @@
 // Licensed under the MIT license.
 
 import * as ccp from "cocopa";
-import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as tp from "typed-promisify";
 
 import * as constants from "../common/constants";
 import { arduinoChannel } from "../common/outputChannel";
@@ -45,11 +43,6 @@ export function isCompilerParserEnabled(dc?: DeviceContext) {
  *
  * Possible enhancements:
  *
- * * Parse c++ standard from arduino command line
- *
- *     Arduino currently sets the C++ standard during compilation with the
- *     flag -std=gnu++11
- *
  * * Order of includes: Perhaps insert the internal includes at the front
  *     as at least for the forcedIncludes IntelliSense seems to take the
  *     order into account.
@@ -79,34 +72,30 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
 
         // Normalize compiler and include paths (resolve ".." and ".")
         runner.result.normalize();
-
-        runner.result.includes = await removeInvalidDirs(runner.result.includes);
+        // Remove invalid paths
+        await runner.result.cleanup();
 
         // Search for Arduino.h in the include paths - we need it for a
         // forced include - users expect Arduino symbols to be available
         // in main sketch without having to include the header explicitly
-        const ardHeader = await locateArduinoHeader(runner.result.includes);
-        const forcedIncludes = ardHeader
-            ? [ ardHeader ]
+        const ardHeader = await runner.result.findFile("Arduino.h");
+        const forcedIncludes = ardHeader.length > 0
+            ? ardHeader
             : undefined;
-        if (!ardHeader) {
+        if (!forcedIncludes) {
             arduinoChannel.warning("Unable to locate \"Arduino.h\" within IntelliSense include paths.");
         }
 
-        // TODO: check what kind of result we've got: gcc or other architecture:
-        //  and instantiate content accordingly (to be implemented within cocopa)
+        // The C++ standard is set to the following default value if no compiler flag has been found.
         const content = new ccp.CCppPropertiesContentResult(runner.result,
                                                             constants.C_CPP_PROPERTIES_CONFIG_NAME,
                                                             ccp.CCppPropertiesISMode.Gcc_X64,
                                                             ccp.CCppPropertiesCStandard.C11,
-                                                            // as of 1.8.11 arduino is on C++11
                                                             ccp.CCppPropertiesCppStandard.Cpp11,
                                                             forcedIncludes);
         try {
-            const cmd = os.platform() === "darwin"
-                ? "Cmd + Alt + I"
-                : "Ctrl + Alt + I";
-            const help = `To manually rebuild your IntelliSense configuration run "${cmd}"`;
+            const cmd = os.platform() === "darwin" ? "Cmd" : "Ctrl";
+            const help = `To manually rebuild your IntelliSense configuration run "${cmd}+Alt+I"`;
             const pPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);
             const prop = new ccp.CCppProperties();
             prop.read(pPath);
@@ -127,27 +116,6 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
     }
 };
 
-// TODO: move to cocopa
-/**
- * Filter directory list by directories by their existence.
- * @param dirs Directories to be checked.
- * @returns The list of directories which exist.
- */
-async function removeInvalidDirs(dirs: string[]) {
-    const fsstat = tp.promisify(fs.stat);
-    const res: string[] = [];
-    for (const d of dirs) {
-        try {
-            const s = await fsstat(d);
-            if (s.isDirectory()) {
-                res.push(d);
-            }
-        } catch (e) {
-        }
-    }
-    return res;
-}
-
 /**
  * Assembles compiler parser engines which then will be used to find the main
  * sketch's compile command and parse the infomation from it required for
@@ -163,55 +131,6 @@ function makeCompilerParserEngines(dc: DeviceContext) {
     const trigger = ccp.getTriggerForArduinoGcc(sketch);
     const gccParserEngine = new ccp.ParserGcc(trigger);
     return [gccParserEngine];
-}
-
-/**
- * Search directories recursively for a file.
- * @param dir Directory where the search should begin.
- * @param what The file we're looking for.
- * @returns The path of the directory which contains the file else undefined.
- */
-async function findDirContaining(dir: string, what: string): Promise<string | undefined> {
-    const readdir = tp.promisify(fs.readdir);
-    const fsstat = tp.promisify(fs.stat);
-
-    let entries: string[];
-    try {
-        entries = await readdir(dir);
-    } catch (e) {
-        return undefined;
-    }
-    for (const entry of entries) {
-        const p = path.join(dir, entry);
-        const s = await fsstat(p);
-        if (s.isDirectory()) {
-            const result = await findDirContaining(p, what);
-            if (result) {
-                return result;
-            }
-        } else if (entry === what) {
-            return dir;
-        }
-    }
-    return undefined;
-};
-
-/**
- * Tries to find the main Arduino header (i.e. Arduino.h) in the given include
- * paths.
- * @param includes Array containing all include paths in which we should look
- * for Arduino.h
- * @returns The full path of the main Arduino header.
- */
-async function locateArduinoHeader(includes: string[]) {
-    const header = "Arduino.h";
-    for (const i of includes) {
-        const result = await findDirContaining(i, header);
-        if (result) {
-            return path.join(result, header);
-        }
-    }
-    return undefined;
 }
 
 /**
