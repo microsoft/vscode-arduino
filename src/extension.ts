@@ -333,8 +333,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 
-    setTimeout(() => {
+    setTimeout(async () => {
         const arduinoManagerProvider = new arduinoContentProviderModule.ArduinoContentProvider(context.extensionPath);
+        await arduinoManagerProvider.initialize();
+
         context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
         registerArduinoCommand("arduino.showBoardManager", async () => {
             const panel = vscode.window.createWebviewPanel("arduinoBoardManager", "Arduino Board Manager", vscode.ViewColumn.Two, {
