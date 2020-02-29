@@ -112,7 +112,7 @@ The following settings are as per sketch settings of the Arduino extension. You 
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
 - `prebuild` - External command which will be invoked before any sketch build (verify, upload, ...). For details see the [Pre- and Post-Build Commands](#Pre--and-Post-Build-Commands) section.
-- `postbuild` - External command to be run after the sketch has been built successfully. See the above section for more details.
+- `postbuild` - External command to be run after the sketch has been built successfully. See the afore mentioned section for more details.
 - `intelliSenseGen` - Override the global setting for auto-generation of the IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`). Three options are available:
   - `"global"`: Use the global settings (default)
   - `"disable"`: Disable the auto-generation even if globally enabled
