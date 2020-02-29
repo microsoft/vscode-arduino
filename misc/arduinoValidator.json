@@ -52,6 +52,18 @@
             "description": "Command to be run after every build",
             "type": "string",
             "minLength": 1
+        },
+        "buildPreferences": {
+            "description": "Arduino preferences which are passed to the Arduino back-end during build",
+            "type": "array",
+            "items": {
+                "type":"array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                    "type": "string"
+                }
+            }
         }
     }
 }
