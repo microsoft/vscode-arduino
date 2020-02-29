@@ -264,6 +264,10 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         this.saveContext();
     }
 
+    public get buildPreferences() {
+        return this._settings.buildPreferences.value;
+    }
+
     public async initialize() {
         if (ArduinoWorkspace.rootPath && util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))) {
             vscode.window.showInformationMessage("Arduino.json already generated.");

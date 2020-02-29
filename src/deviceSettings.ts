@@ -99,6 +99,35 @@ class StrSetting extends Setting<string> {
     }
 }
 
+class BuildPrefSetting extends Setting<string[][]> {
+    public get value() {
+        return super.value;
+    }
+    public set value(value: string[][]) {
+        if (!Array.isArray(value)) {
+            super.value = super.default;
+            return;
+        }
+        if (value.length <= 0) {
+            super.value = super.default;
+            return;
+        }
+        for (const pref of value) {
+            if (!Array.isArray(pref) || pref.length !== 2) {
+                super.value = super.default;
+                return;
+            }
+            for (const i of pref) {
+                if (typeof i !== "string") {
+                    super.value = super.default;
+                    return;
+                }
+            }
+        }
+        super.value = value;
+    }
+}
+
 /**
  * This class encapsulates all device/project specific settings and
  * provides common operations on them.
@@ -114,6 +143,7 @@ export class DeviceSettings {
     public prebuild = new StrSetting();
     public postbuild = new StrSetting();
     public programmer = new StrSetting();
+    public buildPreferences = new  BuildPrefSetting();
 
     /**
      * @returns true if any of the settings values has its modified flag
@@ -129,7 +159,8 @@ export class DeviceSettings {
                this.configuration.modified ||
                this.prebuild.modified ||
                this.postbuild.modified ||
-               this.programmer.modified;
+               this.programmer.modified ||
+               this.buildPreferences.modified;
     }
     /**
      * Clear modified flags of all settings values.
@@ -145,6 +176,7 @@ export class DeviceSettings {
         this.prebuild.commit();
         this.postbuild.commit();
         this.programmer.commit();
+        this.buildPreferences.commit();
     }
     /**
      * Resets all settings values to their default values.
@@ -162,6 +194,7 @@ export class DeviceSettings {
         this.prebuild.reset();
         this.postbuild.reset();
         this.programmer.reset();
+        this.buildPreferences.reset();
         if (commit) {
             this.commit();
         }
@@ -187,6 +220,7 @@ export class DeviceSettings {
             this.prebuild.value = settings.prebuild;
             this.postbuild.value = settings.postbuild;
             this.programmer.value = settings.programmer;
+            this.buildPreferences.value = settings.buildPreferences;
             if (commit) {
                 this.commit();
             }

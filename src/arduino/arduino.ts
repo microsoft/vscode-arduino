@@ -298,7 +298,7 @@ export class ArduinoApp {
             if (this.useArduinoCli()) {
                 args.push("--programmer", programmer)
             } else {
-                args.push("--useprogrammer", "--pref", "programmer=arduino:" + programmer)
+                args.push("--useprogrammer", "--pref", `programmer=arduino:${programmer}`);
             }
 
             args.push("--port", dc.port);
@@ -312,6 +312,14 @@ export class ArduinoApp {
                 args.push("--verify");
             } else {
                 args.push("compile", "-b", boardDescriptor);
+            }
+        }
+
+        if (dc.buildPreferences) {
+            for (const pref of dc.buildPreferences) {
+                // Note: BuildPrefSetting makes sure that each preference
+                // value consists of exactly two items (key and value).
+                args.push("--pref", `${pref[0]}=${pref[1]}`);
             }
         }
 
