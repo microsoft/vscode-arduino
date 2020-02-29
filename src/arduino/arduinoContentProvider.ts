@@ -16,12 +16,9 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
     private _webserver: LocalWebServer;
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
-    constructor(
-        private _extensionPath: string) {
-        this.initialize();
-    }
+    constructor(private _extensionPath: string) { }
 
-    public initialize() {
+    public async initialize() {
         this._webserver = new LocalWebServer(this._extensionPath);
         // Arduino Boards Manager
         this.addHandlerWithLogger("show-boardmanager", "/boardmanager", (req, res) => this.getHtmlView(req, res));
@@ -50,7 +47,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("load-examples", "/api/examples", async (req, res) => await this.getExamples(req, res));
         this.addHandlerWithLogger("open-example", "/api/openexample", (req, res) => this.openExample(req, res), true);
 
-        this._webserver.start();
+        await this._webserver.start();
     }
 
     public async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
