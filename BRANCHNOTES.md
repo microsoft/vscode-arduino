@@ -100,7 +100,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 **2020 02 26** Preparing for pull request: Removed all code marked `IS-REMOVE` and dead code which I was able to identify. Reviewed all TODOs and resolved those which can be fixed without having to bother the maintainers. Left the unresolved on grounds of documentation.  
 **2020 02 27** Integrated analysis into all builds. Fixed bug in board management (board configuration couldn't be set anymore). Added logging filter for non-verbose builds and uploads to remove spurious messages. Added post-build script support.  
 **2020 02 28** Moved some code to cocopa. Cocopa now tries to parse the compiler arguments to set the C++ standard according to the C++ standard set by the individual board package. Better error handling for pre-/post-build commands. Error reporting for exceptions during build cleanup. Full `cmd` and `bash` support within pre-/post-build commands. Environment variables for pre-/post-build commands.  
-
+**2020 02 29** Added support for Arduino preferences within `arduino.json`. Fixed bug which surfaced when no sketch was set. Fixed security issue reported by Mathieu.  
 
 ## Status
 |      | Tasks   |
@@ -147,6 +147,10 @@ During merging I found some bugs within those functions - mainly due to the abov
 
 ## Additional Stuff this Branch addresses
 * Support for `postbuild` commands, see [#786](https://github.com/microsoft/vscode-arduino/issues/786)
+  * Full `cmd` and `bash` syntax support for pre-/post-build commands
+  * Environment variables for pre-/post-build commands
+* Support for Arduino preferences to be set during build, see [#975](https://github.com/microsoft/vscode-arduino/issues/975#issuecomment-592931155)
+* Fixed security issue [#966](https://github.com/microsoft/vscode-arduino/issues/966): Web-server was listening on machine's main interface (0.0.0.0) instead of `localhost`.
 
 ## Motivation
 I write a lot of code for Arduino, especially libraries. The Arduino IDE is not suited for more complex projects and I tried several alternatives:
@@ -167,28 +171,30 @@ I will list every supporter here, thanks!
 ### Supporters
 5$ -> 1 :beer:  
 1h coding -> 20$ -> 4 :beers: (very moderate wage though)  
-2020-02-04 Elektronik Workshop: 32 :beers: (8h coding)  
-2020-02-05 Elektronik Workshop: 40 :beers: (10h coding)  
-2020-02-06 Elektronik Workshop: 36 :beers: (9h coding)  
-2020-02-07 Elektronik Workshop: 48 :beers: (12h coding)  
-2020-02-08 Elektronik Workshop: 52 :beers: (13h coding)  
-2020-02-09 Elektronik Workshop: 40 :beers: (10h coding)  
-2020-02-10 Elektronik Workshop: 32 :beers: (8h coding)  
-2020-02-11 Elektronik Workshop: 16 :beers: (4h coding)  
-2020-02-12 Elektronik Workshop: 32 :beers: (8h coding)  
+2020-02-04 EW: 32 :beers: (8h coding)  
+2020-02-05 EW: 40 :beers: (10h coding)  
+2020-02-06 EW: 36 :beers: (9h coding)  
+2020-02-07 EW: 48 :beers: (12h coding)  
+2020-02-08 EW: 52 :beers: (13h coding)  
+2020-02-09 EW: 40 :beers: (10h coding)  
+2020-02-10 EW: 32 :beers: (8h coding)  
+2020-02-11 EW: 16 :beers: (4h coding)  
+2020-02-12 EW: 32 :beers: (8h coding)  
 2020-02-15 T.D.: 4 :beers: (20$ - Thanks a lot!)  
-2020-02-15 Elektronik Workshop: 28 :beers: (7h coding)  
-2020-02-17 Elektronik Workshop: 52 :beers: (13h coding)  
-2020-02-18 Elektronik Workshop: 36 :beers: (9h coding)  
-2020-02-19 Elektronik Workshop: 48 :beers: (12h coding)  
-2020-02-20 Elektronik Workshop: 56 :beers: (14h coding)  
-2020-02-21 Elektronik Workshop: 48 :beers: (12h coding)  
-2020-02-22 Elektronik Workshop: 44 :beers: (11h coding)  
-2020-02-23 Elektronik Workshop: 20 :beers: (5h coding)  
-2020-02-25 Elektronik Workshop: 12 :beers: (3h coding)  
-2020-02-26 Elektronik Workshop: 16 :beers: (4h coding)  
-2020-02-27 Elektronik Workshop: 48 :beers: (12h coding)  
-2020-02-28 Elektronik Workshop: 52 :beers: (13h coding)  
+2020-02-15 EW: 28 :beers: (7h coding)  
+2020-02-17 EW: 52 :beers: (13h coding)  
+2020-02-18 EW: 36 :beers: (9h coding)  
+2020-02-19 EW: 48 :beers: (12h coding)  
+2020-02-20 EW: 56 :beers: (14h coding)  
+2020-02-21 EW: 48 :beers: (12h coding)  
+2020-02-22 EW: 44 :beers: (11h coding)  
+2020-02-23 EW: 20 :beers: (5h coding)  
+2020-02-25 EW: 12 :beers: (3h coding)  
+2020-02-26 EW: 16 :beers: (4h coding)  
+2020-02-27 EW: 48 :beers: (12h coding)  
+2020-02-28 EW: 52 :beers: (13h coding)  
+2020-02-29 EW: 28 :beers: (7h coding)  
+<!-- 7:00 - 14:00 -->
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
@@ -245,6 +251,7 @@ I will list every supporter here, thanks!
   * Build/Arduino Backend
   * Include paths
   * Relation of IntelliSense and build
+
 ## Non-categorized Notes
 ### Integrate upstream changes into fork
 ```bash
