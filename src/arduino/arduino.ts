@@ -524,9 +524,17 @@ Please make sure the folder is not occupied by other procedures .`);
             args.push("--upload",
                       "--port", dc.port,
                       "--useprogrammer",
-                      "--pref", "programmer=" + programmer);
+                      "--pref", `programmer=${programmer}`);
         } else {
             args.push("--verify");
+        }
+
+        if (dc.buildPreferences) {
+            for (const pref of dc.buildPreferences) {
+                // Note: BuildPrefSetting makes sure that each preference
+                // value consists of exactly two items (key and value).
+                args.push("--pref", `${pref[0]}=${pref[1]}`);
+            }
         }
 
         // We always build verbosely but filter the output based on the settings
