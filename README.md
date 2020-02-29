@@ -117,6 +117,14 @@ The following settings are as per sketch settings of the Arduino extension. You 
   - `"global"`: Use the global settings (default)
   - `"disable"`: Disable the auto-generation even if globally enabled
   - `"enable"`: Enable the auto-generation even if globally disabled
+- `buildPreferences` - Set Arduino preferences which then are used during any build (verify, upload, ...). This allows for extra defines, compiler options or includes. The preference key-value pairs must be set as follows:
+```json
+    "buildPreferences": [
+        ["build.extra_flags", "-DMY_DEFINE=666 -DANOTHER_DEFINE=3.14 -Wall"],
+        ["compiler.cpp.extra_flags", "-DYET_ANOTER=\"hello\""]
+    ]
+}
+```
 
 ## Pre- and Post-Build Commands
 On Windows the commands run within a `cmd`-, on Linux and OSX within a `bash`-instance. Therefore your command can be anything what you can run within those shells. Instead of running a command you can invoke a script. This makes writing more complex pre-/post-build mechanisms much easier and opens up the possibility to run python or other scripting languages.
