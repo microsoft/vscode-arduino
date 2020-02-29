@@ -98,6 +98,9 @@ During merging I found some bugs within those functions - mainly due to the abov
 **2020 02 23** Several tests, fixes and improvements within cocopa. `Arduino.h` now added to forced includes. Fixed code which wasn't linted up to now. Added hint to end of build how to rebuild the IntelliSense configuration. Added missing version field to `c_cpp_properties.json`.  
 **2020 02 25** Implemented and tested support for `.cpp`-sketches. Done implementing the most relevant unit tests in cocopa. Two independent alpha testers confirm proper working of the previous alpha releases. Updated to the latest revision of cocopa.  
 **2020 02 26** Preparing for pull request: Removed all code marked `IS-REMOVE` and dead code which I was able to identify. Reviewed all TODOs and resolved those which can be fixed without having to bother the maintainers. Left the unresolved on grounds of documentation.  
+**2020 02 27** Integrated analysis into all builds. Fixed bug in board management (board configuration couldn't be set anymore). Added logging filter for non-verbose builds and uploads to remove spurious messages. Added post-build script support.  
+**2020 02 28** Moved some code to cocopa. Cocopa now tries to parse the compiler arguments to set the C++ standard according to the C++ standard set by the individual board package. Better error handling for pre-/post-build commands. Error reporting for exceptions during build cleanup. Full `cmd` and `bash` support within pre-/post-build commands. Environment variables for pre-/post-build commands.  
+
 
 ## Status
 |      | Tasks   |
@@ -114,6 +117,7 @@ During merging I found some bugs within those functions - mainly due to the abov
 |                                       | :heavy_check_mark: Merging of parsing result and existing file content |
 |                                       | :heavy_check_mark: Handling inexistent files and folders |
 |                                       | :heavy_check_mark: Write configuration on change only |
+|                                       | :heavy_check_mark: Parse C++ standard from compiler flags |
 | **Configuration flags**               | :heavy_check_mark: Provide global disable flag for IntelliSense auto-config |
 |                                       | :heavy_check_mark: Provide project specific override for the global flag - most users will likely use the default setup and disable auto-generation for very specific projects |
 | **Unit tests**                        | :heavy_check_mark: Basic parser (known boards, match/no match)|
@@ -183,6 +187,8 @@ I will list every supporter here, thanks!
 2020-02-23 Elektronik Workshop: 20 :beers: (5h coding)  
 2020-02-25 Elektronik Workshop: 12 :beers: (3h coding)  
 2020-02-26 Elektronik Workshop: 16 :beers: (4h coding)  
+2020-02-27 Elektronik Workshop: 48 :beers: (12h coding)  
+2020-02-28 Elektronik Workshop: 52 :beers: (13h coding)  
 
 <!-- https://github.com/StylishThemes/GitHub-Dark/wiki/Emoji -->
 
