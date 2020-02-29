@@ -183,7 +183,7 @@ export class ArduinoApp {
             this._building = false;
             logger.notifyUserError("ArduinoApp.build",
                                    reason,
-                                   `Unhandled exception when cleaning up build (${mode}).`);
+                                   `Unhandled exception when cleaning up build "${mode}": ${JSON.stringify(reason)}`);
             return false;
         });
     }
@@ -465,7 +465,6 @@ Please make sure the folder is not occupied by other procedures .`);
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
-        const cocopa = makeCompilerParserContext(dc);
         const verbose = VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose;
 
         if (!this.boardManager.currentBoard) {
@@ -544,6 +543,8 @@ Please make sure the folder is not occupied by other procedures .`);
         arduinoChannel.start(`${mode} sketch '${dc.sketch}'`);
 
         if (buildDir || dc.output) {
+            // 2020-02-29, EW: This whole code appears a bit wonky to me.
+            //   What if the user specifies an output directory "../builds/my project"
             buildDir = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);
             const dirPath = path.dirname(buildDir);
             if (!util.directoryExistsSync(dirPath)) {
@@ -588,6 +589,8 @@ Please make sure the folder is not occupied by other procedures .`);
 
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
+
+        const cocopa = makeCompilerParserContext(dc);
 
         const cleanup = async (result: "ok" | "error") => {
             let ret = true;
