@@ -100,7 +100,7 @@ gulp.task("genAikey", (done) => {
 });
 
 gulp.task("copyVendor", (done) => {
-    fsp.copySync('vendor', 'out/vendor');
+    fsp.copySync('./vendor/node_modules', 'out/vendor/node_modules');
     done();
 });
 

@@ -7,7 +7,7 @@
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.23.0"
+    "vscode": "^1.43.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -537,7 +537,7 @@
   },
   "scripts": {
     "vscode:prepublish": "gulp build --mode=production",
-    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install",
+    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install && cd ../../vendor && npm install",
     "test": "gulp test"
   },
   "extensionDependencies": [
