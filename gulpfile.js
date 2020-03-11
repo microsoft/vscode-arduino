@@ -15,13 +15,13 @@ const argv = require('minimist')(process.argv.slice(2));
 
 //...
 gulp.task("tslint", () => {
-    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./src/views/node_modules/**"])
+    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!./vendor/**", "!node_modules/**", "!./src/views/node_modules/**", "!out/**"])
         .pipe(tslint())
         .pipe(tslint.report());
 });
 
 gulp.task("eslint", () => {
-    return gulp.src(["./vendor/**/*.js", "!**/node_modules/**"])
+    return gulp.src(["!**/node_modules/**"])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
