@@ -43,7 +43,7 @@ export class DebuggerManager {
                 }
             }
         }
-        this._usbDetector = require("../../vendor/node_modules/usb-detection");
+        this._usbDetector = require("usb-native").detector;
         this._debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
             path.join(this._arduinoSettings.packagePath, "packages"));
         if (!util.fileExistsSync(this._debugServerPath)) {

@@ -537,7 +537,7 @@
   },
   "scripts": {
     "vscode:prepublish": "gulp build --mode=production",
-    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install && cd ../../vendor && npm install",
+    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install",
     "test": "gulp test"
   },
   "extensionDependencies": [
@@ -580,6 +580,7 @@
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
     "properties": "^1.2.1",
+    "usb-native": "^4.1.1",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.18",
     "winreg": "^1.2.3",

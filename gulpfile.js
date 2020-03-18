@@ -8,12 +8,10 @@ const sourcemaps = require("gulp-sourcemaps");
 const webpack = require("webpack");
 const del = require('del');
 const fs = require("fs");
-const fsp = require('fs-plus');
 const path = require("path");
 const childProcess = require("child_process");
 const argv = require('minimist')(process.argv.slice(2));
 
-//...
 gulp.task("tslint", () => {
     return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!./vendor/**", "!node_modules/**", "!./src/views/node_modules/**", "!out/**"])
         .pipe(tslint())
@@ -99,11 +97,6 @@ gulp.task("genAikey", (done) => {
     }
 });
 
-gulp.task("copyVendor", (done) => {
-    fsp.copySync('./vendor/node_modules', 'out/vendor/node_modules');
-    done();
-});
-
 gulp.task("test", (done) => {
     function removeExtensionDependencies() {
         const packageJson = JSON.parse(fs.readFileSync("package.json"));
@@ -149,7 +142,7 @@ gulp.task("test", (done) => {
     });
 });
 
-gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack", "copyVendor"));
+gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack"));
 
 gulp.task("build_without_view", gulp.series("clean", "ts-compile"));
 
