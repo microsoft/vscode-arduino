@@ -7,7 +7,7 @@
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.23.0"
+    "vscode": "^1.43.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/Microsoft/vscode-arduino/blob/master/README.md",
   "categories": [
-    "Languages",
+    "Programming Languages",
     "Debuggers",
     "Snippets",
     "Formatters"
@@ -54,6 +54,14 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "breakpoints": [
+      {
+        "language": "c"
+      },
+      {
+        "language": "cpp"
+      }
+    ],
     "snippets": [
       {
         "language": "cpp",
@@ -161,12 +169,6 @@
       {
         "type": "arduino",
         "label": "Arduino",
-        "enableBreakpointsFor": {
-          "languageIds": [
-            "c",
-            "cpp"
-          ]
-        },
         "configurationSnippets": [
           {
             "label": "Arduino: Launch Debugger",
@@ -578,6 +580,7 @@
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
     "properties": "^1.2.1",
+    "usb-native": "^5.0.4",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.18",
     "winreg": "^1.2.3",

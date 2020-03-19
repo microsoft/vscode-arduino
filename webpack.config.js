@@ -10,7 +10,9 @@ function getEntry() {
     encoding: 'utf8'
   });
   const mod = JSON.parse(npmListRes);
-  const unbundledModule = ['impor', 'uuid'];
+  const unbundledModule = ['impor', 'uuid',
+  // usb-native modules can not be bundled
+  'usb-native', 'usb-detection', '@serialport/bindings', 'bindings', 'serialport'];
   
   for (const mod of unbundledModule) {
     const p = 'node_modules/' + mod;

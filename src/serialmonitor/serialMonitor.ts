@@ -9,7 +9,7 @@ import * as Logger from "../logger/logger";
 import { SerialPortCtrl, SerialPortEnding } from "./serialportctrl";
 
 export interface ISerialPortDetail {
-    comName: string;
+    path: string;
     manufacturer: string;
     vendorId: string;
     productId: string;
@@ -67,7 +67,12 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public initialize() {
-        const defaultBaudRate = ArduinoContext.arduinoApp.settings.defaultBaudRate || SerialMonitor.DEFAULT_BAUD_RATE;
+        let defaultBaudRate;
+        if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
+            defaultBaudRate = ArduinoContext.arduinoApp.settings.defaultBaudRate;
+        } else {
+            defaultBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
+        }
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._currentBaudRate = defaultBaudRate;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
@@ -122,13 +127,13 @@ export class SerialMonitor implements vscode.Disposable {
                 return false;
             });
             if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {
-                this.updatePortListStatus(foundPort.comName);
+                this.updatePortListStatus(foundPort.path);
             }
         } else {
             const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
                 return {
                     description: l.manufacturer,
-                    label: l.comName,
+                    label: l.path,
                 };
             }).sort((a, b): number => {
                 return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);

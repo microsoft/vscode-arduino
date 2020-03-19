@@ -2,16 +2,17 @@
 // Licensed under the MIT license.
 
 import * as os from "os";
-import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
+import { OutputChannel } from "vscode";
 import { VscodeSettings } from "../arduino/vscodeSettings";
 
 interface ISerialPortDetail {
-  comName: string;
+  path: string;
   manufacturer: string;
   vendorId: string;
   productId: string;
 }
 
+// TBD: whether to remove serialport ending
 export enum SerialPortEnding {
   "No line ending",
   "Newline",
@@ -22,20 +23,17 @@ export enum SerialPortEnding {
 export class SerialPortCtrl {
   public static get serialport(): any {
     if (!SerialPortCtrl._serialport) {
-      SerialPortCtrl._serialport = require("../../vendor/node-usb-native").SerialPort;
+      SerialPortCtrl._serialport = require("usb-native").SerialPort;
     }
     return SerialPortCtrl._serialport;
   }
 
   public static list(): Promise<ISerialPortDetail[]> {
     return new Promise((resolve, reject) => {
-      SerialPortCtrl.serialport.list((e: any, ports: ISerialPortDetail[]) => {
-        if (e) {
-          reject(e);
-        } else {
-          resolve(ports);
-        }
-      });
+      SerialPortCtrl.serialport.list().then(
+        (ports) => resolve(ports),
+        (err) => reject(err),
+      );
     });
   }
 
@@ -53,7 +51,7 @@ export class SerialPortCtrl {
   }
 
   public get isActive(): boolean {
-    return this._currentSerialPort && this._currentSerialPort.isOpen();
+    return this._currentSerialPort && this._currentSerialPort.isOpen;
   }
 
   public get currentPort(): string {
@@ -63,7 +61,7 @@ export class SerialPortCtrl {
   public open(): Promise<any> {
     this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
     return new Promise((resolve, reject) => {
-      if (this._currentSerialPort && this._currentSerialPort.isOpen()) {
+      if (this._currentSerialPort && this._currentSerialPort.isOpen) {
         this._currentSerialPort.close((err) => {
           if (err) {
             return reject(err);
@@ -84,7 +82,7 @@ export class SerialPortCtrl {
             return resolve();
           }
 
-          this._currentSerialPort.write("TestingOpen", "Both NL & CR", (err) => {
+          this._currentSerialPort.write("TestingOpen" + os.EOL, (err) => {
             // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
             if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
               this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
@@ -114,7 +112,7 @@ export class SerialPortCtrl {
         return;
       }
 
-      this._currentSerialPort.write(text, SerialPortEnding[this._ending], (error) => {
+      this._currentSerialPort.write(text + os.EOL, (error) => {
         if (!error) {
           resolve();
         } else {
