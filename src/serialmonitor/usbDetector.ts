@@ -128,6 +128,7 @@ export class UsbDetector {
                 }
             }
         });
+        this._usbDetector.startMonitoring();
     }
 
     public stopListening() {
