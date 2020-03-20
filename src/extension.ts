@@ -236,7 +236,6 @@ export async function activate(context: vscode.ExtensionContext) {
     registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null));
     registerNonArduinoCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor());
     registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
-    registerNonArduinoCommand("arduino.changeEnding", () => serialMonitor.changeEnding());
     registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
     registerNonArduinoCommand("arduino.closeSerialMonitor", (port, showWarning = true) => serialMonitor.closeSerialMonitor(port, showWarning));
 
