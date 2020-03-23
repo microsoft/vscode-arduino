@@ -15,7 +15,7 @@ interface ISerialPortDetail {
 export class SerialPortCtrl {
   public static get serialport(): any {
     if (!SerialPortCtrl._serialport) {
-      SerialPortCtrl._serialport = require("usb-native").SerialPort;
+      SerialPortCtrl._serialport = require("node-usb-native").SerialPort;
     }
     return SerialPortCtrl._serialport;
   }
