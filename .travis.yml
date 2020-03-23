@@ -47,12 +47,10 @@ before_install:
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
     brew cask install arduino;
   fi
+- npm install -g vsce
+- npm install -g typescript
 
 install:
-- npm install -g vsce
-- npm install -g node-gyp
-- npm install -g typescript
-- npm install -g gulp
 - npm install
 # https://github.com/travis-ci/travis-ci/issues/8813
 - rm -f ./node_modules/.bin/which
