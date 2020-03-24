@@ -34,7 +34,6 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
-  // private const ending = ;
 
   public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
