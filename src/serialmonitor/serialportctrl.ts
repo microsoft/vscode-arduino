@@ -20,13 +20,13 @@ export class SerialPortCtrl {
     return SerialPortCtrl._serialport;
   }
 
-  public static list(): Promise<ISerialPortDetail[]> {
-    return new Promise((resolve, reject) => {
-      SerialPortCtrl.serialport.list().then(
-        (ports) => resolve(ports),
-        (err) => reject(err),
-      );
-    });
+  public static async list(): Promise<ISerialPortDetail[]> {
+    try {
+      const lists = SerialPortCtrl.serialport.list();
+      return lists;
+    } catch (err) {
+      throw err;
+    }
   }
 
   private static _serialport: any;
