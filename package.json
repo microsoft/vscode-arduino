@@ -537,7 +537,7 @@
   },
   "scripts": {
     "vscode:prepublish": "gulp build --mode=production",
-    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install",
+    "postinstall": "(node ./node_modules/vscode/bin/install && cd ./src/views && npm install); (cd ./node_modules/@serialport/bindings/ && node-gyp rebuild --target=7.1.11 --arch=x64 --dist-url=https://atom.io/download/electron)",
     "test": "gulp test"
   },
   "extensionDependencies": [
@@ -580,7 +580,7 @@
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
-    "node-usb-native": "^0.0.4",
+    "node-usb-native": "^0.0.7",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.18",
