@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.3.0
 
+- Release date: March 26, 2020
+
 ### Fixed
 
 - Support Electron v7. Fix issue of "Unable to use serial port in VS Code Version 1.43.0". [[#980](https://github.com/microsoft/vscode-arduino/issues/980)]
@@ -10,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - Remove line ending selection. Fix the issue of "Save the last used end of line". [[#952](https://github.com/microsoft/vscode-arduino/issues/952)]
 - Fix the issue of "Can't install libraries from VS Code for ESP8266". [[#930](https://github.com/microsoft/vscode-arduino/issues/930)]
 - Fix the issue of "Project path can not be changed". [[#978](https://github.com/microsoft/vscode-arduino/issues/978)]
+
+Special thanks to [raomin](https://github.com/raomin), thanks for your contributions and feedbacks.
 
 ## Version 0.2.29
 

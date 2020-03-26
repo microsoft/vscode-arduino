@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.3.0-rc5",
+  "version": "0.3.0",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -537,7 +537,7 @@
   },
   "scripts": {
     "vscode:prepublish": "gulp build --mode=production",
-    "postinstall": "(node ./node_modules/vscode/bin/install && cd ./src/views && npm install); (node ./node_modules/node-usb-native/scripts/rebuild-serialport.js)",
+    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install && node ../../node_modules/node-usb-native/scripts/rebuild-serialport.js",
     "test": "gulp test"
   },
   "extensionDependencies": [
