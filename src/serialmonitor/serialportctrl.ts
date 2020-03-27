@@ -15,18 +15,18 @@ interface ISerialPortDetail {
 export class SerialPortCtrl {
   public static get serialport(): any {
     if (!SerialPortCtrl._serialport) {
-      SerialPortCtrl._serialport = require("usb-native").SerialPort;
+      SerialPortCtrl._serialport = require("node-usb-native").SerialPort;
     }
     return SerialPortCtrl._serialport;
   }
 
-  public static list(): Promise<ISerialPortDetail[]> {
-    return new Promise((resolve, reject) => {
-      SerialPortCtrl.serialport.list().then(
-        (ports) => resolve(ports),
-        (err) => reject(err),
-      );
-    });
+  public static async list(): Promise<ISerialPortDetail[]> {
+    try {
+      const lists = SerialPortCtrl.serialport.list();
+      return lists;
+    } catch (err) {
+      throw err;
+    }
   }
 
   private static _serialport: any;
@@ -34,7 +34,6 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
-  // private const ending = ;
 
   public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
