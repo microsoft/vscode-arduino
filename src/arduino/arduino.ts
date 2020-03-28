@@ -592,6 +592,9 @@ Please make sure the folder is not occupied by other procedures .`);
         if (fs.existsSync(toolPath)) {
             result.push(path.normalize(path.join(toolPath, "**")));
         }
+        // path of custom libraries
+        result.push(path.join(this._settings.sketchbookPath, "libraries", "**"));
+
         return result;
     }
 
