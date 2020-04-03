@@ -67,7 +67,7 @@ suite("Arduino: Extension Tests", () => {
         });
 
     suiteTeardown(() => {
-        // When running test on osx, the vscode instance is hanging there after tests finished and cause mocha timeout.
+        // When running test on osx or windows, the vscode instance is hanging there after tests finished and cause mocha timeout.
         // As a workaround, closing usb-detection process manually would make test window exit normally.
         if (os.platform() !== "linux") {
             usbDetectorModule.UsbDetector.getInstance().stopListening();
