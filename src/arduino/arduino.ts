@@ -141,7 +141,7 @@ export class ArduinoApp {
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor];
+        const args = this.isArduinoCli() ? ["upload", "-b", boardDescriptor] : ["--upload", "--board", boardDescriptor];
         if (dc.port) {
             args.push("--port", dc.port);
         }
@@ -277,7 +277,7 @@ export class ArduinoApp {
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--verify", "--board", boardDescriptor, appPath];
+        const args = this.isArduinoCli() ? ["compile", "-b", boardDescriptor, appPath] : ["--verify", "--board", boardDescriptor, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
@@ -288,8 +288,12 @@ export class ArduinoApp {
                 Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return;
             }
+            
+            if (this.isArduinoCli())
+                args.push("--build-path", `build.path=${outputPath}`);
+            else
+                args.push("--pref", `build.path=${outputPath}`);
 
-            args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
@@ -733,6 +737,10 @@ Please make sure the folder is not occupied by other procedures .`);
 
     public set programmerManager(value: ProgrammerManager) {
         this._programmerManager = value;
+    }
+
+    private isArduinoCli() {
+        return true;
     }
 
     private getProgrammerString(): string {
