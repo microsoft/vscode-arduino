@@ -22,6 +22,7 @@ export interface IArduinoSettings {
     preferencePath: string;
     defaultBaudRate: number;
     preferences: Map<string, string>;
+    isArduinoCli: boolean;
     reloadPreferences(): void;
 }
 
@@ -38,12 +39,15 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _preferences: Map<string, string>;
 
+    private _isArduinoCli : boolean;
+
     public constructor() {
     }
 
     public async initialize() {
         const platform = os.platform();
         this._commandPath = VscodeSettings.getInstance().commandPath;
+        this._isArduinoCli = VscodeSettings.getInstance().isArduinoCli;
         await this.tryResolveArduinoPath();
         await this.tryGetDefaultBaudRate();
         if (platform === "win32") {
@@ -148,6 +152,10 @@ export class ArduinoSettings implements IArduinoSettings {
             this._preferences = util.parseConfigFile(this.preferencePath);
         }
         return this._preferences;
+    }
+
+    public get isArduinoCli() {
+        return this._isArduinoCli;
     }
 
     public get defaultBaudRate() {

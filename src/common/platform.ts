@@ -14,8 +14,8 @@ export function resolveArduinoPath(): string {
     return internalSysLib.resolveArduinoPath();
 }
 
-export function validateArduinoPath(arduinoPath: string): boolean {
-    return internalSysLib.validateArduinoPath(arduinoPath);
+export function validateArduinoPath(arduinoPath: string, isArduinoCli = false): boolean {
+    return internalSysLib.validateArduinoPath(arduinoPath, isArduinoCli);
 }
 
 export function findFile(fileName: string, cwd: string): string {
