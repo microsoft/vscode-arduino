@@ -442,6 +442,11 @@
       "type": "object",
       "title": "Arduino configuration",
       "properties": {
+        "arduino.isArduinoCli" : {
+          "type": "boolean",
+          "default": false,
+          "description": "Arduino-CLI installed instead of more common Arduino GUI"
+        },
         "arduino.path": {
           "type": "string",
           "default": "",
