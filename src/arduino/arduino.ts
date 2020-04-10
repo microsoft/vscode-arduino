@@ -140,7 +140,7 @@ export class ArduinoApp {
             }
         }
 
-        const appPath = this.isArduinoCli ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const appPath = this.isArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = this.isArduinoCli() ? ["upload", "-b", boardDescriptor] : ["--upload", "--board", boardDescriptor];
         if (dc.port) {
             args.push("--port", dc.port);
@@ -213,7 +213,7 @@ export class ArduinoApp {
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
-        const appPath = this.isArduinoCli ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const appPath = this.isArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
             "--pref", "programmer=" + selectProgrammer, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
@@ -276,7 +276,7 @@ export class ArduinoApp {
             }
         }
 
-        const appPath = this.isArduinoCli ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const appPath = this.isArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = this.isArduinoCli() ? ["compile", "-b", boardDescriptor, appPath] : ["--verify", "--board", boardDescriptor, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
