@@ -39,7 +39,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _preferences: Map<string, string>;
 
-    private _isArduinoCli : boolean;
+    private _isArduinoCli: boolean;
 
     public constructor() {
     }

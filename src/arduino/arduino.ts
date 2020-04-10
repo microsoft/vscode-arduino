@@ -289,10 +289,12 @@ export class ArduinoApp {
                 return;
             }
             
-            if (this.isArduinoCli())
+            if (this.isArduinoCli()) {
                 args.push("--build-path", `build.path=${outputPath}`);
-            else
+            }
+            else {
                 args.push("--pref", `build.path=${outputPath}`);
+            }
 
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
         } else {
