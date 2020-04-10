@@ -288,11 +288,10 @@ export class ArduinoApp {
                 Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return;
             }
-            
+
             if (this.isArduinoCli()) {
                 args.push("--build-path", `build.path=${outputPath}`);
-            }
-            else {
+            } else {
                 args.push("--pref", `build.path=${outputPath}`);
             }
 
