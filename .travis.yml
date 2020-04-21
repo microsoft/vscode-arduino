@@ -4,6 +4,7 @@ node_js:
 - '11'
 
 os:
+- windows
 - linux
 - osx
 dist: trusty # using Ubuntu 14.04.5 LTS
@@ -62,7 +63,9 @@ script:
 - gulp tslint
 - gulp genAikey
 - vsce package
-- npm test --silent
+- if [ $TRAVIS_OS_NAME == "linux" ] || [ $TRAVIS_OS_NAME == "osx" ]; then
+    npm test --silent;
+  fi
 
 deploy:
   # deploy to github release
