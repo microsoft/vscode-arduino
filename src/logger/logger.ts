@@ -7,9 +7,9 @@ import TelemetryTransport from "./telemetry-transport";
 import UserNotificationTransport from "./user-notification-transport";
 
 export enum LogLevel {
-    info = "info",
-    warn = "warn",
-    error = "error",
+    Info = "info",
+    Warn = "warn",
+    Error = "error",
 }
 
 function FilterErrorPath(line: string): string {
@@ -27,9 +27,9 @@ function FilterErrorPath(line: string): string {
 export function configure(context: vscode.ExtensionContext) {
     winston.configure({
         transports: [
-            new (winston.transports.File)({ level: LogLevel.warn, filename: context.asAbsolutePath("arduino.log") }),
-            new TelemetryTransport({ level: LogLevel.info, context }),
-            new UserNotificationTransport({ level: LogLevel.info }),
+            new (winston.transports.File)({ level: LogLevel.Warn, filename: context.asAbsolutePath("arduino.log") }),
+            new TelemetryTransport({ level: LogLevel.Info, context }),
+            new UserNotificationTransport({ level: LogLevel.Info }),
         ],
     });
 }
@@ -60,7 +60,7 @@ export function silly(message: string, metadata?: any) {
 
 export function traceUserData(message: string, metadata?: any) {
     // use `info` as the log level and add a special flag in metadata
-    winston.log(LogLevel.info, message, { ...metadata, telemetry: true });
+    winston.log(LogLevel.Info, message, { ...metadata, telemetry: true });
 }
 
 function traceErrorOrWarning(level: string, message: string, error: Error, metadata?: any) {
@@ -78,11 +78,11 @@ function traceErrorOrWarning(level: string, message: string, error: Error, metad
 }
 
 export function traceError(message: string, error: Error, metadata?: any) {
-    traceErrorOrWarning(LogLevel.error, message, error, metadata);
+    traceErrorOrWarning(LogLevel.Error, message, error, metadata);
 }
 
 export function traceWarning(message: string, error: Error, metadata?: any) {
-    traceErrorOrWarning(LogLevel.warn, message, error, metadata);
+    traceErrorOrWarning(LogLevel.Warn, message, error, metadata);
 }
 
 export function notifyAndThrowUserError(errorCode: string, error: Error, message?: string) {

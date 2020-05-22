@@ -61,7 +61,7 @@ export class TelemetryTransport extends winston.Transport {
                         }
                     }
                 }
-                if (level === LogLevel.info) {
+                if (level === LogLevel.Info) {
                     this.reporter.sendTelemetryEvent(message, properties, measures);
                 } else {
                     this.reporter.sendTelemetryErrorEvent(message, properties, measures, ["message", "notification", "errorLine"]);
