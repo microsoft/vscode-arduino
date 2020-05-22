@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import * as winston from "winston";
+import { LogLevel } from "./logger";
 interface IPackageInfo {
     name: string;
     version: string;
@@ -60,7 +61,7 @@ export class TelemetryTransport extends winston.Transport {
                         }
                     }
                 }
-                if (level === "info") {
+                if (level === LogLevel.info) {
                     this.reporter.sendTelemetryEvent(message, properties, measures);
                 } else {
                     this.reporter.sendTelemetryErrorEvent(message, properties, measures, ["message", "notification", "errorLine"]);
