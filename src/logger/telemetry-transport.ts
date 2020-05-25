@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import * as winston from "winston";
+import { LogLevel } from "./logger";
 interface IPackageInfo {
     name: string;
     version: string;
@@ -39,7 +40,7 @@ export class TelemetryTransport extends winston.Transport {
             winston.error("Failed to initialize telemetry due to no aiKey in package.json.");
             return;
         }
-        this.reporter = new TelemetryReporter(packageInfo.name, packageInfo.version, packageInfo.aiKey);
+        this.reporter = new TelemetryReporter(packageInfo.name, packageInfo.version, packageInfo.aiKey, true);
     }
 
     protected log(level: string, message: string, metadata?: any, callback?: (arg1, arg2) => void) {
@@ -60,7 +61,11 @@ export class TelemetryTransport extends winston.Transport {
                         }
                     }
                 }
-                this.reporter.sendTelemetryEvent(message, properties, measures);
+                if (level === LogLevel.Info) {
+                    this.reporter.sendTelemetryEvent(message, properties, measures);
+                } else {
+                    this.reporter.sendTelemetryErrorEvent(message, properties, measures, ["message", "notification", "errorLine"]);
+                }
             } catch (telemetryErr) {
                 // If sending telemetry event fails ignore it so it won"t break the extension
                 winston.error("Failed to send telemetry event. error: " + telemetryErr);
