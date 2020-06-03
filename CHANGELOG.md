@@ -1,6 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.3.1
+
+- Release date: June 3, 2020
+
+### Fixed
+
+- Fix issue of serial monitor keeps esp devices in flash mode. [[#1015](https://github.com/microsoft/vscode-arduino/issues/1015)]
+
+### Changed
+- Suppress sending telemetry data with error details
+
 ## Version 0.3.0
 
 - Release date: March 26, 2020
