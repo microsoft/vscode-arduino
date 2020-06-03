@@ -21,6 +21,7 @@ addons:
 branches:
   only:
   - master
+  - develop
   - /v?[0-9]+\.[0-9]+\.[0-9]+(.*)?/
 
 env:
@@ -35,6 +36,10 @@ before_install:
     wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER;
     tar -xvf /home/$USER/arduino-1.8.2-linux64.tar.xz -C /home/$USER/;
     sudo ln -s /home/$USER/arduino-1.8.2/arduino /usr/bin/arduino;
+    sudo apt-get update;
+    sudo apt-get install g++-multilib;
+    sudo apt-get install -y build-essential;
+    sudo apt-get install libudev-dev;
   fi
 # Arduino 1.8.7 has breaking change, Install board package and library will fail
 # https://github.com/arduino/Arduino/issues/8034
@@ -43,11 +48,12 @@ before_install:
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
     brew cask install arduino;
   fi
+- npm install -g node-gyp
+- npm install -g vsce
+- npm install -g gulp
+- npm install -g typescript
 
 install:
-- npm install -g vsce
-- npm install -g typescript
-- npm install -g gulp
 - npm install
 # https://github.com/travis-ci/travis-ci/issues/8813
 - rm -f ./node_modules/.bin/which

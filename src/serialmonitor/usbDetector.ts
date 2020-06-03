@@ -45,7 +45,7 @@ export class UsbDetector {
         if (os.platform() === "linux" || !enableUSBDetection) {
             return;
         }
-        this._usbDetector = require("../../vendor/node-usb-native").detector;
+        this._usbDetector = require("node-usb-native").detector;
 
         if (!this._usbDetector) {
             return;
@@ -128,6 +128,7 @@ export class UsbDetector {
                 }
             }
         });
+        this._usbDetector.startMonitoring();
     }
 
     public stopListening() {
@@ -159,10 +160,13 @@ export class UsbDetector {
         }
     }
 
-    private showReadMeAndExample(readme: string) {
+    private showReadMeAndExample(readme: string|undefined) {
         if (ArduinoContext.boardManager.currentBoard) {
-            let readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, readme);
-            if (!util.fileExistsSync(readmeFilePath)) {
+            let readmeFilePath = "";
+            if (readme) {
+                readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, readme);
+            }
+            if (!readmeFilePath || !util.fileExistsSync(readmeFilePath)) {
                 readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
             }
             vscode.commands.executeCommand("arduino.showExamples", true);

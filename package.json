@@ -2,12 +2,12 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.2.27",
+  "version": "0.3.0",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.23.0"
+    "vscode": "^1.43.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/Microsoft/vscode-arduino/blob/master/README.md",
   "categories": [
-    "Languages",
+    "Programming Languages",
     "Debuggers",
     "Snippets",
     "Formatters"
@@ -54,6 +54,14 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "breakpoints": [
+      {
+        "language": "c"
+      },
+      {
+        "language": "cpp"
+      }
+    ],
     "snippets": [
       {
         "language": "cpp",
@@ -161,12 +169,6 @@
       {
         "type": "arduino",
         "label": "Arduino",
-        "enableBreakpointsFor": {
-          "languageIds": [
-            "c",
-            "cpp"
-          ]
-        },
         "configurationSnippets": [
           {
             "label": "Arduino: Launch Debugger",
@@ -534,8 +536,8 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "gulp build",
-    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install",
+    "vscode:prepublish": "gulp build --mode=production",
+    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install && node ../../node_modules/node-usb-native/scripts/rebuild-serialport.js",
     "test": "gulp test"
   },
   "extensionDependencies": [
@@ -554,19 +556,21 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-require-path-exists": "^1.1.7",
     "eslint-plugin-standard": "^3.0.1",
-    "gulp": "^3.9.1",
-    "gulp-eslint": "^3.0.1",
+    "fancy-log": "^1.3.3",
+    "gulp": "^4.0.2",
+    "gulp-eslint": "^6.0.0",
     "gulp-sourcemaps": "^2.4.1",
-    "gulp-tslint": "^7.0.1",
-    "gulp-typescript": "^3.1.5",
-    "gulp-util": "^3.0.8",
-    "mocha": "^4.1.0",
-    "run-sequence": "^1.2.2",
-    "tslint": "^4.2.0",
+    "gulp-tslint": "^8.1.4",
+    "gulp-typescript": "^5.0.1",
+    "minimist": "^1.2.0",
+    "mocha": "^6.2.2",
+    "node-gyp": "^6.1.0",
+    "plugin-error": "^1.0.1",
+    "tslint": "^5.20.1",
     "typemoq": "^1.6.0",
     "typescript": "^2.2.1",
-    "vscode": "^1.1.22",
-    "webpack": "^2.2.1"
+    "vscode": "^1.1.36",
+    "webpack": "^4.41.2"
   },
   "dependencies": {
     "body-parser": "^1.16.1",
@@ -576,6 +580,7 @@
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
+    "node-usb-native": "^0.0.13",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.0.18",

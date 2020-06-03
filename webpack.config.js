@@ -10,7 +10,9 @@ function getEntry() {
     encoding: 'utf8'
   });
   const mod = JSON.parse(npmListRes);
-  const unbundledModule = ['impor', 'uuid'];
+  const unbundledModule = ['impor', 'uuid',
+  // usb-native modules can not be bundled
+  'node-usb-native', 'usb-detection', '@serialport/bindings', 'bindings', 'serialport'];
   
   for (const mod of unbundledModule) {
     const p = 'node_modules/' + mod;
@@ -45,7 +47,7 @@ function getDependeciesFromNpm(mod) {
 /**@type {import('webpack').Configuration}*/
 const config = {
     target: 'node',
-
+    
     entry: getEntry(),
     output: {
         path: path.resolve(__dirname, 'out/node_modules'),

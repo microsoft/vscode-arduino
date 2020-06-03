@@ -4,7 +4,7 @@
 "use strict";
 
 import * as compareVersions from "compare-versions";
-import {commands, ExtensionContext, extensions, Uri, window} from "vscode";
+import { commands, ExtensionContext, extensions, Uri, window } from "vscode";
 import * as Logger from "./logger/logger";
 
 const IS_MUST_CANDIDATE_VERSION = false;
