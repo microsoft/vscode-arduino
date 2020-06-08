@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.3.1
 
-- Release date: June 3, 2020
+- Release date: June 9, 2020
 
 ### Fixed
 
