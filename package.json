@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -568,14 +568,14 @@
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^5.0.1",
     "minimist": "^1.2.0",
-    "mocha": "^6.2.2",
+    "mocha": "^6.2.3",
     "node-gyp": "^6.1.0",
     "plugin-error": "^1.0.1",
     "tslint": "^5.20.1",
     "typemoq": "^1.6.0",
     "typescript": "^2.2.1",
     "vscode": "^1.1.36",
-    "webpack": "^4.41.2"
+    "webpack": "^4.42.1"
   },
   "dependencies": {
     "body-parser": "^1.16.1",
@@ -588,7 +588,7 @@
     "node-usb-native": "^0.0.13",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
-    "vscode-extension-telemetry": "0.0.18",
+    "vscode-extension-telemetry": "0.1.6",
     "winreg": "^1.2.3",
     "winston": "^2.3.1"
   }
