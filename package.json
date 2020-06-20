@@ -470,7 +470,7 @@
         "arduino.clearOutputOnBuild": {
           "type": "boolean",
           "default": false,
-          "description": "Clear the output logs before uploading or verifying"
+          "description": "Clear the output logs before uploading or verifying."
         },
         "arduino.openPDEFiletype": {
           "type": "boolean",
