@@ -36,5 +36,5 @@ export const arduinoChannel = {
 
     clear() {
         this.channel.clear();
-    }
+    },
 };
