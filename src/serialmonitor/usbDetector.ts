@@ -9,6 +9,8 @@ import { IBoard } from "../arduino/package";
 import { VscodeSettings } from "../arduino/vscodeSettings";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
+import { ARDUINO_CONFIG_FILE } from "../common/constants";
+import { ArduinoWorkspace } from "../common/workspace";
 
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
@@ -75,6 +77,10 @@ export class UsbDetector {
                     SerialMonitor.getInstance().initialize();
                 }
                 let bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
+                const openEditor = vscode.window.activeTextEditor;
+                if (ArduinoWorkspace.rootPath && (
+                    util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))
+                    || (openEditor && openEditor.document.fileName.endsWith(".ino")))) {
                 if (!bd) {
                     ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackageContent) => {
                         const ignoreBoards = VscodeSettings.getInstance().ignoreBoards || [];
@@ -127,6 +133,7 @@ export class UsbDetector {
                     this.switchBoard(bd, deviceDescriptor);
                 }
             }
+        }
         });
         this._usbDetector.startMonitoring();
     }

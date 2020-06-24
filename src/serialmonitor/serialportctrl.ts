@@ -64,7 +64,7 @@ export class SerialPortCtrl {
           });
         });
       } else {
-        this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate });
+        this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate, hupcl: false });
         this._outputChannel.show();
         this._currentSerialPort.on("open", () => {
           if (VscodeSettings.getInstance().disableTestingOpen) {
