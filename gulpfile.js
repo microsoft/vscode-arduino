@@ -114,9 +114,9 @@ gulp.task("test", (done) => {
     // and restore extensionDependencies after test exited.
     removeExtensionDependencies();
 
-    const child = childProcess.spawn("node", ["./node_modules/vscode/bin/test"], {
+    const child = childProcess.spawn("node", ["./out/test/runTest"], {
         cwd: __dirname,
-        env: Object.assign({}, process.env, { CODE_TESTS_WORKSPACE: path.join(__dirname, "test/resources/blink") }),
+        env: Object.assign({}, process.env),
     });
 
     child.stdout.on("data", (data) => {

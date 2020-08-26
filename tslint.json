@@ -33,7 +33,7 @@
             150
         ], 
         "no-angle-bracket-type-assertion": false,
-        "no-implicit-dependencies": [true, "dev"],
+        "no-implicit-dependencies": [true, "dev", ["vscode"]],
         "no-string-literal": false,
         "no-object-literal-type-assertion": false,
         "no-invalid-template-strings": false,

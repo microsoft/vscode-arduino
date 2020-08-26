@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -537,7 +537,7 @@
   },
   "scripts": {
     "vscode:prepublish": "gulp build --mode=production",
-    "postinstall": "node ./node_modules/vscode/bin/install && cd ./src/views && npm install && node ../../node_modules/node-usb-native/scripts/rebuild-serialport.js",
+    "postinstall": "cd ./src/views && npm install && node ../../node_modules/node-usb-native/scripts/rebuild-serialport.js",
     "test": "gulp test"
   },
   "extensionDependencies": [
@@ -545,11 +545,13 @@
   ],
   "devDependencies": {
     "@types/compare-versions": "^3.0.0",
-    "@types/mocha": "^2.2.32",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^6.0.40",
+    "@types/vscode": "^1.43.0",
     "@types/winreg": "^1.2.30",
+    "acorn": "^7.4.0",
     "del": "^2.2.2",
-    "eslint": "^4.18.2",
+    "eslint": "^6.8.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^4.2.2",
@@ -569,8 +571,8 @@
     "tslint": "^5.20.1",
     "typemoq": "^1.6.0",
     "typescript": "^2.2.1",
-    "vscode": "^1.1.36",
-    "webpack": "^4.42.1"
+    "vscode-test": "^1.4.0",
+    "webpack": "^4.44.1"
   },
   "dependencies": {
     "body-parser": "^1.16.1",
