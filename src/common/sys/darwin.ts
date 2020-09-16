@@ -19,7 +19,8 @@ export function resolveArduinoPath(): string {
 }
 
 export function validateArduinoPath(arduinoPath: string, isArduinoCli = false): boolean {
-    return fileExistsSync(path.join(resolveMacArduinoAppPath(arduinoPath), "/Contents/MacOS/Arduino"));
+    return fileExistsSync(path.join(resolveMacArduinoAppPath(arduinoPath), isArduinoCli ? "arduino-cli" : "/Contents/MacOS/Arduino"));
+
 }
 
 export function findFile(fileName: string, cwd: string): string {
