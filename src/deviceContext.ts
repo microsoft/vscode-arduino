@@ -151,9 +151,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         this._configuration = deviceConfigJson.configuration;
                         this._output = deviceConfigJson.output;
                         this._debugger = deviceConfigJson["debugger"];
-                        this._onDidChange.fire();
                         this._prebuild = deviceConfigJson.prebuild;
                         this._programmer = deviceConfigJson.programmer;
+                        this._onDidChange.fire();
                     } else {
                         Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
                     }
@@ -164,9 +164,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     this._configuration = null;
                     this._output = null;
                     this._debugger = null;
-                    this._onDidChange.fire();
                     this._prebuild = null;
                     this._programmer = null;
+                    this._onDidChange.fire();
                 }
                 return this;
             }, (reason) => {
@@ -182,9 +182,9 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 this._configuration = null;
                 this._output = null;
                 this._debugger = null;
-                this._onDidChange.fire();
                 this._prebuild = null;
                 this._programmer = null;
+                this._onDidChange.fire();
 
                 return this;
             });
