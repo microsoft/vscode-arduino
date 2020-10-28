@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.3.3
+
+- Release date: October 28, 2020
+
+### Changed
+- Update node-usb-native dependency to fix serial port issue from VS Code's Electron version update.
+
 ## Version 0.3.2
 
 - Release date: August 26, 2020
