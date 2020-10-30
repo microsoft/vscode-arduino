@@ -13,7 +13,8 @@ import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
 import { parseBoardDescriptor } from "./board";
-import { IBoard, IPackage, IPlatform } from "./package";
+import { IBoard, IPackage, IPlatform, IProgrammer } from "./package";
+import { parseProgrammerDescriptor } from "./programmer";
 import { VscodeSettings } from "./vscodeSettings";
 
 export class BoardManager {
@@ -21,6 +22,8 @@ export class BoardManager {
     private _packages: IPackage[];
 
     private _platforms: IPlatform[];
+
+    private _programmers: Map<string, IProgrammer>;
 
     private _installedPlatforms: IPlatform[];
 
@@ -69,6 +72,7 @@ export class BoardManager {
 
         // Load all supported boards type.
         this.loadInstalledBoards();
+        this.loadInstalledProgrammers();
         this.updateStatusBar();
         this._boardConfigStatusBar.show();
 
@@ -138,6 +142,10 @@ export class BoardManager {
 
     public get installedBoards(): Map<string, IBoard> {
         return this._boards;
+    }
+
+    public get installedProgrammers(): Map<string, IProgrammer> {
+        return this._programmers;
     }
 
     public get currentBoard(): IBoard {
@@ -243,6 +251,7 @@ export class BoardManager {
                     this._installedPlatforms.push(existingPlatform);
                 }
                 this.loadInstalledBoardsFromPlatform(existingPlatform);
+                this.loadInstalledProgrammersFromPlatform(existingPlatform);
             }
         }
     }
@@ -392,6 +401,23 @@ export class BoardManager {
             const res = parseBoardDescriptor(boardContent, plat);
             res.forEach((bd) => {
                 this._boards.set(bd.key, bd);
+            });
+        }
+    }
+
+    private loadInstalledProgrammers(): void {
+        this._programmers = new Map<string, IProgrammer>();
+        this._installedPlatforms.forEach((plat) => {
+            this.loadInstalledProgrammersFromPlatform(plat);
+        });
+    }
+
+    private loadInstalledProgrammersFromPlatform(plat: IPlatform) {
+        if (util.fileExistsSync(path.join(plat.rootBoardPath, "programmers.txt"))) {
+            const programmersContent = fs.readFileSync(path.join(plat.rootBoardPath, "programmers.txt"), "utf8");
+            const res = parseProgrammerDescriptor(programmersContent, plat);
+            res.forEach((prog) => {
+                this._programmers.set(prog.key, prog);
             });
         }
     }
