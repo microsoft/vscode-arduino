@@ -96,6 +96,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _programmer: string;
 
+    private _suppressSaveContext: boolean = false;
+
     /**
      * @constructor
      */
@@ -203,6 +205,13 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
         if (!ArduinoWorkspace.rootPath) {
             return;
         }
+
+        if (this._suppressSaveContext) {
+            // fine the change event, but do not actually save the file
+            this._onDidChange.fire();
+            return;
+        }
+
         const deviceConfigFile = path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE);
         let deviceConfigJson: any = {};
         if (util.fileExistsSync(deviceConfigFile)) {
@@ -298,6 +307,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public set programmer(value: string) {
         this._programmer = value;
         this.saveContext();
+    }
+
+    public get suppressSaveContext() {
+        return this._suppressSaveContext;
+    }
+
+    public set suppressSaveContext(value: boolean) {
+        this._suppressSaveContext = value;
     }
 
     public async initialize() {
