@@ -3,28 +3,15 @@ import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
+import { IBoard, IProgrammer } from "./package";
 
 export class ProgrammerManager {
-    private _programmervalue: string;
+    public static notFoundDisplayValue: string = "<Select Programmer>";
+
+    private _programmerValue: string;
+    private _programmerDisplayName: string;
 
     private _programmerStatusBar: vscode.StatusBarItem;
-
-    // Static list of 'available' programmers.  This should be repopulated by the currently selected board type.
-    private _availableProgrammers = {
-        "arduino:avrisp": "AVR ISP",
-        "arduino:avrispmkii": "AVRISP mkII",
-        "arduino:usbtinyisp": "USBtinyISP",
-        "arduino:arduinoisp": "ArduinoISP",
-        "arduino:usbasp": "USBasp",
-        "arduino:parallel": "Parallel Programmer",
-        "arduino:arduinoasisp": "Arduino as ISP",
-        "arduino:usbGemma": "Arduino Gemma",
-        "arduino:buspirate": "BusPirate as ISP",
-        "arduino:stk500": "Atmel STK500 development board",
-        "arduino:jtag3isp": "Atmel JTAGICE3 (ISP mode)",
-        "arduino:jtag3": "Atmel JTAGICE3 (JTAG mode)",
-        "arduino:atmel_ice": "Atmel-ICE (AVR)",
-    };
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._programmerStatusBar = vscode.window.createStatusBarItem(
@@ -41,14 +28,18 @@ export class ProgrammerManager {
     }
 
     public get currentProgrammer(): string {
-        return this._programmervalue;
+        return this._programmerValue;
+    }
+
+    public get currentDisplayName(): string {
+        return this._programmerDisplayName;
     }
 
     public async selectProgrammer() {
-        const selectionItems = Object.keys(this._availableProgrammers).map(
+        const selectionItems = this.getAvailableProgrammers(this._arduinoApp.boardManager.currentBoard).map(
             (programmer) => ({
-                label: this.getFriendlyName(programmer),
-                description: programmer,
+                label: programmer.displayName,
+                description: programmer.key,
                 programmer }));
         const chosen = await vscode.window.showQuickPick(selectionItems, {
             placeHolder: "Select programmer",
@@ -57,20 +48,36 @@ export class ProgrammerManager {
             return;
         }
 
-        this.setProgrammerValue(chosen.programmer);
-        const dc = DeviceContext.getInstance();
-        dc.programmer = chosen.programmer;
+        this.setProgrammerValue(chosen.programmer.key);
+        DeviceContext.getInstance().programmer = chosen.programmer.key;
     }
 
-    private setProgrammerValue(programmer: string | null) {
-        this._programmervalue = programmer;
-        this._programmerStatusBar.text = this._programmervalue
-            ? this.getFriendlyName(this._programmervalue)
-            : "<Select Programmer>";
+    private setProgrammerValue(programmerKey: string | null) {
+        this._programmerValue = programmerKey;
+        this._programmerDisplayName = this._programmerValue
+            ? this.getDisplayName(this._programmerValue)
+            : ProgrammerManager.notFoundDisplayValue;
+        this._programmerStatusBar.text = this._programmerDisplayName;
     }
 
-    private getFriendlyName(programmer: string): string {
-        const friendlyName = this._availableProgrammers[programmer];
-        return friendlyName ? friendlyName : programmer;
+    private getDisplayName(programmerKey: string): string {
+        const programmer = this._arduinoApp.boardManager.installedProgrammers.get(programmerKey);
+        return programmer ? programmer.displayName : programmerKey;
+    }
+
+    private getAvailableProgrammers(currentBoard: IBoard): IProgrammer[] {
+        if (!currentBoard || !currentBoard.platform) {
+            return [];
+        }
+
+        // Filter the list of all programmers to those that share the same platform as the board
+        const availableProgrammers: IProgrammer[] = [];
+        for (const programmer of this._arduinoApp.boardManager.installedProgrammers.values()) {
+            if (programmer.platform === currentBoard.platform) {
+                availableProgrammers.push(programmer);
+            }
+        }
+
+        return availableProgrammers;
     }
 }
