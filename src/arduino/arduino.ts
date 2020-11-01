@@ -125,53 +125,56 @@ export class ArduinoApp {
         const serialMonitor = SerialMonitor.getInstance();
 
         const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-        UsbDetector.getInstance().pauseListening();
-        await vscode.workspace.saveAll(false);
+        try {
+            UsbDetector.getInstance().pauseListening();
+            await vscode.workspace.saveAll(false);
 
-        if (dc.prebuild) {
-            arduinoChannel.info(`Run prebuild command: ${dc.prebuild}`);
-            const prebuildargs = dc.prebuild.split(" ");
-            const prebuildCommand = prebuildargs.shift();
-            try {
-                await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, { shell: true, cwd: ArduinoWorkspace.rootPath });
-            } catch (ex) {
-                arduinoChannel.error(`Run prebuild failed: \n${ex.error}`);
-                return;
-            }
-        }
-
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor];
-        if (dc.port) {
-            args.push("--port", dc.port);
-        }
-        args.push(appPath);
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        if (dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
-            const dirPath = path.dirname(outputPath);
-            if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
-                return;
+            if (dc.prebuild) {
+                arduinoChannel.info(`Run prebuild command: ${dc.prebuild}`);
+                const prebuildargs = dc.prebuild.split(" ");
+                const prebuildCommand = prebuildargs.shift();
+                try {
+                    await util.spawn(prebuildCommand, arduinoChannel.channel, prebuildargs, { shell: true, cwd: ArduinoWorkspace.rootPath });
+                } catch (ex) {
+                    arduinoChannel.error(`Run prebuild failed: \n${ex.error}`);
+                    return;
+                }
             }
 
-            args.push("--pref", `build.path=${outputPath}`);
-            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
-        } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            arduinoChannel.warning(msg);
-        }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+            const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
+            const args = ["--upload", "--board", boardDescriptor];
+            if (dc.port) {
+                args.push("--port", dc.port);
+            }
+            args.push(appPath);
+            if (VscodeSettings.getInstance().logLevel === "verbose") {
+                args.push("--verbose");
+            }
+            if (dc.output) {
+                const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
+                const dirPath = path.dirname(outputPath);
+                if (!util.directoryExistsSync(dirPath)) {
+                    Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
+                    return;
+                }
+
+                args.push("--pref", `build.path=${outputPath}`);
+                arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
+            } else {
+                const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
+                arduinoChannel.warning(msg);
+            }
+            await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+                arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+            }, (reason) => {
+                arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            });
+        } finally {
             UsbDetector.getInstance().resumeListening();
             if (needRestore) {
                 await serialMonitor.openSerialMonitor();
             }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
+        }
     }
 
     public async uploadUsingProgrammer() {
