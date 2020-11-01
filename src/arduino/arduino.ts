@@ -24,6 +24,11 @@ import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
 
+export enum BuildMode {
+    Upload = "Upload",
+    UploadUsingProgrammer = "Upload (w/programmer)",
+};
+
 /**
  * Represent an Arduino application based on the official Arduino IDE.
  */
@@ -93,7 +98,7 @@ export class ArduinoApp {
         }
     }
 
-    public async upload() {
+    public async buildSketch(mode: BuildMode) {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
@@ -109,7 +114,7 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
 
-        if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+        if (this.configRequiresSerialForUpload(mode) && !dc.port) {
             const choice = await vscode.window.showInformationMessage(
                 "Serial port is not specified. Do you want to select a serial port for uploading?",
                 "Yes", "No");
@@ -120,7 +125,7 @@ export class ArduinoApp {
         }
 
         arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+        arduinoChannel.start(`${mode} sketch - ${dc.sketch}`);
 
         const serialMonitor = SerialMonitor.getInstance();
 
@@ -146,6 +151,15 @@ export class ArduinoApp {
             if (dc.port) {
                 args.push("--port", dc.port);
             }
+
+            if (mode === BuildMode.UploadUsingProgrammer) {
+                const programmer = this.getProgrammerString();
+                if (!programmer) {
+                    return;
+                }
+                args.push("--useprogrammer", "--pref", "programmer=" + programmer);
+            }
+
             args.push(appPath);
             if (VscodeSettings.getInstance().logLevel === "verbose") {
                 args.push("--verbose");
@@ -165,7 +179,7 @@ export class ArduinoApp {
                 arduinoChannel.warning(msg);
             }
             await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
-                arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+                arduinoChannel.end(`${mode} complete: ${dc.sketch}${os.EOL}`);
             }, (reason) => {
                 arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
             });
@@ -175,76 +189,6 @@ export class ArduinoApp {
                 await serialMonitor.openSerialMonitor();
             }
         }
-    }
-
-    public async uploadUsingProgrammer() {
-        const dc = DeviceContext.getInstance();
-        const boardDescriptor = this.getBoardBuildString();
-        if (!boardDescriptor) {
-            return;
-        }
-
-        const selectProgrammer = this.getProgrammerString();
-        if (!selectProgrammer) {
-            return;
-        }
-
-        if (!ArduinoWorkspace.rootPath) {
-            vscode.window.showWarningMessage("Cannot find the sketch file.");
-            return;
-        }
-
-        if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
-            await this.getMainSketch(dc);
-        }
-        if (!dc.port) {
-            const choice = await vscode.window.showInformationMessage(
-                "Serial port is not specified. Do you want to select a serial port for uploading?",
-                "Yes", "No");
-            if (choice === "Yes") {
-                vscode.commands.executeCommand("arduino.selectSerialPort");
-            }
-            return;
-        }
-
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
-
-        const serialMonitor = SerialMonitor.getInstance();
-
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-        UsbDetector.getInstance().pauseListening();
-        await vscode.workspace.saveAll(false);
-
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
-            "--pref", "programmer=" + selectProgrammer, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        if (dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
-            const dirPath = path.dirname(outputPath);
-            if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
-                return;
-            }
-
-            args.push("--pref", `build.path=${outputPath}`);
-            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
-        } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            arduinoChannel.warning(msg);
-        }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
-            UsbDetector.getInstance().resumeListening();
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
     }
 
     public async verify(output: string = "") {
@@ -762,5 +706,19 @@ Please make sure the folder is not occupied by other procedures .`);
             vscode.window.showErrorMessage("No sketch file was found. Please specify the sketch in the arduino.json file");
             throw new Error("No sketch file was found.");
         }
+    }
+
+    private configRequiresSerialForUpload(mode: BuildMode): boolean {
+        const dc = DeviceContext.getInstance();
+
+        if (mode === BuildMode.UploadUsingProgrammer) {
+            // Currently all programmer configurations require a selected serial port
+            return true;
+        }
+
+        // Certain boards allow configuration of the STLink programmers as part of the board
+        // config and use during the regular upload, rather than "Upload using programmer"
+        // https://github.com/microsoft/vscode-arduino/issues/595
+        return (!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration));
     }
 }

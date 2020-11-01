@@ -27,6 +27,7 @@ const completionProviderModule = impor("./langService/completionProvider") as ty
 import * as Logger from "./logger/logger";
 const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
+import { BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
@@ -142,7 +143,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Uploading...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.upload();
+                    await arduinoContextModule.default.arduinoApp.buildSketch(BuildMode.Upload);
                 });
             } catch (ex) {
             }
@@ -177,7 +178,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await arduinoContextModule.default.arduinoApp.uploadUsingProgrammer();
+                await arduinoContextModule.default.arduinoApp.buildSketch(BuildMode.UploadUsingProgrammer);
             } catch (ex) {
             }
             delete status.compile;
