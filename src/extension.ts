@@ -122,7 +122,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Verifying...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.verify();
+                    await arduinoContextModule.default.arduinoApp.buildSketch(BuildMode.Verify);
                 });
             } catch (ex) {
             }

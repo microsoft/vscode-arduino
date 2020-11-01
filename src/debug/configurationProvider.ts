@@ -4,7 +4,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { ArduinoApp } from "../arduino/arduino";
+import { BuildMode } from "../arduino/arduino";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 
@@ -136,7 +136,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
             config.program = path.join(ArduinoWorkspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
-            if (!await ArduinoContext.arduinoApp.verify(outputFolder)) {
+            if (!await ArduinoContext.arduinoApp.buildSketch(BuildMode.Verify, outputFolder)) {
                 vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
                 return false;
             }
