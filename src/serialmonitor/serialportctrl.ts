@@ -71,7 +71,7 @@ export class SerialPortCtrl {
             this._outputChannel.appendLine("[Warning] Auto checking serial port open is disabled");
             return resolve();
           }
-          
+
           this._currentSerialPort.write("TestingOpen" + "\r\n", (err) => {
             // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
             if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
@@ -79,10 +79,10 @@ export class SerialPortCtrl {
               reject(err);
             } else {
               this._outputChannel.appendLine(`[Info] Opened the serial port - ${this._currentPort}`);
-              this._currentSerialPort.set(['dtr=true'], (err) => {
+              this._currentSerialPort.set(["dtr=true"], (err) => {
                 if (err) {
                   reject(err);
-                } 
+                }
               });
               resolve();
             }
@@ -169,7 +169,7 @@ export class SerialPortCtrl {
         if (err) {
           reject(err);
         } else {
-          this._currentSerialPort.set(['dtr=true'], (err) => {
+          this._currentSerialPort.set(["dtr=true"], (err) => {
             if (err) {
               reject(err);
             } else {
