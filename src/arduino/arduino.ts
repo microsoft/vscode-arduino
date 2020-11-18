@@ -577,6 +577,10 @@ Please make sure the folder is not occupied by other procedures .`);
         }
         const toolsPath = boardDescriptor.platform.rootBoardPath;
         result.push(path.normalize(path.join(toolsPath, "**")));
+        const hardwareToolPath = path.join(toolsPath, "..", "..", "tools");
+        if (fs.existsSync(hardwareToolPath)){
+            result.push(path.normalize(path.join(hardwareToolPath, "**")));
+        } 
         // if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
         //     const coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
         //     if (coreLibs && coreLibs.length > 0) {
