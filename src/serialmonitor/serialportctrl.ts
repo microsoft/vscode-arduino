@@ -79,7 +79,7 @@ export class SerialPortCtrl {
               reject(err);
             } else {
               this._outputChannel.appendLine(`[Info] Opened the serial port - ${this._currentPort}`);
-              this._currentSerialPort.set(["dtr=true"], (err) => {
+              this._currentSerialPort.set(["dtr=true", "rts=true"], (err) => {
                 if (err) {
                   reject(err);
                 }
@@ -169,7 +169,7 @@ export class SerialPortCtrl {
         if (err) {
           reject(err);
         } else {
-          this._currentSerialPort.set(["dtr=true"], (err) => {
+          this._currentSerialPort.set(["dtr=true", "rts=true"], (err) => {
             if (err) {
               reject(err);
             } else {
