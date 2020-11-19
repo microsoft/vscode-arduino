@@ -22,7 +22,7 @@ export class SerialMonitor implements vscode.Disposable {
     public static DEFAULT_BAUD_RATE: number = 115200;
 
     public static listBaudRates(): number[] {
-        return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000,500000, 1000000, 2000000];
+        return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000];
     }
 
     public static getInstance(): SerialMonitor {
