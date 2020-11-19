@@ -320,15 +320,21 @@ export class ArduinoApp {
             return;
         }
         const cppConfigFile = fs.readFileSync(configFilePath, "utf8");
-        const cppConfig = JSON.parse(cppConfigFile) as { configurations: Array<{ includePath: string[], forcedInclude: string[] }> };
+        const cppConfig = JSON.parse(cppConfigFile) as { configurations: Array<{
+            includePath: string[],
+            forcedInclude: string[],
+            defines: string[],
+        }> };
         const libPaths = this.getDefaultPackageLibPaths();
         const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
+        const defines = this.getDefualtDefines();
         const configuration = cppConfig.configurations[0];
 
         let cppConfigFileUpdated = false;
         // cpp exntension changes \\ to \\\\ in paths in JSON string, revert them first
         configuration.includePath = configuration.includePath.map((path) => path.replace(/\\\\/g, "\\"));
         configuration.forcedInclude = configuration.forcedInclude.map((path) => path.replace(/\\\\/g, "\\"));
+        configuration.defines = configuration.defines.map((path) => path.replace(/\\\\/g, "\\"));
 
         for (const libPath of libPaths) {
             if (configuration.includePath.indexOf(libPath) === -1) {
@@ -343,6 +349,12 @@ export class ArduinoApp {
             }
         }
 
+        for (const define of defines) {
+            if (configuration.defines.indexOf(define) === -1) {
+                cppConfigFileUpdated = true;
+                configuration.defines.push(define);
+            }
+        }
         // remove all unexisting paths
         // concern mistake removal, comment temporary
         // for (let pathIndex = 0; pathIndex < configuration.includePath.length; pathIndex++) {
@@ -386,6 +398,7 @@ export class ArduinoApp {
         }
 
         const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
+        const defaultDefines = this.getDefualtDefines();
 
         if (!ArduinoWorkspace.rootPath) {
             return;
@@ -442,6 +455,10 @@ export class ArduinoApp {
                 }
             }
             configSection.forcedInclude = defaultForcedInclude.concat(configSection.forcedInclude);
+        }
+
+        if (!configSection.defines) {
+            configSection.defines = defaultDefines;
         }
 
         fs.writeFileSync(configFilePath, JSON.stringify(deviceContext, null, 4));
@@ -578,9 +595,15 @@ Please make sure the folder is not occupied by other procedures .`);
         const toolsPath = boardDescriptor.platform.rootBoardPath;
         result.push(path.normalize(path.join(toolsPath, "**")));
         const hardwareToolPath = path.join(toolsPath, "..", "..", "tools");
-        if (fs.existsSync(hardwareToolPath)){
+        if (fs.existsSync(hardwareToolPath)) {
             result.push(path.normalize(path.join(hardwareToolPath, "**")));
-        } 
+        }
+
+        // Add default libraries to include path
+        result.push(path.normalize(path.join(this._settings.defaultLibPath, "**")));
+
+        const userLibsPath = (path.join(this._settings.sketchbookPath, "libraries", "**"));
+        result.push(userLibsPath);
         // if (util.directoryExistsSync(path.join(toolsPath, "cores"))) {
         //     const coreLibs = fs.readdirSync(path.join(toolsPath, "cores"));
         //     if (coreLibs && coreLibs.length > 0) {
@@ -609,6 +632,12 @@ Please make sure the folder is not occupied by other procedures .`);
         if (fs.existsSync(arduinoHeadFilePath)) {
             result.push(arduinoHeadFilePath);
         }
+        return result;
+    }
+
+    public getDefualtDefines(): string[] {
+        const result = [];
+        result.push("USBCON");
         return result;
     }
 
