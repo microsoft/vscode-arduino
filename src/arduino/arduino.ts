@@ -327,11 +327,11 @@ export class ArduinoApp {
         }> };
         const libPaths = this.getDefaultPackageLibPaths();
         const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
-        const defines = this.getDefualtDefines();
+        const defines = this.getDefaultDefines();
         const configuration = cppConfig.configurations[0];
 
         let cppConfigFileUpdated = false;
-        // cpp exntension changes \\ to \\\\ in paths in JSON string, revert them first
+        // cpp extension changes \\ to \\\\ in paths in JSON string, revert them first
         configuration.includePath = configuration.includePath.map((path) => path.replace(/\\\\/g, "\\"));
         configuration.forcedInclude = configuration.forcedInclude.map((path) => path.replace(/\\\\/g, "\\"));
         configuration.defines = configuration.defines.map((path) => path.replace(/\\\\/g, "\\"));
@@ -398,7 +398,7 @@ export class ArduinoApp {
         }
 
         const defaultForcedInclude = this.getDefaultForcedIncludeFiles();
-        const defaultDefines = this.getDefualtDefines();
+        const defaultDefines = this.getDefaultDefines();
 
         if (!ArduinoWorkspace.rootPath) {
             return;
@@ -635,8 +635,9 @@ Please make sure the folder is not occupied by other procedures .`);
         return result;
     }
 
-    public getDefualtDefines(): string[] {
+    public getDefaultDefines(): string[] {
         const result = [];
+        // USBCON is required in order for Serial to be recognized by intellisense
         result.push("USBCON");
         return result;
     }
