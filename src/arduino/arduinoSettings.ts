@@ -53,7 +53,7 @@ export class ArduinoSettings implements IArduinoSettings {
         if (platform === "win32") {
             await this.updateWindowsPath();
             if (this._commandPath === "") {
-                this._commandPath = "arduino_debug.exe";
+                this._isArduinoCli ? this._commandPath = "arduino-cli.exe" : this._commandPath = "arduino_debug.exe";
             }
         } else if (platform === "linux") {
             if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
