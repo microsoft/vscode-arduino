@@ -483,9 +483,14 @@ export class ArduinoApp {
         }
     }
 
-    /**
-     * Install arduino board package based on package name and platform hardware architecture.
-     */
+     /**
+      * Installs arduino board package.
+      * (If using the aduino CLI this installs the corrosponding core.)
+      * @param {string} packageName - board vendor
+      * @param {string} arch - board architecture
+      * @param {string} version - version of board package or core to download
+      * @param {boolean} [showOutput=true] - show raw output from command
+      */
     public async installBoard(packageName: string, arch: string = "", version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
         const updatingIndex = packageName === "dummy" && !arch && !version;
@@ -500,16 +505,20 @@ export class ArduinoApp {
                 arduinoChannel.start(`Install package - ${packageName}...`);
             } catch (error) {
                 arduinoChannel.start(`Install package - ${packageName} failed under directory : ${error.path}${os.EOL}
-Please make sure the folder is not occupied by other procedures .`);
+                                      Please make sure the folder is not occupied by other procedures .`);
                 arduinoChannel.error(`Error message - ${error.message}${os.EOL}`);
                 arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
                 return;
             }
         }
         try {
-            await util.spawn(this._settings.commandPath,
-                showOutput ? arduinoChannel.channel : null,
-                ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`]);
+            this.isArduinoCli() ?
+                await util.spawn(this._settings.commandPath,
+                    showOutput ? arduinoChannel.channel : null,
+                    ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`]) :
+                await util.spawn(this._settings.commandPath,
+                    showOutput ? arduinoChannel.channel : null,
+                    ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`]);
 
             if (updatingIndex) {
                 arduinoChannel.end("Updated package index files.");
@@ -536,6 +545,13 @@ Please make sure the folder is not occupied by other procedures .`);
         arduinoChannel.end(`Uninstalled board package - ${boardName}${os.EOL}`);
     }
 
+    /**
+     * Downloads or updates a library
+     * @param {string} libName - name of the library to download
+     * @param {string} version - version of library to download
+     * @param {boolean} [showOutput=true] - show raw output from command
+     */
+
     public async installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
         const updatingIndex = (libName === "dummy" && !version);
@@ -545,6 +561,10 @@ Please make sure the folder is not occupied by other procedures .`);
             arduinoChannel.start(`Install library - ${libName}`);
         }
         try {
+            this.isArduinoCli() ?
+            await  util.spawn(this._settings.commandPath,
+                showOutput ? arduinoChannel.channel : null,
+                ["lib", "install", `${libName}${version && "@" + version}`]) :
             await util.spawn(this._settings.commandPath,
                 showOutput ? arduinoChannel.channel : null,
                 ["--install-library", `${libName}${version && ":" + version}`]);
