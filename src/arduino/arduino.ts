@@ -93,6 +93,9 @@ export class ArduinoApp {
         }
     }
 
+    /**
+     * Upload code
+     */
     public async upload() {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
@@ -140,8 +143,8 @@ export class ArduinoApp {
             }
         }
 
-        const appPath = this.isArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = this.isArduinoCli() ? ["upload", "-b", boardDescriptor] : ["--upload", "--board", boardDescriptor];
+        const appPath = this.useArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const args = this.useArduinoCli() ? ["upload", "-b", boardDescriptor] : ["--upload", "--board", boardDescriptor];
         if (dc.port) {
             args.push("--port", dc.port);
         }
@@ -213,7 +216,7 @@ export class ArduinoApp {
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
-        const appPath = this.isArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const appPath = this.useArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
             "--pref", "programmer=" + selectProgrammer, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
@@ -276,8 +279,8 @@ export class ArduinoApp {
             }
         }
 
-        const appPath = this.isArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = this.isArduinoCli() ? ["compile", "-b", boardDescriptor, appPath] : ["--verify", "--board", boardDescriptor, appPath];
+        const appPath = this.useArduinoCli() ?  ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const args = this.useArduinoCli() ? ["compile", "-b", boardDescriptor, appPath] : ["--verify", "--board", boardDescriptor, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
@@ -289,7 +292,7 @@ export class ArduinoApp {
                 return;
             }
 
-            if (this.isArduinoCli()) {
+            if (this.useArduinoCli()) {
                 args.push("--build-path", `build.path=${outputPath}`);
             } else {
                 args.push("--pref", `build.path=${outputPath}`);
@@ -512,7 +515,7 @@ export class ArduinoApp {
             }
         }
         try {
-            this.isArduinoCli() ?
+            this.useArduinoCli() ?
                 await util.spawn(this._settings.commandPath,
                     showOutput ? arduinoChannel.channel : null,
                     ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`]) :
@@ -561,7 +564,7 @@ export class ArduinoApp {
             arduinoChannel.start(`Install library - ${libName}`);
         }
         try {
-            this.isArduinoCli() ?
+            this.useArduinoCli() ?
             await  util.spawn(this._settings.commandPath,
                 showOutput ? arduinoChannel.channel : null,
                 ["lib", "install", `${libName}${version && "@" + version}`]) :
@@ -760,8 +763,13 @@ export class ArduinoApp {
         this._programmerManager = value;
     }
 
-    private isArduinoCli() {
-        return VscodeSettings.getInstance().isArduinoCli;
+    /**
+     * Checks if the arduino cli is being used
+     * @returns {bool} - true if arduino cli is being use
+     */
+    private useArduinoCli() {
+        return this._settings.useArduinoCli;
+        // return VscodeSettings.getInstance().useArduinoCli;
     }
 
     private getProgrammerString(): string {

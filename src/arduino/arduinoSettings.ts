@@ -22,7 +22,7 @@ export interface IArduinoSettings {
     preferencePath: string;
     defaultBaudRate: number;
     preferences: Map<string, string>;
-    isArduinoCli: boolean;
+    useArduinoCli: boolean;
     reloadPreferences(): void;
 }
 
@@ -39,7 +39,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _preferences: Map<string, string>;
 
-    private _isArduinoCli: boolean;
+    private _useArduinoCli: boolean;
 
     public constructor() {
     }
@@ -47,13 +47,13 @@ export class ArduinoSettings implements IArduinoSettings {
     public async initialize() {
         const platform = os.platform();
         this._commandPath = VscodeSettings.getInstance().commandPath;
-        this._isArduinoCli = VscodeSettings.getInstance().isArduinoCli;
+        this._useArduinoCli = VscodeSettings.getInstance().useArduinoCli;
         await this.tryResolveArduinoPath();
         await this.tryGetDefaultBaudRate();
         if (platform === "win32") {
             await this.updateWindowsPath();
             if (this._commandPath === "") {
-                this._isArduinoCli ? this._commandPath = "arduino-cli.exe" : this._commandPath = "arduino_debug.exe";
+                this._useArduinoCli ? this._commandPath = "arduino-cli.exe" : this._commandPath = "arduino_debug.exe";
             }
         } else if (platform === "linux") {
             if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
@@ -154,8 +154,8 @@ export class ArduinoSettings implements IArduinoSettings {
         return this._preferences;
     }
 
-    public get isArduinoCli() {
-        return this._isArduinoCli;
+    public get useArduinoCli() {
+        return this._useArduinoCli;
     }
 
     public get defaultBaudRate() {

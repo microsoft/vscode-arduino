@@ -20,8 +20,8 @@ export function resolveArduinoPath(): string {
     return pathString || "";
 }
 
-export function validateArduinoPath(arduinoPath: string, isArduinoCli = false): boolean {
-    return fileExistsSync(path.join(arduinoPath, isArduinoCli ? "arduino-cli" : "arduino"));
+export function validateArduinoPath(arduinoPath: string, useArduinoCli = false): boolean {
+    return fileExistsSync(path.join(arduinoPath, useArduinoCli ? "arduino-cli" : "arduino"));
 }
 
 export function findFile(fileName: string, cwd: string): string {
