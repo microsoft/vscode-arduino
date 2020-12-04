@@ -144,7 +144,8 @@ export class ArduinoApp {
         }
 
         const appPath = this.useArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = this.useArduinoCli() ? ["upload", "-b", boardDescriptor] : ["--upload", "--board", boardDescriptor];
+        // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
+        const args = this.useArduinoCli() ? ["compile", "--upload", "-b", boardDescriptor] : ["--upload", "--board", boardDescriptor];
         if (dc.port) {
             args.push("--port", dc.port);
         }
@@ -176,6 +177,10 @@ export class ArduinoApp {
             arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
         });
     }
+
+    /**
+     * Upload code using specified programmer
+     */
 
     public async uploadUsingProgrammer() {
         const dc = DeviceContext.getInstance();
@@ -217,8 +222,10 @@ export class ArduinoApp {
         await vscode.workspace.saveAll(false);
 
         const appPath = this.useArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
-            "--pref", "programmer=" + selectProgrammer, appPath];
+        const args = this.useArduinoCli() ?
+                     ["compile", "--upload", "-b", boardDescriptor, "--port", dc.port, "--programmer", selectProgrammer, appPath] :
+                     ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
+                      "--pref", "programmer=" + selectProgrammer, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
@@ -501,7 +508,7 @@ export class ArduinoApp {
             arduinoChannel.start(`Update package index files...`);
         } else {
             try {
-                const packagePath = path.join(this._settings.packagePath, "packages", packageName);
+                const packagePath = path.join(this._settings.packagePath, "packages", packageName, arch);
                 if (util.directoryExistsSync(packagePath)) {
                     util.rmdirRecursivelySync(packagePath);
                 }
@@ -514,6 +521,7 @@ export class ArduinoApp {
                 return;
             }
         }
+        arduinoChannel.info(`${packageName}${arch && ":" + arch}${version && ":" + version}`);
         try {
             this.useArduinoCli() ?
                 await util.spawn(this._settings.commandPath,
