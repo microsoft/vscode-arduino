@@ -453,7 +453,7 @@
         "arduino.useArduinoCli": {
           "type": "boolean",
           "default": false,
-          "description": "Arduino-CLI installed instead of more common Arduino GUI"
+          "description": "Use Arduino CLI installed instead of Arduino IDE"
         },
         "arduino.path": {
           "type": "string",
