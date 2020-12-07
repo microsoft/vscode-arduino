@@ -102,6 +102,10 @@
         "title": "Arduino: Upload Using Programmer"
       },
       {
+        "command": "arduino.cliUploadUsingProgrammer",
+        "title": "Arduino CLI: Upload Using Programmer"
+      },
+      {
         "command": "arduino.selectProgrammer",
         "title": "Arduino: Select Programmer"
       },

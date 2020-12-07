@@ -97,10 +97,15 @@ export class ArduinoApp {
      * Upload code to selected board
      * @param {bool} [compile=true] - Indicates whether to compile the code when using the CLI to upload
      */
-    public async upload(compile: boolean = true) {
+    public async upload(compile: boolean = true, useProgrammer: boolean = false) {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
+            return;
+        }
+
+        const selectProgrammer = useProgrammer ? this.getProgrammerString() : null;
+        if (useProgrammer && !selectProgrammer) {
             return;
         }
 
@@ -152,8 +157,16 @@ export class ArduinoApp {
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
         const args = (!compile && this.useArduinoCli()) ? ["upload", "-b", boardDescriptor] :
-                     this.useArduinoCli() ? ["compile", "--upload", "-b", boardDescriptor] :
-                                          ["--upload", "--board", boardDescriptor];
+                                                          this.useArduinoCli() ? ["compile", "--upload", "-b", boardDescriptor] :
+                                                                                 ["--upload", "--board", boardDescriptor];
+
+        if (useProgrammer) {
+            if (this.useArduinoCli()) {
+                args.push("--programmer", selectProgrammer)
+            } else {
+                args.push("--useprogrammer", "--pref", "programmer=" + selectProgrammer)
+            }
+        }
 
         if (dc.port) {
             args.push("--port", dc.port);
@@ -170,83 +183,13 @@ export class ArduinoApp {
                 return;
             }
 
-            args.push("--pref", `build.path=${outputPath}`);
-            arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
-        } else {
-            const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
-            arduinoChannel.warning(msg);
-        }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
-            UsbDetector.getInstance().resumeListening();
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
-        });
-    }
+            if (this.useArduinoCli()) {
+                args.push("--build-path", outputPath);
 
-    /**
-     * Upload code using specified programmer
-     */
-
-    public async uploadUsingProgrammer() {
-        const dc = DeviceContext.getInstance();
-        const boardDescriptor = this.getBoardBuildString();
-        if (!boardDescriptor) {
-            return;
-        }
-
-        const selectProgrammer = this.getProgrammerString();
-        if (!selectProgrammer) {
-            return;
-        }
-
-        if (!ArduinoWorkspace.rootPath) {
-            vscode.window.showWarningMessage("Cannot find the sketch file.");
-            return;
-        }
-
-        if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
-            await this.getMainSketch(dc);
-        }
-        if (!dc.port) {
-            const choice = await vscode.window.showInformationMessage(
-                "Serial port is not specified. Do you want to select a serial port for uploading?",
-                "Yes", "No");
-            if (choice === "Yes") {
-                vscode.commands.executeCommand("arduino.selectSerialPort");
-            }
-            return;
-        }
-
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
-
-        const serialMonitor = SerialMonitor.getInstance();
-
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-        UsbDetector.getInstance().pauseListening();
-        await vscode.workspace.saveAll(false);
-
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = this.useArduinoCli() ?
-                     ["compile", "--upload", "-b", boardDescriptor, "--port", dc.port, "--programmer", selectProgrammer, appPath] :
-                     ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
-                      "--pref", "programmer=" + selectProgrammer, appPath];
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
-            args.push("--verbose");
-        }
-        if (dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
-            const dirPath = path.dirname(outputPath);
-            if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
-                return;
+            } else {
+                args.push("--pref", `build.path=${outputPath}`);
             }
 
-            args.push("--pref", `build.path=${outputPath}`);
             arduinoChannel.info(`Please see the build logs in Output path: ${outputPath}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";

@@ -197,7 +197,20 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await arduinoContextModule.default.arduinoApp.uploadUsingProgrammer();
+                await arduinoContextModule.default.arduinoApp.upload(true, true);
+            } catch (ex) {
+            }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.cliUploadUsingProgrammer", async () => {
+        if (!status.compile) {
+            status.compile = "cliUpload";
+            try {
+                await arduinoContextModule.default.arduinoApp.upload(false, true);
             } catch (ex) {
             }
             delete status.compile;
