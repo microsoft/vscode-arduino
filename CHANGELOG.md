@@ -1,6 +1,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.3.4
+
+- Release date: November 22, 2020
+
+### Changed
+- Add DTR and RTS signals on serial open and buad rate change
+- Improves c_cpp_properties.json autogeneration for intelliSense
+
+## Version 0.3.3
+
+- Release date: October 29, 2020
+
+### Changed
+- Update node-usb-native dependency to fix serial port issue from VS Code's Electron version update.
+
 ## Version 0.3.2
 
 - Release date: August 26, 2020
