@@ -96,6 +96,7 @@ export class ArduinoApp {
     /**
      * Upload code to selected board
      * @param {bool} [compile=true] - Indicates whether to compile the code when using the CLI to upload
+     * @param {bool} [useProgrammer=false] - Indicate whether a specific programmer should be used
      */
     public async upload(compile: boolean = true, useProgrammer: boolean = false) {
         const dc = DeviceContext.getInstance();
@@ -175,7 +176,7 @@ export class ArduinoApp {
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
-        if (dc.output) {
+        if (dc.output && compile) {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
