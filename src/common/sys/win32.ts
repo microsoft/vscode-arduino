@@ -27,8 +27,9 @@ export async function resolveArduinoPath() {
     return pathString;
 }
 
-export function validateArduinoPath(arduinoPath: string): boolean {
-    return fileExistsSync(path.join(arduinoPath, "arduino_debug.exe"));
+export function validateArduinoPath(arduinoPath: string, useArduinoCli = false): boolean {
+    return fileExistsSync(path.join(arduinoPath, useArduinoCli ? "arduino-cli.exe" : "arduino_debug.exe"));
+
 }
 
 export function findFile(fileName: string, cwd: string): string {
