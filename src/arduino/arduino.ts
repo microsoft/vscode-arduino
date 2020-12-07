@@ -94,9 +94,10 @@ export class ArduinoApp {
     }
 
     /**
-     * Upload code
+     * Upload code to selected board
+     * @param {bool} [compile=true] - Indicates whether to compile the code when using the CLI to upload
      */
-    public async upload() {
+    public async upload(compile: boolean = true) {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
@@ -143,9 +144,17 @@ export class ArduinoApp {
             }
         }
 
-        const appPath = this.useArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        if (!compile && !this.useArduinoCli()) {
+            arduinoChannel.error("This command is only availble when using the Arduino CLI");
+            return;
+        }
+
+        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
-        const args = this.useArduinoCli() ? ["compile", "--upload", "-b", boardDescriptor] : ["--upload", "--board", boardDescriptor];
+        const args = (!compile && this.useArduinoCli()) ? ["upload", "-b", boardDescriptor] :
+                     this.useArduinoCli() ? ["compile", "--upload", "-b", boardDescriptor] :
+                                          ["--upload", "--board", boardDescriptor];
+
         if (dc.port) {
             args.push("--port", dc.port);
         }
@@ -221,7 +230,7 @@ export class ArduinoApp {
         UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
-        const appPath = this.useArduinoCli() ? ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = this.useArduinoCli() ?
                      ["compile", "--upload", "-b", boardDescriptor, "--port", dc.port, "--programmer", selectProgrammer, appPath] :
                      ["--upload", "--board", boardDescriptor, "--port", dc.port, "--useprogrammer",
@@ -286,7 +295,7 @@ export class ArduinoApp {
             }
         }
 
-        const appPath = this.useArduinoCli() ?  ArduinoWorkspace.rootPath : path.join(ArduinoWorkspace.rootPath, dc.sketch);
+        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         const args = this.useArduinoCli() ? ["compile", "-b", boardDescriptor, appPath] : ["--verify", "--board", boardDescriptor, appPath];
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");

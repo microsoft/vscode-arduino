@@ -154,6 +154,24 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
+    registerArduinoCommand("arduino.cliUpload", async () => {
+        if (!status.compile) {
+            status.compile = "cliUpload";
+            try {
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    title: "Arduino: Using CLI to upload...",
+                }, async () => {
+                    await arduinoContextModule.default.arduinoApp.upload(false);
+                });
+            } catch (ex) {
+            }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
     registerArduinoCommand("arduino.setSketchFile", async () => {
         const sketchFileName = deviceContext.sketch;
         const newSketchFileName = await vscode.window.showInputBox({

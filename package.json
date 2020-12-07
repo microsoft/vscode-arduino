@@ -94,6 +94,10 @@
         }
       },
       {
+        "command": "arduino.cliUpload",
+        "title": "Arduino CLI: Upload"
+      },
+      {
         "command": "arduino.uploadUsingProgrammer",
         "title": "Arduino: Upload Using Programmer"
       },
