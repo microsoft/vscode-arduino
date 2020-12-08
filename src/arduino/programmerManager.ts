@@ -4,111 +4,78 @@ import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
 
-export enum ProgrammerList {
-    "AVR ISP",
-    "AVRISP mkII",
-    "USBtinyISP",
-    "ArduinoISP",
-    "ArduinoISP.org",
-    "USBasp",
-    "Parallel Programmer",
-    "Arduino as ISP",
-    "Arduino Gemma",
-    "BusPirate as ISP",
-    "Atmel STK500 development board",
-    "Atmel JTAGICE3 (ISP mode)",
-    "Atmel JTAGICE3 (JTAG mode)",
-    "Atmel-ICE (AVR)",
-}
-
 export class ProgrammerManager {
-
-    private static _programmerManager: ProgrammerManager = null;
-
-    private _currentprogrammer: ProgrammerList;
-
     private _programmervalue: string;
 
     private _programmerStatusBar: vscode.StatusBarItem;
 
+    // Static list of 'available' programmers.  This should be repopulated by the currently selected board type.
+    private _availableProgrammers = {
+        avrisp: "AVR ISP",
+        avrispmkii: "AVRISP mkII",
+        usbtinyisp: "USBtinyISP",
+        arduinoisp: "ArduinoISP",
+        usbasp: "USBasp",
+        parallel: "Parallel Programmer",
+        arduinoasisp: "Arduino as ISP",
+        usbGemma: "Arduino Gemma",
+        buspirate: "BusPirate as ISP",
+        stk500: "Atmel STK500 development board",
+        jtag3isp: "Atmel JTAGICE3 (ISP mode)",
+        jtag3: "Atmel JTAGICE3 (JTAG mode)",
+        atmel_ice: "Atmel-ICE (AVR)",
+    };
+
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
-        this._programmerStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PROGRAMMER);
+        this._programmerStatusBar = vscode.window.createStatusBarItem(
+            vscode.StatusBarAlignment.Right,
+            constants.statusBarPriority.PROGRAMMER,
+        );
         this._programmerStatusBar.command = "arduino.selectProgrammer";
         this._programmerStatusBar.tooltip = "Select Programmer";
-        this._programmerStatusBar.text = "<Select Programmer>";
+        this.setProgrammerValue(DeviceContext.getInstance().programmer);
         this._programmerStatusBar.show();
+        DeviceContext.getInstance().onDidChange(() => {
+            this.setProgrammerValue(DeviceContext.getInstance().programmer);
+        });
     }
 
     public get currentProgrammer(): string {
         return this._programmervalue;
     }
 
+    /**
+     * Select a programmer from the list of available programmers
+     * Set the programmer value in device context
+     * List format: programmer_name:friendly_name
+     */
     public async selectProgrammer() {
-        const chosen: string | undefined = await vscode.window.showQuickPick(Object.keys(ProgrammerList)
-            .filter((key) => {
-                return !isNaN(Number(ProgrammerList[key]));
-            }), { placeHolder: "Select programmer" });
+        const selectionItems = Object.keys(this._availableProgrammers).map(
+            (programmer) => ({
+                label: this.getFriendlyName(programmer),
+                description: programmer,
+                programmer }));
+        const chosen = await vscode.window.showQuickPick(selectionItems, {
+            placeHolder: "Select programmer",
+        });
         if (!chosen) {
             return;
         }
-        this._currentprogrammer = ProgrammerList[chosen];
-        this.getProgrammer(this._currentprogrammer);
-        this._programmerStatusBar.text = chosen;
+
+        this.setProgrammerValue(chosen.programmer);
         const dc = DeviceContext.getInstance();
-        dc.programmer = chosen;
+        dc.programmer = chosen.programmer;
     }
 
-    /**
-     * Gets a specific programmer from the programmers list.
-     * If using the Arduino IDE, adds prefix "adruino:"
-     * @param {ProgrammerList} newProgrammer - a list of the available programmers
-     */
-    public getProgrammer(newProgrammer: ProgrammerList) {
-        let prefix = "";
-        if (!this._settings.useArduinoCli) {
-            prefix = "arduino:"};
-        switch (newProgrammer) {
-            case ProgrammerList["AVR ISP"]:
-                this._programmervalue = prefix + "avrisp";
-                break;
-            case ProgrammerList["AVRISP mkII"]:
-                this._programmervalue = prefix + "avrispmkii";
-                break;
-            case ProgrammerList.USBtinyISP:
-                this._programmervalue = prefix + "usbtinyisp";
-                break;
-            case ProgrammerList.ArduinoISP:
-                this._programmervalue = prefix + "arduinoisp";
-                break;
-            case ProgrammerList.USBasp:
-                this._programmervalue = prefix + "usbasp";
-                break;
-            case ProgrammerList["Parallel Programmer"]:
-                this._programmervalue = prefix + "parallel";
-                break;
-            case ProgrammerList["Arduino as ISP"]:
-                this._programmervalue = prefix + "arduinoasisp";
-                break;
-            case ProgrammerList["Arduino Gemma"]:
-                this._programmervalue = prefix + "usbGemma";
-                break;
-            case ProgrammerList["BusPirate as ISP"]:
-                this._programmervalue = prefix + "buspirate";
-                break;
-            case ProgrammerList["Atmel STK500 development board"]:
-                this._programmervalue = prefix + "stk500";
-                break;
-            case ProgrammerList["Atmel JTAGICE3 (ISP mode)"]:
-                this._programmervalue = prefix + "jtag3isp";
-                break;
-            case ProgrammerList["Atmel JTAGICE3 (JTAG mode)"]:
-                this._programmervalue = prefix + "jtag3";
-                break;
-            case ProgrammerList["Atmel-ICE (AVR)"]:
-                this._programmervalue = prefix + "atmel_ice";
-                break;
-            default:
-                break;
-        }
+    private setProgrammerValue(programmer: string | null) {
+        this._programmervalue = programmer;
+        this._programmerStatusBar.text = this._programmervalue
+            ? this.getFriendlyName(this._programmervalue)
+            : "<Select Programmer>";
+    }
+
+    private getFriendlyName(programmer: string): string {
+        const friendlyName = this._availableProgrammers[programmer];
+        return friendlyName ? friendlyName : programmer;
     }
 }

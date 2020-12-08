@@ -165,7 +165,7 @@ export class ArduinoApp {
             if (this.useArduinoCli()) {
                 args.push("--programmer", selectProgrammer)
             } else {
-                args.push("--useprogrammer", "--pref", "programmer=" + selectProgrammer)
+                args.push("--useprogrammer", "--pref", "programmer=arduino:" + selectProgrammer)
             }
         }
 
