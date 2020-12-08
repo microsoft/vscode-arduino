@@ -256,7 +256,7 @@ export class ArduinoApp {
 
         arduinoChannel.show();
 
-        let verifyResult: boolean;
+        let success = false;
         const compilerParserContext = makeCompilerParserContext(dc);
 
         try {
@@ -266,7 +266,7 @@ export class ArduinoApp {
                              undefined,
                              compilerParserContext.callback);
             arduinoChannel.end(`Finished verifying sketch - ${dc.sketch}${os.EOL}`);
-            verifyResult = true;
+            success = true;
         } catch (reason) {
             const msg = reason.code ?
                 `Exit with code=${reason.code}${os.EOL}` :
@@ -274,14 +274,13 @@ export class ArduinoApp {
                     reason.message :
                     JSON.stringify(reason);
             arduinoChannel.error(msg);
-            verifyResult = false;
         }
 
         if (compilerParserContext.conclude) {
             compilerParserContext.conclude();
         }
 
-        return verifyResult;
+        return success;
     }
 
     public tryToUpdateIncludePaths() {
