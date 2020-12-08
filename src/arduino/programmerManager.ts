@@ -44,6 +44,11 @@ export class ProgrammerManager {
         return this._programmervalue;
     }
 
+    /**
+     * Select a programmer from the list of available programmers
+     * Set the programmer value in device context
+     * List format: programmer_name:friendly_name
+     */
     public async selectProgrammer() {
         const selectionItems = Object.keys(this._availableProgrammers).map(
             (programmer) => ({
