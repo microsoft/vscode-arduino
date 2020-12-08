@@ -13,6 +13,23 @@ export class ProgrammerManager {
 
     private _programmerStatusBar: vscode.StatusBarItem;
 
+    // Static list of 'available' programmers.  This should be repopulated by the currently selected board type.
+    private _availableProgrammers = {
+        avrisp: "AVR ISP",
+        avrispmkii: "AVRISP mkII",
+        usbtinyisp: "USBtinyISP",
+        arduinoisp: "ArduinoISP",
+        usbasp: "USBasp",
+        parallel: "Parallel Programmer",
+        arduinoasisp: "Arduino as ISP",
+        usbGemma: "Arduino Gemma",
+        buspirate: "BusPirate as ISP",
+        stk500: "Atmel STK500 development board",
+        jtag3isp: "Atmel JTAGICE3 (ISP mode)",
+        jtag3: "Atmel JTAGICE3 (JTAG mode)",
+        atmel_ice: "Atmel-ICE (AVR)",
+    };
+
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
         this._programmerStatusBar = vscode.window.createStatusBarItem(
             vscode.StatusBarAlignment.Right,
@@ -35,6 +52,11 @@ export class ProgrammerManager {
         return this._programmerDisplayName;
     }
 
+    /**
+     * Select a programmer from the list of available programmers
+     * Set the programmer value in device context
+     * List format: programmer_name:friendly_name
+     */
     public async selectProgrammer() {
         const selectionItems = this.getAvailableProgrammers(this._arduinoApp.boardManager.currentBoard).map(
             (programmer) => ({

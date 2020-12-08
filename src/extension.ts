@@ -91,7 +91,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
             const arduinoPath = arduinoContextModule.default.arduinoApp.settings.arduinoPath;
             const commandPath = arduinoContextModule.default.arduinoApp.settings.commandPath;
-            if (!arduinoPath || !validateArduinoPath(arduinoPath)) { // Pop up vscode User Settings page when cannot resolve arduino path.
+            const useArduinoCli = arduinoContextModule.default.arduinoApp.settings.useArduinoCli;
+            // Pop up vscode User Settings page when cannot resolve arduino path.
+            if (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli)) {
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             } else if (!commandPath || !util.fileExistsSync(commandPath)) {
@@ -152,6 +154,24 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
+    registerArduinoCommand("arduino.cliUpload", async () => {
+        if (!status.compile) {
+            status.compile = "cliUpload";
+            try {
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    title: "Arduino: Using CLI to upload...",
+                }, async () => {
+                    await arduinoContextModule.default.arduinoApp.upload(false);
+                });
+            } catch (ex) {
+            }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
     registerArduinoCommand("arduino.setSketchFile", async () => {
         const sketchFileName = deviceContext.sketch;
         const newSketchFileName = await vscode.window.showInputBox({
@@ -177,7 +197,20 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await arduinoContextModule.default.arduinoApp.uploadUsingProgrammer();
+                await arduinoContextModule.default.arduinoApp.upload(true, true);
+            } catch (ex) {
+            }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.cliUploadUsingProgrammer", async () => {
+        if (!status.compile) {
+            status.compile = "cliUpload";
+            try {
+                await arduinoContextModule.default.arduinoApp.upload(false, true);
             } catch (ex) {
             }
             delete status.compile;
