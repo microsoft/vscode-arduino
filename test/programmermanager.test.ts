@@ -39,7 +39,7 @@ suite("Arduino: Programmer Manager.", () => {
             new Programmer("test3", platformMock2.object)];
 
         const installedProgrammers = new Map<string, IProgrammer>();
-        programmers.forEach((v) => installedProgrammers.set(v.key, v));
+        programmers.forEach((v) => installedProgrammers.set(v.name, v));
 
         // Mock the BoardManager with minimal set of required functionality
         const mockBoardManager = TypeMoq.Mock.ofType(BoardManager);
@@ -65,14 +65,14 @@ suite("Arduino: Programmer Manager.", () => {
     });
 
     test("value stored in arduino.ino should load by default", () => {
-        assert.equal(programmerManager.currentProgrammer, "arduino:jtag3isp");
-        assert.equal(programmerManager.currentDisplayName, "arduino:jtag3isp");
+        assert.equal(programmerManager.currentProgrammer, "jtag3isp");
+        assert.equal(programmerManager.currentDisplayName, "jtag3isp");
     });
 
     test("changing arduino.ino value should change programmer", (done) => {
-        DeviceContext.getInstance().programmer = programmers[0].key;
+        DeviceContext.getInstance().programmer = programmers[0].name;
         setTimeout(() => {
-            assert.equal(programmerManager.currentProgrammer, programmers[0].key);
+            assert.equal(programmerManager.currentProgrammer, programmers[0].name);
             assert.equal(programmerManager.currentDisplayName, programmers[0].displayName);
             done();
         }, 200);

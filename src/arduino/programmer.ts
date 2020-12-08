@@ -54,13 +54,6 @@ export class Programmer implements IProgrammer {
         this._displayName = value;
     }
 
-    /**
-     * @returns {string} Return programmer key in format packageName:name
-     */
-    public get key() {
-        return `${this.getPackageName}:${this.name}`;
-    }
-
     private get getPackageName(): string {
         return this.platform.packageName ? this.platform.packageName : this.platform.package.name;
     }

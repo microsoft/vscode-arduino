@@ -71,9 +71,9 @@ suite("Arduino: Board Manager.", () => {
 
     test("should be able to load installed programmers", () => {
         assert.equal(boardManager.installedProgrammers.size, 17, `Expected to find programmers for dummy & AVR boards`);
-        assert.ok(boardManager.installedProgrammers.get("arduino:avrispmkii"),
+        assert.ok(boardManager.installedProgrammers.get("avrispmkii"),
             "should parse installed programmers from Arduino IDE built-in packages");
-        assert.ok(boardManager.installedProgrammers.get("esp8266:esp8266_dummy"),
+        assert.ok(boardManager.installedProgrammers.get("esp8266_dummy"),
             "should parse installed programmers from custom packages ($sketchbook/hardware directory)");
     });
 
@@ -116,12 +116,10 @@ suite("Arduino: Board Manager.", () => {
         const avrispmkii = programmerDescriptors.get("avrispmkii");
         assert.equal(avrispmkii.name, "avrispmkii");
         assert.equal(avrispmkii.displayName, "AVRISP mkII");
-        assert.equal(avrispmkii.key, "arduino:avrispmkii");
 
         const usbGemma = programmerDescriptors.get("usbGemma");
         assert.equal(usbGemma.name, "usbGemma");
         assert.equal(usbGemma.displayName, "Arduino Gemma");
-        assert.equal(usbGemma.key, "arduino:usbGemma");
     });
 
     test("should parse platform.txt correctly", () => {

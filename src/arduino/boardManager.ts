@@ -417,7 +417,7 @@ export class BoardManager {
             const programmersContent = fs.readFileSync(path.join(plat.rootBoardPath, "programmers.txt"), "utf8");
             const res = parseProgrammerDescriptor(programmersContent, plat);
             res.forEach((prog) => {
-                this._programmers.set(prog.key, prog);
+                this._programmers.set(prog.name, prog);
             });
         }
     }

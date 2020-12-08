@@ -61,7 +61,7 @@ export class ProgrammerManager {
         const selectionItems = this.getAvailableProgrammers(this._arduinoApp.boardManager.currentBoard).map(
             (programmer) => ({
                 label: programmer.displayName,
-                description: programmer.key,
+                description: programmer.name,
                 programmer }));
         const chosen = await vscode.window.showQuickPick(selectionItems, {
             placeHolder: "Select programmer",
@@ -70,8 +70,8 @@ export class ProgrammerManager {
             return;
         }
 
-        this.setProgrammerValue(chosen.programmer.key);
-        DeviceContext.getInstance().programmer = chosen.programmer.key;
+        this.setProgrammerValue(chosen.programmer.name);
+        DeviceContext.getInstance().programmer = chosen.programmer.name;
     }
 
     private setProgrammerValue(programmerKey: string | null) {

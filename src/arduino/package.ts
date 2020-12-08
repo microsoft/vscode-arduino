@@ -229,12 +229,6 @@ export interface IBoard {
 export interface IProgrammer {
 
     /**
-     * Unique key that represent the programmer in the package:name.
-     * @property {string}
-     */
-    key: string;
-
-    /**
      * Programmer name for Arduino compilation such as `avrisp`, `atmel_ice`
      * @property {string}
      */
@@ -246,6 +240,7 @@ export interface IProgrammer {
      */
     displayName: string;
 
+    // TODO: verify if this is still need or not, might be needed for the IDE
     /**
      * Reference to the platform that contains this board.
      * @prop {IPlatform}

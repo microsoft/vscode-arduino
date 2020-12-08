@@ -17,7 +17,7 @@ suite("Arduino: Device Context config", () => {
                 assert.equal(deviceContext.configuration, "cpu=atmega328");
                 assert.equal(deviceContext.output, null);
                 assert.equal(deviceContext.debugger_, null);
-                assert.equal(deviceContext.programmer, "arduino:jtag3isp");
+                assert.equal(deviceContext.programmer, "jtag3isp");
                 done();
             });
         } catch (error) {
