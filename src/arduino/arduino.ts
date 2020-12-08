@@ -9,7 +9,7 @@ import * as vscode from "vscode";
 
 import * as constants from "../common/constants";
 import * as util from "../common/util";
-import * as Logger from "../logger/logger";
+import * as logger from "../logger/logger";
 
 import { DeviceContext } from "../deviceContext";
 import { IArduinoSettings } from "./arduinoSettings";
@@ -177,7 +177,7 @@ export class ArduinoApp {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
+                logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return;
             }
 
@@ -237,7 +237,7 @@ export class ArduinoApp {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
-                Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
+                logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
                 return false;
             }
 
@@ -382,7 +382,7 @@ export class ArduinoApp {
             deviceContext = util.tryParseJSON(fs.readFileSync(configFilePath, "utf8"));
         }
         if (!deviceContext) {
-            Logger.notifyAndThrowUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
+            logger.notifyAndThrowUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
         }
 
         deviceContext.configurations = deviceContext.configurations || [];
@@ -799,7 +799,7 @@ export class ArduinoApp {
     private getProgrammerString(): string {
         const selectProgrammer = this.programmerManager.currentProgrammer;
         if (!selectProgrammer) {
-            Logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
+            logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
             return;
         }
         return selectProgrammer;
@@ -808,7 +808,7 @@ export class ArduinoApp {
     private getBoardBuildString(): string {
         const selectedBoard = this.boardManager.currentBoard;
         if (!selectedBoard) {
-            Logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
+            logger.notifyUserError("getBoardBuildString", new Error(constants.messages.NO_BOARD_SELECTED));
             return;
         }
         return selectedBoard.getBuildConfig();
