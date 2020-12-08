@@ -11,19 +11,19 @@ export class ProgrammerManager {
 
     // Static list of 'available' programmers.  This should be repopulated by the currently selected board type.
     private _availableProgrammers = {
-        "arduino:avrisp": "AVR ISP",
-        "arduino:avrispmkii": "AVRISP mkII",
-        "arduino:usbtinyisp": "USBtinyISP",
-        "arduino:arduinoisp": "ArduinoISP",
-        "arduino:usbasp": "USBasp",
-        "arduino:parallel": "Parallel Programmer",
-        "arduino:arduinoasisp": "Arduino as ISP",
-        "arduino:usbGemma": "Arduino Gemma",
-        "arduino:buspirate": "BusPirate as ISP",
-        "arduino:stk500": "Atmel STK500 development board",
-        "arduino:jtag3isp": "Atmel JTAGICE3 (ISP mode)",
-        "arduino:jtag3": "Atmel JTAGICE3 (JTAG mode)",
-        "arduino:atmel_ice": "Atmel-ICE (AVR)",
+        avrisp: "AVR ISP",
+        avrispmkii: "AVRISP mkII",
+        usbtinyisp: "USBtinyISP",
+        arduinoisp: "ArduinoISP",
+        usbasp: "USBasp",
+        parallel: "Parallel Programmer",
+        arduinoasisp: "Arduino as ISP",
+        usbGemma: "Arduino Gemma",
+        buspirate: "BusPirate as ISP",
+        stk500: "Atmel STK500 development board",
+        jtag3isp: "Atmel JTAGICE3 (ISP mode)",
+        jtag3: "Atmel JTAGICE3 (JTAG mode)",
+        atmel_ice: "Atmel-ICE (AVR)",
     };
 
     constructor(private _settings: IArduinoSettings, private _arduinoApp: ArduinoApp) {
@@ -63,10 +63,7 @@ export class ProgrammerManager {
     }
 
     private setProgrammerValue(programmer: string | null) {
-        let prefix = "";
-        if (!this._settings.useArduinoCli) {
-            prefix = "arduino:"};
-        this._programmervalue = prefix + programmer;
+        this._programmervalue = programmer;
         this._programmerStatusBar.text = this._programmervalue
             ? this.getFriendlyName(this._programmervalue)
             : "<Select Programmer>";
