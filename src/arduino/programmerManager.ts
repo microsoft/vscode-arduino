@@ -3,7 +3,7 @@ import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
-import { IBoard, IPlatform, IProgrammer } from "./package";
+import { IBoard, IProgrammer } from "./package";
 
 export class ProgrammerManager {
     public static notFoundDisplayValue: string = "<Select Programmer>";
@@ -53,21 +53,22 @@ export class ProgrammerManager {
             return;
         }
 
-        this.setProgrammerValue(this._settings.useArduinoCli ? chosen.programmer.name : chosen.programmer.key);
-        DeviceContext.getInstance().programmer = chosen.programmer.name;
+        this.setProgrammerValue(chosen.programmer.name);
+        DeviceContext.getInstance().programmer = this._programmerValue;
     }
 
-    private setProgrammerValue(programmerKey: string | null) {
-        this._programmerValue = programmerKey;
+    private setProgrammerValue(programmerName: string | null) {
+        const programmer = this._arduinoApp.boardManager.installedProgrammers.get(programmerName);
+        this._programmerValue = this._settings.useArduinoCli ? programmerName : programmer ? programmer.key : programmerName;
         this._programmerDisplayName = this._programmerValue
-            ? this.getDisplayName(this._programmerValue)
+            ? this.getDisplayName(programmerName)
             : ProgrammerManager.notFoundDisplayValue;
         this._programmerStatusBar.text = this._programmerDisplayName;
     }
 
-    private getDisplayName(programmerKey: string): string {
-        const programmer = this._arduinoApp.boardManager.installedProgrammers.get(programmerKey);
-        return programmer ? programmer.displayName : programmerKey;
+    private getDisplayName(programmerName: string): string {
+        const programmer = this._arduinoApp.boardManager.installedProgrammers.get(programmerName);
+        return programmer ? programmer.displayName : programmerName;
     }
 
     private getAvailableProgrammers(currentBoard: IBoard): IProgrammer[] {

@@ -72,7 +72,7 @@ suite("Arduino: Programmer Manager.", () => {
     test("changing arduino.ino value should change programmer", (done) => {
         DeviceContext.getInstance().programmer = programmers[0].name;
         setTimeout(() => {
-            assert.equal(programmerManager.currentProgrammer, programmers[0].name);
+            assert.equal(programmerManager.currentProgrammer, programmers[0].key);
             assert.equal(programmerManager.currentDisplayName, programmers[0].displayName);
             done();
         }, 200);
