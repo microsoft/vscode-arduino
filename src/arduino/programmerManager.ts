@@ -3,7 +3,7 @@ import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
-import { IBoard, IProgrammer } from "./package";
+import { IBoard, IPlatform, IProgrammer } from "./package";
 
 export class ProgrammerManager {
     public static notFoundDisplayValue: string = "<Select Programmer>";
@@ -45,7 +45,7 @@ export class ProgrammerManager {
     }
 
     public get currentProgrammer(): string {
-        return this._programmerValue;
+        return this._settings.useArduinoCli ? this._programmerValue : this.getPlatform + this._programmerValue;
     }
 
     public get currentDisplayName(): string {
@@ -85,6 +85,11 @@ export class ProgrammerManager {
     private getDisplayName(programmerKey: string): string {
         const programmer = this._arduinoApp.boardManager.installedProgrammers.get(programmerKey);
         return programmer ? programmer.displayName : programmerKey;
+    }
+
+    private getPlatform(programmerKey: string): IPlatform {
+        const programmer = this._arduinoApp.boardManager.installedProgrammers.get(programmerKey);
+        return programmer.platform;
     }
 
     private getAvailableProgrammers(currentBoard: IBoard): IProgrammer[] {
