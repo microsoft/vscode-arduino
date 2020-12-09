@@ -65,8 +65,8 @@ suite("Arduino: Programmer Manager.", () => {
     });
 
     test("value stored in arduino.ino should load by default", () => {
-        assert.equal(programmerManager.currentProgrammer, "jtag3isp");
-        assert.equal(programmerManager.currentDisplayName, "jtag3isp");
+        assert.equal(programmerManager.currentProgrammer, "arduino:jtag3isp");
+        assert.equal(programmerManager.currentDisplayName, "arduino:jtag3isp");
     });
 
     test("changing arduino.ino value should change programmer", (done) => {
