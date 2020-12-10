@@ -145,7 +145,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Uploading...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.upload(BuildMode.Upload);
+                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
                 });
             } catch (ex) {
             }
@@ -163,7 +163,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Using CLI to upload...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.upload(BuildMode.Upload, false);
+                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, false);
                 });
             } catch (ex) {
             }
@@ -198,7 +198,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, true);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, true);
             } catch (ex) {
             }
             delete status.compile;
@@ -211,7 +211,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "cliUpload";
             try {
-                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, false);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, false);
             } catch (ex) {
             }
             delete status.compile;
