@@ -36,7 +36,9 @@ export enum BuildMode {
     Verify = "Verifying",
     Analyze = "Analyzing",
     Upload = "Uploading",
+    CliUpload = "Uploading latest binaries",
     UploadProgrammer = "Uploading (programmer)",
+    CliUploadProgrammer = "Uploading latest binaries (programmer)",
 };
 
 /**
@@ -219,9 +221,14 @@ export class ArduinoApp {
         }
     }
 
-    /**
-     * Install arduino board package based on package name and platform hardware architecture.
-     */
+     /**
+      * Installs arduino board package.
+      * (If using the aduino CLI this installs the corrosponding core.)
+      * @param {string} packageName - board vendor
+      * @param {string} arch - board architecture
+      * @param {string} version - version of board package or core to download
+      * @param {boolean} [showOutput=true] - show raw output from command
+      */
     public async installBoard(packageName: string, arch: string = "", version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
         const updatingIndex = packageName === "dummy" && !arch && !version;
@@ -229,24 +236,29 @@ export class ArduinoApp {
             arduinoChannel.start(`Update package index files...`);
         } else {
             try {
-                const packagePath = path.join(this._settings.packagePath, "packages", packageName);
+                const packagePath = path.join(this._settings.packagePath, "packages", packageName, arch);
                 if (util.directoryExistsSync(packagePath)) {
                     util.rmdirRecursivelySync(packagePath);
                 }
                 arduinoChannel.start(`Install package - ${packageName}...`);
             } catch (error) {
                 arduinoChannel.start(`Install package - ${packageName} failed under directory : ${error.path}${os.EOL}
-Please make sure the folder is not occupied by other procedures .`);
+                                      Please make sure the folder is not occupied by other procedures .`);
                 arduinoChannel.error(`Error message - ${error.message}${os.EOL}`);
                 arduinoChannel.error(`Exit with code=${error.code}${os.EOL}`);
                 return;
             }
         }
+        arduinoChannel.info(`${packageName}${arch && ":" + arch}${version && ":" + version}`);
         try {
-            await util.spawn(this._settings.commandPath,
-                             ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`],
-                             undefined,
-                             { channel: showOutput ? arduinoChannel.channel : null });
+            this._settings.useArduinoCli ?
+                await util.spawn(this._settings.commandPath,
+                    ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`], undefined,
+                    { channel: showOutput ? arduinoChannel.channel : null }) :
+                await util.spawn(this._settings.commandPath,
+                    ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`], undefined,
+                    { channel: showOutput ? arduinoChannel.channel : null });
+
             if (updatingIndex) {
                 arduinoChannel.end("Updated package index files.");
             } else {
@@ -272,6 +284,13 @@ Please make sure the folder is not occupied by other procedures .`);
         arduinoChannel.end(`Uninstalled board package - ${boardName}${os.EOL}`);
     }
 
+    /**
+     * Downloads or updates a library
+     * @param {string} libName - name of the library to download
+     * @param {string} version - version of library to download
+     * @param {boolean} [showOutput=true] - show raw output from command
+     */
+
     public async installLibrary(libName: string, version: string = "", showOutput: boolean = true) {
         arduinoChannel.show();
         const updatingIndex = (libName === "dummy" && !version);
@@ -281,6 +300,11 @@ Please make sure the folder is not occupied by other procedures .`);
             arduinoChannel.start(`Install library - ${libName}`);
         }
         try {
+            this.useArduinoCli() ?
+            await  util.spawn(this._settings.commandPath,
+                ["lib", "install", `${libName}${version && "@" + version}`],
+                undefined,
+                { channel: showOutput ? arduinoChannel.channel : undefined }) :
             await util.spawn(this._settings.commandPath,
                              ["--install-library", `${libName}${version && ":" + version}`],
                              undefined,
@@ -450,8 +474,25 @@ Please make sure the folder is not occupied by other procedures .`);
                 arduinoChannel.error(`Running ${what}-build command failed: ${os.EOL}${msg}`);
                 return false;
             }
+            return true;
         }
-        return true;
+    }
+
+    /**
+     * Checks if the arduino cli is being used
+     * @returns {bool} - true if arduino cli is being use
+     */
+    private useArduinoCli() {
+        return this._settings.useArduinoCli;
+        // return VscodeSettings.getInstance().useArduinoCli;
+    }
+
+    private getProgrammerString(): string {
+        const selectProgrammer = this.programmerManager.currentProgrammer;
+        if (!selectProgrammer) {
+            logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
+            return;
+        }
     }
 
     /**
@@ -475,7 +516,7 @@ Please make sure the folder is not occupied by other procedures .`);
         }
         const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
 
-        args.push("--board", boardDescriptor);
+        this._settings.useArduinoCli ? args.push("-b", boardDescriptor) : args.push("--board", boardDescriptor);
 
         if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Workspace doesn't seem to have a folder added to it yet.");
@@ -507,7 +548,26 @@ Please make sure the folder is not occupied by other procedures .`);
                 await selectSerial();
                 return false;
             }
-            args.push("--upload");
+
+            this._settings.useArduinoCli ? args.push("compile", "--upload") : args.push("--upload");
+
+            if (dc.port) {
+                args.push("--port", dc.port);
+            }
+
+        } else if (mode === BuildMode.CliUpload) {
+            if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+                await selectSerial();
+                return false;
+            }
+
+            if (!this._settings.useArduinoCli) {
+                arduinoChannel.error("This command is only avaialble while using the Arduino CLI");
+                return false;
+            }
+
+            args.push("upload");
+
             if (dc.port) {
                 args.push("--port", dc.port);
             }
@@ -521,15 +581,43 @@ Please make sure the folder is not occupied by other procedures .`);
                 await selectSerial();
                 return false;
             }
-            args.push("--upload",
-                      "--port", dc.port,
-                      "--useprogrammer",
-                      "--pref", `programmer=${programmer}`);
+            this._settings.useArduinoCli ?
+                args.push("compile",
+                            "--upload",
+                            "--porgrammer", programmer) :
+                args.push("--upload",
+                        "--useprogrammer",
+                        "--pref", `programmer=${programmer}`);
+
+            args.push("--port", dc.port);
+
+        } else if (mode === BuildMode.CliUploadProgrammer) {
+            const programmer = this.programmerManager.currentProgrammer;
+            if (!programmer) {
+                logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
+                return false;
+            }
+            if (!dc.port) {
+                await selectSerial();
+                return false;
+            }
+
+            if (!this._settings.useArduinoCli) {
+                arduinoChannel.error("This command is only avaialble while using the Arduino CLI");
+                return false;
+            }
+
+            args.push("compile",
+                        "--upload",
+                        "--porgrammer", programmer,
+                        "--port", dc.port);
+
         } else {
             args.push("--verify");
         }
 
-        if (dc.buildPreferences) {
+        // TODO: Option to add prefrences when using the CLI
+        if (dc.buildPreferences && !this._settings.useArduinoCli) {
             for (const pref of dc.buildPreferences) {
                 // Note: BuildPrefSetting makes sure that each preference
                 // value consists of exactly two items (key and value).
@@ -538,9 +626,12 @@ Please make sure the folder is not occupied by other procedures .`);
         }
 
         // We always build verbosely but filter the output based on the settings
-        args.push("--verbose-build");
+        if (!this._settings.useArduinoCli) {
+            args.push("--verbose-build");
+        }
+
         if (verbose) {
-            args.push("--verbose-upload");
+            this._settings.useArduinoCli ? args.push ("--verbose") : args.push("--verbose-upload");
         }
 
         await vscode.workspace.saveAll(false);
@@ -559,7 +650,7 @@ Please make sure the folder is not occupied by other procedures .`);
                 logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + buildDir));
                 return false;
             }
-            args.push("--pref", `build.path=${buildDir}`);
+            this._settings.useArduinoCli ? args.push ("--build-path", buildDir) : args.push("--pref", `build.path=${buildDir}`);
             arduinoChannel.info(`Please see the build logs in output path: ${buildDir}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Build will be slower. See README.";
