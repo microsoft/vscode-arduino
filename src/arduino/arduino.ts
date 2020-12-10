@@ -137,10 +137,6 @@ export class ArduinoApp {
         arduinoChannel.show();
         arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
 
-        const serialMonitor = SerialMonitor.getInstance();
-
-        const needRestore = await serialMonitor.closeSerialMonitor(dc.port);
-        UsbDetector.getInstance().pauseListening();
         await vscode.workspace.saveAll(false);
 
         if (!await this.runPreBuildCommand(dc)) {
@@ -205,17 +201,28 @@ export class ArduinoApp {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
             arduinoChannel.warning(msg);
         }
+
+        // stop serial monitor when everything is prepared and good
+        // what makes restoring of its previous state easier
+        const restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
+        UsbDetector.getInstance().pauseListening();
+
+        const cleanup = async () => {
+            UsbDetector.getInstance().resumeListening();
+            if (restoreSerialMonitor) {
+                await SerialMonitor.getInstance().openSerialMonitor();
+            }
+        }
+
         await util.spawn(
             this._settings.commandPath,
             arduinoChannel.channel,
             args,
         ).then(async () => {
-            UsbDetector.getInstance().resumeListening();
-            if (needRestore) {
-                await serialMonitor.openSerialMonitor();
-            }
+            await cleanup();
             arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
-        }, (reason) => {
+        }, async (reason) => {
+            await cleanup();
             const msg = reason.code ?
                 `Exit with code=${reason.code}${os.EOL}` :
                 reason.message ?
@@ -292,16 +299,22 @@ export class ArduinoApp {
         let success = false;
         const compilerParserContext = makeCompilerParserContext(dc);
 
+        const cleanup = async () => {
+            await Promise.resolve();
+        }
+
         await util.spawn(
             this._settings.commandPath,
             arduinoChannel.channel,
             args,
             undefined,
             compilerParserContext.callback,
-        ).then(() => {
+        ).then(async () => {
+            await cleanup();
             arduinoChannel.end(`Finished verifying sketch - ${dc.sketch}${os.EOL}`);
             success = true;
-        }, (reason) => {
+        }, async (reason) => {
+            await cleanup();
             const msg = reason.code ?
                 `Exit with code=${reason.code}${os.EOL}` :
                 reason.message ?
