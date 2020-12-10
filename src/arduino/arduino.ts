@@ -205,7 +205,11 @@ export class ArduinoApp {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Upload could be slow. See README.";
             arduinoChannel.warning(msg);
         }
-        await util.spawn(this._settings.commandPath, arduinoChannel.channel, args).then(async () => {
+        await util.spawn(
+            this._settings.commandPath,
+            arduinoChannel.channel,
+            args,
+        ).then(async () => {
             UsbDetector.getInstance().resumeListening();
             if (needRestore) {
                 await serialMonitor.openSerialMonitor();
@@ -283,22 +287,23 @@ export class ArduinoApp {
         let success = false;
         const compilerParserContext = makeCompilerParserContext(dc);
 
-        try {
-            await util.spawn(this._settings.commandPath,
-                             arduinoChannel.channel,
-                             args,
-                             undefined,
-                             compilerParserContext.callback);
+        await util.spawn(
+            this._settings.commandPath,
+            arduinoChannel.channel,
+            args,
+            undefined,
+            compilerParserContext.callback,
+        ).then(() => {
             arduinoChannel.end(`Finished verifying sketch - ${dc.sketch}${os.EOL}`);
             success = true;
-        } catch (reason) {
+        }, (reason) => {
             const msg = reason.code ?
                 `Exit with code=${reason.code}${os.EOL}` :
                 reason.message ?
                     reason.message :
                     JSON.stringify(reason);
             arduinoChannel.error(msg);
-        }
+        });
 
         if (compilerParserContext.conclude) {
             compilerParserContext.conclude();
