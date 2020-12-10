@@ -280,7 +280,7 @@ export class ArduinoApp {
         });
     }
 
-    public async verify(buildMode: BuildMode, output: string = "") {
+    public async verify(buildMode: BuildMode, buildDir: string = "") {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         const boardDescriptor = this.getBoardBuildString();
@@ -322,8 +322,8 @@ export class ArduinoApp {
             return false;
         }
 
-        if (output || dc.output) {
-            const outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
+        if (buildDir || dc.output) {
+            const outputPath = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
                 logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
