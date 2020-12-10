@@ -138,15 +138,6 @@ export class ArduinoApp {
             return;
         }
 
-        arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
-
-        await vscode.workspace.saveAll(false);
-
-        if (!await this.runPreBuildCommand(dc)) {
-            return;
-        }
-
         if (!compile && !this.useArduinoCli()) {
             arduinoChannel.error("This command is only availble when using the Arduino CLI");
             return;
@@ -176,14 +167,20 @@ export class ArduinoApp {
             args.push("--port", dc.port);
         }
 
-        if (!await this.runPreBuildCommand(dc)) {
-            return;
-        }
-
         const verbose = VscodeSettings.getInstance().logLevel === "verbose";
         if (verbose) {
             args.push("--verbose");
         }
+
+        await vscode.workspace.saveAll(false);
+
+        arduinoChannel.show();
+        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+
+        if (!await this.runPreBuildCommand(dc)) {
+            return;
+        }
+
         if (dc.output && compile) {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             const dirPath = path.dirname(outputPath);
@@ -258,14 +255,6 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
 
-        await vscode.workspace.saveAll(false);
-
-        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
-
-        if (!await this.runPreBuildCommand(dc)) {
-            return false;
-        }
-
         if (!this.useArduinoCli()) {
             args.push("--verify");
         } else {
@@ -276,6 +265,16 @@ export class ArduinoApp {
         if (verbose) {
             args.push("--verbose");
         }
+
+        await vscode.workspace.saveAll(false);
+
+        arduinoChannel.show();
+        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+
+        if (!await this.runPreBuildCommand(dc)) {
+            return false;
+        }
+
         if (output || dc.output) {
             const outputPath = path.resolve(ArduinoWorkspace.rootPath, output || dc.output);
             const dirPath = path.dirname(outputPath);
@@ -296,8 +295,6 @@ export class ArduinoApp {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Verify could be slow. See README.";
             arduinoChannel.warning(msg);
         }
-
-        arduinoChannel.show();
 
         let success = false;
         const compilerParserContext = makeCompilerParserContext(dc);
