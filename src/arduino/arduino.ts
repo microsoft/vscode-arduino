@@ -26,6 +26,7 @@ import { makeCompilerParserContext } from "./intellisense";
 import { ProgrammerManager } from "./programmerManager";
 
 export enum BuildMode {
+    Verify = "Verifying",
     Upload = "Uploading",
     UploadProgrammer = "Uploading (programmer)",
 };
@@ -271,7 +272,7 @@ export class ArduinoApp {
         });
     }
 
-    public async verify(output: string = "") {
+    public async verify(buildMode: BuildMode, output: string = "") {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         const boardDescriptor = this.getBoardBuildString();
@@ -291,10 +292,12 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
 
-        if (!this.useArduinoCli()) {
-            args.push("--verify");
-        } else {
-            args.push("compile", "-b", boardDescriptor);
+        if (buildMode === BuildMode.Verify) {
+            if (!this.useArduinoCli()) {
+                args.push("--verify");
+            } else {
+                args.push("compile", "-b", boardDescriptor);
+            }
         }
 
         const verbose = VscodeSettings.getInstance().logLevel === "verbose";
@@ -305,7 +308,7 @@ export class ArduinoApp {
         await vscode.workspace.saveAll(false);
 
         arduinoChannel.show();
-        arduinoChannel.start(`Verify sketch - ${dc.sketch}`);
+        arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
         if (!await this.runPreBuildCommand(dc)) {
             return false;
@@ -350,16 +353,16 @@ export class ArduinoApp {
             compilerParserContext.callback,
         ).then(async () => {
             await cleanup();
-            arduinoChannel.end(`Finished verifying sketch - ${dc.sketch}${os.EOL}`);
+            arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
             success = true;
         }, async (reason) => {
             await cleanup();
             const msg = reason.code ?
-                `Exit with code=${reason.code}${os.EOL}` :
+                `Exit with code=${reason.code}` :
                 reason.message ?
                     reason.message :
                     JSON.stringify(reason);
-            arduinoChannel.error(msg);
+            arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
         });
 
         if (compilerParserContext.conclude) {
