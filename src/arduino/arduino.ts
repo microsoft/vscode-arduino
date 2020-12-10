@@ -107,7 +107,7 @@ export class ArduinoApp {
      *     selectable programmer
      * @param {bool} [compile=true] - Indicates whether to compile the code when using the CLI to upload
      */
-    public async upload(buildMode: BuildMode, compile: boolean = true) {
+    public async build(buildMode: BuildMode, compile: boolean = true) {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
