@@ -152,7 +152,6 @@ export class ArduinoApp {
             return;
         }
 
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
         if (!this.useArduinoCli()) {
             args.push("--upload");
         } else {
@@ -176,7 +175,7 @@ export class ArduinoApp {
         if (dc.port) {
             args.push("--port", dc.port);
         }
-        args.push(appPath);
+
         if (!await this.runPreBuildCommand(dc)) {
             return;
         }
@@ -210,6 +209,9 @@ export class ArduinoApp {
         // what makes restoring of its previous state easier
         const restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
         UsbDetector.getInstance().pauseListening();
+
+        // Push sketch as last argument
+        args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
         const cleanup = async () => {
             UsbDetector.getInstance().resumeListening();
@@ -264,15 +266,12 @@ export class ArduinoApp {
             return false;
         }
 
-        const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-
         if (!this.useArduinoCli()) {
             args.push("--verify");
         } else {
             args.push("compile", "-b", boardDescriptor);
         }
 
-        args.push(appPath);
         const verbose = VscodeSettings.getInstance().logLevel === "verbose";
         if (verbose) {
             args.push("--verbose");
@@ -302,6 +301,9 @@ export class ArduinoApp {
 
         let success = false;
         const compilerParserContext = makeCompilerParserContext(dc);
+
+        // Push sketch as last argument
+        args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
         const cleanup = async () => {
             await Promise.resolve();
