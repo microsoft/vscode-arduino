@@ -110,11 +110,6 @@ export class ArduinoApp {
             args.push("--board", boardDescriptor);
         }
 
-        const selectProgrammer = useProgrammer ? this.getProgrammerString() : null;
-        if (useProgrammer && !selectProgrammer) {
-            return;
-        }
-
         if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Cannot find the sketch file.");
             return;
@@ -131,6 +126,11 @@ export class ArduinoApp {
             if (choice === "Yes") {
                 vscode.commands.executeCommand("arduino.selectSerialPort");
             }
+        }
+
+        const selectProgrammer = useProgrammer ? this.getProgrammerString() : null;
+        if (useProgrammer && !selectProgrammer) {
+            return;
         }
 
         if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
