@@ -124,13 +124,17 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
 
-        if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+        const selectSerial = async () => {
             const choice = await vscode.window.showInformationMessage(
                 "Serial port is not specified. Do you want to select a serial port for uploading?",
                 "Yes", "No");
             if (choice === "Yes") {
                 vscode.commands.executeCommand("arduino.selectSerialPort");
             }
+        }
+
+        if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+            await selectSerial();
             return;
         }
 
