@@ -79,7 +79,7 @@ suite("Arduino: Library Manager.", () => {
                 if (util.directoryExistsSync(libPath)) {
                     done();
                 } else {
-                    done(new Error("AzureIoTHub library install failure, can't find library path :" + libPath));
+                    done(new Error("AzureIoTHub library install failure, can't find library path: " + libPath));
                 }
             });
 

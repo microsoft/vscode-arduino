@@ -15,6 +15,7 @@ const configKeys = {
     IGNORE_BOARDS: "arduino.ignoreBoards",
     SKIP_HEADER_PROVIDER: "arduino.skipHeaderProvider",
     DEFAULT_BAUD_RATE: "arduino.defaultBaudRate",
+    USE_ARDUINO_CLI: "arduino.useArduinoCli",
 };
 
 export interface IVscodeSettings {
@@ -28,6 +29,7 @@ export interface IVscodeSettings {
     ignoreBoards: string[];
     skipHeaderProvider: boolean;
     defaultBaudRate: number;
+    useArduinoCli: boolean;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -81,6 +83,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get defaultBaudRate(): number {
         return this.getConfigValue<number>(configKeys.DEFAULT_BAUD_RATE);
+    }
+
+    public get useArduinoCli(): boolean {
+        return this.getConfigValue<boolean>(configKeys.USE_ARDUINO_CLI);
     }
 
     public get skipHeaderProvider(): boolean {

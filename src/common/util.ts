@@ -200,6 +200,13 @@ export function isArduinoFile(filePath): boolean {
     return fileExistsSync(filePath) && (path.extname(filePath) === ".ino" || path.extname(filePath) === ".pde");
 }
 
+/**
+ * Send a command to arduino
+ * @param {string} command - base command path (either Arduino IDE or CLI)
+ * @param {vscode.OutputChannel} outputChannel - output display channel
+ * @param {string[]} [args=[]] - arguments to pass to the command
+ * @param {any} [options={}] - options and flags for the arguments
+ */
 export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<object> {
     return new Promise((resolve, reject) => {
         const stdout = "";
