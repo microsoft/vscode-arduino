@@ -216,7 +216,12 @@ export class ArduinoApp {
             }
             arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
         }, (reason) => {
-            arduinoChannel.error(`Exit with code=${reason.code}${os.EOL}`);
+            const msg = reason.code ?
+                `Exit with code=${reason.code}${os.EOL}` :
+                reason.message ?
+                    reason.message :
+                    JSON.stringify(reason);
+            arduinoChannel.error(msg);
         });
     }
 
