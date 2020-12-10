@@ -101,10 +101,13 @@ export class ArduinoApp {
 
     /**
      * Upload code to selected board
+     * @param {BuildMode} buildMode Build mode.
+     *  * BuildMode.Upload: Compile and upload
+     *  * BuildMode.UploadProgrammer: Compile and upload using the user
+     *     selectable programmer
      * @param {bool} [compile=true] - Indicates whether to compile the code when using the CLI to upload
-     * @param {bool} [useProgrammer=false] - Indicate whether a specific programmer should be used
      */
-    public async upload(buildMode: BuildMode, compile: boolean = true, useProgrammer: boolean = false) {
+    public async upload(buildMode: BuildMode, compile: boolean = true) {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
@@ -134,11 +137,6 @@ export class ArduinoApp {
             }
         }
 
-        const selectProgrammer = useProgrammer ? this.getProgrammerString() : null;
-        if (useProgrammer && !selectProgrammer) {
-            return;
-        }
-
         if (buildMode === BuildMode.Upload) {
             if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
                 await selectSerial();
@@ -162,17 +160,43 @@ export class ArduinoApp {
                 args.push("-b", boardDescriptor);
             }
 
-            if (useProgrammer) {
-                if (this.useArduinoCli()) {
-                    args.push("--programmer", selectProgrammer)
-                } else {
-                    args.push("--useprogrammer", "--pref", "programmer=arduino:" + selectProgrammer)
-                }
-            }
-
             if (dc.port) {
                 args.push("--port", dc.port);
             }
+        } else if (buildMode === BuildMode.UploadProgrammer) {
+            const programmer = this.getProgrammerString();
+            if (!programmer) {
+                return;
+            }
+            if (!dc.port) {
+                await selectSerial();
+                return;
+            }
+
+            if (!compile && !this.useArduinoCli()) {
+                arduinoChannel.error("This command is only available when using the Arduino CLI");
+                return;
+            }
+
+            if (!this.useArduinoCli()) {
+                args.push("--upload");
+            } else {
+                // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
+                if (compile) {
+                    args.push("compile", "--upload");
+                } else {
+                    args.push("upload");
+                }
+                args.push("-b", boardDescriptor);
+            }
+
+            if (this.useArduinoCli()) {
+                args.push("--programmer", programmer)
+            } else {
+                args.push("--useprogrammer", "--pref", "programmer=arduino:" + programmer)
+            }
+
+            args.push("--port", dc.port);
         }
 
         const verbose = VscodeSettings.getInstance().logLevel === "verbose";
