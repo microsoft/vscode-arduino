@@ -25,6 +25,11 @@ import { UsbDetector } from "../serialmonitor/usbDetector";
 import { makeCompilerParserContext } from "./intellisense";
 import { ProgrammerManager } from "./programmerManager";
 
+export enum BuildMode {
+    Upload = "Uploading",
+    UploadProgrammer = "Uploading (programmer)",
+};
+
 /**
  * Represent an Arduino application based on the official Arduino IDE.
  */
@@ -99,9 +104,10 @@ export class ArduinoApp {
      * @param {bool} [compile=true] - Indicates whether to compile the code when using the CLI to upload
      * @param {bool} [useProgrammer=false] - Indicate whether a specific programmer should be used
      */
-    public async upload(compile: boolean = true, useProgrammer: boolean = false) {
+    public async upload(buildMode: BuildMode, compile: boolean = true, useProgrammer: boolean = false) {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
+        let restoreSerialMonitor: boolean = false;
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return;
@@ -133,38 +139,40 @@ export class ArduinoApp {
             return;
         }
 
-        if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
-            await selectSerial();
-            return;
-        }
-
-        if (!compile && !this.useArduinoCli()) {
-            arduinoChannel.error("This command is only available when using the Arduino CLI");
-            return;
-        }
-
-        if (!this.useArduinoCli()) {
-            args.push("--upload");
-        } else {
-            // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
-            if (compile) {
-                args.push("compile", "--upload");
-            } else {
-                args.push("upload");
+        if (buildMode === BuildMode.Upload) {
+            if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+                await selectSerial();
+                return;
             }
-            args.push("-b", boardDescriptor);
-        }
 
-        if (useProgrammer) {
-            if (this.useArduinoCli()) {
-                args.push("--programmer", selectProgrammer)
-            } else {
-                args.push("--useprogrammer", "--pref", "programmer=arduino:" + selectProgrammer)
+            if (!compile && !this.useArduinoCli()) {
+                arduinoChannel.error("This command is only available when using the Arduino CLI");
+                return;
             }
-        }
 
-        if (dc.port) {
-            args.push("--port", dc.port);
+            if (!this.useArduinoCli()) {
+                args.push("--upload");
+            } else {
+                // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
+                if (compile) {
+                    args.push("compile", "--upload");
+                } else {
+                    args.push("upload");
+                }
+                args.push("-b", boardDescriptor);
+            }
+
+            if (useProgrammer) {
+                if (this.useArduinoCli()) {
+                    args.push("--programmer", selectProgrammer)
+                } else {
+                    args.push("--useprogrammer", "--pref", "programmer=arduino:" + selectProgrammer)
+                }
+            }
+
+            if (dc.port) {
+                args.push("--port", dc.port);
+            }
         }
 
         const verbose = VscodeSettings.getInstance().logLevel === "verbose";
@@ -175,7 +183,7 @@ export class ArduinoApp {
         await vscode.workspace.saveAll(false);
 
         arduinoChannel.show();
-        arduinoChannel.start(`Upload sketch - ${dc.sketch}`);
+        arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
         if (!await this.runPreBuildCommand(dc)) {
             return;
@@ -204,16 +212,20 @@ export class ArduinoApp {
 
         // stop serial monitor when everything is prepared and good
         // what makes restoring of its previous state easier
-        const restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
-        UsbDetector.getInstance().pauseListening();
+        if (buildMode === BuildMode.Upload || buildMode === BuildMode.UploadProgrammer) {
+            restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
+            UsbDetector.getInstance().pauseListening();
+        }
 
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
         const cleanup = async () => {
-            UsbDetector.getInstance().resumeListening();
-            if (restoreSerialMonitor) {
-                await SerialMonitor.getInstance().openSerialMonitor();
+            if (buildMode === BuildMode.Upload || buildMode === BuildMode.UploadProgrammer) {
+                UsbDetector.getInstance().resumeListening();
+                if (restoreSerialMonitor) {
+                    await SerialMonitor.getInstance().openSerialMonitor();
+                }
             }
         }
 
@@ -223,15 +235,15 @@ export class ArduinoApp {
             args,
         ).then(async () => {
             await cleanup();
-            arduinoChannel.end(`Uploaded the sketch: ${dc.sketch}${os.EOL}`);
+            arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
         }, async (reason) => {
             await cleanup();
             const msg = reason.code ?
-                `Exit with code=${reason.code}${os.EOL}` :
+                `Exit with code=${reason.code}` :
                 reason.message ?
                     reason.message :
                     JSON.stringify(reason);
-            arduinoChannel.error(msg);
+            arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
         });
     }
 
