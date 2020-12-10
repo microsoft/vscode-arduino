@@ -181,7 +181,8 @@ export class ArduinoApp {
             return;
         }
 
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
+        const verbose = VscodeSettings.getInstance().logLevel === "verbose";
+        if (verbose) {
             args.push("--verbose");
         }
         if (dc.output && compile) {
@@ -252,7 +253,8 @@ export class ArduinoApp {
         }
 
         args.push(appPath);
-        if (VscodeSettings.getInstance().logLevel === "verbose") {
+        const verbose = VscodeSettings.getInstance().logLevel === "verbose";
+        if (verbose) {
             args.push("--verbose");
         }
         if (output || dc.output) {
