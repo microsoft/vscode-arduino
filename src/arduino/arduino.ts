@@ -101,9 +101,13 @@ export class ArduinoApp {
      */
     public async upload(compile: boolean = true, useProgrammer: boolean = false) {
         const dc = DeviceContext.getInstance();
+        const args: string[] = [];
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return;
+        }
+        if (!this.useArduinoCli()) {
+            args.push("--board", boardDescriptor);
         }
 
         const selectProgrammer = useProgrammer ? this.getProgrammerString() : null;
@@ -149,10 +153,17 @@ export class ArduinoApp {
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
-        const args = (!compile && this.useArduinoCli()) ? ["upload", "-b", boardDescriptor] :
-                                                          this.useArduinoCli() ? ["compile", "--upload", "-b", boardDescriptor] :
-                                                                                 ["--upload", "--board", boardDescriptor];
+        if (!this.useArduinoCli()) {
+            args.push("--upload");
+        } else {
+            // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
+            if (compile) {
+                args.push("compile", "--upload");
+            } else {
+                args.push("upload");
+            }
+            args.push("-b", boardDescriptor);
+        }
 
         if (useProgrammer) {
             if (this.useArduinoCli()) {
@@ -206,9 +217,13 @@ export class ArduinoApp {
 
     public async verify(output: string = "") {
         const dc = DeviceContext.getInstance();
+        const args: string[] = [];
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return false;
+        }
+        if (!this.useArduinoCli()) {
+            args.push("--board", boardDescriptor);
         }
 
         if (!ArduinoWorkspace.rootPath) {
@@ -229,7 +244,14 @@ export class ArduinoApp {
         }
 
         const appPath = path.join(ArduinoWorkspace.rootPath, dc.sketch);
-        const args = this.useArduinoCli() ? ["compile", "-b", boardDescriptor, appPath] : ["--verify", "--board", boardDescriptor, appPath];
+
+        if (!this.useArduinoCli()) {
+            args.push("--verify");
+        } else {
+            args.push("compile", "-b", boardDescriptor);
+        }
+
+        args.push(appPath);
         if (VscodeSettings.getInstance().logLevel === "verbose") {
             args.push("--verbose");
         }
