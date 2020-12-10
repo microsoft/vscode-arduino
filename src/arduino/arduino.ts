@@ -516,6 +516,9 @@ export class ArduinoApp {
         }
         const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
 
+        if (mode === BuildMode.Analyze) {
+            args.push("compile");
+        }
         this._settings.useArduinoCli ? args.push("-b", boardDescriptor) : args.push("--board", boardDescriptor);
 
         if (!ArduinoWorkspace.rootPath) {
@@ -626,9 +629,8 @@ export class ArduinoApp {
         }
 
         // We always build verbosely but filter the output based on the settings
-        if (!this._settings.useArduinoCli) {
-            args.push("--verbose-build");
-        }
+
+        this._settings.useArduinoCli ? args.push("--verbose") : args.push("--verbose-build");
 
         if (verbose) {
             this._settings.useArduinoCli ? args.push ("--verbose") : args.push("--verbose-upload");
@@ -675,13 +677,16 @@ export class ArduinoApp {
         // TODO EW: What should we do with pre-/post build commands when running
         //   analysis? Some could use it to generate/manipulate code which could
         //   be a prerequisite for a successful build
-        if (!await this.runPrePostBuildCommand(dc, env, "pre")) {
+        if (dc.prebuild && !await this.runPrePostBuildCommand(dc, env, "pre")) {
             return false;
         }
 
         // stop serial monitor when everything is prepared and good
         // what makes restoring of its previous state easier
-        if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
+        if (mode === BuildMode.Upload ||
+            mode === BuildMode.UploadProgrammer ||
+            mode === BuildMode.CliUpload ||
+            mode === BuildMode.CliUploadProgrammer) {
             restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
             UsbDetector.getInstance().pauseListening();
         }
@@ -744,7 +749,7 @@ export class ArduinoApp {
             this._settings.commandPath,
             args,
             undefined,
-            { stdout: stdoutcb, stderr: stderrcb },
+            { channel: arduinoChannel.channel, stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             const ret = await cleanup("ok");
             if (ret) {

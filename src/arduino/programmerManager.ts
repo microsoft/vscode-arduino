@@ -35,7 +35,7 @@ export class ProgrammerManager {
         this._programmerStatusBar.tooltip = "Select Programmer";
         this.setProgrammerValue(DeviceContext.getInstance().programmer);
         this._programmerStatusBar.show();
-        DeviceContext.getInstance().onDidChange(() => {
+        DeviceContext.getInstance().onChangeProgrammer(() => {
             this.setProgrammerValue(DeviceContext.getInstance().programmer);
         });
     }
