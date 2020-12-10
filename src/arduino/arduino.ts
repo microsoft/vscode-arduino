@@ -515,10 +515,6 @@ export class ArduinoApp {
         }
         const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
 
-        if (buildMode === BuildMode.Analyze) {
-            args.push("compile");
-        }
-
         if (this.useArduinoCli()) {
             args.push("-b", boardDescriptor);
         } else {
@@ -626,7 +622,9 @@ export class ArduinoApp {
                 "--programmer", programmer,
                 "--port", dc.port);
         } else {
-            if (!this.useArduinoCli()) {
+            if (this.useArduinoCli()) {
+                args.unshift("compile");
+            } else {
                 args.push("--verify");
             }
         }
@@ -767,7 +765,7 @@ export class ArduinoApp {
             this._settings.commandPath,
             args,
             undefined,
-            { channel: arduinoChannel.channel, stdout: stdoutcb, stderr: stderrcb },
+            { /*channel: arduinoChannel.channel,*/ stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             const ret = await cleanup("ok");
             if (ret) {
