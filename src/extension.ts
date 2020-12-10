@@ -198,7 +198,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, true, true);
+                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, true);
             } catch (ex) {
             }
             delete status.compile;
@@ -211,7 +211,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "cliUpload";
             try {
-                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, false, true);
+                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, false);
             } catch (ex) {
             }
             delete status.compile;
