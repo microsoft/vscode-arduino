@@ -27,6 +27,7 @@ const completionProviderModule = impor("./langService/completionProvider") as ty
 import * as Logger from "./logger/logger";
 const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
+import { BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
@@ -144,7 +145,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Uploading...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.upload();
+                    await arduinoContextModule.default.arduinoApp.upload(BuildMode.Upload);
                 });
             } catch (ex) {
             }
@@ -162,7 +163,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Using CLI to upload...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.upload(false);
+                    await arduinoContextModule.default.arduinoApp.upload(BuildMode.Upload, false);
                 });
             } catch (ex) {
             }
@@ -197,7 +198,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "upload";
             try {
-                await arduinoContextModule.default.arduinoApp.upload(true, true);
+                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, true, true);
             } catch (ex) {
             }
             delete status.compile;
@@ -210,7 +211,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!status.compile) {
             status.compile = "cliUpload";
             try {
-                await arduinoContextModule.default.arduinoApp.upload(false, true);
+                await arduinoContextModule.default.arduinoApp.upload(BuildMode.UploadProgrammer, false, true);
             } catch (ex) {
             }
             delete status.compile;
