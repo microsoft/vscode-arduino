@@ -516,9 +516,6 @@ export class ArduinoApp {
         }
         const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
 
-        if (mode === BuildMode.Analyze) {
-            args.push("compile");
-        }
         this._settings.useArduinoCli ? args.push("-b", boardDescriptor) : args.push("--board", boardDescriptor);
 
         if (!ArduinoWorkspace.rootPath) {
@@ -616,7 +613,7 @@ export class ArduinoApp {
                         "--port", dc.port);
 
         } else {
-            args.push("--verify");
+            this._settings.useArduinoCli ? args.unshift("compile") : args.push("--verify");
         }
 
         // TODO: Option to add prefrences when using the CLI
@@ -749,7 +746,7 @@ export class ArduinoApp {
             this._settings.commandPath,
             args,
             undefined,
-            { channel: arduinoChannel.channel, stdout: stdoutcb, stderr: stderrcb },
+            { /*channel: arduinoChannel.channel,*/ stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             const ret = await cleanup("ok");
             if (ret) {
