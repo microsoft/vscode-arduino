@@ -254,10 +254,18 @@ export class ArduinoApp {
             }
         }
 
+        // TODO: Get rid of spawn's channel parameter and just support
+        // stdout and stderr callbacks
+        const stdoutCallback = (line: string) => {
+            arduinoChannel.channel.append(line);
+        }
+
         await util.spawn(
             this._settings.commandPath,
             arduinoChannel.channel,
             args,
+            undefined,
+            stdoutCallback,
         ).then(async () => {
             await cleanup();
             arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
@@ -345,12 +353,18 @@ export class ArduinoApp {
             await Promise.resolve();
         }
 
+        // TODO: Get rid of spawn's channel parameter and just support
+        // stdout and stderr callbacks
+        const stdoutCallback = (line: string) => {
+            arduinoChannel.channel.append(line);
+        }
+
         await util.spawn(
             this._settings.commandPath,
             arduinoChannel.channel,
             args,
             undefined,
-            compilerParserContext.callback,
+            stdoutCallback,
         ).then(async () => {
             await cleanup();
             arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
