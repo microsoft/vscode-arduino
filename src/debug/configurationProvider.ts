@@ -137,7 +137,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
 
             // always compile elf to make sure debug the right elf
             if (!await ArduinoContext.arduinoApp.build(BuildMode.Verify, true, outputFolder)) {
-                vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
+                vscode.window.showErrorMessage("Failed to verify the program, please check the output for details.");
                 return false;
             }
 

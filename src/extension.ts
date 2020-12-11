@@ -44,8 +44,8 @@ export async function activate(context: vscode.ExtensionContext) {
         const workingFile = path.normalize(openEditor.document.fileName);
         const workspaceFolder = (vscode.workspace && ArduinoWorkspace.rootPath) || "";
         if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
-            vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
-                "the arduino extension might not work appropriately.");
+            vscode.window.showWarningMessage(`The open file "${workingFile}" is not inside the workspace folder, ` +
+                "the arduino extension might not work properly.");
         }
     }
     const vscodeSettings = VscodeSettings.getInstance();
@@ -197,6 +197,9 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
         if (!status.compile) {
             status.compile = "upload";
+            // TODO: no progress indicator
+            //       and: exceptions should be handled within build
+            //            function
             try {
                 await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, true);
             } catch (ex) {
@@ -214,6 +217,21 @@ export async function activate(context: vscode.ExtensionContext) {
                 await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, false);
             } catch (ex) {
             }
+            delete status.compile;
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.rebuildIntelliSenseConfig", async () => {
+        if (!status.compile) {
+            status.compile = "intellisenserebuild";
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Rebuilding IS Configuration...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Analyze, true);
+            });
             delete status.compile;
         }
     }, () => {
