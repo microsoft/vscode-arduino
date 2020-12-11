@@ -145,7 +145,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     location: vscode.ProgressLocation.Window,
                     title: "Arduino: Uploading...",
                 }, async () => {
-                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
+                    await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, true);
                 });
             } catch (ex) {
             }
