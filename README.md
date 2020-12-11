@@ -50,10 +50,12 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
 - **Arduino: Upload Using Programmer**: Upload using an external programmer.
 - **Arduino: Verify**: Build sketch.
+- **Arduino: Rebuild IntelliSense Configuration**: Forced/manual rebuild of the IntelliSense configuration. The extension analyzes Arduino's build output and sets the Intellisense include paths, defines, compiler arguments accordingly.
 
 ## Keybindings
 - **Arduino: Upload** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>U</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>U</kbd>
 - **Arduino: Verify** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>R</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>R</kbd>
+- **Arduino: Rebuild IntelliSense Configuration** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
 
 ## Options
 | Option | Description |
@@ -115,8 +117,15 @@ The following settings are as per sketch settings of the Arduino extension. You 
   - `"enable"`: Enable the auto-generation even if globally disabled
 
 ## IntelliSense
+*TODO: Rewrite this section*
 vscode-arduino auto-configures IntelliSense by default. vscode-arduino analyzes Arduino's compiler output during verify and generates the corresponding configuration file at `.vscode/c_cpp_properties.json` and tries as hard as possible to keep things up to date, e.g. running verify when switching the board or the sketch.
 It doesn't makes sense though to run verify repeatedly. Therefore if the workspace reports problems (for instance after adding new includes to a new library) run *verify* such that IntelliSense knows of the new include directories (since the Arduino-backend performs the library resolution externally).
+
+TODO: Note about configuration selection in lower right.
+
+Manual rebuild: **Ardino: Rebuild IntelliSense Configuration**,
+Keybindings: **Arduino: Rebuild IntelliSense Configuration** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
+
 
 ## Debugging Arduino Code <sup>preview</sup>
 Before you start to debug your Arduino code, please read [this document](https://code.visualstudio.com/docs/editor/debugging) to learn about the basic mechanisms of debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for further reference.
