@@ -15,6 +15,7 @@ import { DeviceContext } from "../deviceContext";
 import { IArduinoSettings } from "./arduinoSettings";
 import { BoardManager } from "./boardManager";
 import { ExampleManager } from "./exampleManager";
+import { ICoCoPaContext, isCompilerParserEnabled, makeCompilerParserContext } from "./intellisense";
 import { LibraryManager } from "./libraryManager";
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -22,11 +23,11 @@ import { arduinoChannel } from "../common/outputChannel";
 import { ArduinoWorkspace } from "../common/workspace";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
-import { makeCompilerParserContext } from "./intellisense";
 import { ProgrammerManager } from "./programmerManager";
 
 export enum BuildMode {
     Verify = "Verifying",
+    Analyze = "Analyzing",
     Upload = "Uploading",
     UploadProgrammer = "Uploading (programmer)",
 };
@@ -283,6 +284,8 @@ export class ArduinoApp {
     public async verify(buildMode: BuildMode, buildDir: string = "") {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
+        let cocopa: ICoCoPaContext;
+
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
             return false;
@@ -300,7 +303,17 @@ export class ArduinoApp {
             await this.getMainSketch(dc);
         }
 
-        if (buildMode === BuildMode.Verify) {
+        if (buildMode === BuildMode.Analyze) {
+            if (!isCompilerParserEnabled()) {
+                return false;
+            }
+            cocopa = makeCompilerParserContext(dc);
+            if (!this.useArduinoCli()) {
+                args.push("--verify", "--verbose");
+            } else {
+                args.push("compile", "--verbose", "-b", boardDescriptor);
+            }
+        } else {
             if (!this.useArduinoCli()) {
                 args.push("--verify");
             } else {
@@ -309,7 +322,7 @@ export class ArduinoApp {
         }
 
         const verbose = VscodeSettings.getInstance().logLevel === "verbose";
-        if (verbose) {
+        if (buildMode !== BuildMode.Analyze && verbose) {
             args.push("--verbose");
         }
 
@@ -344,19 +357,28 @@ export class ArduinoApp {
         }
 
         let success = false;
-        const compilerParserContext = makeCompilerParserContext(dc);
 
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
         const cleanup = async () => {
+            if (cocopa) {
+                cocopa.conclude();
+            }
             await Promise.resolve();
         }
 
         // TODO: Get rid of spawn's channel parameter and just support
         // stdout and stderr callbacks
         const stdoutCallback = (line: string) => {
-            arduinoChannel.channel.append(line);
+            if (cocopa) {
+                cocopa.callback(line);
+                if (verbose) {
+                    arduinoChannel.channel.append(line);
+                }
+            } else {
+                arduinoChannel.channel.append(line);
+            }
         }
 
         await util.spawn(
@@ -378,10 +400,6 @@ export class ArduinoApp {
                     JSON.stringify(reason);
             arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
         });
-
-        if (compilerParserContext.conclude) {
-            compilerParserContext.conclude();
-        }
 
         return success;
     }
