@@ -136,7 +136,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
             config.program = path.join(ArduinoWorkspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
-            if (!await ArduinoContext.arduinoApp.verify(BuildMode.Verify, outputFolder)) {
+            if (!await ArduinoContext.arduinoApp.build(BuildMode.Verify, true, outputFolder)) {
                 vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
                 return false;
             }
