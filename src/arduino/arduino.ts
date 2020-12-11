@@ -115,7 +115,7 @@ export class ArduinoApp {
         let restoreSerialMonitor: boolean = false;
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
-            return;
+            return false;
         }
         if (!this.useArduinoCli()) {
             args.push("--board", boardDescriptor);
@@ -123,7 +123,7 @@ export class ArduinoApp {
 
         if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Cannot find the sketch file.");
-            return;
+            return false;
         }
 
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
@@ -142,12 +142,12 @@ export class ArduinoApp {
         if (buildMode === BuildMode.Upload) {
             if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
                 await selectSerial();
-                return;
+                return false;
             }
 
             if (!compile && !this.useArduinoCli()) {
                 arduinoChannel.error("This command is only available when using the Arduino CLI");
-                return;
+                return false;
             }
 
             if (!this.useArduinoCli()) {
@@ -168,16 +168,16 @@ export class ArduinoApp {
         } else if (buildMode === BuildMode.UploadProgrammer) {
             const programmer = this.getProgrammerString();
             if (!programmer) {
-                return;
+                return false;
             }
             if (!dc.port) {
                 await selectSerial();
-                return;
+                return false;
             }
 
             if (!compile && !this.useArduinoCli()) {
                 arduinoChannel.error("This command is only available when using the Arduino CLI");
-                return;
+                return false;
             }
 
             if (!this.useArduinoCli()) {
@@ -212,7 +212,7 @@ export class ArduinoApp {
         arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
         if (!await this.runPreBuildCommand(dc)) {
-            return;
+            return false;
         }
 
         if (dc.output && compile) {
@@ -220,7 +220,7 @@ export class ArduinoApp {
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
                 logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
-                return;
+                return false;
             }
 
             if (this.useArduinoCli()) {
@@ -242,6 +242,8 @@ export class ArduinoApp {
             restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
             UsbDetector.getInstance().pauseListening();
         }
+
+        let success = false;
 
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
@@ -270,6 +272,7 @@ export class ArduinoApp {
         ).then(async () => {
             await cleanup();
             arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
+            success = true;
         }, async (reason) => {
             await cleanup();
             const msg = reason.code ?
@@ -279,6 +282,7 @@ export class ArduinoApp {
                     JSON.stringify(reason);
             arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
         });
+        return success;
     }
 
     public async verify(buildMode: BuildMode, buildDir: string = "") {
