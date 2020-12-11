@@ -211,12 +211,12 @@ export class ArduinoApp {
         const dc = DeviceContext.getInstance();
         const boardDescriptor = this.getBoardBuildString();
         if (!boardDescriptor) {
-            return;
+            return false;
         }
 
         if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Cannot find the sketch file.");
-            return;
+            return false;
         }
 
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
@@ -249,7 +249,7 @@ export class ArduinoApp {
             const dirPath = path.dirname(outputPath);
             if (!util.directoryExistsSync(dirPath)) {
                 Logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + outputPath));
-                return;
+                return false;
             }
 
             if (this.useArduinoCli()) {
