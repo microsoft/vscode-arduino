@@ -16,6 +16,7 @@ const configKeys = {
     SKIP_HEADER_PROVIDER: "arduino.skipHeaderProvider",
     DEFAULT_BAUD_RATE: "arduino.defaultBaudRate",
     DISABLE_INTELLISENSE_AUTO_GEN: "arduino.disableIntelliSenseAutoGen",
+    USE_ARDUINO_CLI: "arduino.useArduinoCli",
 };
 
 export interface IVscodeSettings {
@@ -30,6 +31,7 @@ export interface IVscodeSettings {
     skipHeaderProvider: boolean;
     defaultBaudRate: number;
     disableIntelliSenseAutoGen: boolean;
+    useArduinoCli: boolean;
     updateAdditionalUrls(urls: string | string[]): void;
 }
 
@@ -83,6 +85,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get defaultBaudRate(): number {
         return this.getConfigValue<number>(configKeys.DEFAULT_BAUD_RATE);
+    }
+
+    public get useArduinoCli(): boolean {
+        return this.getConfigValue<boolean>(configKeys.USE_ARDUINO_CLI);
     }
 
     public get skipHeaderProvider(): boolean {

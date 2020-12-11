@@ -90,7 +90,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
             const arduinoPath = arduinoContextModule.default.arduinoApp.settings.arduinoPath;
             const commandPath = arduinoContextModule.default.arduinoApp.settings.commandPath;
-            if (!arduinoPath || !validateArduinoPath(arduinoPath)) { // Pop up vscode User Settings page when cannot resolve arduino path.
+            const useArduinoCli = arduinoContextModule.default.arduinoApp.settings.useArduinoCli;
+            // Pop up vscode User Settings page when cannot resolve arduino path.
+            if (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli)) {
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             } else if (!commandPath || !util.fileExistsSync(commandPath)) {
@@ -141,6 +143,19 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
+    registerArduinoCommand("arduino.cliUpload", async () => {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
+            });
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
     registerArduinoCommand("arduino.setSketchFile", async () => {
         const sketchFileName = deviceContext.sketch;
         const newSketchFileName = await vscode.window.showInputBox({
@@ -163,6 +178,19 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading (programmer)...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer);
+            });
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.cliUploadUsingProgrammer", async () => {
         if (!arduinoContextModule.default.arduinoApp.building) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,

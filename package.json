@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -94,12 +94,20 @@
         }
       },
       {
+        "command": "arduino.cliUpload",
+        "title": "Arduino CLI: Upload"
+      },
+      {
         "command": "arduino.uploadUsingProgrammer",
         "title": "Arduino: Upload Using Programmer"
       },
       {
         "command": "arduino.rebuildIntelliSenseConfig",
         "title": "Arduino: Rebuild IntelliSense Configuration"
+      },
+      {
+        "command": "arduino.cliUploadUsingProgrammer",
+        "title": "Arduino CLI: Upload Using Programmer"
       },
       {
         "command": "arduino.selectProgrammer",
@@ -451,6 +459,11 @@
       "type": "object",
       "title": "Arduino configuration",
       "properties": {
+        "arduino.useArduinoCli": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Use Arduino CLI installed instead of Arduino IDE. `#arduino.path#` must be set, as there is no default path for 'arduino-cli'. (Requires a restart after change)"
+        },
         "arduino.path": {
           "type": "string",
           "default": "",
