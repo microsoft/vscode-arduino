@@ -139,7 +139,7 @@ export class ArduinoApp {
         }
 
         if (!compile && !this.useArduinoCli()) {
-            arduinoChannel.error("This command is only availble when using the Arduino CLI");
+            arduinoChannel.error("This command is only available when using the Arduino CLI");
             return;
         }
 
