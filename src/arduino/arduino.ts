@@ -512,7 +512,9 @@ export class ArduinoApp {
         }
         const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
 
-        if (!this.useArduinoCli()) {
+        if (this.useArduinoCli()) {
+            args.push("-b", boardDescriptor);
+        } else {
             args.push("--board", boardDescriptor);
         }
 
@@ -561,7 +563,6 @@ export class ArduinoApp {
                 } else {
                     args.push("upload");
                 }
-                args.push("-b", boardDescriptor);
             }
 
             if (dc.port) {
@@ -591,7 +592,6 @@ export class ArduinoApp {
                 } else {
                     args.push("upload");
                 }
-                args.push("-b", boardDescriptor);
             }
 
             if (this.useArduinoCli()) {
@@ -603,14 +603,10 @@ export class ArduinoApp {
             args.push("--port", dc.port);
             if (!this.useArduinoCli()) {
                 args.push("--verify");
-            } else {
-                args.push("compile", "-b", boardDescriptor);
             }
         } else {
             if (!this.useArduinoCli()) {
                 args.push("--verify");
-            } else {
-                args.push("compile", "-b", boardDescriptor);
             }
         }
 
