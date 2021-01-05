@@ -36,7 +36,9 @@ export enum BuildMode {
     Verify = "Verifying",
     Analyze = "Analyzing",
     Upload = "Uploading",
+    CliUpload = "Uploading using Arduino CLI",
     UploadProgrammer = "Uploading (programmer)",
+    CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
 };
 
 /**
@@ -74,7 +76,7 @@ export class ArduinoApp {
         const analysisDelayMs = 1000 * 3;
         this._analysisManager = new AnalysisManager(
             () => this._building,
-            async () => { await this.build(BuildMode.Analyze, true); },
+            async () => { await this.build(BuildMode.Analyze); },
             analysisDelayMs);
     }
 
@@ -159,7 +161,6 @@ export class ArduinoApp {
      * something is missing, it tries to query the user for the missing piece
      * of information (sketch, board, etc.). Analyze runs non interactively and
      * just returns false.
-     * @param {bool} compile - Indicates whether to compile the code when using the CLI to upload
      * @param buildDir Override the build directory set by the project settings
      * with the given directory.
      * @returns true on success, false if
@@ -167,7 +168,7 @@ export class ArduinoApp {
      *  * board- or programmer-manager aren't initialized yet
      *  * or something went wrong during the build
      */
-    public async build(buildMode: BuildMode, compile: boolean, buildDir?: string) {
+    public async build(buildMode: BuildMode, buildDir?: string) {
 
         if (!this._boardManager || !this._programmerManager || this._building) {
             return false;
@@ -175,7 +176,7 @@ export class ArduinoApp {
 
         this._building = true;
 
-        return await this._build(buildMode, compile, buildDir)
+        return await this._build(buildMode, buildDir)
         .then((ret) => {
             this._building = false;
             return ret;
@@ -498,7 +499,7 @@ export class ArduinoApp {
      * @param buildDir See build()
      * @see https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc
      */
-    private async _build(buildMode: BuildMode, compile: boolean, buildDir?: string): Promise<boolean> {
+    private async _build(buildMode: BuildMode, buildDir?: string): Promise<boolean> {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
@@ -549,21 +550,27 @@ export class ArduinoApp {
                 return false;
             }
 
-            if (!compile && !this.useArduinoCli()) {
-                arduinoChannel.error("This command is only available when using the Arduino CLI");
+            if (!this.useArduinoCli()) {
+                args.push("--upload");
+            } else {
+                args.push("compile", "--upload");
+            }
+
+            if (dc.port) {
+                args.push("--port", dc.port);
+            }
+        } else if (buildMode === BuildMode.CliUpload) {
+            if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
+                await selectSerial();
                 return false;
             }
 
             if (!this.useArduinoCli()) {
-                args.push("--upload");
-            } else {
-                // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
-                if (compile) {
-                    args.push("compile", "--upload");
-                } else {
-                    args.push("upload");
-                }
+                arduinoChannel.error("This command is only available when using the Arduino CLI");
+                return false;
             }
+
+            args.push("upload");
 
             if (dc.port) {
                 args.push("--port", dc.port);
@@ -578,20 +585,12 @@ export class ArduinoApp {
                 await selectSerial();
                 return false;
             }
-            if (!compile && !this.useArduinoCli()) {
-                arduinoChannel.error("This command is only available when using the Arduino CLI");
-                return false;
-            }
 
             if (!this.useArduinoCli()) {
                 args.push("--upload");
             } else {
                 // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
-                if (compile) {
-                    args.push("compile", "--upload");
-                } else {
-                    args.push("upload");
-                }
+                args.push("upload");
             }
 
             if (this.useArduinoCli()) {
@@ -604,6 +603,24 @@ export class ArduinoApp {
             if (!this.useArduinoCli()) {
                 args.push("--verify");
             }
+        } else if (buildMode === BuildMode.CliUploadProgrammer) {
+            const programmer = this.programmerManager.currentProgrammer;
+            if (!programmer) {
+                logger.notifyUserError("programmerManager.currentProgrammer", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
+                return false;
+            }
+            if (!dc.port) {
+                await selectSerial();
+                return false;
+            }
+            if (!this.useArduinoCli()) {
+                arduinoChannel.error("This command is only available when using the Arduino CLI");
+                return false;
+            }
+
+            args.push("compile", "--upload");
+            args.push("--programmer", programmer)
+            args.push("--port", dc.port);
         } else {
             if (!this.useArduinoCli()) {
                 args.push("--verify");
@@ -631,7 +648,7 @@ export class ArduinoApp {
         arduinoChannel.show();
         arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
-        if ((buildDir || dc.output) && compile) {
+        if (buildDir || dc.output) {
             // 2020-02-29, EW: This whole code appears a bit wonky to me.
             //   What if the user specifies an output directory "../builds/my project"
             buildDir = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);

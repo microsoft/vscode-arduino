@@ -120,7 +120,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Verifying...",
             }, async () => {
-                await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify, true);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify);
             });
         }
     }, () => {
@@ -136,7 +136,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Uploading...",
             }, async () => {
-                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, true);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
             });
         }
     }, () => {
@@ -149,7 +149,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Using CLI to upload...",
             }, async () => {
-                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload, false);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.CliUpload);
             });
         }
     }, () => {
@@ -183,7 +183,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Uploading (programmer)...",
             }, async () => {
-                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, true);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer);
             });
         }
     }, () => {
@@ -196,7 +196,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Using CLI to upload (programmer)...",
             }, async () => {
-                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer, false);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.CliUploadProgrammer);
             });
         }
     }, () => {
@@ -209,7 +209,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Rebuilding IS Configuration...",
             }, async () => {
-                await arduinoContextModule.default.arduinoApp.build(BuildMode.Analyze, true);
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Analyze);
             });
         }
     }, () => {
