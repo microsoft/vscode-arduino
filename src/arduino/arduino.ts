@@ -448,37 +448,39 @@ export class ArduinoApp {
             ? dc.prebuild
             : dc.postbuild;
 
-        if (cmdline) {
-            arduinoChannel.info(`Running ${what}-build command: "${cmdline}"`);
-            let cmd: string;
-            let args: string[];
-            // pre-/post-build commands feature full bash support on UNIX systems.
-            // On Windows you have full cmd support.
-            if (os.platform() === "win32") {
-                args = [];
-                cmd = cmdline;
-            } else {
-                args = ["-c", cmdline];
-                cmd = "bash";
-            }
-            try {
-                await util.spawn(cmd,
-                                 args,
-                                 {
-                                     shell: os.platform() === "win32",
-                                     cwd: ArduinoWorkspace.rootPath,
-                                     env: {...environment},
-                                 },
-                                 { channel: arduinoChannel.channel });
-            } catch (ex) {
-                const msg = ex.error
-                    ? `${ex.error}`
-                    : ex.code
-                        ? `Exit code = ${ex.code}`
-                        : JSON.stringify(ex);
-                arduinoChannel.error(`Running ${what}-build command failed: ${os.EOL}${msg}`);
-                return false;
-            }
+        if (!cmdline) {
+            return true; // Successfully done nothing.
+        }
+
+        arduinoChannel.info(`Running ${what}-build command: "${cmdline}"`);
+        let cmd: string;
+        let args: string[];
+        // pre-/post-build commands feature full bash support on UNIX systems.
+        // On Windows you have full cmd support.
+        if (os.platform() === "win32") {
+            args = [];
+            cmd = cmdline;
+        } else {
+            args = ["-c", cmdline];
+            cmd = "bash";
+        }
+        try {
+            await util.spawn(cmd,
+                                args,
+                                {
+                                    shell: os.platform() === "win32",
+                                    cwd: ArduinoWorkspace.rootPath,
+                                    env: {...environment},
+                                },
+                                { channel: arduinoChannel.channel });
+        } catch (ex) {
+            const msg = ex.error
+                ? `${ex.error}`
+                : ex.code
+                    ? `Exit code = ${ex.code}`
+                    : JSON.stringify(ex);
+            arduinoChannel.error(`Running ${what}-build command failed: ${os.EOL}${msg}`);
+            return false;
         }
         return true;
     }
