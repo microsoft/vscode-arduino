@@ -615,9 +615,10 @@ export class ArduinoApp {
                 return false;
             }
 
-            args.push("compile", "--upload");
-            args.push("--programmer", programmer)
-            args.push("--port", dc.port);
+            args.push("compile",
+                "--upload",
+                "--programmer", programmer,
+                "--port", dc.port);
         } else {
             if (!this.useArduinoCli()) {
                 args.push("--verify");
