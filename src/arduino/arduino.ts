@@ -550,10 +550,10 @@ export class ArduinoApp {
                 return false;
             }
 
-            if (!this.useArduinoCli()) {
-                args.push("--upload");
-            } else {
+            if (this.useArduinoCli()) {
                 args.push("compile", "--upload");
+            } else {
+                args.push("--upload");
             }
 
             if (dc.port) {
@@ -586,17 +586,13 @@ export class ArduinoApp {
                 return false;
             }
 
-            if (!this.useArduinoCli()) {
-                args.push("--upload");
-            } else {
-                // TODO: add the --clean argument to the cli args when v 0.14 is released (this will clean up the build folder after uploading)
-                args.push("upload");
-            }
-
             if (this.useArduinoCli()) {
-                args.push("--programmer", programmer)
+                args.push("upload",
+                    "--programmer", programmer);
             } else {
-                args.push("--useprogrammer", "--pref", `programmer=arduino:${programmer}`);
+                args.push("--upload",
+                    "--useprogrammer",
+                    "--pref", `programmer=arduino:${programmer}`);
             }
 
             args.push("--port", dc.port);
