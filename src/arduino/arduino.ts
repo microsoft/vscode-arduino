@@ -587,7 +587,8 @@ export class ArduinoApp {
             }
 
             if (this.useArduinoCli()) {
-                args.push("upload",
+                args.push("compile",
+                    "--upload",
                     "--programmer", programmer);
             } else {
                 args.push("--upload",
