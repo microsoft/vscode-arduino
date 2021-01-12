@@ -617,8 +617,7 @@ export class ArduinoApp {
                 return false;
             }
 
-            args.push("compile",
-                "--upload",
+            args.push("upload",
                 "--programmer", programmer,
                 "--port", dc.port);
         } else {
@@ -641,7 +640,7 @@ export class ArduinoApp {
 
         this._settings.useArduinoCli ? args.push("--verbose") : args.push("--verbose-build");
 
-        if (verbose) {
+        if (verbose && !this._settings.useArduinoCli) {
             args.push("--verbose-upload");
         }
 
