@@ -692,7 +692,7 @@ export class ArduinoApp {
         // TODO EW: What should we do with pre-/post build commands when running
         //   analysis? Some could use it to generate/manipulate code which could
         //   be a prerequisite for a successful build
-        if (dc.prebuild && !await this.runPrePostBuildCommand(dc, env, "pre")) {
+        if (!await this.runPrePostBuildCommand(dc, env, "pre")) {
             return false;
         }
 
