@@ -1,0 +1,14 @@
+#**********************************************
+# Dummy esp8266 programmer
+#**********************************************
+esp8266_dummy.name=Dummy esp8266 programmer
+esp8266_dummy.program.tool=bootburn
+esp8266_dummy.program.cmd=esp8266prog
+esp8266_dummy.program.cmd.windows=esp8266prog.exe
+
+#**********************************************
+# Dummy esp8266 bootloader programmer
+#**********************************************
+esp8266_boot_dummy.name=Dummy esp8266 bootloader programmer
+esp8266_boot_dummy.program.tool=bootburn
+esp8266_boot_dummy.program.cmd=esp8266bootprog

@@ -50,10 +50,12 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
 - **Arduino: Upload Using Programmer**: Upload using an external programmer.
 - **Arduino: Verify**: Build sketch.
+- **Arduino: Rebuild IntelliSense Configuration**: Forced/manual rebuild of the IntelliSense configuration. The extension analyzes Arduino's build output and sets the Intellisense include paths, defines, compiler arguments accordingly.
 
 ## Keybindings
 - **Arduino: Upload** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>U</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>U</kbd>
 - **Arduino: Verify** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>R</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>R</kbd>
+- **Arduino: Rebuild IntelliSense Configuration** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
 
 ## Options
 | Option | Description |
@@ -62,11 +64,12 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.commandPath` | Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for windows,`Contents/MacOS/Arduino` for Mac and `arduino` for Linux, You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux. |
 | `arduino.additionalUrls` | Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma(`,`) as separator, or have a string array. The default value is empty. |
 | `arduino.logLevel` | CLI output log level. Could be info or verbose. The default value is `"info"`. |
-| `arduino.allowPDEFiletype` | Allow the VSCode Arduino extension to open .pde files from pre-1.0.0 versions of Ardiuno. Note that this will break Processing code. Default value is `false`. | 
+| `arduino.allowPDEFiletype` | Allow the VSCode Arduino extension to open .pde files from pre-1.0.0 versions of Ardiuno. Note that this will break Processing code. Default value is `false`. |
 | `arduino.enableUSBDetection` | Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport `npm install -g serialport` `serialport-list -f jsonline`|
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
 | `arduino.defaultBaudRate` | Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000 |
+| `arduino.disableIntelliSenseAutoGen` | When `true` vscode-arduino will not auto-generate an IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`) by analyzing Arduino's compiler output. |
 
 The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
 
@@ -75,7 +78,7 @@ The following Visual Studio Code settings are available for the Arduino extensio
     "arduino.path": "C:/Program Files (x86)/Arduino",
     "arduino.commandPath": "arduino_debug.exe",
     "arduino.logLevel": "info",
-    "arduino.allowPDEFiletype": false, 
+    "arduino.allowPDEFiletype": false,
     "arduino.enableUSBDetection": true,
     "arduino.disableTestingOpen": false,
     "arduino.skipHeaderProvider": false,
@@ -98,7 +101,9 @@ The following settings are as per sketch settings of the Arduino extension. You 
     "board": "adafruit:samd:adafruit_feather_m0",
     "output": "../build",
     "debugger": "jlink",
-    "prebuild": "bash prebuild.sh"
+    "prebuild": "./prebuild.sh",
+    "postbuild": "./postbuild.sh",
+    "intelliSenseGen": "global"
 }
 ```
 - `sketch` - The main sketch file name of Arduino.
@@ -106,7 +111,68 @@ The following settings are as per sketch settings of the Arduino extension. You 
 - `board` - Currently selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
 - `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/master/misc/debuggerUsbMapping.json). By default, this option is not set.
-- `prebuild` - External command before building the sketch file. You should only set one `prebuild` command. `command1 && command2` does not work. If you need to run multiple commands before the build, then create a script.
+- `prebuild` - External command which will be invoked before any sketch build (verify, upload, ...). For details see the [Pre- and Post-Build Commands](#Pre--and-Post-Build-Commands) section.
+- `postbuild` - External command to be run after the sketch has been built successfully. See the afore mentioned section for more details.
+- `intelliSenseGen` - Override the global setting for auto-generation of the IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`). Three options are available:
+  - `"global"`: Use the global settings (default)
+  - `"disable"`: Disable the auto-generation even if globally enabled
+  - `"enable"`: Enable the auto-generation even if globally disabled
+- `buildPreferences` - Set Arduino preferences which then are used during any build (verify, upload, ...). This allows for extra defines, compiler options or includes. The preference key-value pairs must be set as follows:
+```json
+    "buildPreferences": [
+        ["build.extra_flags", "-DMY_DEFINE=666 -DANOTHER_DEFINE=3.14 -Wall"],
+        ["compiler.cpp.extra_flags", "-DYET_ANOTER=\"hello\""]
+    ]
+}
+```
+
+## Pre- and Post-Build Commands
+On Windows the commands run within a `cmd`-, on Linux and OSX within a `bash`-instance. Therefore your command can be anything what you can run within those shells. Instead of running a command you can invoke a script. This makes writing more complex pre-/post-build mechanisms much easier and opens up the possibility to run python or other scripting languages.
+The commands run within the workspace root directory and vscode-arduino sets the following environment variables:  
+**`VSCA_BUILD_MODE`** The current build mode, one of `Verifying`, `Uploading`, `Uploading (programmer)` or `Analyzing`. This allows you to run your script on certain build modes only.  
+**`VSCA_SKETCH`** The sketch file relative to your workspace root directory.  
+**`VSCA_BOARD`** Your board and configuration, e.g. `arduino:avr:nano:cpu=atmega328`.  
+**`VSCA_WORKSPACE_DIR`** The absolute path of your workspace root directory.  
+**`VSCA_LOG_LEVEL`** The current log level. This allows you to control the verbosity of your scripts.  
+**`VSCA_SERIAL`** The serial port used for uploading. Not set if you haven't set one in your `arduino.json`.  
+**`VSCA_BUILD_DIR`** The build directory. Not set if you haven't set one in your `arduino.json`.  
+
+For example under Windows the following `arduino.json` setup
+```json
+{
+    "board": "arduino:avr:nano",
+    "sketch": "test.ino",
+    "configuration": "cpu=atmega328",
+    "prebuild": "IF \"%VSCA_BUILD_MODE%\"==\"Verifying\" (echo VSCA_BUILD_MODE=%VSCA_BUILD_MODE% && echo VSCA_BOARD=%VSCA_BOARD%)"
+}
+```
+will produce
+```
+[Starting] Verifying sketch 'test.ino'
+Running pre-build command: "IF "%VSCA_BUILD_MODE%"=="Verifying" (echo VSCA_BUILD_MODE=%VSCA_BUILD_MODE% && echo VSCA_BOARD=%VSCA_BOARD%)"
+VSCA_BUILD_MODE=Verifying 
+VSCA_BOARD=arduino:avr:nano:cpu=atmega328
+Loading configuration...
+<...>
+```
+when verifying.
+
+## IntelliSense
+vscode-arduino auto-configures IntelliSense by default. vscode-arduino analyzes Arduino's compiler output by running a separate build and generates the corresponding configuration file at `.vscode/c_cpp_properties.json`. vscode-arduino tries as hard as possible to keep things up to date, e.g. it runs the analysis when switching the board or the sketch.
+
+It doesn't makes sense though to run the analysis repeatedly. Therefore if the workspace reports problems ("squiggles") - for instance after adding new includes from a new library - run the analysis manually:
+
+Manual rebuild: **Arduino: Rebuild IntelliSense Configuration**,
+Keybindings: <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>I</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>I</kbd>
+
+When the analysis is invoked manually it ignores any global and project specific disable.
+
+### IntelliSense Configurations
+vscode-arduino's analysis stores the result as a dedicated IntelliSense-configuration named `Arduino`. You have to select it from the far right of the status bar when you're in one of your source files as shown here:
+
+![74001156-cfce8280-496a-11ea-9b9d-7d30c83765c1](https://user-images.githubusercontent.com/21954933/74351237-2696ea80-4db7-11ea-9f7a-1bfc652ad5f5.png)
+
+This system allows you to setup and use own IntelliSense configurations in parallel to the automatically generated configurations provided through vscode-arduino. Just add your configuration to `c_cpp_properties.json` and name it differently from the default configuration (`Arduino`), e.g. `My awesome configuration` and select it from the status bar or via the command palette command **C/C++: Select a Configuration...**
 
 ## Debugging Arduino Code <sup>preview</sup>
 Before you start to debug your Arduino code, please read [this document](https://code.visualstudio.com/docs/editor/debugging) to learn about the basic mechanisms of debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for further reference.

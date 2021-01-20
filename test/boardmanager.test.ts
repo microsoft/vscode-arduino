@@ -12,6 +12,7 @@ import { ArduinoSettings } from "../src/arduino/arduinoSettings";
 import { parseBoardDescriptor } from "../src/arduino/board";
 import { BoardManager } from "../src/arduino/boardManager";
 import { IPlatform } from "../src/arduino/package";
+import { parseProgrammerDescriptor } from "../src/arduino/programmer";
 import * as util from "../src/common/util";
 
 suite("Arduino: Board Manager.", () => {
@@ -28,7 +29,6 @@ suite("Arduino: Board Manager.", () => {
         const arduinoApp = TypeMoq.Mock.ofType(ArduinoApp);
         arduinoApp.setup((x) => x.setPref(TypeMoq.It.isAny(), TypeMoq.It.isAny()));
         arduinoApp.setup((x) => x.initialize(TypeMoq.It.isAny()));
-        arduinoApp.setup((x) => x.addLibPath(TypeMoq.It.isAny()));
 
         try {
             boardManager = new BoardManager(arduinoSettings.object, arduinoApp.object);
@@ -68,6 +68,14 @@ suite("Arduino: Board Manager.", () => {
             "should parse installed boards from custom packages ($sketchbook/hardware directory)");
     });
 
+    test("should be able to load installed programmers", () => {
+        assert.equal(boardManager.installedProgrammers.size, 17, `Expected to find programmers for dummy & AVR boards`);
+        assert.ok(boardManager.installedProgrammers.get("avrispmkii"),
+            "should parse installed programmers from Arduino IDE built-in packages");
+        assert.ok(boardManager.installedProgrammers.get("esp8266_dummy"),
+            "should parse installed programmers from custom packages ($sketchbook/hardware directory)");
+    });
+
     test("should parse boards.txt correctly", () => {
         const arduinoAvrBoard = fs.readFileSync(Path.join(Resources.mockedIDEPackagePath, "arduino/avr/boards.txt"), "utf8");
         const platform = {
@@ -91,6 +99,26 @@ suite("Arduino: Board Manager.", () => {
         assert.equal(diecimilaBoard.configItems[0].selectedOption, "atmega328");
         assert.equal(diecimilaBoard.configItems[0].options.length, 2);
         assert.equal(diecimilaBoard.customConfig, "cpu=atmega328");
+    });
+
+    test("should parse programmers.txt correctly", () => {
+        const arduinoAvrBoard = fs.readFileSync(Path.join(Resources.mockedIDEPackagePath, "arduino/avr/programmers.txt"), "utf8");
+        const platform = {
+            name: "Arduino AVR Boards",
+            architecture: "avr",
+            package: {
+                name: "arduino",
+            },
+        };
+        const programmerDescriptors = parseProgrammerDescriptor(arduinoAvrBoard, <IPlatform> platform);
+
+        const avrispmkii = programmerDescriptors.get("avrispmkii");
+        assert.equal(avrispmkii.name, "avrispmkii");
+        assert.equal(avrispmkii.displayName, "AVRISP mkII");
+
+        const usbGemma = programmerDescriptors.get("usbGemma");
+        assert.equal(usbGemma.name, "usbGemma");
+        assert.equal(usbGemma.displayName, "Arduino Gemma");
     });
 
     test("should parse platform.txt correctly", () => {
