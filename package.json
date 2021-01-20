@@ -37,10 +37,10 @@
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.uploadUsingProgrammer",
+    "onCommand:arduino.rebuildIntelliSenseConfig",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.changeBaudRate",
-    "onCommand:arduino.addLibPath",
     "onCommand:arduino.openSerialMonitor",
     "onCommand:arduino.sendMessageToSerialPort",
     "onCommand:arduino.closeSerialMonitor",
@@ -104,6 +104,10 @@
       {
         "command": "arduino.cliUploadUsingProgrammer",
         "title": "Arduino CLI: Upload Using Programmer"
+      },
+      {
+        "command": "arduino.rebuildIntelliSenseConfig",
+        "title": "Arduino: Rebuild IntelliSense Configuration"
       },
       {
         "command": "arduino.selectProgrammer",
@@ -243,7 +247,7 @@
               },
               "targetArchitecture": {
                 "type": "string",
-                "description": "The architecture of the debuggee.",
+                "description": "The architecture of the debugger.",
                 "default": "arm"
               },
               "cwd": {
@@ -444,6 +448,11 @@
         "command": "arduino.upload",
         "key": "ctrl+alt+u",
         "mac": "cmd+alt+u"
+      },
+      {
+        "command": "arduino.rebuildIntelliSenseConfig",
+        "key": "ctrl+alt+i",
+        "mac": "cmd+alt+i"
       }
     ],
     "configuration": {
@@ -504,6 +513,11 @@
         "arduino.defaultBaudRate": {
           "type": "number",
           "default": 115200
+        },
+        "arduino.disableIntelliSenseAutoGen": {
+          "type": "boolean",
+          "default": false,
+          "description": "When disabled vscode-arduino will not auto-generate an IntelliSense configuration (i.e. c_cpp_properties.json) by analyzing the compiler output."
         }
       }
     },
@@ -559,10 +573,11 @@
   "devDependencies": {
     "@types/compare-versions": "^3.0.0",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^6.0.40",
+    "@types/node": "^6.14.9",
     "@types/vscode": "^1.43.0",
     "@types/winreg": "^1.2.30",
     "acorn": "^7.4.0",
+    "ajv": "^5.0.0",
     "del": "^2.2.2",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^10.2.1",
@@ -583,12 +598,13 @@
     "plugin-error": "^1.0.1",
     "tslint": "^5.20.1",
     "typemoq": "^1.6.0",
-    "typescript": "^2.2.1",
+    "typescript": "^3.7.5",
     "vscode-test": "^1.4.0",
     "webpack": "^4.44.1"
   },
   "dependencies": {
     "body-parser": "^1.16.1",
+    "cocopa": "0.0.13",
     "compare-versions": "^3.4.0",
     "eventemitter2": "^4.1.0",
     "express": "^4.14.1",

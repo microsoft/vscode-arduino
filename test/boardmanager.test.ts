@@ -29,7 +29,6 @@ suite("Arduino: Board Manager.", () => {
         const arduinoApp = TypeMoq.Mock.ofType(ArduinoApp);
         arduinoApp.setup((x) => x.setPref(TypeMoq.It.isAny(), TypeMoq.It.isAny()));
         arduinoApp.setup((x) => x.initialize(TypeMoq.It.isAny()));
-        arduinoApp.setup((x) => x.addLibPath(TypeMoq.It.isAny()));
 
         try {
             boardManager = new BoardManager(arduinoSettings.object, arduinoApp.object);

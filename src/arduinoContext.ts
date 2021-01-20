@@ -19,6 +19,8 @@ class ArduinoContext {
         this._arduinoApp = value;
     }
 
+    // TODO EW: This is redundant: the board manager is already part of
+    // the arduino app
     public get boardManager() {
         return this._boardManager;
     }
@@ -38,6 +40,10 @@ class ArduinoContext {
         return this._debuggerManager;
     }
 
+    // TODO EW: You don't have to initialize members to null
+    //  if they don't get a default value or aren't initialized
+    //  within a constructor they are "undefined" by default.
+    //  This makes comparing against null (above) superfluous.
     private _arduinoApp: ArduinoApp = null;
     private _debuggerManager: DebuggerManager = null;
     private _boardManager: BoardManager = null;
