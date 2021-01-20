@@ -92,6 +92,12 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private _sketchStatusBar: vscode.StatusBarItem;
 
+    private _prebuild: string;
+
+    private _programmer: string;
+
+    private _suppressSaveContext: boolean = false;
+
     /**
      * @constructor
      */
@@ -262,6 +268,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public set programmer(value: string) {
         this._settings.programmer.value = value;
         this.saveContext();
+    }
+
+    public get suppressSaveContext() {
+        return this._suppressSaveContext;
+    }
+
+    public set suppressSaveContext(value: boolean) {
+        this._suppressSaveContext = value;
     }
 
     public get buildPreferences() {

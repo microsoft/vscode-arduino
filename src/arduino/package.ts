@@ -267,3 +267,34 @@ export interface IBoard {
      */
     getPackageName();
 }
+
+/**
+ * Interface for classes that represent an Arduino supported programmer.
+ *
+ * @interface
+ */
+export interface IProgrammer {
+    /**
+     * Unique key that represent the programmer in the package:name.
+     * @property {string}
+     */
+    key: string;
+
+    /**
+     * Programmer name for Arduino compilation such as `avrisp`, `atmel_ice`
+     * @property {string}
+     */
+    name: string;
+
+    /**
+     * The human readable name displayed in the Arduino programmer selection menu
+     * @property {string}
+     */
+    displayName: string;
+
+    /**
+     * Reference to the platform that contains this board.
+     * @prop {IPlatform}
+     */
+    platform: IPlatform;
+}
