@@ -175,7 +175,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 path.resolve(ArduinoWorkspace.rootPath, deviceContext.output));
             excludePatterns.push(`${outputPath}/**`);
         }
-        const excludePattern = `{${excludePatterns.join(",")}}`.replace("\\", "/");
+        const excludePattern = `{${excludePatterns.map((p) => p.replace("\\", "/")).join(",")}}`;
 
         const fileUris = await vscode.workspace.findFiles(includePattern, excludePattern);
         const newSketchFileName = await vscode.window.showQuickPick(fileUris.map((fileUri) =>
