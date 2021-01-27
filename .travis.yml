@@ -46,8 +46,8 @@ before_install:
 # https://github.com/arduino/Arduino/issues/8034
 # Arduino 1.8.8 has fixed issue 8034.
 - if [ $TRAVIS_OS_NAME == "osx" ]; then
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-    brew cask install arduino;
+    /usr/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)";
+    brew install --cask arduino;
   fi
 - npm install -g node-gyp
 - npm install -g vsce

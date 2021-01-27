@@ -9,7 +9,6 @@ import * as path from "path";
 export default class LocalWebServer {
     private app = express();
     private server;
-    private _serverPort: string;
 
     constructor(private _extensionPath: string) {
         this.app.use("/", express.static(path.join(this._extensionPath, "./out/views")));
@@ -18,10 +17,10 @@ export default class LocalWebServer {
     }
 
     public getServerUrl(): string {
-        return `http://localhost:${this._serverPort}`;
+        return `http://localhost:${this.server.address().port}`;
     }
     public getEndpointUri(type: string): string {
-        return `http://localhost:${this._serverPort}/${type}`;
+        return `http://localhost:${this.server.address().port}/${type}`;
     }
 
     public addHandler(url: string, handler: (req, res) => void): void {
@@ -32,10 +31,24 @@ export default class LocalWebServer {
         this.app.post(url, handler);
     }
 
-    public start(): void {
-        const port = this.server.listen(0).address().port;
-        // tslint:disable-next-line
-        console.log(`Starting express server on port: ${port}`);
-        this._serverPort = port;
+    /**
+     * Start webserver.
+     * If it fails to listen reject will report its error.
+     */
+    public async start() {
+        return new Promise<void>((resolve, reject) => {
+            // Address and port are available as soon as the server
+            // started listening, resolving localhost requires
+            // some time.
+            this.server.listen(0, "localhost", (error) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                // tslint:disable-next-line
+                console.log(`Express server listening on port: ${this.server.address().port}`);
+                resolve();
+            });
+        });
     }
 }
