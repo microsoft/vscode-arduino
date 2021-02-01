@@ -50,6 +50,7 @@ jobs:
           gulp genAikey
           vsce package
       - name: run tests
+        if: ${{ matrix.os == 'ubuntu-latest' || 'macos-latest'}}
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npm test --silent
