@@ -39,7 +39,7 @@ jobs:
       - name: macos setup
         if: ${{ matrix.os == 'macos-latest' }}
         run: | 
-          /usr/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
           brew install arduino --cask
       - name: preinstall 
         run: | 
@@ -55,7 +55,7 @@ jobs:
           gulp genAikey
           vsce package
       - name: run tests
-        if: ${{ matrix.os == 'ubuntu-latest' }} || ${{ matrix.os == 'macos-latest' }}
+        if: ${{ matrix.os != windows-latest' }}
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npm test --silent
