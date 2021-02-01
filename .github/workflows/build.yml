@@ -2,7 +2,7 @@ name: CI-Tests
 on:
   push:
     branches:
-      - $default-branch
+      - actions
       - develop
     tags:
       - v*.*.*
