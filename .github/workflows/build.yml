@@ -17,38 +17,38 @@ jobs:
       strategy:
         matrix:
           os: [ubuntu-trusty, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }} 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 11.x
-      - name: linux setup
-        if: ${{ matrix.os }} == ubuntu-trusty
-        run: |
-          export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
-          sleep 3
-          wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER
-          tar -xvf /home/$USER/arduino-1.8.2-linux64.tar.xz -C /home/$USER/
-          sudo ln -s /home/$USER/arduino-1.8.2/arduino /usr/bin/arduino
-          sudo apt-get update
-          sudo apt-get install g++-multilib
-          sudo apt-get install -y build-essential
-          sudo apt-get install libudev-dev
-      - name: macos setup
-        if: ${{ matrix.os }} == macos-latest
-        run: | 
-          /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-          brew cask install arduino
-      - run: | 
-          npm install -g node-gyp
-          npm install -g vsce
-          npm install -g gulp
-          npm install -g 
-          npm install
-          gulp tslint
-          gulp genAikey
-          vsce package
-      - name: run tests
-        uses: GabrielBB/xvfb-action@v1
-        run: npm test --silent
+      runs-on: ${{ matrix.os }} 
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-node@v1
+          with:
+            node-version: 11.x
+        - name: linux setup
+          if: ${{ matrix.os }} == ubuntu-trusty
+          run: |
+            export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
+            sleep 3
+            wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER
+            tar -xvf /home/$USER/arduino-1.8.2-linux64.tar.xz -C /home/$USER/
+            sudo ln -s /home/$USER/arduino-1.8.2/arduino /usr/bin/arduino
+            sudo apt-get update
+            sudo apt-get install g++-multilib
+            sudo apt-get install -y build-essential
+            sudo apt-get install libudev-dev
+        - name: macos setup
+          if: ${{ matrix.os }} == macos-latest
+          run: | 
+            /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+            brew cask install arduino
+        - run: | 
+            npm install -g node-gyp
+            npm install -g vsce
+            npm install -g gulp
+            npm install -g 
+            npm install
+            gulp tslint
+            gulp genAikey
+            vsce package
+        - name: run tests
+          uses: GabrielBB/xvfb-action@v1
+          run: npm test --silent
