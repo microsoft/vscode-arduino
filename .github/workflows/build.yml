@@ -1,16 +1,12 @@
 name: CI-Tests
 on: 
   push:
-    branches:
-      - $default-branch
-      - develop
+    branches: [ $default-branch, develop ]
     tags:
       - v*.*.*
       - v*.*.*-RC*
   pull_request:
-    branches:
-      - $default-branch
-      - develop
+    branches: [ $default-branch, develop ]
 
 
 jobs:
