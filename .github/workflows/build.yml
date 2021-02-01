@@ -9,12 +9,12 @@ on:
       - v*.*.*-RC*
   pull_request:
     branches:
-      - $default-branch
+      - master
       - develop
 
 
 jobs:
-  build:
+  Build:
 
     runs-on: ${{ matrix.os }} 
     strategy:
@@ -62,3 +62,31 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npm test --silent
+  
+  package:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+        uses: actions/checkout@v2
+    - name: Get Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 11.x
+    - name: preinstall 
+        run: | 
+          npm install -g node-gyp
+          npm install -g vsce
+          npm install -g gulp
+    - name: install
+      run: npm install
+    - name: scripts
+      run: |
+        gulp tslint
+        gulp genAikey
+        vsce package
+        npm run package
+      
+
+
