@@ -1,19 +1,20 @@
 name: CI-Tests
 on: 
   push:
-    branches: [ $default-branch, develop ]
-    tags:
-      - v*.*.*
-      - v*.*.*-RC*
+    branches: [ $default-branch ]
+    # tags:
+    #   - v*.*.*
+    #   - v*.*.*-RC*
   pull_request:
     branches: [ $default-branch, develop ]
 
 
 jobs:
   build:
+
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
     
     runs-on: ${{ matrix.os }} 
     
