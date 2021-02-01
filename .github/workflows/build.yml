@@ -20,9 +20,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 11.x
+      - name: Get Node
+        uses: actions/setup-node@v1
+          with:
+            node-version: 11.x
       - name: linux setup
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -38,19 +39,23 @@ jobs:
       - name: macos setup
         if: ${{ matrix.os == 'macos-latest' }}
         run: | 
-          /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+          usr/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
           brew install arduino --cask
-      - run: | 
-          npm install -g node-gyp
-          npm install -g vsce
-          npm install -g gulp
-          npm install -g 
-          npm install
-          gulp tslint
-          gulp genAikey
-          vsce package
+      - name: preinstall 
+        run: | 
+            npm install -g node-gyp
+            npm install -g vsce
+            npm install -g gulp
+            npm install -g typescript
+      - name: install
+        run: npm install
+      - name: scripts
+        run: |
+            gulp tslint
+            gulp genAikey
+            vsce package
       - name: run tests
-        if: ${{ matrix.os == 'ubuntu-latest' || 'macos-latest'}}
+        if: ${{ matrix.os == 'ubuntu-latest' }} || ${{ matrix.os == 'macos-latest' }}
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npm test --silent
