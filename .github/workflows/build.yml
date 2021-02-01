@@ -39,7 +39,7 @@ jobs:
         if: ${{ matrix.os == 'macos-latest' }}
         run: | 
           /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-          brew cask install arduino
+          brew install arduino --cask
       - run: | 
           npm install -g node-gyp
           npm install -g vsce
