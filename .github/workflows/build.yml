@@ -63,11 +63,14 @@ jobs:
         with:
           run: npm test --silent
   
-  package:
-    needs: build
+  Package:
+    needs: Build
     runs-on: windows-latest
-
+    # if: github.ref = 'refs/tags/v*.*.*'
+    env:
+      VERSION: github.ref = 'refs/tags/v*.*.*'
     steps:
+    - run: echo ${{env.VERSION}}
     - name: Checkout
       uses: actions/checkout@v2
     - name: Get Node
@@ -86,7 +89,11 @@ jobs:
         gulp tslint
         gulp genAikey
         vsce package
-        npm run package
+    - name: create artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: ${{ env.ver }}.vsix
+        path: ${{githubworkspace}}/vscode-arduino/vscode-arduino/vscode-arduino-0.3.4.vsix
       
 
 
