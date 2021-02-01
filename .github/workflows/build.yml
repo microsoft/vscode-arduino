@@ -39,21 +39,21 @@ jobs:
       - name: macos setup
         if: ${{ matrix.os == 'macos-latest' }}
         run: | 
-          usr/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+          /usr/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
           brew install arduino --cask
       - name: preinstall 
         run: | 
-            npm install -g node-gyp
-            npm install -g vsce
-            npm install -g gulp
-            npm install -g typescript
+          npm install -g node-gyp
+          npm install -g vsce
+          npm install -g gulp
+          npm install -g typescript
       - name: install
         run: npm install
       - name: scripts
         run: |
-            gulp tslint
-            gulp genAikey
-            vsce package
+          gulp tslint
+          gulp genAikey
+          vsce package
       - name: run tests
         if: ${{ matrix.os == 'ubuntu-latest' }} || ${{ matrix.os == 'macos-latest' }}
         uses: GabrielBB/xvfb-action@v1
