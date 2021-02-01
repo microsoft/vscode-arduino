@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 11.x
       - name: linux setup
-        if: ${{ matrix.os == ubuntu-latest }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
           sleep 3
@@ -36,7 +36,7 @@ jobs:
           sudo apt-get install -y build-essential
           sudo apt-get install libudev-dev
       - name: macos setup
-        if: ${{ matrix.os == macos-latest }}
+        if: ${{ matrix.os == 'macos-latest' }}
         run: | 
           /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
           brew cask install arduino
