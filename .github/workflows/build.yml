@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }} 
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ] 
+        os: [ ubuntu-trusty, macos-latest, windows-latest ] 
     
     steps:
       - name: Checkout
@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 11.x
       - name: linux setup
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'ubuntu-trusty' }}
         run: |
           export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
           sleep 3
