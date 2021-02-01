@@ -55,7 +55,7 @@ jobs:
           gulp genAikey
           vsce package
       - name: run tests
-        if: ${{ matrix.os != windows-latest' }}
+        if: ${{ matrix.os != 'windows-latest' }}
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npm test --silent
