@@ -51,4 +51,5 @@ jobs:
             vsce package
         - name: run tests
           uses: GabrielBB/xvfb-action@v1
-          run: npm test --silent
+          with:
+            run: npm test --silent
