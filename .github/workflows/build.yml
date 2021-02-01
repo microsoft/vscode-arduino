@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 11.x
       - name: linux setup
-        if: ${{ matrix.os }} == ubuntu-trusty
+        if: ${{ matrix.os }} == ubuntu-latest
         run: |
           export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
           sleep 3
