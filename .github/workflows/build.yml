@@ -6,7 +6,6 @@ on:
       - develop
     tags:
       - v*
-      - v*.*.*-[a-zA-Z]*
   pull_request:
     branches:
       - master
@@ -14,18 +13,17 @@ on:
 
 
 jobs:
-  Build:
+  build:
 
     runs-on: ${{ matrix.os }} 
     strategy:
       matrix:
-        # os: [ ubuntu-latest, macos-latest, windows-latest ] 
-        os: [ windows-latest ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
     
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v2
-      - name: Get Node
+      - name: get node
         uses: actions/setup-node@v1
         with:
           node-version: 11.x
@@ -64,17 +62,17 @@ jobs:
         with:
           run: npm test --silent
   
-  Package:
-    needs: Build
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment: Deploy
-    # if: env.VERSION == '!v0.[0-9].[0-9]-[rR]*'
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
     - run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - run: echo ${{env.VERSION}}
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Get Node
+    - name: get node
       uses: actions/setup-node@v1
       with:
         node-version: 11.x
@@ -82,9 +80,6 @@ jobs:
       run: |
         export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
         sleep 3
-        wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER
-        tar -xvf /home/$USER/arduino-1.8.2-linux64.tar.xz -C /home/$USER/
-        sudo ln -s /home/$USER/arduino-1.8.2/arduino /usr/bin/arduino
         sudo apt-get update
         sudo apt-get install g++-multilib
         sudo apt-get install -y build-essential
@@ -101,7 +96,7 @@ jobs:
         gulp tslint
         gulp genAikey
         vsce package
-    - name: Upload binaries to release
+    - name: upload .vsix to github tag
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.OAUTH_TOKEN }}
@@ -109,3 +104,6 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
+    - name: publish
+      if: ${{env.VERSION}} == v[0-9].[0-9].[0-9]
+      run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
