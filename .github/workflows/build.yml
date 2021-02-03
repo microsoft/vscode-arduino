@@ -78,7 +78,6 @@ jobs:
       with:
         node-version: 11.x
     - name: linux setup
-      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
         sleep 3
@@ -105,4 +104,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: vscode-arduino-${{env.VERSION}}.vsix
-        path: ${{github.workspace}}/*.vsix
+        path: ${{github.workspace}}/vscode-arduino-0.3.4.vsix
