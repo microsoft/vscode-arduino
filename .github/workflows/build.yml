@@ -67,11 +67,9 @@ jobs:
   Package:
     needs: Build
     runs-on: windows-latest
-    env:
-      VERSION: ${{ GITHUB_REF#refs/tags/*/ }}
     # if: env.VERSION == '!v0.[0-9].[0-9]-[rR]*'
     steps:
-    - run: echo ${{env.VERSION}}
+    - run: echo "VERSION=${GITHUB_REF#refs/tags/*/}" >> $GITHUB_ENV
     - name: Checkout
       uses: actions/checkout@v2
     - name: Get Node
