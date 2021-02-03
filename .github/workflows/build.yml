@@ -67,6 +67,7 @@ jobs:
   Package:
     needs: Build
     runs-on: ubuntu-latest
+    environment: Deploy
     # if: env.VERSION == '!v0.[0-9].[0-9]-[rR]*'
     steps:
     - run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
