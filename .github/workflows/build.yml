@@ -5,8 +5,8 @@ on:
       - actions
       - develop
     tags:
-      - v*.*.*
-      - v*.*.*-RC*
+      - v*
+      - v*.*.*-[a-zA-Z]*
   pull_request:
     branches:
       - master
@@ -19,7 +19,8 @@ jobs:
     runs-on: ${{ matrix.os }} 
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ] 
+        # os: [ ubuntu-latest, macos-latest, windows-latest ] 
+        os: windows-latest
     
     steps:
       - name: Checkout
@@ -66,9 +67,9 @@ jobs:
   Package:
     needs: Build
     runs-on: windows-latest
-    # if: github.ref = 'refs/tags/v*.*.*'
     env:
-      VERSION: github.ref = 'refs/tags/v*.*.*'
+      VERSION: ${GITHUB_REF#refs/tags/*/}
+    # if: env.VERSION == '!v0.[0-9].[0-9]-[rR]*'
     steps:
     - run: echo ${{env.VERSION}}
     - name: Checkout
@@ -92,8 +93,8 @@ jobs:
     - name: create artifact
       uses: actions/upload-artifact@v1
       with:
-        name: ${{ env.ver }}.vsix
-        path: ${{githubworkspace}}/vscode-arduino/vscode-arduino/vscode-arduino-0.3.4.vsix
+        name: vscode-arduino-${{env.VERSION}}.vsix
+        path: ${{github.workspace}}/vscode-arduino/vscode-arduino/vscode-arduino-0.3.4.vsix
       
 
 
