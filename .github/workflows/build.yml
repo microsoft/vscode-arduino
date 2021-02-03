@@ -100,8 +100,11 @@ jobs:
         gulp tslint
         gulp genAikey
         vsce package
-    - name: create artifact
-      uses: actions/upload-artifact@v1
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
       with:
-        name: vscode-arduino-${{env.VERSION}}.vsix
-        path: ${{github.workspace}}/vscode-arduino-0.3.4.vsix
+        repo_token: ${{ secrets.OAUTH_TOKEN }}
+        file: ${{github.workspace}}/vscode-arduino*.vsix
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
