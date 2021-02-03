@@ -2,7 +2,7 @@ name: CI-Tests
 on:
   push:
     branches:
-      - actions
+      - master
       - develop
     tags:
       - v*
@@ -69,8 +69,8 @@ jobs:
     runs-on: ubuntu-latest
     # if: env.VERSION == '!v0.[0-9].[0-9]-[rR]*'
     steps:
-    - run: echo "VERSION=${GITHUB_REF#refs/tags/*/}" >> $GITHUB_ENV
-    - run: echo VERSION
+    - run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - run: echo ${{env.VERSION}}
     - name: Checkout
       uses: actions/checkout@v2
     - name: Get Node
