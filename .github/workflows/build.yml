@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         # os: [ ubuntu-latest, macos-latest, windows-latest ] 
-        os: [ swindows-latest ]
+        os: [ windows-latest ]
     
     steps:
       - name: Checkout
