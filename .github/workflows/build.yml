@@ -65,7 +65,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: Deploy
+    environment: vsix-publishing
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
     - run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
