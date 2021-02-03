@@ -92,7 +92,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: vscode-arduino-${{env.VERSION}}.vsix
-        path: ${{github.workspace}}/vscode-arduino/vscode-arduino/vscode-arduino-0.3.4.vsix
-      
-
-
+        path: ${{github.workspace}}\*.vsix
