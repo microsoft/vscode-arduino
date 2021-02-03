@@ -66,7 +66,7 @@ jobs:
   
   Package:
     needs: Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     # if: env.VERSION == '!v0.[0-9].[0-9]-[rR]*'
     steps:
     - run: echo "VERSION=${GITHUB_REF#refs/tags/*/}" >> $GITHUB_ENV
@@ -76,6 +76,18 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 11.x
+    - name: linux setup
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
+        sleep 3
+        wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER
+        tar -xvf /home/$USER/arduino-1.8.2-linux64.tar.xz -C /home/$USER/
+        sudo ln -s /home/$USER/arduino-1.8.2/arduino /usr/bin/arduino
+        sudo apt-get update
+        sudo apt-get install g++-multilib
+        sudo apt-get install -y build-essential
+        sudo apt-get install libudev-dev
     - name: preinstall 
       run: | 
         npm install -g node-gyp
@@ -87,9 +99,11 @@ jobs:
       run: |
         gulp tslint
         gulp genAikey
+        mkdir package
+        cd package
         vsce package
     - name: create artifact
       uses: actions/upload-artifact@v1
       with:
         name: vscode-arduino-${{env.VERSION}}.vsix
-        path: ${{github.workspace}}\*.vsix
+        path: package
