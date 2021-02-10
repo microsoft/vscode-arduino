@@ -107,8 +107,9 @@ jobs:
       id: check-version
       run: |
         if [[ ${{ env.VERSION }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::set-output name=ISPRODUCTION::true"
+            echo ::set-output name=ISPRODUCTION::true
         fi
+        echo "steps.check-version.output.ISPRODUCTION"
     - name: publish
       if: steps.check-version.output.ISPRODUCTION == 'true'
       run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
