@@ -1,0 +1,108 @@
+name: CI-Tests
+on:
+  push:
+    branches:
+      - master
+      - develop
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
+      - develop
+
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }} 
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: get node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 11.x
+      - name: linux setup
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
+          sleep 3
+          wget https://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz -P /home/$USER
+          tar -xvf /home/$USER/arduino-1.8.2-linux64.tar.xz -C /home/$USER/
+          sudo ln -s /home/$USER/arduino-1.8.2/arduino /usr/bin/arduino
+          sudo apt-get update
+          sudo apt-get install g++-multilib
+          sudo apt-get install -y build-essential
+          sudo apt-get install libudev-dev
+      - name: macos setup
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: | 
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+          brew install arduino --cask
+      - name: preinstall 
+        run: | 
+          npm install -g node-gyp
+          npm install -g vsce
+          npm install -g gulp
+      - name: install
+        run: npm install
+      - name: scripts
+        run: |
+          gulp tslint
+          gulp genAikey
+          vsce package
+      - name: run tests
+        if: ${{ matrix.os != 'windows-latest' }}
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: npm test --silent
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: vsix-publishing
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    steps:
+    - run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - run: echo ${{env.VERSION}}
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: get node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 11.x
+    - name: linux setup
+      run: |
+        export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
+        sleep 3
+        sudo apt-get update
+        sudo apt-get install g++-multilib
+        sudo apt-get install -y build-essential
+        sudo apt-get install libudev-dev
+    - name: preinstall 
+      run: | 
+        npm install -g node-gyp
+        npm install -g vsce
+        npm install -g gulp
+    - name: install
+      run: npm install
+    - name: scripts
+      run: |
+        gulp tslint
+        gulp genAikey
+        vsce package
+    - name: upload .vsix to github tag
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.OAUTH_TOKEN }}
+        file: ${{github.workspace}}/vscode-arduino*.vsix
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+    - name: publish
+      if: github.ref == 'refs/tags/[0-9].[0-9].[0-9]'
+      run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
