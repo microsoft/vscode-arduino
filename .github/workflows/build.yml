@@ -103,6 +103,11 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
+    - name: check for production tag
+      id: check-version
+      run: if [[ ${{ env.VERSION }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo ::set-output name=isprod::true 
+            fi
     - name: publish
-      if: ${{ env.VERSION == 'v[0-9]+.[0-9]+.[0-9]+' }}
+      if: steps.check-version.output.isprod == 'true'
       run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
