@@ -104,5 +104,5 @@ jobs:
         overwrite: true
         file_glob: true
     - name: publish
-      if: github.ref == 'refs/tags/[0-9].[0-9].[0-9]'
+      if: github.ref == 'refs/tags/v[0-9].[0-9].[0-9]'
       run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
