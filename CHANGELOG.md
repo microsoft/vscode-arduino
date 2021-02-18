@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.3.5
+
+- Release date: November 22, 2020
+
+### Fixes
+- Update to node-usb-native 0.0.19
+
 ## Version 0.3.4
 
 - Release date: November 22, 2020
