@@ -442,6 +442,11 @@
       "type": "object",
       "title": "Arduino configuration",
       "properties": {
+        "arduino.useActiveSketch": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allows to verify or compile sketch opened in active tab."
+        },
         "arduino.path": {
           "type": "string",
           "default": "",
