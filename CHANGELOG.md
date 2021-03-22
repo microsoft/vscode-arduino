@@ -1,6 +1,24 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.0
+
+### Added
+- Support for Arduino CLI (#1017)
+
+### Changed
+- Autogenerate c_cpp_properties.json with all complier arguments and libraries for IntelliSense (#1183)
+- Detects available programmers for selected board (#1118)
+
+### Fixed
+- Typos
+
+### Breaking Changes
+- Unifies all build commands under a single
+
+### Known Issues
+- Arduino CLI doesn't work on Mac (#1205)
+
 ## Version 0.3.5
 
 - Release date: November 22, 2020

@@ -4,6 +4,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { ARDUINO_CONFIG_FILE } from "./constants";
 
 export class ArduinoWorkspace {
     static get rootPath(): string|undefined {
@@ -14,7 +15,7 @@ export class ArduinoWorkspace {
 
         for (const workspaceFolder of workspaceFolders) {
             const workspaceFolderPath = workspaceFolder.uri.fsPath;
-            const arduinoConfigPath = path.join(workspaceFolderPath, ".vscode", "arduino.json");
+            const arduinoConfigPath = path.join(workspaceFolderPath, ARDUINO_CONFIG_FILE);
             if (fs.existsSync(arduinoConfigPath)) {
                 return workspaceFolderPath;
             }

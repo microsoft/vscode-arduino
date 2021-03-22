@@ -19,7 +19,7 @@ function getEntry() {
     fs.copySync(p, 'out/node_modules/' + mod);
   }
 
-  const list = getDependeciesFromNpm(mod);
+  const list = getDependenciesFromNpm(mod);
   const moduleList = list.filter((value, index, self) => {
     return self.indexOf(value) === index && unbundledModule.indexOf(value) === -1 && !/^@types\//.test(value);
   });
@@ -31,7 +31,7 @@ function getEntry() {
   return entry;
 }
 
-function getDependeciesFromNpm(mod) {
+function getDependenciesFromNpm(mod) {
   let list = [];
   const deps = mod.dependencies;
   if (!deps) {
@@ -39,7 +39,7 @@ function getDependeciesFromNpm(mod) {
   }
   for (const m of Object.keys(deps)) {
     list.push(m);
-    list = list.concat(getDependeciesFromNpm(deps[m]));
+    list = list.concat(getDependenciesFromNpm(deps[m]));
   }
   return list;
 }

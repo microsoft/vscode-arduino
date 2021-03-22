@@ -27,10 +27,9 @@ const completionProviderModule = impor("./langService/completionProvider") as ty
 import * as Logger from "./logger/logger";
 const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
+import { BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
-
-const status: any = {};
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
@@ -43,8 +42,8 @@ export async function activate(context: vscode.ExtensionContext) {
         const workingFile = path.normalize(openEditor.document.fileName);
         const workspaceFolder = (vscode.workspace && ArduinoWorkspace.rootPath) || "";
         if (!workspaceFolder || workingFile.indexOf(path.normalize(workspaceFolder)) < 0) {
-            vscode.window.showWarningMessage(`The working file "${workingFile}" is not under the workspace folder, ` +
-                "the arduino extension might not work appropriately.");
+            vscode.window.showWarningMessage(`The open file "${workingFile}" is not inside the workspace folder, ` +
+                "the arduino extension might not work properly.");
         }
     }
     const vscodeSettings = VscodeSettings.getInstance();
@@ -91,7 +90,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
             const arduinoPath = arduinoContextModule.default.arduinoApp.settings.arduinoPath;
             const commandPath = arduinoContextModule.default.arduinoApp.settings.commandPath;
-            if (!arduinoPath || !validateArduinoPath(arduinoPath)) { // Pop up vscode User Settings page when cannot resolve arduino path.
+            const useArduinoCli = arduinoContextModule.default.arduinoApp.settings.useArduinoCli;
+            // Pop up vscode User Settings page when cannot resolve arduino path.
+            if (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli)) {
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             } else if (!commandPath || !util.fileExistsSync(commandPath)) {
@@ -114,18 +115,13 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
 
     registerArduinoCommand("arduino.verify", async () => {
-        if (!status.compile) {
-            status.compile = "verify";
-            try {
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Verifying...",
-                }, async () => {
-                    await arduinoContextModule.default.arduinoApp.verify();
-                });
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Verifying...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Verify);
+            });
         }
     }, () => {
         return {
@@ -135,18 +131,26 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.upload", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
-            try {
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Arduino: Uploading...",
-                }, async () => {
-                    await arduinoContextModule.default.arduinoApp.upload();
-                });
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Upload);
+            });
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.cliUpload", async () => {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Using CLI to upload...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.CliUpload);
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
@@ -174,26 +178,55 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
-            try {
-                await arduinoContextModule.default.arduinoApp.uploadUsingProgrammer();
-            } catch (ex) {
-            }
-            delete status.compile;
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Uploading (programmer)...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.UploadProgrammer);
+            });
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.cliUploadUsingProgrammer", async () => {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Using CLI to upload (programmer)...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.CliUploadProgrammer);
+            });
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name };
+    });
+
+    registerArduinoCommand("arduino.rebuildIntelliSenseConfig", async () => {
+        if (!arduinoContextModule.default.arduinoApp.building) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Rebuilding IS Configuration...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.build(BuildMode.Analyze);
+            });
         }
     }, () => {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
     registerArduinoCommand("arduino.selectProgrammer", async () => {
-        if (!status.compile) {
-            status.compile = "upload";
+        // Note: this guard does not prevent building while setting the
+        // programmer. But when looking at the code of selectProgrammer
+        // it seems not to be possible to trigger building while setting
+        // the programmer. If the timed IntelliSense analysis is triggered
+        // this is not a problem, since it doesn't use the programmer.
+        if (!arduinoContextModule.default.arduinoApp.building) {
             try {
                 await arduinoContextModule.default.arduinoApp.programmerManager.selectProgrammer();
             } catch (ex) {
             }
-            delete status.compile;
         }
     }, () => {
         return {
@@ -202,7 +235,6 @@ export async function activate(context: vscode.ExtensionContext) {
         };
     });
 
-    registerArduinoCommand("arduino.addLibPath", (path) => arduinoContextModule.default.arduinoApp.addLibPath(path));
     registerArduinoCommand("arduino.openExample", (path) => arduinoContextModule.default.arduinoApp.openExample(path));
     registerArduinoCommand("arduino.loadPackages", async () => await arduinoContextModule.default.boardManager.loadPackages(true));
     registerArduinoCommand("arduino.installBoard", async (packageName, arch, version: string = "") => {
@@ -255,8 +287,6 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            arduinoContextModule.default.boardManager.updateStatusBar(true);
-            arduinoContextModule.default.arduinoApp.tryToUpdateIncludePaths();
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
     }
@@ -272,7 +302,6 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize();
             }
-            arduinoContextModule.default.boardManager.updateStatusBar(true);
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         }
     });
@@ -304,8 +333,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 
-    setTimeout(() => {
+    setTimeout(async () => {
         const arduinoManagerProvider = new arduinoContentProviderModule.ArduinoContentProvider(context.extensionPath);
+        await arduinoManagerProvider.initialize();
+
         context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
         registerArduinoCommand("arduino.showBoardManager", async () => {
             const panel = vscode.window.createWebviewPanel("arduinoBoardManager", "Arduino Board Manager", vscode.ViewColumn.Two, {

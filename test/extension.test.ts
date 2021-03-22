@@ -37,6 +37,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.verify",
                     "arduino.upload",
                     "arduino.uploadUsingProgrammer",
+                    "arduino.rebuildIntelliSenseConfig",
                     "arduino.selectProgrammer",
                     "arduino.showBoardManager",
                     "arduino.showLibraryManager",
@@ -44,7 +45,6 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.showExamples",
                     "arduino.changeBoardType",
                     "arduino.initialize",
-                    "arduino.addLibPath",
                     "arduino.selectSerialPort",
                     "arduino.openSerialMonitor",
                     "arduino.changeBaudRate",
@@ -55,6 +55,8 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.loadPackages",
                     "arduino.installBoard",
                     "arduino.setSketchFile",
+                    "arduino.cliUpload",
+                    "arduino.cliUploadUsingProgrammer",
                 ];
 
                 const foundArduinoCommands = commands.filter((value) => {
