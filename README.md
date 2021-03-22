@@ -16,10 +16,18 @@ Welcome to the Visual Studio Code extension for **Arduino** <sup>preview</sup> !
 * Integrated Arduino Debugging <sup>New</sup>
 
 ## Prerequisites
-The Arduino IDE is required. Please install it from the [download page](https://www.arduino.cc/en/main/software#download).
+Either the Arduino IDE or Arduino CLI are required.
+
+### Arduino IDE
+The Arduino IDE can be installed the Arduino [download page](https://www.arduino.cc/en/main/software#download).
 - The supported Arduino IDE versions are `1.6.x` and later.
 - The Windows Store's version of the Arduino IDE is not supported because of the sandbox environment that the application runs in.
 - *Note:* Arduino IDE `1.8.7` has some breaking changes, causing board package and library installation failures.
+
+### Arduino CLI
+The Arduino CLI can be downloaded from the repository's [release page](https://github.com/arduino/arduino-cli/releases/tag/0.13.0)
+- The extension has only been tested with v0.13.0.
+- If you use the CLI you will have to set `arduino.path` since the CLI does not have a defualt path. 
 
 ## Installation
 Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
@@ -48,7 +56,9 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Select Serial Port**: Change the current serial port.
 - **Arduino: Send Text to Serial Port**: Send a line of text via the current serial port.
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
+- **Arduino: CLI Upload**: Upload complied code without building sketch (CLI only).
 - **Arduino: Upload Using Programmer**: Upload using an external programmer.
+- **Arduino: CLI Upload Using Programmer**: Upload using an external programmer without building sketch (CLI only).
 - **Arduino: Verify**: Build sketch.
 - **Arduino: Rebuild IntelliSense Configuration**: Forced/manual rebuild of the IntelliSense configuration. The extension analyzes Arduino's build output and sets the Intellisense include paths, defines, compiler arguments accordingly.
 
