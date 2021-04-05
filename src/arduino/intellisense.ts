@@ -93,7 +93,16 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
                                                             ccp.CCppPropertiesCStandard.C11,
                                                             ccp.CCppPropertiesCppStandard.Cpp11,
                                                             forcedIncludes);
+
+        // The following 4 lines are added to prevent null.d from being created in the workspace
+        // directory on MacOS and Linux. This is may be a bug in intelliSense
+        const mmdIndex = runner.result.options.findIndex((element) => element === "-MMD");
+        if (mmdIndex) {
+            runner.result.options.splice(mmdIndex);
+        }
+
         try {
+
             const cmd = os.platform() === "darwin" ? "Cmd" : "Ctrl";
             const help = `To manually rebuild your IntelliSense configuration run "${cmd}+Alt+I"`;
             const pPath = path.join(ArduinoWorkspace.rootPath, constants.CPP_CONFIG_FILE);

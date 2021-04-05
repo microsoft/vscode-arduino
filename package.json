@@ -2,12 +2,12 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.53.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -36,7 +36,9 @@
     "*",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
+    "onCommand:arduino.cliUpload",
     "onCommand:arduino.uploadUsingProgrammer",
+    "onCommand:arduiono.cliUploadUsingProgrammer",
     "onCommand:arduino.rebuildIntelliSenseConfig",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
@@ -616,7 +618,7 @@
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
-    "node-usb-native": "^0.0.18",
+    "node-usb-native": "^0.0.19",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.1.6",
