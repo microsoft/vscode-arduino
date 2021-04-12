@@ -42,6 +42,7 @@
     "onCommand:arduino.rebuildIntelliSenseConfig",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
+    "onCommand:arduino.selectSketch",
     "onCommand:arduino.changeBaudRate",
     "onCommand:arduino.openSerialMonitor",
     "onCommand:arduino.sendMessageToSerialPort",
@@ -114,6 +115,10 @@
       {
         "command": "arduino.selectProgrammer",
         "title": "Arduino: Select Programmer"
+      },
+      {
+        "command": "arduino.selectSketch",
+        "title": "Arduino: Select Sketch"
       },
       {
         "command": "arduino.selectSerialPort",
