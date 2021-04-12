@@ -54,7 +54,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.showExampleExplorer",
                     "arduino.loadPackages",
                     "arduino.installBoard",
-                    "arduino.setSketchFile",
+                    "arduino.selectSketch",
                     "arduino.cliUpload",
                     "arduino.cliUploadUsingProgrammer",
                 ];
