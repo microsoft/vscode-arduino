@@ -101,6 +101,9 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
             runner.result.options.splice(mmdIndex);
         }
 
+        // Add USB Connected marco to defines
+        runner.result.defines.push("USBCON")
+
         try {
 
             const cmd = os.platform() === "darwin" ? "Cmd" : "Ctrl";
