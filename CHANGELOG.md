@@ -1,6 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.1
+
+### Added
+- Quickpick sketch selection (#1128) Thanks @maddogjt
+
+### Fixed
+- Arduino CLI on MacOS (#1227) Thanks @awmichel
+- Typos (#1226, #1225, #1191) Thanks @jogo- @CBielstein
+- add USBCON back into IntelliSense config (#1231)
+- Update depedencies
+
 ## Version 0.4.0
 
 ### Added
