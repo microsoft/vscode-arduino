@@ -208,7 +208,7 @@ export function spawn(
         let codepage = "65001";
         if (os.platform() === "win32") {
             try {
-                const chcp = child_process.execSync("chcp.com");
+                const chcp = child_process.execSync(`chcp.com ${codepage}`);
                 codepage = chcp.toString().split(":").pop().trim();
             } catch (error) {
                 arduinoChannel.warning(`Defaulting to code page 850 because chcp.com failed.\
