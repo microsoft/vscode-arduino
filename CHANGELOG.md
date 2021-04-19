@@ -4,22 +4,23 @@ All notable changes to this project will be documented in this file.
 ## Version 0.4.1
 
 ### Added
-- Quickpick sketch selection (#1128) Thanks @maddogjt
+- Quickpick sketch selection [#1128](https://github.com/microsoft/vscode-arduino/pull/1128) Thanks [@maddogjt](https://github.com/maddogjt)
 
 ### Fixed
-- Arduino CLI on MacOS (#1227) Thanks @awmichel
-- Typos (#1226, #1225, #1191) Thanks @jogo- @CBielstein
-- add USBCON back into IntelliSense config (#1231)
+- Arduino CLI on MacOS [#1221](https://github.com/microsoft/vscode-arduino/issues/1221) Thanks [@awmichel](https://github.com/awmichel)
+- Typos [#1226](https://github.com/microsoft/vscode-arduino/pull/1226), [#1225](https://github.com/microsoft/vscode-arduino/pull/1225), [#1191](https://github.com/microsoft/vscode-arduino/pull/1191) Thanks [@jogo-](https://github.com/jogo-) [@CBielstein](https://github.com/CBielstein)
+- add USBCON back into IntelliSense config [#1216](https://github.com/microsoft/vscode-arduino/issues/1216)
 - Update depedencies
+- App Insights key in Actions [#1236](https://github.com/microsoft/vscode-arduino/pull/1236)
 
 ## Version 0.4.0
 
 ### Added
-- Support for Arduino CLI (#1017)
+- Support for Arduino CLI #1017
 
 ### Changed
-- Autogenerate c_cpp_properties.json with all complier arguments and libraries for IntelliSense (#1183)
-- Detects available programmers for selected board (#1118)
+- Autogenerate c_cpp_properties.json with all complier arguments and libraries for IntelliSense #1183
+- Detects available programmers for selected board #1118
 
 ### Fixed
 - Typos
@@ -28,7 +29,7 @@ All notable changes to this project will be documented in this file.
 - Unifies all build commands under a single
 
 ### Known Issues
-- Arduino CLI doesn't work on Mac (#1205)
+- Arduino CLI doesn't work on Mac [#1205](https://github.com/microsoft/vscode-arduino/issues/1205)
 
 ## Version 0.3.5
 
