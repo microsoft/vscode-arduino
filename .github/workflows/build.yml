@@ -53,7 +53,6 @@ jobs:
       - name: scripts
         run: |
           gulp tslint
-          gulp genAikey
           vsce package
       - name: run tests
         if: ${{ matrix.os != 'windows-latest' }}
@@ -93,7 +92,6 @@ jobs:
     - name: scripts
       run: |
         gulp tslint
-        gulp genAikey
         vsce package
     - name: upload .vsix to github tag
       uses: svenstaro/upload-release-action@v2
@@ -111,4 +109,8 @@ jobs:
         fi
     - name: publish
       if: steps.check-version.outputs.ISPRODUCTION == 'true'
-      run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
+      env:
+        PROD_AIKEY: ${{ secrets.PROD_AIKEY }}
+      run: | 
+        gulp genAikey
+        vsce publish -p ${{ secrets.VSCE_TOKEN }}

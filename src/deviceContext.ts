@@ -112,7 +112,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             this._watcher.onDidDelete(() => this.loadContext());
             this._vscodeWatcher.onDidDelete(() => this.loadContext());
             this._sketchStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.SKETCH);
-            this._sketchStatusBar.command = "arduino.setSketchFile";
+            this._sketchStatusBar.command = "arduino.selectSketch";
             this._sketchStatusBar.tooltip = "Sketch File";
         }
     }
