@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.2
+
+### Fixed
+- Update app insights key
+
 ## Version 0.4.1
 
 ### Added
@@ -10,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - Arduino CLI on MacOS [#1221](https://github.com/microsoft/vscode-arduino/issues/1221) Thanks [@awmichel](https://github.com/awmichel)
 - Typos [#1226](https://github.com/microsoft/vscode-arduino/pull/1226), [#1225](https://github.com/microsoft/vscode-arduino/pull/1225), [#1191](https://github.com/microsoft/vscode-arduino/pull/1191) Thanks [@jogo-](https://github.com/jogo-) [@CBielstein](https://github.com/CBielstein)
 - add USBCON back into IntelliSense config [#1216](https://github.com/microsoft/vscode-arduino/issues/1216)
-- Update depedencies
+- Update dependencies
 - App Insights key in Actions [#1236](https://github.com/microsoft/vscode-arduino/pull/1236)
 
 ## Version 0.4.0
