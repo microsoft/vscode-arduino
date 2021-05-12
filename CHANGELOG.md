@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.3
+
+### Fixed
+- Update node-usb-native to v0.0.20 to fix serial and port selecting [#1257](https://github.com/microsoft/vscode-arduino/issues/1257)
+- Updated dependencies
+
 ## Version 0.4.2
 
 ### Fixed

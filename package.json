@@ -2,12 +2,12 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
   "engines": {
-    "vscode": "^1.53.0"
+    "vscode": "^1.56.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -618,7 +618,7 @@
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
-    "node-usb-native": "^0.0.19",
+    "node-usb-native": "^0.0.20",
     "properties": "^1.2.1",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.1.6",
