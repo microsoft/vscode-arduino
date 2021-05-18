@@ -140,7 +140,7 @@ The following settings are as per sketch settings of the Arduino extension. You 
 }
 ```
 
-## Pre- and Post-Build Commands
+## Pre-, Successful-, Failed-, and Post-Build Commands
 On Windows the commands run within a `cmd`-, on Linux and OSX within a `bash`-instance. Therefore your command can be anything what you can run within those shells. Instead of running a command you can invoke a script. This makes writing more complex pre-/post-build mechanisms much easier and opens up the possibility to run python or other scripting languages.
 The commands run within the workspace root directory and vscode-arduino sets the following environment variables:  
 **`VSCA_BUILD_MODE`** The current build mode, one of `Verifying`, `Uploading`, `Uploading (programmer)` or `Analyzing`. This allows you to run your script on certain build modes only.  
