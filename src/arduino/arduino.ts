@@ -737,8 +737,7 @@ export class ArduinoApp {
             } else {
                 ret = await this.runPrePostBuildCommand(dc, env, "failed");
             }
-            // Do we need to handle a return value for this case?
-            await this.runPrePostBuildCommand(dc, env, "post");
+            ret = await this.runPrePostBuildCommand(dc, env, "post");
             await cocopa.conclude();
             if (buildMode === BuildMode.Upload || buildMode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
