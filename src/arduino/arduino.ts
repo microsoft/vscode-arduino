@@ -725,9 +725,14 @@ export class ArduinoApp {
             }
             return ret;
         }
+        let stdoutbuf = ""
         const stdoutcb = (line: string) => {
             if (cocopa.callback) {
-                cocopa.callback(line);
+                stdoutbuf += line
+                let lines = [stdoutbuf];
+                lines = stdoutbuf.split('\n');
+                stdoutbuf = lines.pop()!;
+                lines.forEach((line) => cocopa.callback(line));
             }
             if (verbose) {
                 arduinoChannel.channel.append(line);
