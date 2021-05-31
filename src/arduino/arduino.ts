@@ -725,12 +725,11 @@ export class ArduinoApp {
             }
             return ret;
         }
-        let stdoutbuf = ""
+        let stdoutbuf = "";
         const stdoutcb = (line: string) => {
             if (cocopa.callback) {
-                stdoutbuf += line
-                let lines = [stdoutbuf];
-                lines = stdoutbuf.split('\n');
+                stdoutbuf += line;
+                let lines = stdoutbuf.split('\n');
                 stdoutbuf = lines.pop()!;
                 lines.forEach((line) => cocopa.callback(line));
             }
