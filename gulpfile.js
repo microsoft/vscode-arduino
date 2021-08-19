@@ -7,6 +7,8 @@ const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
 const webpack = require("webpack");
 const del = require('del');
+const download = require("download");
+const extract = require("extract-zip");
 const fs = require("fs");
 const path = require("path");
 const childProcess = require("child_process");
@@ -60,6 +62,26 @@ gulp.task("node_modules-webpack", (done) => {
         done();
     });
 });
+
+gulp.task("insert-serial-monitor-cli", async (done) => {
+    const platforms = [
+        "linux",
+        "macos",
+        "windows",
+    ]
+    const release = "latest"
+    const destDir = path.resolve("out", "serial-monitor-cli")
+
+    async function downloadAndUnzip(platform) {
+        const fileName = `${platform}.zip`;
+        const zipPath = path.join(destDir, fileName);
+        await download(`https://github.com/microsoft/serial-monitor-cli/releases/${release}/download/${fileName}`, destDir);
+        await extract(zipPath, { dir: path.join(destDir, platform) });
+        fs.rmSync(zipPath);
+    }
+
+    Promise.all(platforms.map(downloadAndUnzip)).then(done);
+})
 
 gulp.task("ts-compile", () => {
     const tsProject = ts.createProject("./tsconfig.json");
@@ -132,7 +154,8 @@ gulp.task("test", (done) => {
     });
 });
 
-gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack"));
+gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack", "insert-serial-monitor-cli"));
+
 
 gulp.task("build_without_view", gulp.series("clean", "ts-compile"));
 
