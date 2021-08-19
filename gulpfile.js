@@ -154,7 +154,7 @@ gulp.task("test", (done) => {
     });
 });
 
-gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack", "insert-serial-monitor-cli"));
+gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack", /* "insert-serial-monitor-cli" */));
 
 gulp.task("build_without_view", gulp.series("clean", "ts-compile"));
 
