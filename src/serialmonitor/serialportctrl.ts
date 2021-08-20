@@ -3,8 +3,9 @@
 
 import { ChildProcess, execFileSync, spawn  } from "child_process";
 import * as os from "os";
+import * as path from "path";
 import { OutputChannel } from "vscode";
-import { VscodeSettings } from "../arduino/vscodeSettings";
+import { DeviceContext } from "../deviceContext";
 
 interface ISerialPortDetail {
   port: string;
@@ -23,7 +24,17 @@ export class SerialPortCtrl {
     return lists;
   }
 
-  private static _serialCliPath: string = "D:/source/github/serial-monitor-cli/dist/main.exe";
+  private static get _serialCliPath(): string {
+    let fileName: string;
+    if (os.platform() === "win32") {
+        fileName = "main.exe"
+    } else if (os.platform() === "linux" || os.platform() === "darwin") {
+        fileName = "main"
+    }
+    const deviceContext = DeviceContext.getInstance();
+    return path.resolve(deviceContext.extensionPath, "out", "serial-monitor-cli", `${os.platform}`, fileName);
+  }
+
   private _child: ChildProcess;
   private _currentPort: string;
   private _currentBaudRate: number;
