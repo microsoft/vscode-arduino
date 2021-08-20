@@ -66,8 +66,8 @@ gulp.task("node_modules-webpack", (done) => {
 gulp.task("insert-serial-monitor-cli", async (done) => {
     const platforms = [
         "linux",
-        "macos",
-        "windows",
+        "darwin",
+        "win32",
     ]
     const release = "latest"
     const destDir = path.resolve("out", "serial-monitor-cli")
