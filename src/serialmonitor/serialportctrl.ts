@@ -56,17 +56,18 @@ export class SerialPortCtrl {
     return this._currentPort;
   }
 
-  public open(): Promise<any> {
+  public open(): Promise<void> {
     this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
     this._outputChannel.show();
 
     if (this._child) {
-        this._child.stdin.write("close\n");
+        this.stop();
     }
-    this._child = spawn(SerialPortCtrl._serialCliPath,
-                        ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "--json"])
 
     return new Promise((resolve, reject) => {
+        this._child = spawn(SerialPortCtrl._serialCliPath,
+            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "--json"])
+
         this._child.on("error", (err) => {
             reject(err)
         });
@@ -75,20 +76,25 @@ export class SerialPortCtrl {
             const jsonObj = JSON.parse(data.toString())
             this._outputChannel.append(jsonObj["payload"] + "\n");
         });
-        resolve(true);
+        // TODO: add message check to ensure _child spawned without errors
+        resolve();
+        // this._child.on("spawn", (spawn) => {
+        //     resolve();
+        // });
+
      });
   }
 
-  public sendMessage(text: string): Promise<any> {
+  public sendMessage(text: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!text || !this._currentSerialPort || !this.isActive) {
-        resolve(false);
+        resolve();
         return;
       }
 
       this._currentSerialPort.write(text + "\r\n", (error) => {
         if (!error) {
-          resolve(true);
+          resolve();
         } else {
           return reject(error);
         }
@@ -96,15 +102,15 @@ export class SerialPortCtrl {
     });
   }
 
-  public changePort(newPort: string): Promise<any> {
+  public changePort(newPort: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (newPort === this._currentPort) {
-        resolve(true);
+        resolve();
         return;
       }
       this._currentPort = newPort;
       if (!this._currentSerialPort || !this.isActive) {
-        resolve(false);
+        resolve();
         return;
       }
       this._currentSerialPort.close((err) => {
@@ -112,14 +118,13 @@ export class SerialPortCtrl {
           reject(err);
         } else {
           this._currentSerialPort = null;
-          resolve(true);
+          resolve();
         }
       });
     });
   }
 
-  public stop(): Promise<any> {
-    this._child.stdin.write('{"cmd": "close"}\n');
+  public stop(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (!this.isActive) {
         resolve(false);
@@ -138,18 +143,17 @@ export class SerialPortCtrl {
       });
   }
 
-  public changeBaudRate(newRate: number): Promise<any> {
-    // this._outputChannel.appendLine(this.isActive.toString());
+  public changeBaudRate(newRate: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this._currentBaudRate = newRate;
       if (!this._child || !this.isActive) {
-        resolve(true);
+        resolve();
         return;
       } else {
             try {
                 this.stop();
                 this.open();
-                resolve(true);
+                resolve();
             } catch (error) {
                 reject(error);
             }
