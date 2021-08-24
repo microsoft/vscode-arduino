@@ -148,10 +148,10 @@ export class SerialPortCtrl {
     });
   }
 
-  public stop(): Promise<void> {
+  public stop(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (!this.isActive) {
-        resolve();
+        resolve(false);
         return;
       }
       try {
@@ -160,7 +160,7 @@ export class SerialPortCtrl {
           this._outputChannel.appendLine(`[Done] Closed the serial port ${os.EOL}`);
         }
         this._child = null;
-        resolve();
+        resolve(true);
       } catch (error) {
           reject(error);
       }
