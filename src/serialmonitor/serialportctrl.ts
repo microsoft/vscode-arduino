@@ -29,8 +29,8 @@ export class SerialPortCtrl {
     const lists = JSON.parse(stdout);
     lists.forEach((port) => {
         const vidPid = this._parseVidPid(port["hwid"]);
-        port["vendorId"] = vidPid[0];
-        port["productId"] = vidPid[1];
+        port["vendorId"] = vidPid["vid"];
+        port["productId"] = vidPid["pid"];
     });
     return lists;
   }
@@ -43,16 +43,8 @@ export class SerialPortCtrl {
    * @returns vendor id and product id values in an array. Returns null if none are found.
    */
   private static _parseVidPid(hwid: string): any {
-    let vidPidValues = [];
-    const re = /VID:PID/gi
-    if (hwid.search(re) !== -1) {
-        const hwidSplit = hwid.split(" ");
-        const vidPid = hwidSplit[1].split("=")
-        vidPidValues = vidPid[1].split(":")
-    } else {
-        vidPidValues = [null, null];
-    }
-    return vidPidValues
+    const result = hwid.match(/VID:PID=(?<vid>\w+):(?<pid>\w+)/i);
+    return result !== null ? result["groups"] : [null, null];
   }
 
   private static get _serialCliPath(): string {
@@ -156,10 +148,10 @@ export class SerialPortCtrl {
     });
   }
 
-  public stop(): Promise<boolean> {
+  public stop(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.isActive) {
-        resolve(false);
+        resolve();
         return;
       }
       try {
@@ -168,7 +160,7 @@ export class SerialPortCtrl {
           this._outputChannel.appendLine(`[Done] Closed the serial port ${os.EOL}`);
         }
         this._child = null;
-        resolve(true);
+        resolve();
       } catch (error) {
           reject(error);
       }
