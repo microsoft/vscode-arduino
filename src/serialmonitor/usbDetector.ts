@@ -43,14 +43,11 @@ export class UsbDetector {
     }
 
     public async startListening() {
-        // This code is unreachable since the usbDector module is not longer being used. It's currenlty kept here for
-        // refrence for an alternative method to be used in the future.
-        return;
         const enableUSBDetection = VscodeSettings.getInstance().enableUSBDetection;
         if (os.platform() === "linux" || !enableUSBDetection) {
             return;
         }
-        // this._usbDetector = require("node-usb-native").detector;
+        this._usbDetector = require("node-usb-native").detector;
 
         if (!this._usbDetector) {
             return;
