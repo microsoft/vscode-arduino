@@ -103,9 +103,9 @@ export class SerialMonitor implements vscode.Disposable {
             const foundPort = lists.find((p) => {
                 // The pid and vid returned by SerialPortCtrl start with 0x prefix in Mac, but no 0x prefix in Win32.
                 // Should compare with decimal value to keep compatibility.
-                // if (p.productId && p.vendorId) {
-                //     return parseInt(p.productId, 16) === valueOfPid && parseInt(p.vendorId, 16) === valueOfVid;
-                // }
+                if (p.productId && p.vendorId) {
+                    return parseInt(p.productId, 16) === valueOfPid && parseInt(p.vendorId, 16) === valueOfVid;
+                }
                 return false;
             });
             if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {

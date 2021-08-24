@@ -503,7 +503,8 @@
         },
         "arduino.enableUSBDetection": {
           "type": "boolean",
-          "default": true
+          "default": false,
+          "description": "USB Detection is currently not working"
         },
         "arduino.disableTestingOpen": {
           "type": "boolean",

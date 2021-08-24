@@ -11,17 +11,40 @@ interface ISerialPortDetail {
   port: string;
   desc: string;
   hwid: string;
-//   vendorId: string;
-//   productId: string;
+  vendorId: string;
+  productId: string;
 }
 
 export class SerialPortCtrl {
 
+/**
+ * Launches the serial monitor to check which external usb devices are connected.
+ *
+ * @returns An array of ISerialPortDetail from external serial devices.
+ *
+ */
   public static list(): Promise<ISerialPortDetail[]> {
     // TODO: Wrap this in a try catch block, catch error if no serial monitor at path
     const stdout =  execFileSync(SerialPortCtrl._serialCliPath, ["list-ports"]);
     const lists = JSON.parse(stdout);
+    lists.forEach((port) => {
+        const vidPid = this._parseVidPid(port["hwid"]);
+        port["vendorId"] = vidPid["vid"];
+        port["productId"] = vidPid["pid"];
+    });
     return lists;
+  }
+
+  /**
+   * Parse out vendor id and product id from the hardware id provided by the device.
+   *
+   * @param hwid: The hardware information for a sepcific device
+   *
+   * @returns vendor id and product id values in an array. Returns null if none are found.
+   */
+  private static _parseVidPid(hwid: string): any {
+    const result = hwid.match(/VID:PID=(?<vid>\w+):(?<pid>\w+)/i);
+    return result !== null ? result["groups"] : [null, null];
   }
 
   private static get _serialCliPath(): string {
@@ -56,17 +79,18 @@ export class SerialPortCtrl {
     return this._currentPort;
   }
 
-  public open(): Promise<any> {
+  public open(): Promise<void> {
     this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
     this._outputChannel.show();
 
     if (this._child) {
-        this._child.stdin.write("close\n");
+        this.stop();
     }
-    this._child = spawn(SerialPortCtrl._serialCliPath,
-                        ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "--json"])
 
     return new Promise((resolve, reject) => {
+        this._child = spawn(SerialPortCtrl._serialCliPath,
+            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "--json"])
+
         this._child.on("error", (err) => {
             reject(err)
         });
@@ -75,20 +99,26 @@ export class SerialPortCtrl {
             const jsonObj = JSON.parse(data.toString())
             this._outputChannel.append(jsonObj["payload"] + "\n");
         });
-        resolve(true);
+        // TODO: add message check to ensure _child spawned without errors
+        resolve();
+        // The spawn event is only supported in node v15+ vscode
+        // this._child.on("spawn", (spawn) => {
+        //     resolve();
+        // });
+
      });
   }
 
-  public sendMessage(text: string): Promise<any> {
+  public sendMessage(text: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!text || !this._currentSerialPort || !this.isActive) {
-        resolve(false);
+        resolve();
         return;
       }
 
       this._currentSerialPort.write(text + "\r\n", (error) => {
         if (!error) {
-          resolve(true);
+          resolve();
         } else {
           return reject(error);
         }
@@ -96,15 +126,15 @@ export class SerialPortCtrl {
     });
   }
 
-  public changePort(newPort: string): Promise<any> {
+  public changePort(newPort: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (newPort === this._currentPort) {
-        resolve(true);
+        resolve();
         return;
       }
       this._currentPort = newPort;
       if (!this._currentSerialPort || !this.isActive) {
-        resolve(false);
+        resolve();
         return;
       }
       this._currentSerialPort.close((err) => {
@@ -112,14 +142,13 @@ export class SerialPortCtrl {
           reject(err);
         } else {
           this._currentSerialPort = null;
-          resolve(true);
+          resolve();
         }
       });
     });
   }
 
-  public stop(): Promise<any> {
-    this._child.stdin.write('{"cmd": "close"}\n');
+  public stop(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (!this.isActive) {
         resolve(false);
@@ -138,18 +167,17 @@ export class SerialPortCtrl {
       });
   }
 
-  public changeBaudRate(newRate: number): Promise<any> {
-    // this._outputChannel.appendLine(this.isActive.toString());
+  public changeBaudRate(newRate: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this._currentBaudRate = newRate;
       if (!this._child || !this.isActive) {
-        resolve(true);
+        resolve();
         return;
       } else {
             try {
                 this.stop();
                 this.open();
-                resolve(true);
+                resolve();
             } catch (error) {
                 reject(error);
             }
