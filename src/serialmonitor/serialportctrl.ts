@@ -11,17 +11,48 @@ interface ISerialPortDetail {
   port: string;
   desc: string;
   hwid: string;
-//   vendorId: string;
-//   productId: string;
+  vendorId: string;
+  productId: string;
 }
 
 export class SerialPortCtrl {
 
+/**
+ * Launches the serial monitor to check which external usb devices are connected.
+ *
+ * @returns An array of ISerialPortDetail from external serial devices.
+ *
+ */
   public static list(): Promise<ISerialPortDetail[]> {
     // TODO: Wrap this in a try catch block, catch error if no serial monitor at path
     const stdout =  execFileSync(SerialPortCtrl._serialCliPath, ["list-ports"]);
     const lists = JSON.parse(stdout);
+    lists.forEach((port) => {
+        const vidPid = this._parseVidPid(port["hwid"]);
+        port["vendorId"] = vidPid[0];
+        port["productId"] = vidPid[1];
+    });
     return lists;
+  }
+
+  /**
+   * Parse out vendor id and product id from the hardware id provided by the device.
+   *
+   * @param hwid: The hardware information for a sepcific device
+   *
+   * @returns vendor id and product id values in an array. Returns null if none are found.
+   */
+  private static _parseVidPid(hwid: string): any {
+    let vidPidValues = [];
+    const re = /VID:PID/gi
+    if (hwid.search(re) !== -1) {
+        const hwidSplit = hwid.split(" ");
+        const vidPid = hwidSplit[1].split("=")
+        vidPidValues = vidPid[1].split(":")
+    } else {
+        vidPidValues = [null, null];
+    }
+    return vidPidValues
   }
 
   private static get _serialCliPath(): string {
@@ -78,6 +109,7 @@ export class SerialPortCtrl {
         });
         // TODO: add message check to ensure _child spawned without errors
         resolve();
+        // The spawn event is only supported in node v15+ vscode
         // this._child.on("spawn", (spawn) => {
         //     resolve();
         // });

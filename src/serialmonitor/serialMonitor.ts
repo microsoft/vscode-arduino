@@ -12,8 +12,8 @@ export interface ISerialPortDetail {
   port: string;
   desc: string;
   hwid: string;
-//   vendorId: string;
-//   productId: string;
+  vendorId: string;
+  productId: string;
 }
 
 export class SerialMonitor implements vscode.Disposable {
@@ -101,12 +101,11 @@ export class SerialMonitor implements vscode.Disposable {
             const valueOfVid = parseInt(vid, 16);
             const valueOfPid = parseInt(pid, 16);
             const foundPort = lists.find((p) => {
-                // V0.0.3 of the serial monitor cli doesn't return vid/pid, but future versions will.
                 // The pid and vid returned by SerialPortCtrl start with 0x prefix in Mac, but no 0x prefix in Win32.
                 // Should compare with decimal value to keep compatibility.
-                // if (p.productId && p.vendorId) {
-                //     return parseInt(p.productId, 16) === valueOfPid && parseInt(p.vendorId, 16) === valueOfVid;
-                // }
+                if (p.productId && p.vendorId) {
+                    return parseInt(p.productId, 16) === valueOfPid && parseInt(p.vendorId, 16) === valueOfVid;
+                }
                 return false;
             });
             if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {
