@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.4
+
+### Changed
+- Serial monitor uses a new backend which doesn't break with updates of VSCode. [#1322](https://github.com/microsoft/vscode-arduino/pull/1322)
+
 ## Version 0.4.3
 
 ### Fixed
