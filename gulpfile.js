@@ -1,26 +1,27 @@
 const gulp = require("gulp");
-const eslint = require('gulp-eslint');
+const eslint = require("gulp-eslint");
 const tslint = require("gulp-tslint");
-const gutil = require("gulp-util");
+const PluginError = require("plugin-error");
+const log = require("fancy-log");
 const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
 const webpack = require("webpack");
-const runSequence = require('run-sequence');
-const del = require('del');
-
+const del = require("del");
+const download = require("download");
+const extract = require("extract-zip");
 const fs = require("fs");
 const path = require("path");
 const childProcess = require("child_process");
+const argv = require("minimist")(process.argv.slice(2));
 
-//...
 gulp.task("tslint", () => {
-    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!node_modules/**", "!./src/views/node_modules/**"])
+    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!./vendor/**", "!node_modules/**", "!./src/views/node_modules/**", "!out/**"])
         .pipe(tslint())
         .pipe(tslint.report());
 });
 
 gulp.task("eslint", () => {
-    return gulp.src(["./vendor/**/*.js", "!**/node_modules/**"])
+    return gulp.src(["!**/node_modules/**"])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
@@ -29,18 +30,59 @@ gulp.task("eslint", () => {
 gulp.task("html-webpack", (done) => {
     const config = require("./src/views/webpack.config.js");
     config.context = `${__dirname}/src/views`;
+    config.mode = argv.mode ? argv.mode : "production";
     return webpack(config, (err, stats) => {
         const statsJson = stats.toJson();
         if (err || (statsJson.errors && statsJson.errors.length)) {
             statsJson.errors.forEach(webpackError => {
-                gutil.log(gutil.colors.red(`Error (webpack): ${webpackError}`));
+                log.error(`Error (webpack): ${webpackError}`);
             });
 
-            throw new gutil.PluginError('webpack', JSON.stringify(err || statsJson.errors));
+            throw new PluginError("webpack", JSON.stringify(err || statsJson.errors));
         }
-        gutil.log('[webpack]', stats.toString());
+        log("[webpack]", stats.toString());
         done();
     });
+});
+
+gulp.task("node_modules-webpack", (done) => {
+    const config = require("./webpack.config.js");
+    config.context = `${__dirname}`;
+    config.mode = argv.mode ? argv.mode : "production";
+    return webpack(config, (err, stats) => {
+        const statsJson = stats.toJson();
+        if (err || (statsJson.errors && statsJson.errors.length)) {
+            statsJson.errors.forEach(webpackError => {
+                log.error(`Error (webpack): ${webpackError}`);
+            });
+
+            throw new PluginError("webpack", JSON.stringify(err || statsJson.errors));
+        }
+        log("[webpack]", stats.toString());
+        done();
+    });
+});
+
+gulp.task("insert-serial-monitor-cli", async (done) => {
+    const platforms = [
+        "linux",
+        "darwin",
+        "win32",
+    ];
+    const release = "latest";
+    const destDir = path.resolve("out", "serial-monitor-cli");
+
+    async function downloadAndUnzip(platform) {
+        const fileName = `${platform}.zip`;
+        const zipPath = path.join(destDir, fileName);
+        await download(`https://github.com/microsoft/serial-monitor-cli/releases/${release}/download/${fileName}`,
+                       destDir,
+                       );
+        await extract(zipPath, { dir: path.join(destDir, platform) });
+        fs.rmSync(zipPath);
+    }
+
+    Promise.all(platforms.map(downloadAndUnzip)).then(done);
 });
 
 gulp.task("ts-compile", () => {
@@ -53,29 +95,20 @@ gulp.task("ts-compile", () => {
                 // Correct source map path.
                 const relativeSourcePath = path.relative(path.dirname(file.path), path.join(file.base, sourcePath));
                 return relativeSourcePath;
-            }
+            },
         }))
         .pipe(gulp.dest("out"));
 });
 
 gulp.task("clean", (done) => {
-    return del('out', done);
+    return del("out", done);
 });
 
 gulp.task("genAikey", (done) => {
-    if (process.env.TRAVIS_TAG) {
-        const ISPROD = /^v?[0-9]+\.[0-9]+\.[0-9]+$/.test(process.env.TRAVIS_TAG || "");
-        const packageJson = JSON.parse(fs.readFileSync("package.json"));
-        if (ISPROD) {
-            packageJson.aiKey = process.env["PROD_AIKEY"];
-        } else {
-            packageJson.aiKey = process.env["INT_AIKEY"] || packageJson.aiKey;
-        }
-        fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
-        done();
-    } else {
-        gutil.log("Skipping genAiKey");
-    }
+    const packageJson = JSON.parse(fs.readFileSync("package.json"));
+    packageJson.aiKey = process.env.PROD_AIKEY;
+    fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
+    done();
 });
 
 gulp.task("test", (done) => {
@@ -91,25 +124,25 @@ gulp.task("test", (done) => {
     }
 
     // When using cli command "npm test" to exec test, the depended extensions (cpptools) are not available so that
-    // the extension cannot be activated. As a workaround, remove extensionDependencies from package.json before running test
-    // and restore extensionDependencies after test exited.
+    // the extension cannot be activated. As a workaround, remove extensionDependencies from package.json before
+    // running test and restore extensionDependencies after test exited.
     removeExtensionDependencies();
 
-    const child = childProcess.spawn("node", ["./node_modules/vscode/bin/test"], {
+    const child = childProcess.spawn("node", ["./out/test/runTest"], {
         cwd: __dirname,
-        env: Object.assign({}, process.env, { CODE_TESTS_WORKSPACE: path.join(__dirname, "test/resources/blink") }),
+        env: Object.assign({}, process.env),
     });
 
     child.stdout.on("data", (data) => {
-        gutil.log(data.toString().trim());
+        log(data.toString().trim());
     });
 
     child.stderr.on("data", (data) => {
-        gutil.log(gutil.colors.red(data.toString().trim()));
+        log.error(data.toString().trim());
     });
 
     child.on("error", (error) => {
-        gutil.log(gutil.colors.red(error));
+        log.error(error);
     });
 
     child.on("exit", (code) => {
@@ -117,18 +150,15 @@ gulp.task("test", (done) => {
         if (code === 0) {
             done();
         } else {
+            log.error("exit code: " + code);
             done(code);
         }
     });
 });
 
-gulp.task("build", (done) => {
-    return runSequence("clean", "ts-compile", "html-webpack", done);
-});
+gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack", "insert-serial-monitor-cli"));
 
-gulp.task("build_without_view", (done) => {
-    return runSequence("clean", "ts-compile", done);
-});
+gulp.task("build_without_view", gulp.series("clean", "ts-compile"));
 
 gulp.task("watch", () => {
     gulp.watch(["./src/**/*", "./test/**/*", "!./src/views/**/*"], ["ts-compile"]);

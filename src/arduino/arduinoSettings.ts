@@ -22,6 +22,7 @@ export interface IArduinoSettings {
     preferencePath: string;
     defaultBaudRate: number;
     preferences: Map<string, string>;
+    useArduinoCli: boolean;
     reloadPreferences(): void;
 }
 
@@ -38,18 +39,21 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _preferences: Map<string, string>;
 
+    private _useArduinoCli: boolean;
+
     public constructor() {
     }
 
     public async initialize() {
         const platform = os.platform();
         this._commandPath = VscodeSettings.getInstance().commandPath;
+        this._useArduinoCli = VscodeSettings.getInstance().useArduinoCli;
         await this.tryResolveArduinoPath();
         await this.tryGetDefaultBaudRate();
         if (platform === "win32") {
             await this.updateWindowsPath();
             if (this._commandPath === "") {
-                this._commandPath = "arduino_debug.exe";
+                this._useArduinoCli ? this._commandPath = "arduino-cli.exe" : this._commandPath = "arduino_debug.exe";
             }
         } else if (platform === "linux") {
             if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
@@ -100,7 +104,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultExamplePath(): string {
         if (os.platform() === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), "/Contents/Java/examples");
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), "/Contents/Java/examples");
         } else {
             return path.join(this._arduinoPath, "examples");
         }
@@ -112,7 +116,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultPackagePath(): string {
         if (os.platform() === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), "/Contents/Java/hardware");
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), "/Contents/Java/hardware");
         } else { // linux and win32.
             return path.join(this._arduinoPath, "hardware");
         }
@@ -120,7 +124,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultLibPath(): string {
         if (os.platform() === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), "/Contents/Java/libraries");
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), "/Contents/Java/libraries");
         } else { // linux and win32
             return path.join(this._arduinoPath, "libraries");
         }
@@ -129,7 +133,7 @@ export class ArduinoSettings implements IArduinoSettings {
     public get commandPath(): string {
         const platform = os.platform();
         if (platform === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), path.normalize(this._commandPath));
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), path.normalize(this._commandPath));
         } else {
             return path.join(this._arduinoPath, path.normalize(this._commandPath));
         }
@@ -148,6 +152,10 @@ export class ArduinoSettings implements IArduinoSettings {
             this._preferences = util.parseConfigFile(this.preferencePath);
         }
         return this._preferences;
+    }
+
+    public get useArduinoCli() {
+        return this._useArduinoCli;
     }
 
     public get defaultBaudRate() {

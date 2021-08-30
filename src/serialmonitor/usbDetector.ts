@@ -9,6 +9,8 @@ import { IBoard } from "../arduino/package";
 import { VscodeSettings } from "../arduino/vscodeSettings";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
+import { ARDUINO_CONFIG_FILE } from "../common/constants";
+import { ArduinoWorkspace } from "../common/workspace";
 
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
@@ -45,7 +47,7 @@ export class UsbDetector {
         if (os.platform() === "linux" || !enableUSBDetection) {
             return;
         }
-        this._usbDetector = require("../../../vendor/node-usb-native").detector;
+        this._usbDetector = require("node-usb-native").detector;
 
         if (!this._usbDetector) {
             return;
@@ -74,7 +76,14 @@ export class UsbDetector {
                 if (!SerialMonitor.getInstance().initialized) {
                     SerialMonitor.getInstance().initialize();
                 }
+
+                // TODO EW: this is board manager code which should be moved into board manager
+
                 let bd = ArduinoContext.boardManager.installedBoards.get(boardKey);
+                const openEditor = vscode.window.activeTextEditor;
+                if (ArduinoWorkspace.rootPath && (
+                    util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))
+                    || (openEditor && openEditor.document.fileName.endsWith(".ino")))) {
                 if (!bd) {
                     ArduinoContext.boardManager.updatePackageIndex(deviceDescriptor.indexFile).then((shouldLoadPackageContent) => {
                         const ignoreBoards = VscodeSettings.getInstance().ignoreBoards || [];
@@ -127,7 +136,9 @@ export class UsbDetector {
                     this.switchBoard(bd, deviceDescriptor);
                 }
             }
+        }
         });
+        this._usbDetector.startMonitoring();
     }
 
     public stopListening() {
@@ -159,10 +170,13 @@ export class UsbDetector {
         }
     }
 
-    private showReadMeAndExample(readme: string) {
+    private showReadMeAndExample(readme: string|undefined) {
         if (ArduinoContext.boardManager.currentBoard) {
-            let readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, readme);
-            if (!util.fileExistsSync(readmeFilePath)) {
+            let readmeFilePath = "";
+            if (readme) {
+                readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, readme);
+            }
+            if (!readmeFilePath || !util.fileExistsSync(readmeFilePath)) {
                 readmeFilePath = path.join(ArduinoContext.boardManager.currentBoard.platform.rootBoardPath, "README.md");
             }
             vscode.commands.executeCommand("arduino.showExamples", true);

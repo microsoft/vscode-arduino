@@ -5,6 +5,8 @@
 import * as assert from "assert";
 import * as os from "os";
 import * as vscode from "vscode";
+const impor = require("impor")(__dirname);
+const usbDetectorModule = impor("../src/serialmonitor/usbDetector") as typeof import ("../src/serialmonitor/usbDetector");
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Arduino: Extension Tests", () => {
@@ -35,6 +37,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.verify",
                     "arduino.upload",
                     "arduino.uploadUsingProgrammer",
+                    "arduino.rebuildIntelliSenseConfig",
                     "arduino.selectProgrammer",
                     "arduino.showBoardManager",
                     "arduino.showLibraryManager",
@@ -43,19 +46,19 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.showSerialPlotter",
                     "arduino.changeBoardType",
                     "arduino.initialize",
-                    "arduino.addLibPath",
                     "arduino.selectSerialPort",
                     "arduino.openSerialMonitor",
                     "arduino.openSerialPlotter",
                     "arduino.changeBaudRate",
-                    "arduino.changeEnding",
                     "arduino.sendMessageToSerialPort",
                     "arduino.closeSerialMonitor",
                     "arduino.reloadExample",
                     "arduino.showExampleExplorer",
                     "arduino.loadPackages",
                     "arduino.installBoard",
-                    "arduino.setSketchFile",
+                    "arduino.selectSketch",
+                    "arduino.cliUpload",
+                    "arduino.cliUploadUsingProgrammer",
                 ];
 
                 const foundArduinoCommands = commands.filter((value) => {
@@ -68,11 +71,10 @@ suite("Arduino: Extension Tests", () => {
         });
 
     suiteTeardown(() => {
-        // When running test on osx, the vscode instance is hanging there after tests finished and cause mocha timeout.
+        // When running test on osx or windows, the vscode instance is hanging there after tests finished and cause mocha timeout.
         // As a workaround, closing usb-detection process manually would make test window exit normally.
         if (os.platform() !== "linux") {
-            const usbDector = require("../../vendor/node-usb-native").detector;
-            usbDector.stopMonitoring();
+            usbDetectorModule.UsbDetector.getInstance().stopListening();
         }
     });
 });

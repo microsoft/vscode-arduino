@@ -6,10 +6,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import * as constants from "./common/constants";
 import * as util from "./common/util";
-import * as Logger from "./logger/logger";
 
 import { ARDUINO_CONFIG_FILE } from "./common/constants";
 import { ArduinoWorkspace } from "./common/workspace";
+import { DeviceSettings } from "./deviceSettings"
 
 /**
  * Interface that represents the arduino context information.
@@ -57,7 +57,10 @@ export interface IDeviceContext {
      */
     configuration: string;
 
-    onDidChange: vscode.Event<void>;
+    /**
+     * IntelliSense configuration auto-generation project override.
+     */
+    intelliSenseGen: string;
 
     initialize(): void;
 }
@@ -70,20 +73,17 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     private static _deviceContext: DeviceContext = new DeviceContext();
 
-    private _onDidChange = new vscode.EventEmitter<void>();
-
-    private _port: string;
-
-    private _board: string;
-
-    private _sketch: string;
-
-    private _output: string;
-
-    private _debugger: string;
-
-    private _configuration: string;
-
+    private _settings = new DeviceSettings();
+    /**
+     * TODO EW, 2020-02-17:
+     * The absolute file path of the directory containing the vscode-arduino
+     * extension. Not sure why this is stored here (it's a bit misplaced) and
+     * not in a dedicated extension object containing the extension context
+     * passed during activation. Another way would be a function in util.ts
+     * using a mechanism like
+     *
+     *   path.normalize(path.join(path.dirname(__filename), ".."))
+     */
     private _extensionPath: string;
 
     private _watcher: vscode.FileSystemWatcher;
@@ -95,6 +95,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     private _prebuild: string;
 
     private _programmer: string;
+
+    private _suppressSaveContext: boolean = false;
 
     /**
      * @constructor
@@ -110,7 +112,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             this._watcher.onDidDelete(() => this.loadContext());
             this._vscodeWatcher.onDidDelete(() => this.loadContext());
             this._sketchStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.SKETCH);
-            this._sketchStatusBar.command = "arduino.setSketchFile";
+            this._sketchStatusBar.command = "arduino.selectSketch";
             this._sketchStatusBar.tooltip = "Sketch File";
         }
     }
@@ -136,37 +138,25 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
      * TODO: Current we use the Arduino default settings. For future release, this dependency might be removed
      * and the setting only depends on device.json.
      * @method
+     *
+     * TODO EW, 2020-02-18:
+     * A problem I discovered: here you try to find the config file location
+     * and when you're writing below, you use a hard-coded location. When
+     * resorting to "find", you have to store the file's location at least and
+     * reuse it when saving.
+     * But I think the intention is: load a config file from anywhere and save
+     * it under .vscode/arduino.json. But then the initial load has to use find
+     * and afterwards it must not use find anymore.
      */
     public loadContext(): Thenable<object> {
         return vscode.workspace.findFiles(ARDUINO_CONFIG_FILE, null, 1)
             .then((files) => {
-                let deviceConfigJson: any = {};
                 if (files && files.length > 0) {
-                    const configFile = files[0];
-                    deviceConfigJson = util.tryParseJSON(fs.readFileSync(configFile.fsPath, "utf8"));
-                    if (deviceConfigJson) {
-                        this._port = deviceConfigJson.port;
-                        this._board = deviceConfigJson.board;
-                        this._sketch = deviceConfigJson.sketch;
-                        this._configuration = deviceConfigJson.configuration;
-                        this._output = deviceConfigJson.output;
-                        this._debugger = deviceConfigJson["debugger"];
-                        this._onDidChange.fire();
-                        this._prebuild = deviceConfigJson.prebuild;
-                        this._programmer = deviceConfigJson.programmer;
-                    } else {
-                        Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
-                    }
+                    this._settings.load(files[0].fsPath);
+                    // on invalid configuration we continue with current settings
                 } else {
-                    this._port = null;
-                    this._board = null;
-                    this._sketch = null;
-                    this._configuration = null;
-                    this._output = null;
-                    this._debugger = null;
-                    this._onDidChange.fire();
-                    this._prebuild = null;
-                    this._programmer = null;
+                    // No configuration file found, starting over with defaults
+                    this._settings.reset();
                 }
                 return this;
             }, (reason) => {
@@ -176,137 +166,129 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 // Logger.notifyUserError("arduinoFileUnhandleError", new Error(reason.toString()));
 
                  // Workaround for change in API, populate required props for arduino.json
-                this._port = null;
-                this._board = null;
-                this._sketch = null;
-                this._configuration = null;
-                this._output = null;
-                this._debugger = null;
-                this._onDidChange.fire();
-                this._prebuild = null;
-                this._programmer = null;
-
+                this._settings.reset();
                 return this;
             });
     }
 
     public showStatusBar() {
-        if (!this._sketch) {
+        if (!this._settings.sketch.value) {
             return false;
         }
-
-        this._sketchStatusBar.text = this._sketch;
+        this._sketchStatusBar.text = this._settings.sketch.value;
         this._sketchStatusBar.show();
     }
 
-    public saveContext() {
-        if (!ArduinoWorkspace.rootPath) {
-            return;
-        }
-        const deviceConfigFile = path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE);
-        let deviceConfigJson: any = {};
-        if (util.fileExistsSync(deviceConfigFile)) {
-            deviceConfigJson = util.tryParseJSON(fs.readFileSync(deviceConfigFile, "utf8"));
-        }
-        if (!deviceConfigJson) {
-            Logger.notifyUserError("arduinoFileError", new Error(constants.messages.ARDUINO_FILE_ERROR));
-            return;
-        }
-        deviceConfigJson.sketch = this.sketch;
-        deviceConfigJson.port = this.port;
-        deviceConfigJson.board = this.board;
-        deviceConfigJson.output = this.output;
-        deviceConfigJson["debugger"] = this.debugger_;
-        deviceConfigJson.configuration = this.configuration;
-        deviceConfigJson.programmer = this.programmer;
-
-        util.mkdirRecursivelySync(path.dirname(deviceConfigFile));
-        fs.writeFileSync(deviceConfigFile, JSON.stringify(deviceConfigJson, (key, value) => {
-            if (value === null) {
-                return undefined;
-            }
-            return value;
-        }, 4));
-    }
-
-    public get onDidChange(): vscode.Event<void> {
-        return this._onDidChange.event;
-    }
+    public get onChangePort() { return this._settings.port.emitter.event }
+    public get onChangeBoard() { return this._settings.board.emitter.event }
+    public get onChangeSketch() { return this._settings.sketch.emitter.event }
+    public get onChangeOutput() { return this._settings.output.emitter.event }
+    public get onChangeDebugger() { return this._settings.debugger.emitter.event }
+    public get onChangeISAutoGen() { return this._settings.intelliSenseGen.emitter.event }
+    public get onChangeConfiguration() { return this._settings.configuration.emitter.event }
+    public get onChangePrebuild() { return this._settings.prebuild.emitter.event }
+    public get onChangePostbuild() { return this._settings.postbuild.emitter.event }
+    public get onChangeProgrammer() { return this._settings.programmer.emitter.event }
 
     public get port() {
-        return this._port;
+        return this._settings.port.value;
     }
 
     public set port(value: string) {
-        this._port = value;
+        this._settings.port.value = value;
         this.saveContext();
     }
 
     public get board() {
-        return this._board;
+        return this._settings.board.value;
     }
 
     public set board(value: string) {
-        this._board = value;
+        this._settings.board.value = value;
         this.saveContext();
     }
 
     public get sketch() {
-        return this._sketch;
+        return this._settings.sketch.value;
     }
 
     public set sketch(value: string) {
-        this._sketch = value;
+        this._settings.sketch.value = value;
         this.saveContext();
     }
 
     public get prebuild() {
-        return this._prebuild ? this._prebuild.trim() : "";
+        return this._settings.prebuild.value;
+    }
+
+    public get postbuild() {
+        return this._settings.postbuild.value;
     }
 
     public get output() {
-        return this._output;
+        return this._settings.output.value;
     }
 
     public set output(value: string) {
-        this._output = value;
+        this._settings.output.value = value;
         this.saveContext();
     }
 
     public get debugger_() {
-        return this._debugger;
+        return this._settings.debugger.value;
     }
 
     public set debugger_(value: string) {
-        this._debugger = value;
+        this._settings.debugger.value = value;
+        this.saveContext();
+    }
+
+    public get intelliSenseGen() {
+        return this._settings.intelliSenseGen.value;
+    }
+
+    public set intelliSenseGen(value: string) {
+        this._settings.intelliSenseGen.value = value;
         this.saveContext();
     }
 
     public get configuration() {
-        return this._configuration;
+        return this._settings.configuration.value;
     }
 
     public set configuration(value: string) {
-        this._configuration = value;
+        this._settings.configuration.value = value;
         this.saveContext();
     }
 
     public get programmer() {
-        return this._programmer;
+        return this._settings.programmer.value;
     }
 
     public set programmer(value: string) {
-        this._programmer = value;
+        this._settings.programmer.value = value;
         this.saveContext();
+    }
+
+    public get suppressSaveContext() {
+        return this._suppressSaveContext;
+    }
+
+    public set suppressSaveContext(value: boolean) {
+        this._suppressSaveContext = value;
+    }
+
+    public get buildPreferences() {
+        return this._settings.buildPreferences.value;
     }
 
     public async initialize() {
         if (ArduinoWorkspace.rootPath && util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))) {
-            vscode.window.showInformationMessage("Arduino.json is already generated.");
+            vscode.window.showInformationMessage("Arduino.json already generated.");
             return;
         } else {
             if (!ArduinoWorkspace.rootPath) {
-                vscode.window.showInformationMessage("Please open an folder first.");
+                vscode.window.showInformationMessage("Please open a folder first.");
                 return;
             }
             await this.resolveMainSketch();
@@ -314,20 +296,41 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                 await vscode.commands.executeCommand("arduino.changeBoardType");
                 vscode.window.showInformationMessage("The workspace is initialized with the Arduino extension support.");
             } else {
-                vscode.window.showInformationMessage("No *.ino sketch file was found or selected, so skip initialize command.");
+                vscode.window.showInformationMessage("No sketch (*.ino or *.cpp) was found or selected - initialization skipped.");
             }
         }
     }
 
+    /**
+     * Note: We're using the class' setter for the sketch (i.e. this.sketch = ...)
+     * to make sure that any changes are synched to the configuration file.
+     */
     public async resolveMainSketch() {
-        return await vscode.workspace.findFiles("**/*.ino", null)
+        // TODO (EW, 2020-02-18): Here you look for *.ino files but below you allow
+        //  *.cpp/*.c files to be set as sketch
+        await vscode.workspace.findFiles("**/*.ino", null)
             .then(async (fileUris) => {
                 if (fileUris.length === 0) {
                     let newSketchFileName = await vscode.window.showInputBox({
-                        value: "app.ino",
-                        prompt: "No .ino file was found on workspace, initialize sketch first",
-                        placeHolder: "Input the sketch file name",
+                        value: "my-sketch.ino",
+                        prompt: "No sketch (*.ino) found in workspace, please provide a name",
+                        placeHolder: "Sketch file name (*.ino or *.cpp)",
                         validateInput: (value) => {
+                            /* TODO (EW, 2020-02-18):
+                             * is 'c' actually allowed? Also found on within other files.
+                             * And the regular expression doesn't need the internal groups.
+                             * The outer group can be an anonymous group.
+                             * And \w doesn't match dashes - so any sketch containing dashes
+                             * will not be found.
+                             * The correct expression therefore would be something like this:
+                             *
+                             *   /^[\w\-]+\.(?:ino|cpp)$/
+                             *
+                             * I'd recommend to define such regular expressions (including)
+                             * line splitting etc.) at the global constants file.
+                             * This is true for any hard coded paths (like the snippets below)
+                             * as well.
+                             */
                             if (value && /^\w+\.((ino)|(cpp)|c)$/.test(value.trim())) {
                                 return null;
                             } else {
@@ -344,7 +347,7 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         const textDocument = await vscode.workspace.openTextDocument(path.join(ArduinoWorkspace.rootPath, newSketchFileName));
                         vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);
                     } else {
-                        this._sketch = undefined;
+                        this.sketch = undefined;
                     }
                 } else if (fileUris.length === 1) {
                     this.sketch = path.relative(ArduinoWorkspace.rootPath, fileUris[0].fsPath);
@@ -360,5 +363,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                     }
                 }
             });
+        return this.sketch;
+    }
+
+    private saveContext() {
+        if (!ArduinoWorkspace.rootPath) {
+            return;
+        }
+        const deviceConfigFile = path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE);
+        this._settings.save(deviceConfigFile);
     }
 }

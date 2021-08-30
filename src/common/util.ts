@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as childProcess from "child_process";
+import * as child_process from "child_process";
 import * as fs from "fs";
 import * as iconv from "iconv-lite";
 import * as os from "os";
@@ -9,23 +9,9 @@ import * as path from "path";
 import * as properties from "properties";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
+import { arduinoChannel } from "./outputChannel";
 
 const encodingMapping: object = JSON.parse(fs.readFileSync(path.join(__dirname, "../../../misc", "codepageMapping.json"), "utf8"));
-
-/**
- * This function will return the VSCode C/C++ extesnion compatible platform literals.
- * @function getCppConfigPlatform
- */
-export function getCppConfigPlatform(): string {
-    const plat = os.platform();
-    if (plat === "linux") {
-        return "Linux";
-    } else if (plat === "darwin") {
-        return "Mac";
-    } else if (plat === "win32") {
-        return "Win32";
-    }
-}
 
 /**
  * This function will detect the file existing in the sync mode.
@@ -199,34 +185,69 @@ export function isArduinoFile(filePath): boolean {
     return fileExistsSync(filePath) && (path.extname(filePath) === ".ino" || path.extname(filePath) === ".pde");
 }
 
-export function spawn(command: string, outputChannel: vscode.OutputChannel, args: string[] = [], options: any = {}): Thenable<object> {
+/**
+ * Send a command to arduino
+ * @param {string} command - base command path (either Arduino IDE or CLI)
+ * @param {vscode.OutputChannel} outputChannel - output display channel
+ * @param {string[]} [args=[]] - arguments to pass to the command
+ * @param {any} [options={}] - options and flags for the arguments
+ * @param {(string) => {}} - callback for stdout text
+ */
+export function spawn(
+    command: string,
+    args: string[] = [],
+    options: child_process.SpawnOptions = {},
+    output?: {channel?: vscode.OutputChannel,
+              stdout?: (s: string) => void,
+              stderr?: (s: string) => void},
+): Thenable<object> {
     return new Promise((resolve, reject) => {
-        const stdout = "";
-        const stderr = "";
         options.cwd = options.cwd || path.resolve(path.join(__dirname, ".."));
-        const child = childProcess.spawn(command, args, options);
+        const child = child_process.spawn(command, args, options);
 
         let codepage = "65001";
         if (os.platform() === "win32") {
-            codepage = childProcess.execSync("chcp").toString().split(":").pop().trim();
+            try {
+                const chcp = child_process.execSync("chcp.com");
+                codepage = chcp.toString().split(":").pop().trim();
+            } catch (error) {
+                arduinoChannel.warning(`Defaulting to code page 850 because chcp.com failed.\
+                \rEnsure your path includes %SystemRoot%\\system32\r${error.message}`);
+                codepage = "850";
+            }
         }
 
-        if (outputChannel) {
-            child.stdout.on("data", (data: Buffer) => {
-                outputChannel.append(decodeData(data, codepage));
-            });
-            child.stderr.on("data", (data: Buffer) => {
-                outputChannel.append(decodeData(data, codepage));
-            });
+        if (output) {
+            if (output.channel || output.stdout) {
+                child.stdout.on("data", (data: Buffer) => {
+                    const decoded = decodeData(data, codepage);
+                    if (output.stdout) {
+                        output.stdout(decoded);
+                    }
+                    if (output.channel) {
+                        output.channel.append(decoded);
+                    }
+                });
+            }
+            if (output.channel || output.stderr) {
+                child.stderr.on("data", (data: Buffer) => {
+                    const decoded = decodeData(data, codepage);
+                    if (output.stderr) {
+                        output.stderr(decoded);
+                    }
+                    if (output.channel) {
+                        output.channel.append(decoded);
+                    }
+                });
+            }
         }
 
-        child.on("error", (error) => reject({ error, stderr, stdout }));
-
+        child.on("error", (error) => reject({ error }));
         child.on("exit", (code) => {
             if (code === 0) {
-                resolve({ code, stdout, stderr });
+                resolve({ code });
             } else {
-                reject({ code, stdout, stderr });
+                reject({ code });
             }
         });
     });
@@ -247,7 +268,7 @@ export function tryParseJSON(jsonString: string) {
         }
     } catch (ex) { }
 
-    return false;
+    return undefined;
 }
 
 export function isJunk(filename: string): boolean {
@@ -405,8 +426,8 @@ export function convertToHex(number, width = 0) {
  * in case you named Arduino with a version number
  * @argument {string} arduinoPath
  */
-export function resolveMacArduinoAppPath(arduinoPath: string): string {
-    if (/Arduino.*\.app/.test(arduinoPath)) {
+export function resolveMacArduinoAppPath(arduinoPath: string, useArduinoCli = false): string {
+    if (useArduinoCli || /Arduino.*\.app/.test(arduinoPath)) {
         return arduinoPath;
     } else {
         return path.join(arduinoPath, "Arduino.app");

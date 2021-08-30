@@ -4,11 +4,12 @@
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { ArduinoApp } from "../arduino/arduino";
+import { ArduinoApp, BuildMode } from "../arduino/arduino";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 
 import { VscodeSettings } from "../arduino/vscodeSettings";
+import * as constants from "../common/constants";
 import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { ArduinoWorkspace } from "../common/workspace";
@@ -77,7 +78,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
             await ArduinoActivator.activate();
         }
 
-        if (VscodeSettings.getInstance().logLevel === "verbose" && !config.logging) {
+        if (VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose && !config.logging) {
             config = {
                 ...config, logging: {
                     engineLogging: true,
@@ -136,8 +137,8 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
             config.program = path.join(ArduinoWorkspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
-            if (!await ArduinoContext.arduinoApp.verify(outputFolder)) {
-                vscode.window.showErrorMessage("Failure to verify the program, please check output for details.");
+            if (!await ArduinoContext.arduinoApp.build(BuildMode.Verify, outputFolder)) {
+                vscode.window.showErrorMessage("Failed to verify the program, please check the output for details.");
                 return false;
             }
 

@@ -32,6 +32,38 @@
             "description": "Arduino Debugger Settings",
             "type": "string",
             "minLength": 1
+        },
+        "intelliSenseGen": {
+            "description": "Disable/enable the automatic generation of the IntelliSense configuration file (c_cpp_properties.json) for this project (overrides the global setting). When set to \"global\" the global extension settings will be used.",
+            "type": "string",
+            "default": "global",
+            "enum": [
+                "global",
+                "disable",
+                "enable"
+            ]
+        },
+        "prebuild": {
+            "description": "Command to be run before every build",
+            "type": "string",
+            "minLength": 1
+        },
+        "postbuild": {
+            "description": "Command to be run after every build",
+            "type": "string",
+            "minLength": 1
+        },
+        "buildPreferences": {
+            "description": "Arduino preferences which are passed to the Arduino back-end during build",
+            "type": "array",
+            "items": {
+                "type":"array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                    "type": "string"
+                }
+            }
         }
     }
 }

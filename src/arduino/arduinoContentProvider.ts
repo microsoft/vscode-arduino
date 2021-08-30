@@ -9,21 +9,18 @@ import ArduinoContext from "../arduinoContext";
 import * as Constants from "../common/constants";
 import { SERIAL_PLOTTER_URI } from "../common/constants";
 import * as JSONHelper from "../common/cycle";
+import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import LocalWebServer from "./localWebServer";
-import { VscodeSettings } from "./vscodeSettings";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
     private _webserver: LocalWebServer;
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
-    constructor(
-        private _extensionPath: string) {
-        this.initialize();
-    }
+    constructor(private _extensionPath: string) { }
 
-    public initialize() {
+    public async initialize() {
         this._webserver = new LocalWebServer(this._extensionPath);
         // Arduino Boards Manager
         this.addHandlerWithLogger("show-boardmanager", "/boardmanager", (req, res) => this.getHtmlView(req, res));
@@ -56,7 +53,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("show-serialplotter", "/serialplotter", (req, res) => this.getHtmlView(req, res));
         this.addHandlerWithLogger("updateplotrate", "/api/updateplotrate", (req, res) => this.updatePlotRefreshRate(req, res), true);
 
-        this._webserver.start();
+        await this._webserver.start();
+
     }
 
     public async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
@@ -225,7 +223,6 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             return res.status(400).send("BAD Request! Missing { libraryPath } parameters!");
         } else {
             try {
-                await ArduinoContext.arduinoApp.addLibPath(req.body.libraryPath);
                 await ArduinoContext.arduinoApp.includeLibrary(req.body.libraryPath);
                 return res.json({
                     status: "OK",
@@ -280,6 +277,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         } else {
             try {
                 ArduinoContext.boardManager.currentBoard.updateConfig(req.body.configId, req.body.optionId);
+                const dc = DeviceContext.getInstance();
+                dc.configuration = ArduinoContext.boardManager.currentBoard.customConfig;
                 return res.json({
                     status: "OK",
                 });
