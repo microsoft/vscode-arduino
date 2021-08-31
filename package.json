@@ -527,7 +527,6 @@
           "type": "number",
           "default": 115200
         },
-
         "arduino.plotterRegex": {
           "type": "string",
           "default": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]$"
@@ -622,7 +621,7 @@
     "webpack": "^4.44.1"
   },
   "dependencies": {
-    "@types/dygraphs": "^1.1.8",
+    "@types/dygraphs": "2.1.0",
     "body-parser": "^1.16.1",
     "cocopa": "0.0.13",
     "compare-versions": "^3.4.0",

@@ -48,6 +48,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _baudRateStatusBar: vscode.StatusBarItem;
 
+    // TODO: Remove?
     private _endingStatusBar: vscode.StatusBarItem;
 
     private _plotterStatusBar: vscode.StatusBarItem;
@@ -56,20 +57,8 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _outputChannel: vscode.OutputChannel;
 
-    private _ending: SerialPortEnding;
-
     private constructor() {
         this._serialPlotter = new SerialPlotter();
-
-        const dc = DeviceContext.getInstance();
-        dc.onDidChange(() => {
-            if (dc.port) {
-                if (!this.initialized) {
-                    this.initialize();
-                }
-                this.updatePortListStatus(null);
-            }
-        });
     }
 
     public initialize() {
@@ -98,11 +87,10 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.text = defaultBaudRate.toString();
         this.updatePortListStatus();
 
-        this._endingStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.ENDING);
-        this._ending = SerialMonitor.DEFAULT_ENDING;
-        this._endingStatusBar.command = "arduino.changeEnding";
-        this._endingStatusBar.tooltip = "Serial Port Line Ending";
-        this._endingStatusBar.text = `No line ending`;
+        // this._endingStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.ENDING);
+        // this._endingStatusBar.command = "arduino.changeEnding";
+        // this._endingStatusBar.tooltip = "Serial Port Line Ending";
+        // this._endingStatusBar.text = `No line ending`;
 
         this._plotterStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_SERIAL_PLOTTER);
         this._plotterStatusBar.command = "arduino.openSerialPlotter";

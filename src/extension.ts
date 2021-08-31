@@ -117,13 +117,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
 
-    registerArduinoCommand("arduino.showSerialPlotter", async () => {
-        const html = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
-        const serialPlotter = SerialMonitor.getInstance().serialPlotter;
-
-        SerialPlotterPanel.createOrShow({serialPlotter, html});
-    });
-
     registerArduinoCommand("arduino.verify", async () => {
         if (!arduinoContextModule.default.arduinoApp.building) {
             await vscode.window.withProgress({
@@ -416,6 +409,12 @@ export async function activate(context: vscode.ExtensionContext) {
                 board: (arduinoContextModule.default.boardManager.currentBoard === null) ? null :
                     arduinoContextModule.default.boardManager.currentBoard.name,
             };
+        });
+        registerArduinoCommand("arduino.showSerialPlotter", async () => {
+            const html = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
+            const serialPlotter = SerialMonitor.getInstance().serialPlotter;
+
+            SerialPlotterPanel.createOrShow({serialPlotter, html});
         });
     }, 100);
 

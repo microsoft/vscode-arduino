@@ -3,11 +3,10 @@
 
 import { ChildProcess, execFileSync, spawn  } from "child_process";
 import * as os from "os";
-import * as vscode from "vscode";
-import { OutputChannel, QuickPickItem, StatusBarAlignment, StatusBarItem, window } from "vscode";
-import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as path from "path";
+import * as vscode from "vscode";
 import { OutputChannel } from "vscode";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import { DeviceContext } from "../deviceContext";
 
 interface ISerialPortDetail {
@@ -65,14 +64,12 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
-  private _ending: SerialPortEnding;
   private _lineEmitter: vscode.EventEmitter<string>;
   private _lineBuffer: Buffer;
 
   public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
-    this._ending = ending;
     this._lineEmitter = new vscode.EventEmitter();
     this._lineBuffer = Buffer.alloc(0);
   }
@@ -111,8 +108,8 @@ export class SerialPortCtrl {
         this._child.stdout.on("data", (data) => {
             const jsonObj = JSON.parse(data.toString())
             this._outputChannel.append(jsonObj["payload"] + "\n");
-          
-            this.readLines(_event).forEach((line) => this._lineEmitter.fire(line));
+
+            this.readLines(jsonObj["payload"]).forEach((line) => this._lineEmitter.fire(line));
         });
         // TODO: add message check to ensure _child spawned without errors
         resolve();
@@ -198,10 +195,6 @@ export class SerialPortCtrl {
             }
         }
     });
-  }
-
-  public changeEnding(newEnding: SerialPortEnding) {
-    this._ending = newEnding;
   }
 
   private readLines(buf: Buffer): string[] {
