@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import {SerialPlotter} from "./serialPlotter";
+import { SerialPlotter } from "./serialPlotter";
 
 export class SerialPlotterPanel {
     public static currentPanel: SerialPlotterPanel | void = null;

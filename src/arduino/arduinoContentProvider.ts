@@ -97,7 +97,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                         window.addEventListener('message', msg => {
                             var data = msg.data;
                             iframe.contentWindow.postMessage(data, url);
-                        })    
+                        })
                     }
 
                     iframe.src = url;

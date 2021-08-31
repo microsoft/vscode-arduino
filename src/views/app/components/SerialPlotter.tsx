@@ -239,7 +239,8 @@ class SerialPlotter extends React.Component<React.Props<void>, ISerialPlotterSta
                     this.doAction(data as IMessageAction);
                     break;
                 default:
-                    console.warn("Unknown message type", data);
+                    // TODO: Add warning back in not in console
+                    // console.warn("Unknown message type", data);
             }
         });
 

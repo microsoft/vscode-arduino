@@ -97,7 +97,7 @@ export class VscodeSettings implements IVscodeSettings {
     public get skipHeaderProvider(): boolean {
         return this.getConfigValue<boolean>(configKeys.SKIP_HEADER_PROVIDER);
     }
-  
+
     public get plotterRegex(): string {
         return this.getConfigValue<string>(configKeys.PLOTTER_REGEX);
     }
