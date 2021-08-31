@@ -53,6 +53,7 @@
     "onCommand:arduino.showLibraryManager",
     "onCommand:arduino.showExamples",
     "onCommand:arduino.initialize",
+    "onCommand:arduino.openSerialPlotter",
     "onDebug"
   ],
   "main": "./out/src/extension",
@@ -159,6 +160,10 @@
       {
         "command": "arduino.showExamples",
         "title": "Arduino: Examples"
+      },
+      {
+        "command": "arduino.openSerialPlotter",
+        "title": "Arduino: Open Serial Plotter"
       }
     ],
     "menus": {
@@ -522,6 +527,10 @@
           "type": "number",
           "default": 115200
         },
+        "arduino.plotterRegex": {
+          "type": "string",
+          "default": "^PLOT\\[(\\d+)\\]\\[(.+?)=(.+?)\\]$"
+        },
         "arduino.disableIntelliSenseAutoGen": {
           "type": "boolean",
           "default": false,
@@ -612,6 +621,7 @@
     "webpack": "^4.44.1"
   },
   "dependencies": {
+    "@types/dygraphs": "2.1.0",
     "body-parser": "^1.16.1",
     "cocopa": "0.0.13",
     "compare-versions": "^3.4.0",
@@ -620,6 +630,7 @@
     "express": "^4.14.1",
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
+    "lodash.throttle": "^4.1.1",
     "impor": "^0.1.1",
     "node-usb-native": "^0.0.20",
     "properties": "^1.2.1",

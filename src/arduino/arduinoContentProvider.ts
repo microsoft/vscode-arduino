@@ -7,9 +7,11 @@ import * as vscode from "vscode";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 import * as Constants from "../common/constants";
+import { SERIAL_PLOTTER_URI } from "../common/constants";
 import * as JSONHelper from "../common/cycle";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
+import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import LocalWebServer from "./localWebServer";
 
 export class ArduinoContentProvider implements vscode.TextDocumentContentProvider {
@@ -47,7 +49,12 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("load-examples", "/api/examples", async (req, res) => await this.getExamples(req, res));
         this.addHandlerWithLogger("open-example", "/api/openexample", (req, res) => this.openExample(req, res), true);
 
+        // Arduino Serial Plotter
+        this.addHandlerWithLogger("show-serialplotter", "/serialplotter", (req, res) => this.getHtmlView(req, res));
+        this.addHandlerWithLogger("updateplotrate", "/api/updateplotrate", (req, res) => this.updatePlotRefreshRate(req, res), true);
+
         await this._webserver.start();
+
     }
 
     public async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
@@ -63,6 +70,8 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
             type = "boardConfig";
         } else if (uri.toString() === Constants.EXAMPLES_URI.toString()) {
             type = "examples";
+        } else if (uri.toString() === Constants.SERIAL_PLOTTER_URI.toString()) {
+            type = "serialplotter";
         }
 
         const timeNow = new Date().getTime();
@@ -81,7 +90,17 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                             "theme=" + encodeURIComponent(theme.trim()) +
                             "&backgroundcolor=" + encodeURIComponent(backgroundcolor.trim()) +
                             "&color=" + encodeURIComponent(color.trim());
-                    document.getElementById('frame').src = url;
+
+                    var iframe = document.getElementById('frame');
+
+                    iframe.onload = function() {
+                        window.addEventListener('message', msg => {
+                            var data = msg.data;
+                            iframe.contentWindow.postMessage(data, url);
+                        })
+                    }
+
+                    iframe.src = url;
                 };
             </script>
         </head>
@@ -287,6 +306,24 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                 });
             } catch (error) {
                 return res.status(500).send(`Cannot open the example folder with error message "${error}"`);
+            }
+        }
+    }
+
+    public updatePlotRefreshRate(req, res) {
+        if (!req.body.rate) {
+            return res.status(400).send("BAD Request! Missing parameters!");
+        } else {
+            try {
+                const serialMonitor = SerialMonitor.getInstance();
+
+                serialMonitor.serialPlotter.setThrottling(req.body.rate);
+
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Update plot refresh rate failed with message "code:${error.code}, err:${error.stderr}"`);
             }
         }
     }
