@@ -27,7 +27,7 @@ The Arduino IDE can be installed the Arduino [download page](https://www.arduino
 ### Arduino CLI
 The Arduino CLI can be downloaded from the repository's [release page](https://github.com/arduino/arduino-cli/releases/tag/0.13.0)
 - The extension has only been tested with v0.13.0.
-- If you use the CLI you will have to set `arduino.path` since the CLI does not have a default path. 
+- If you use the CLI you will have to set `arduino.path` since the CLI does not have a default path.
 
 ## Installation
 Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
@@ -138,14 +138,14 @@ The following settings are as per sketch settings of the Arduino extension. You 
 
 ## Pre- and Post-Build Commands
 On Windows the commands run within a `cmd`-, on Linux and OSX within a `bash`-instance. Therefore your command can be anything what you can run within those shells. Instead of running a command you can invoke a script. This makes writing more complex pre-/post-build mechanisms much easier and opens up the possibility to run python or other scripting languages.
-The commands run within the workspace root directory and vscode-arduino sets the following environment variables:  
-**`VSCA_BUILD_MODE`** The current build mode, one of `Verifying`, `Uploading`, `Uploading (programmer)` or `Analyzing`. This allows you to run your script on certain build modes only.  
-**`VSCA_SKETCH`** The sketch file relative to your workspace root directory.  
-**`VSCA_BOARD`** Your board and configuration, e.g. `arduino:avr:nano:cpu=atmega328`.  
-**`VSCA_WORKSPACE_DIR`** The absolute path of your workspace root directory.  
-**`VSCA_LOG_LEVEL`** The current log level. This allows you to control the verbosity of your scripts.  
-**`VSCA_SERIAL`** The serial port used for uploading. Not set if you haven't set one in your `arduino.json`.  
-**`VSCA_BUILD_DIR`** The build directory. Not set if you haven't set one in your `arduino.json`.  
+The commands run within the workspace root directory and vscode-arduino sets the following environment variables:
+**`VSCA_BUILD_MODE`** The current build mode, one of `Verifying`, `Uploading`, `Uploading (programmer)` or `Analyzing`. This allows you to run your script on certain build modes only.
+**`VSCA_SKETCH`** The sketch file relative to your workspace root directory.
+**`VSCA_BOARD`** Your board and configuration, e.g. `arduino:avr:nano:cpu=atmega328`.
+**`VSCA_WORKSPACE_DIR`** The absolute path of your workspace root directory.
+**`VSCA_LOG_LEVEL`** The current log level. This allows you to control the verbosity of your scripts.
+**`VSCA_SERIAL`** The serial port used for uploading. Not set if you haven't set one in your `arduino.json`.
+**`VSCA_BUILD_DIR`** The build directory. Not set if you haven't set one in your `arduino.json`.
 
 For example under Windows the following `arduino.json` setup
 ```json
@@ -160,7 +160,7 @@ will produce
 ```
 [Starting] Verifying sketch 'test.ino'
 Running pre-build command: "IF "%VSCA_BUILD_MODE%"=="Verifying" (echo VSCA_BUILD_MODE=%VSCA_BUILD_MODE% && echo VSCA_BOARD=%VSCA_BOARD%)"
-VSCA_BUILD_MODE=Verifying 
+VSCA_BUILD_MODE=Verifying
 VSCA_BOARD=arduino:avr:nano:cpu=atmega328
 Loading configuration...
 <...>
