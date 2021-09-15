@@ -1,0 +1,2 @@
+--ignore-dir=out
+--ignore-dir=.vscode-test
