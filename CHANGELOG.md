@@ -3,10 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.4.4
 
+- Release date: August 26, 2021
+
 ### Changed
 - Serial monitor uses a new backend which doesn't break with updates of VSCode. [#1322](https://github.com/microsoft/vscode-arduino/pull/1322)
 
 ## Version 0.4.3
+
+- Release date: May 12, 2021
 
 ### Fixed
 - Update node-usb-native to v0.0.20 to fix serial and port selecting [#1257](https://github.com/microsoft/vscode-arduino/issues/1257)
@@ -14,10 +18,14 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.4.2
 
+- Release date: April 22, 2021
+
 ### Fixed
 - Update app insights key
 
 ## Version 0.4.1
+
+- Release date: April 19, 2021
 
 ### Added
 - Quickpick sketch selection [#1128](https://github.com/microsoft/vscode-arduino/pull/1128) Thanks [@maddogjt](https://github.com/maddogjt)
@@ -30,6 +38,8 @@ All notable changes to this project will be documented in this file.
 - App Insights key in Actions [#1236](https://github.com/microsoft/vscode-arduino/pull/1236)
 
 ## Version 0.4.0
+
+- Release date: March 22. 2021
 
 ### Added
 - Support for Arduino CLI #1017
@@ -444,6 +454,8 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 - Avoid verify/upload reentry issue
 
 ## Version 0.1.1
+
+- Release date: April 14, 2017
 
 - HotFix: Update display tag.
 
