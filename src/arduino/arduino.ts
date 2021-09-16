@@ -343,6 +343,7 @@ export class ArduinoApp {
         function tmpName(name) {
             let counter = 0;
             let candidateName = name;
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (!util.fileExistsSync(candidateName) && !util.directoryExistsSync(candidateName)) {
                     return candidateName;
