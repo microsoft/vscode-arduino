@@ -126,7 +126,7 @@ export class Board implements IBoard {
                 default:
                     return r;
             }
-        };
+        }
         return result;
     }
 

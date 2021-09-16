@@ -39,7 +39,7 @@ export enum BuildMode {
     CliUpload = "Uploading using Arduino CLI",
     UploadProgrammer = "Uploading (programmer)",
     CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
-};
+}
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.

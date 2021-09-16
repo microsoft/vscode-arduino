@@ -112,7 +112,7 @@ export function decycle(object, replacer) {
             }
             return value;
         }(object, "$"));
-    };
+    }
 
 export function retrocycle($) {
         "use strict";
@@ -173,4 +173,4 @@ export function retrocycle($) {
             }
         }($));
         return $;
-    };
+    }
