@@ -10,10 +10,13 @@ export const CPP_CONFIG_FILE = path.join(".vscode", "c_cpp_properties.json");
 /** The name of the intellisense configuration managed by vscode-arduino. */
 export const C_CPP_PROPERTIES_CONFIG_NAME = "Arduino";
 
+// Not sure why eslint fails to detect usage of this enum, so disable checking.
+/* eslint-disable no-unused-vars */
 export enum LogLevel {
     Info = "info",
     Verbose = "verbose",
 }
+/* eslint-enable no-unused-vars */
 
 export const ARDUINO_MODE: vscode.DocumentSelector = [
     { language: "cpp", scheme: "file" },

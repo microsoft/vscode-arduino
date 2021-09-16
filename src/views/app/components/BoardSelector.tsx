@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import * as React from "react";
-import { Col, DropdownButton, Grid, Row } from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import Select from "react-select";
 import * as API from "../actions/api";
 

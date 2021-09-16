@@ -27,6 +27,8 @@ import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
 
+// Not sure why eslint fails to detect usage of this enum, so disable checking.
+/* eslint-disable no-unused-vars */
 /**
  * Supported build modes. For further explanation see the documentation
  * of ArduinoApp.build().
@@ -40,6 +42,7 @@ export enum BuildMode {
     UploadProgrammer = "Uploading (programmer)",
     CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
 }
+/* eslint-enable no-unused-vars */
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
