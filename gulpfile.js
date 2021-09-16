@@ -21,7 +21,7 @@ gulp.task("tslint", () => {
 });
 
 gulp.task("eslint", () => {
-    return gulp.src(["!**/node_modules/**"])
+    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!./vendor/**", "!node_modules/**", "!./src/views/node_modules/**", "!out/**"])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
