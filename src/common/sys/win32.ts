@@ -7,6 +7,7 @@ import * as WinReg from "winreg";
 import { directoryExistsSync, fileExistsSync, getRegistryValues } from "../util";
 
 export async function resolveArduinoPath() {
+    // eslint-disable-next-line no-prototype-builtins
     const isWin64 = process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432");
     let pathString = await getRegistryValues(WinReg.HKLM,
         isWin64 ? "\\SOFTWARE\\WOW6432Node\\Arduino" : "\\SOFTWARE\\Arduino",
