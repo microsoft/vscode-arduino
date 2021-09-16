@@ -115,7 +115,7 @@ export class BoardManager {
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
-            await VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
+            VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
