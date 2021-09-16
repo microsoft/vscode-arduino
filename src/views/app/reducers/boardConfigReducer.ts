@@ -18,13 +18,14 @@ export default function boardConfigReducer(state = initalState, action) {
                 ...state,
                 errorMessage: "",
             };
-        case actions.INSTALLED_BOARDS_SUCCESS:
+        case actions.INSTALLED_BOARDS_SUCCESS: {
             const selectedBoard = action.installedBoards.find((b) => b.isSelected);
             return {
                 ...state,
                 errorMessage: "",
                 installedBoards: action.installedBoards,
             };
+        }
         case actions.INSTALLED_BOARDS_FAILURE:
             return {
                 ...state,
