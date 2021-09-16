@@ -35,7 +35,7 @@ class BoardConfig extends React.Component<IBoardConfigProps, React.Props<any>> {
         this.state = {};
     }
 
-    public componentWillMount() {
+    public UNSAFE_componentWillMount() {
         this.props.loadInstalledBoards();
         this.props.loadConfigItems();
     }
