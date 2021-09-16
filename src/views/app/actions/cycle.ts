@@ -36,7 +36,7 @@ export function decycle(object, replacer) {
 
 // So,
 
-//      var a = [];
+//      let a = [];
 //      a[0] = a;
 //      return JSON.stringify(JSON.decycle(a));
 
@@ -49,14 +49,14 @@ export function decycle(object, replacer) {
 // the object or array. [NUMBER] or [STRING] indicates a child element or
 // property.
 
-        var objects = new WeakMap();     // object to path mappings
+        const objects = new WeakMap();     // object to path mappings
 
         return (function derez(value, path) {
 
 // The derez function recurses through the object, producing the deep copy.
 
-            var old_path;   // The path of an earlier occurance of value
-            var nu;         // The new object or array
+            let old_path;   // The path of an earlier occurance of value
+            let nu;         // The new object or array
 
 // If a replacer function was provided, then call it to get a replacement value.
 
@@ -132,11 +132,11 @@ export function retrocycle($) {
 // Goessner's JSONPath.
 
 // So,
-//      var s = '[{"$ref":"$"}]';
+//      let s = '[{"$ref":"$"}]';
 //      return JSON.retrocycle(JSON.parse(s));
 // produces an array containing a single element which is the array itself.
 
-        var px = /^\$(?:\[(?:\d+|"(?:[^\\"\u0000-\u001f]|\\([\\"/bfnrt]|u[0-9a-zA-Z]{4}))*")\])*$/;
+        const px = /^\$(?:\[(?:\d+|"(?:[^\\"\u0000-\u001f]|\\([\\"/bfnrt]|u[0-9a-zA-Z]{4}))*")\])*$/;
 
         (function rez(value) {
 
@@ -149,7 +149,7 @@ export function retrocycle($) {
                 if (Array.isArray(value)) {
                     value.forEach(function (element, i) {
                         if (typeof element === "object" && element !== null) {
-                            var path = element.$ref;
+                            const path = element.$ref;
                             if (typeof path === "string" && px.test(path)) {
                                 value[i] = eval(path);
                             } else {
@@ -159,9 +159,9 @@ export function retrocycle($) {
                     });
                 } else {
                     Object.keys(value).forEach(function (name) {
-                        var item = value[name];
+                        const item = value[name];
                         if (typeof item === "object" && item !== null) {
-                            var path = item.$ref;
+                            const path = item.$ref;
                             if (typeof path === "string" && px.test(path)) {
                                 value[name] = eval(path);
                             } else {
