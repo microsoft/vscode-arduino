@@ -1,9 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## Version ...the next release...
+## Version 0.4.5
 
-- Release date: ...
+- Release date: September 21, 2021
+
+### Changed
+- Various minor updates to documentation [#1349](https://github.com/microsoft/vscode-arduino/pull/1349)
+- Don't set `commandPath` when `arduino-cli` is `true` [#1297](https://github.com/microsoft/vscode-arduino/pull/1297)
 
 ## Version 0.4.4
 
