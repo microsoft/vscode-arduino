@@ -80,7 +80,7 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
         this.handleCheck = this.handleCheck.bind(this);
     }
 
-    public componentWillMount() {
+    public UNSAFE_componentWillMount() {
         this.props.loadLibraries(false);
     }
 

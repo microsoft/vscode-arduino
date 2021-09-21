@@ -6,11 +6,14 @@ import * as winston from "winston";
 import TelemetryTransport from "./telemetry-transport";
 import UserNotificationTransport from "./user-notification-transport";
 
+// Not sure why eslint fails to detect usage of this enum, so disable checking.
+/* eslint-disable no-unused-vars */
 export enum LogLevel {
     Info = "info",
     Warn = "warn",
     Error = "error",
 }
+/* eslint-enable no-unused-vars */
 
 function FilterErrorPath(line: string): string {
     if (line) {

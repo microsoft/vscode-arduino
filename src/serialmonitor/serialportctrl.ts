@@ -26,7 +26,7 @@ export class SerialPortCtrl {
   public static list(): Promise<ISerialPortDetail[]> {
     // TODO: Wrap this in a try catch block, catch error if no serial monitor at path
     const stdout =  execFileSync(SerialPortCtrl._serialCliPath, ["list-ports"]);
-    const lists = JSON.parse(stdout);
+    const lists = JSON.parse(stdout.toString("utf-8"));
     lists.forEach((port) => {
         const vidPid = this._parseVidPid(port["hwid"]);
         port["vendorId"] = vidPid["vid"];

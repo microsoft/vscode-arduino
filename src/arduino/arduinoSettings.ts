@@ -3,11 +3,10 @@
 
 import * as os from "os";
 import * as path from "path";
-import * as vscode from "vscode";
 import * as WinReg from "winreg";
 import * as util from "../common/util";
 
-import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
+import { resolveArduinoPath } from "../common/platform";
 
 import { VscodeSettings } from "./vscodeSettings";
 

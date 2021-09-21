@@ -22,7 +22,7 @@ export default function libraryManagerReducer(state = initalState, action) {
                 requesting: true,
                 errorMessage: "",
             };
-        case actions.LIBRARIES_SUCCESS:
+        case actions.LIBRARIES_SUCCESS: {
             const types = util.parseGroups(action.libraries, "types");
             const categories = util.parseGroups(action.libraries, (item) => {
                 return item.category || "Uncategorized";
@@ -40,6 +40,7 @@ export default function libraryManagerReducer(state = initalState, action) {
                 requesting: false,
                 errorMessage: "",
             };
+        }
         case actions.LIBRARIES_FAILURE:
             return {
                 ...state,

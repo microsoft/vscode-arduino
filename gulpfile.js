@@ -1,8 +1,8 @@
 const gulp = require("gulp");
 const eslint = require("gulp-eslint");
 const tslint = require("gulp-tslint");
-const PluginError = require("plugin-error");
-const log = require("fancy-log");
+const PluginError = require("plugin-error");
+const log = require("fancy-log");
 const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
 const webpack = require("webpack");
@@ -21,7 +21,7 @@ gulp.task("tslint", () => {
 });
 
 gulp.task("eslint", () => {
-    return gulp.src(["!**/node_modules/**"])
+    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!./vendor/**", "!node_modules/**", "!./src/views/node_modules/**", "!out/**"])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());

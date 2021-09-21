@@ -24,7 +24,7 @@ export default function boardManagerReducer(state = initalState, action) {
                 requesting: true,
                 categories: ["All", "Updatable", "Installed"],
             };
-        case actions.BOARD_PACKAGES_SUCCESS:
+        case actions.BOARD_PACKAGES_SUCCESS: {
             const categories = util.parseGroups(action.platforms, "category");
             // Sorting versions in descending order.
             action.platforms.forEach((element) => {
@@ -37,6 +37,7 @@ export default function boardManagerReducer(state = initalState, action) {
                 platforms: action.platforms,
                 categories: ["All", "Updatable", "Installed"].concat(categories.sort()),
             };
+        }
         case actions.BOARD_PACKAGES_FAILURE:
             return {
                 ...state,

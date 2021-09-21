@@ -4,7 +4,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { ArduinoApp, BuildMode } from "../arduino/arduino";
+import { BuildMode } from "../arduino/arduino";
 import ArduinoActivator from "../arduinoActivator";
 import ArduinoContext from "../arduinoContext";
 

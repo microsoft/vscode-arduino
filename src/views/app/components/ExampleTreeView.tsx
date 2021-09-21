@@ -39,7 +39,7 @@ class ExampleTreeView extends React.Component<IExampleViewProps, IExampleViewSta
         this.onExpand = this.onExpand.bind(this);
     }
 
-    public componentWillMount() {
+    public UNSAFE_componentWillMount() {
         this.props.loadExamples();
     }
 

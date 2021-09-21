@@ -2,10 +2,8 @@
 // Licensed under the MIT license.
 
 import * as actions from "../actions";
-import * as util from "../utils/util";
 
 const initalState = {
-    selectedBoard: "",
     installedBoards: [],
     configitems: [],
     errorMessage: "",
@@ -18,13 +16,13 @@ export default function boardConfigReducer(state = initalState, action) {
                 ...state,
                 errorMessage: "",
             };
-        case actions.INSTALLED_BOARDS_SUCCESS:
-            const selectedBoard = action.installedBoards.find((b) => b.isSelected);
+        case actions.INSTALLED_BOARDS_SUCCESS: {
             return {
                 ...state,
                 errorMessage: "",
                 installedBoards: action.installedBoards,
             };
+        }
         case actions.INSTALLED_BOARDS_FAILURE:
             return {
                 ...state,

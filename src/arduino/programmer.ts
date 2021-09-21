@@ -4,11 +4,10 @@
 import { IPlatform, IProgrammer } from "./package";
 
 export function parseProgrammerDescriptor(programmerDescriptor: string, plat: IPlatform): Map<string, IProgrammer> {
-    const progrmmerLineRegex = /([^\.]+)\.(\S+)=(.+)/;
+    const progrmmerLineRegex = /([^.]+)\.(\S+)=(.+)/;
 
     const result = new Map<string, IProgrammer>();
     const lines = programmerDescriptor.split(/[\r|\r\n|\n]/);
-    const menuMap = new Map<string, string>();
 
     lines.forEach((line) => {
         // Ignore comments.

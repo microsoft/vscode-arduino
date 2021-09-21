@@ -66,7 +66,7 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
         this.typeUpdate = this.typeUpdate.bind(this);
     }
 
-    public componentWillMount() {
+    public UNSAFE_componentWillMount() {
         this.props.loadBoardPackages(false);
     }
 
@@ -109,9 +109,9 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
             uninstallBoard: this.props.uninstallBoard,
         };
 
-        const isOperating = this.props.installingBoardName || this.props.uninstallingBoardName;
+        const isOperating = !!this.props.installingBoardName || !!this.props.uninstallingBoardName;
         return (
-            <div className={"boardmanager " + (!!isOperating ? "disabled" : "")}>
+            <div className={"boardmanager " + (isOperating ? "disabled" : "")}>
                 {
                     this.props.requesting && (
                         <div className="mask theme-bgcolor">Loading...</div>

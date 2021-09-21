@@ -1,6 +1,4 @@
 import * as assert from "assert";
-import * as Path from "path";
-import * as util from "../src/common/util";
 
 import { DeviceContext } from "../src/deviceContext";
 
