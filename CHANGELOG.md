@@ -1,7 +1,20 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version ...the next release...
+
+- Release date: ...
+
+## Version 0.4.4
+
+- Release date: August 26, 2021
+
+### Changed
+- Serial monitor uses a new backend which doesn't break with updates of VSCode. [#1322](https://github.com/microsoft/vscode-arduino/pull/1322)
+
 ## Version 0.4.3
+
+- Release date: May 12, 2021
 
 ### Fixed
 - Update node-usb-native to v0.0.20 to fix serial and port selecting [#1257](https://github.com/microsoft/vscode-arduino/issues/1257)
@@ -9,10 +22,14 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.4.2
 
+- Release date: April 22, 2021
+
 ### Fixed
 - Update app insights key
 
 ## Version 0.4.1
+
+- Release date: April 19, 2021
 
 ### Added
 - Quickpick sketch selection [#1128](https://github.com/microsoft/vscode-arduino/pull/1128) Thanks [@maddogjt](https://github.com/maddogjt)
@@ -25,6 +42,8 @@ All notable changes to this project will be documented in this file.
 - App Insights key in Actions [#1236](https://github.com/microsoft/vscode-arduino/pull/1236)
 
 ## Version 0.4.0
+
+- Release date: March 22. 2021
 
 ### Added
 - Support for Arduino CLI #1017
@@ -353,19 +372,19 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 
 - Release date: August 24, 2017
 
-### Added 
+### Added
 - Add settings for enabled/disable USB detection
 - Add Arduino Example tree explorer viewlet
 - Contribution from [DeqingSun](https://github.com/DeqingSun): Support multiple versions of Arduino on Mac [#375](https://github.com/Microsoft/vscode-arduino/pull/375)
 - Contribution from [DeqingSun](https://github.com/DeqingSun): Add board support for STM32F1 with Arudino_STM32 [#377](https://github.com/Microsoft/vscode-arduino/pull/377)
 
-### Changed 
+### Changed
 - Leverage the output path config to speedup upload/verify
 - Fix USB detection issue during uploading [#371](https://github.com/Microsoft/vscode-arduino/pull/371), [372](https://github.com/Microsoft/vscode-arduino/pull/372)
 - Contribution from [lialosiu](https://github.com/lialosiu): Fix encoding issue for non UTF-8 [#364](https://github.com/Microsoft/vscode-arduino/pull/364)
-- Update the documents with the helps of 
+- Update the documents with the helps of
     - [eduherminio](https://github.com/Microsoft/vscode-arduino/pull/361)
-    - [Atalanttore](https://github.com/Microsoft/vscode-arduino/pull/381), 
+    - [Atalanttore](https://github.com/Microsoft/vscode-arduino/pull/381),
 
 ## Version 0.2.4
 
@@ -440,7 +459,9 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 
 ## Version 0.1.1
 
-- HotFix: Update display tag. 
+- Release date: April 14, 2017
+
+- HotFix: Update display tag.
 
 ## Version 0.1.0
 
