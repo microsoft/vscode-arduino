@@ -111,12 +111,11 @@ export class SerialPortCtrl {
 
   public sendMessage(text: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (!text || !this._currentSerialPort || !this.isActive) {
+      if (!text || !this.isActive) {
         resolve();
         return;
       }
-
-      this._currentSerialPort.write(text + "\r\n", (error) => {
+      this._child.stdin.write(`{"cmd": "write", "payload": "${text}"}\n`, (error) => {
         if (!error) {
           resolve();
         } else {
