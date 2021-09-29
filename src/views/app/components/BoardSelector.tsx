@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import * as React from "react";
-import { Col, DropdownButton, Grid, Row } from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import Select from "react-select";
 import * as API from "../actions/api";
 
@@ -25,9 +25,9 @@ export default class BoardSelector extends React.Component<IBoardSelectorProps, 
 
     public render() {
         if (!this.state.selectedBoard && this.props.installedBoards.length) {
-            this.state = {
+            this.setState({
                 selectedBoard: this.props.installedBoards.find((bd) => bd.isSelected),
-            };
+            });
         }
         const options = this.props.installedBoards.map((b) => {
             return {

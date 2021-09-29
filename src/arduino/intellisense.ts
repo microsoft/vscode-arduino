@@ -14,7 +14,7 @@ import { VscodeSettings } from "./vscodeSettings";
 export interface ICoCoPaContext {
     callback: (s: string) => void;
     conclude: () => Promise<void>;
-};
+}
 
 /**
  * Returns true if the combination of global enable/disable and project
@@ -126,7 +126,7 @@ export function makeCompilerParserContext(dc: DeviceContext): ICoCoPaContext {
         callback: runner.callback(),
         conclude: _conclude,
     }
-};
+}
 
 /**
  * Assembles compiler parser engines which then will be used to find the main
@@ -145,6 +145,8 @@ function makeCompilerParserEngines(dc: DeviceContext) {
     return [gccParserEngine];
 }
 
+// Not sure why eslint fails to detect usage of these enums, so disable checking.
+/* eslint-disable no-unused-vars */
 /**
  * Possible states of AnalysisManager's state machine.
  */
@@ -187,6 +189,7 @@ enum AnalysisEvent {
      */
     AnalysisBuildDone,
 }
+/* eslint-enable no-unused-vars */
 
 /**
  * This class manages analysis builds for the automatic IntelliSense
