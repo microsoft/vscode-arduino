@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.6
+
+- Release date: September 29, 2021
+
+### Changed
+
+- Fix send serial message [#1356](https://github.com/microsoft/vscode-arduino/pull/1356)
+- Update eslint to latest version and fix issues reported [#1352](https://github.com/microsoft/vscode-arduino/pull/1352)
+
 ## Version 0.4.5
 
 - Release date: September 21, 2021

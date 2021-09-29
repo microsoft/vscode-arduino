@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 import * as path from "path";
-import { directoryExistsSync, fileExistsSync } from "./util";
 
 export const isWindows = (process.platform === "win32");
 export const isMacintosh = (process.platform === "darwin");

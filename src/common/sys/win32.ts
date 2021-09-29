@@ -7,6 +7,7 @@ import * as WinReg from "winreg";
 import { directoryExistsSync, fileExistsSync, getRegistryValues } from "../util";
 
 export async function resolveArduinoPath() {
+    // eslint-disable-next-line no-prototype-builtins
     const isWin64 = process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432");
     let pathString = await getRegistryValues(WinReg.HKLM,
         isWin64 ? "\\SOFTWARE\\WOW6432Node\\Arduino" : "\\SOFTWARE\\Arduino",
@@ -35,8 +36,7 @@ export function validateArduinoPath(arduinoPath: string, useArduinoCli = false):
 export function findFile(fileName: string, cwd: string): string {
     let result;
     try {
-        let pathString;
-        pathString = childProcess.execSync(`dir ${fileName} /S /B`, { encoding: "utf8", cwd }).split("\n");
+        const pathString = childProcess.execSync(`dir ${fileName} /S /B`, { encoding: "utf8", cwd }).split("\n");
         if (pathString && pathString[0] && fileExistsSync(pathString[0].trim())) {
             result = path.normalize(pathString[0].trim());
         }
