@@ -21,6 +21,17 @@
         "config_file": "stlink-v2-1.cfg"
     },
     {
+        "vid": "0483",
+        "pid": [
+            "374e",
+            "374f",
+            "3753"
+        ],
+        "name": "ST Link V3.0",
+        "short_name": "stlink-v3.0",
+        "config_file": "stlink-v3-0.cfg"
+    },
+    {
         "pid": [
             "0101",
             "0102",
