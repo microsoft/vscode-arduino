@@ -767,7 +767,7 @@ export class ArduinoApp {
         return await util.spawn(
             this._settings.commandPath,
             args,
-            undefined,
+            { cwd: ArduinoWorkspace.rootPath },
             { /*channel: arduinoChannel.channel,*/ stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             const ret = await cleanup("ok");
