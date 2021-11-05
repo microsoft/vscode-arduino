@@ -152,8 +152,6 @@ export interface IBoardConfigItem {
     options: IBoardConfigOption[];
 }
 
-// Not sure why eslint fails to detect usage of this enum, so disable checking.
-/* eslint-disable no-unused-vars */
 /**
  * Return values of calls to IBoard.loadConfig() and IBoard.updateConfig().
  */
@@ -182,7 +180,6 @@ export enum BoardConfigResult {
      */
     InvalidFormat,
 }
-/* eslint-enable no-unused-vars */
 
 /**
  * Interface for classes that represent an Arduino supported board.
