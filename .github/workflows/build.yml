@@ -25,7 +25,7 @@ jobs:
       - name: get node
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 11.x
       - name: linux setup
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -46,7 +46,7 @@ jobs:
       - name: preinstall 
         run: | 
           npm install -g node-gyp
-          npm install -g vsce
+          npm install -g vsce@"^1.0.0"
           npm install -g gulp
       - name: install
         run: npm install
@@ -73,7 +73,7 @@ jobs:
     - name: get node
       uses: actions/setup-node@v1
       with:
-        node-version: 16.x
+        node-version: 11.x
     - name: linux setup
       run: |
         export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
@@ -85,7 +85,7 @@ jobs:
     - name: preinstall 
       run: | 
         npm install -g node-gyp
-        npm install -g vsce
+        npm install -g vsce@"^1.0.0"
         npm install -g gulp
     - name: install
       run: npm install
