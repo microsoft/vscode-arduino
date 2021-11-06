@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Fix empty board and examples list [#1367](https://github.com/microsoft/vscode-arduino/pull/1367)
 - Fix ESLint parsing for enums [#1368](https://github.com/microsoft/vscode-arduino/pull/1368)
 - Fix build cwd [#1375](https://github.com/microsoft/vscode-arduino/pull/1375)
+- Fix stack overflow in board configuration view [#1379](https://github.com/microsoft/vscode-arduino/pull/1379)
 
 ## Version 0.4.6
 
