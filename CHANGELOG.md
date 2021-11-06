@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.4.7
 
-- Release date: ???
+- Release date: November 5, 2021
 
 ### Changed
 
