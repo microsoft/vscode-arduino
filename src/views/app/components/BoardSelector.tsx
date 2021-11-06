@@ -23,12 +23,15 @@ export default class BoardSelector extends React.Component<IBoardSelectorProps, 
         this.updateSelectedBoard = this.updateSelectedBoard.bind(this);
     }
 
-    public render() {
-        if (!this.state.selectedBoard && this.props.installedBoards.length) {
+    public componentWillReceiveProps(nextProps) {
+        if (!this.state.selectedBoard && nextProps.installedBoards.length) {
             this.setState({
-                selectedBoard: this.props.installedBoards.find((bd) => bd.isSelected),
+                selectedBoard: nextProps.installedBoards.find((bd) => bd.isSelected),
             });
         }
+    }
+
+    public render() {
         const options = this.props.installedBoards.map((b) => {
             return {
                 value: b.key,

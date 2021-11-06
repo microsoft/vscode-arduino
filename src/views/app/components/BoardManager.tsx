@@ -66,7 +66,7 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
         this.typeUpdate = this.typeUpdate.bind(this);
     }
 
-    public UNSAFE_componentWillMount() {
+    public componentWillMount() {
         this.props.loadBoardPackages(false);
     }
 

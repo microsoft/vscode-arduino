@@ -46,7 +46,7 @@ jobs:
       - name: preinstall 
         run: | 
           npm install -g node-gyp
-          npm install -g vsce
+          npm install -g vsce@"^1.0.0"
           npm install -g gulp
       - name: install
         run: npm install
@@ -85,7 +85,7 @@ jobs:
     - name: preinstall 
       run: | 
         npm install -g node-gyp
-        npm install -g vsce
+        npm install -g vsce@"^1.0.0"
         npm install -g gulp
     - name: install
       run: npm install
