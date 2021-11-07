@@ -496,6 +496,15 @@ export class ArduinoApp {
     }
 
     /**
+     * Checks if the line contains memory usage information
+     * @param line output line to check
+     * @returns {bool} true if line contains memory usage information
+     */
+    private isMemoryUsageInformation(line: string) {
+        return line.startsWith("Sketch uses ") || line.startsWith("Global variables use ");
+    }
+
+    /**
      * Private implementation. Not to be called directly. The wrapper build()
      * manages the build state.
      * @param buildMode See build()
@@ -732,6 +741,11 @@ export class ArduinoApp {
             }
             if (verbose) {
                 arduinoChannel.channel.append(line);
+            } else {
+                // Output sketch memory usage in non-verbose mode
+                if (this.isMemoryUsageInformation(line)) {
+                    arduinoChannel.channel.append(line);
+                }
             }
         }
         const stderrcb = (line: string) => {
