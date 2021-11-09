@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.8
+
+- Release date: November 9, 2021
+
+### Changed
+
+- Fix application insights key [31dd3a9](https://github.com/microsoft/vscode-arduino/commit/31dd3a94c64eb12a5483038c5bfe668abad36f91)
+
 ## Version 0.4.7
 
 - Release date: November 5, 2021
