@@ -73,7 +73,9 @@ jobs:
 
       - name: Check for linting errors
         run: gulp tslint
-      - name: Build and pack extension
+      - name: Build extension
+        run: gulp build --mode=production
+      - name: Pack extension
         run: vsce package --out vscode-arduino.vsix
       - name: Publish extension VSIX as artifact
         uses: actions/upload-artifact@v2
