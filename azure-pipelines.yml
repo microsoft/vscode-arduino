@@ -61,10 +61,8 @@ steps:
   - script: curl -LO https://downloads.arduino.cc/arduino-1.8.19-windows.zip
     displayName: Download Arduino IDE
   - script: >-
-      node --eval "process.exit(require('crypto').createHash('sha256').update(
-      require('fs').readFileSync('arduino-1.8.19-windows.zip')).digest('hex')
-      == 'c704a821089eab2588f1deae775916219b1517febd1dd574ff29958dca873945'
-      ? 0 : 1)"
+      node build/checkHash.js arduino-1.8.19-windows.zip
+      c704a821089eab2588f1deae775916219b1517febd1dd574ff29958dca873945
     displayName: Verify Arduino IDE
   - task: ExtractFiles@1
     displayName: Extract Arduino IDE
