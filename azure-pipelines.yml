@@ -78,13 +78,11 @@ steps:
   - script: gulp genAikey
     displayName: Use production AI key
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
-  - script: gulp build --mode=production
-    displayName: Build extension
   # Pack the extension now even though it's unsigned so that we ignore files
   # from .vscodeignore. This will reduce load on the signing server later and
   # ensure we only attempt to sign shipping files.
   - script: vsce package --out vscode-arduino.vsix
-    displayName: Pack extension
+    displayName: Build and pack extension
 
   - task: ComponentGovernanceComponentDetection@0
     displayName: Detect components

@@ -13,6 +13,8 @@
     <FilesToSign Include="$(OutDir)\**\*.js" Exclude="$(OutDir)\**\node_modules\**\*.js">
       <Authenticode>Microsoft400</Authenticode>
     </FilesToSign>
+    <!-- Authenticode only works on Windows files. If we get the ability to sign Linux and Mac executables, the signing
+         steps should probably move to the serial-monitor-cli repo instead of doing all the signing here. -->
     <FilesToSign Include="$(OutDir)\out\serial-monitor-cli\win32\*.exe">
       <Authenticode>Microsoft400</Authenticode>
     </FilesToSign>
