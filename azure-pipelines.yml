@@ -32,13 +32,13 @@ pool:
 variables:
   # MicroBuild requires TeamName to be set.
   TeamName: C++ Cross Platform and Cloud
-  # If the user didn't override the signing type, then only real-sign on master
-  # or dev.
+  # If the user didn't override the signing type, then only real-sign on tags,
+  # master, or dev.
   ${{ if ne(parameters.SignTypeOverride, 'default') }}:
     SignType: ${{ parameters.SignTypeOverride }}
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'dev'))) }}:
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'dev'))) }}:
     SignType: real
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'dev')))) }}:
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'dev')))) }}:
     SignType: test
 
 steps:
