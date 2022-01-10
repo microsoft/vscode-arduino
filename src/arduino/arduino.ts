@@ -27,8 +27,6 @@ import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
 
-// Not sure why eslint fails to detect usage of this enum, so disable checking.
-/* eslint-disable no-unused-vars */
 /**
  * Supported build modes. For further explanation see the documentation
  * of ArduinoApp.build().
@@ -42,7 +40,6 @@ export enum BuildMode {
     UploadProgrammer = "Uploading (programmer)",
     CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
 }
-/* eslint-enable no-unused-vars */
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -650,6 +647,9 @@ export class ArduinoApp {
         // we prepare the channel here since all following code will
         // or at leas can possibly output to it
         arduinoChannel.show();
+        if (VscodeSettings.getInstance().clearOutputOnBuild) {
+            arduinoChannel.clear();
+        }
         arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
         if (buildDir || dc.output) {
@@ -764,7 +764,7 @@ export class ArduinoApp {
         return await util.spawn(
             this._settings.commandPath,
             args,
-            undefined,
+            { cwd: ArduinoWorkspace.rootPath },
             { /*channel: arduinoChannel.channel,*/ stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             const ret = await cleanup("ok");

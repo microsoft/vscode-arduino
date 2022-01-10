@@ -146,7 +146,6 @@ function makeCompilerParserEngines(dc: DeviceContext) {
 }
 
 // Not sure why eslint fails to detect usage of these enums, so disable checking.
-/* eslint-disable no-unused-vars */
 /**
  * Possible states of AnalysisManager's state machine.
  */
@@ -189,7 +188,6 @@ enum AnalysisEvent {
      */
     AnalysisBuildDone,
 }
-/* eslint-enable no-unused-vars */
 
 /**
  * This class manages analysis builds for the automatic IntelliSense

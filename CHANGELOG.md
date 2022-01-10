@@ -1,6 +1,26 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.8
+
+- Release date: November 9, 2021
+
+### Changed
+
+- Fix application insights key [31dd3a9](https://github.com/microsoft/vscode-arduino/commit/31dd3a94c64eb12a5483038c5bfe668abad36f91)
+
+## Version 0.4.7
+
+- Release date: November 5, 2021
+
+### Changed
+
+- Add support for ST-Link v3.0 [#1366](https://github.com/microsoft/vscode-arduino/pull/1366)
+- Fix empty board and examples list [#1367](https://github.com/microsoft/vscode-arduino/pull/1367)
+- Fix ESLint parsing for enums [#1368](https://github.com/microsoft/vscode-arduino/pull/1368)
+- Fix build cwd [#1375](https://github.com/microsoft/vscode-arduino/pull/1375)
+- Fix stack overflow in board configuration view [#1379](https://github.com/microsoft/vscode-arduino/pull/1379)
+
 ## Version 0.4.6
 
 - Release date: September 29, 2021
