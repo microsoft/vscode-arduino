@@ -650,6 +650,9 @@ export class ArduinoApp {
         // we prepare the channel here since all following code will
         // or at leas can possibly output to it
         arduinoChannel.show();
+        if (VscodeSettings.getInstance().clearOutputOnBuild) {
+            arduinoChannel.clear();
+        }
         arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
         if (buildDir || dc.output) {
