@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { DeviceContext } from "../deviceContext";
-import { IBoard, IBoardConfigItem, IPlatform } from "./package";
+import { BoardConfigResult, IBoard, IBoardConfigItem, IPlatform } from "./package";
 
 export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): Map<string, IBoard> {
-    const boardLineRegex = /([^\.]+)\.(\S+)=(.+)/;
+    const boardLineRegex = /([^.]+)\.(\S+)=(.+)/;
 
     const result = new Map<string, IBoard>();
-    const lines = boardDescriptor.split(/[\r|\r\n|\n]/);
+    const lines = boardDescriptor.split(/(?:\r|\r\n|\n)/);
     const menuMap = new Map<string, string>();
 
     lines.forEach((line) => {
@@ -18,7 +17,7 @@ export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): 
         }
 
         const match = boardLineRegex.exec(line);
-        if (match && match.length > 3) {
+        if (match) {
             if (line.startsWith("menu.")) {
                 menuMap.set(match[2], match[3]);
                 return;
@@ -39,7 +38,7 @@ export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): 
     return result;
 }
 
-const MENU_REGEX = /menu\.([^\.]+)\.([^\.]+)(\.?(\S+)?)/;
+const MENU_REGEX = /menu\.([^.]+)\.([^.]+)(\.?(\S+)?)/;
 
 export class Board implements IBoard {
     public name?: string;
@@ -52,15 +51,15 @@ export class Board implements IBoard {
         this._configItems = [];
     }
 
-    public get board(): string {
+    public get board() {
         return this._board;
     }
 
-    public get platform(): IPlatform {
+    public get platform() {
         return this._platform;
     }
 
-    public addParameter(key: string, value: string): void {
+    public addParameter(key: string, value: string) {
         const match = key.match(MENU_REGEX);
         if (match) {
             const existingItem = this._configItems.find((item) => item.id === match[1]);
@@ -82,8 +81,7 @@ export class Board implements IBoard {
             }
         }
     }
-
-    public getBuildConfig(): string {
+    public getBuildConfig() {
         return `${this.getPackageName()}:${this.platform.architecture}:${this.board}${this.customConfig ? ":" + this.customConfig : ""}`;
     }
 
@@ -100,36 +98,84 @@ export class Board implements IBoard {
         }
     }
 
-    public get configItems(): IBoardConfigItem[] {
+    public get configItems() {
         return this._configItems;
     }
 
-    public loadConfig(configString: string): void {
+    public loadConfig(configString: string) {
+        // An empty or undefined config string resets the configuration
+        if (!configString) {
+            this.resetConfig();
+            return BoardConfigResult.Success;
+        }
         const configSections = configString.split(",");
         const keyValueRegex = /(\S+)=(\S+)/;
-        configSections.forEach((configSection) => {
-            const match = configSection.match(keyValueRegex);
-            if (match && match.length >= 2) {
-                this.updateConfig(match[1], match[2]);
+        let result = BoardConfigResult.Success;
+        for (const section of configSections) {
+            const match = section.match(keyValueRegex);
+            if (!match) {
+                return BoardConfigResult.InvalidFormat;
             }
-        });
+            const r = this.updateConfig(match[1], match[2]);
+            switch (r) {
+                case BoardConfigResult.SuccessNoChange:
+                    result = r;
+                    break;
+                case BoardConfigResult.Success:
+                    break;
+                default:
+                    return r;
+            }
+        }
+        return result;
     }
 
-    public updateConfig(configId: string, optionId: string): boolean {
+    /**
+     * For documentation see the documentation on IBoard.updateConfig().
+     */
+    public updateConfig(configId: string, optionId: string) {
         const targetConfig = this._configItems.find((config) => config.id === configId);
         if (!targetConfig) {
-            return false;
+            return BoardConfigResult.InvalidConfigID;
         }
-        if (targetConfig.selectedOption !== optionId) {
-            targetConfig.selectedOption = optionId;
-            const dc = DeviceContext.getInstance();
-            dc.configuration = this.customConfig;
-            return true;
+        // Iterate through all options and ...
+        for (const o of targetConfig.options) {
+            // Make sure that we only set valid options, e.g. when loading
+            // from config files.
+            if (o.id === optionId) {
+                if (targetConfig.selectedOption !== optionId) {
+                    targetConfig.selectedOption = optionId;
+                    return BoardConfigResult.Success;
+                }
+                return BoardConfigResult.SuccessNoChange;
+            }
         }
-        return false;
+        return BoardConfigResult.InvalidOptionID;
+    }
+
+    public resetConfig() {
+        for (const c of this._configItems) {
+            c.selectedOption = c.options[0].id;
+        }
     }
 
     public getPackageName() {
         return this.platform.packageName ? this.platform.packageName : this.platform.package.name;
     }
+}
+
+/**
+ * Test if two boards are of the same type, i.e. have the same key.
+ * @param {IBoard | undefined} a A board.
+ * @param {IBoard | undefined} b And another board.
+ * @returns {boolean} true if two boards are of the same type, else false.
+ */
+export function boardEqual(a: IBoard | undefined,
+                           b: IBoard | undefined) {
+    if (a && b) {
+        return a.key === b.key;
+    } else if (a || b) {
+        return false;
+    }
+    return true;
 }

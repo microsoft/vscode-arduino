@@ -12,8 +12,9 @@ import { arduinoChannel } from "../common/outputChannel";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
-import { parseBoardDescriptor } from "./board";
-import { IBoard, IPackage, IPlatform } from "./package";
+import { boardEqual, parseBoardDescriptor } from "./board";
+import { BoardConfigResult, IBoard, IPackage, IPlatform, IProgrammer } from "./package";
+import { parseProgrammerDescriptor } from "./programmer";
 import { VscodeSettings } from "./vscodeSettings";
 
 export class BoardManager {
@@ -21,6 +22,8 @@ export class BoardManager {
     private _packages: IPackage[];
 
     private _platforms: IPlatform[];
+
+    private _programmers: Map<string, IProgrammer>;
 
     private _installedPlatforms: IPlatform[];
 
@@ -67,15 +70,20 @@ export class BoardManager {
         // Load default platforms from arduino installation directory and user manually installed platforms.
         this.loadInstalledPlatforms();
 
-        // Load all supported boards type.
+        // Load all supported board types
         this.loadInstalledBoards();
+        this.loadInstalledProgrammers();
         this.updateStatusBar();
         this._boardConfigStatusBar.show();
 
         const dc = DeviceContext.getInstance();
-        dc.onDidChange(() => {
-            this.updateStatusBar();
-        });
+        dc.onChangeBoard(() => this.onDeviceContextBoardChange());
+        dc.onChangeConfiguration(() => this.onDeviceContextConfigurationChange());
+
+        // load initial board from DeviceContext by emulating
+        // a board change event.
+        this.onDeviceContextBoardChange();
+        this.updateStatusBar(true);
     }
 
     public async changeBoardType() {
@@ -107,7 +115,7 @@ export class BoardManager {
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
-            await VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
+            VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
@@ -119,13 +127,21 @@ export class BoardManager {
 
     public doChangeBoardType(targetBoard: IBoard) {
         const dc = DeviceContext.getInstance();
-        dc.board = targetBoard.key;
-        this._currentBoard = targetBoard;
-        dc.configuration = this._currentBoard.customConfig;
-        this._boardConfigStatusBar.text = targetBoard.name;
-        this._arduinoApp.addLibPath(null);
 
-        this._onBoardTypeChanged.fire();
+        if (dc.board === targetBoard.key) {
+            return;
+        }
+
+        // Resetting the board first that we don't overwrite the configuration
+        // of the previous board.
+        this._currentBoard = null;
+        // This will cause a configuration changed event which will have no
+        // effect because no current board is set.
+        dc.configuration = targetBoard.customConfig;
+        // This will generate a device context board event which will set the
+        // correct board and configuration. We know that it will trigger - we
+        // made sure above that the boards actually differ
+        dc.board = targetBoard.key;
     }
 
     public get packages(): IPackage[] {
@@ -138,6 +154,10 @@ export class BoardManager {
 
     public get installedBoards(): Map<string, IBoard> {
         return this._boards;
+    }
+
+    public get installedProgrammers(): Map<string, IProgrammer> {
+        return this._programmers;
     }
 
     public get currentBoard(): IBoard {
@@ -243,28 +263,93 @@ export class BoardManager {
                     this._installedPlatforms.push(existingPlatform);
                 }
                 this.loadInstalledBoardsFromPlatform(existingPlatform);
+                this.loadInstalledProgrammersFromPlatform(existingPlatform);
             }
         }
     }
 
-    public updateStatusBar(show: boolean = true): void {
+    private updateStatusBar(show: boolean = true): void {
         if (show) {
             this._boardConfigStatusBar.show();
-            const dc = DeviceContext.getInstance();
-            const selectedBoard = this._boards.get(dc.board);
-            if (selectedBoard) {
-                this._currentBoard = selectedBoard;
-                this._boardConfigStatusBar.text = selectedBoard.name;
-                if (dc.configuration) {
-                    this._currentBoard.loadConfig(dc.configuration);
-                }
+            if (this._currentBoard) {
+                this._boardConfigStatusBar.text = this._currentBoard.name;
             } else {
-                this._currentBoard = null;
                 this._boardConfigStatusBar.text = "<Select Board Type>";
             }
         } else {
             this._boardConfigStatusBar.hide();
         }
+    }
+
+    /**
+     * Event callback if DeviceContext detected a new board - either when
+     * loaded from configuration file or when set by the doChangeBoardType
+     * member.
+     */
+    private onDeviceContextBoardChange() {
+        const dc = DeviceContext.getInstance();
+        const newBoard = this._boards.get(dc.board);
+        if (boardEqual(newBoard, this._currentBoard)) {
+            return;
+        }
+        if (newBoard) {
+            this._currentBoard = newBoard;
+            if (dc.configuration) {
+                // In case the configuration is incompatible, we reset it as
+                // setting partially valid configurations can lead to nasty
+                // surprises. When setting a new board this is acceptable
+                const r = this._currentBoard.loadConfig(dc.configuration);
+                if (r !== BoardConfigResult.Success && r !== BoardConfigResult.SuccessNoChange) {
+                    this._currentBoard.resetConfig();
+                    // we don't reset dc.configuration to give the user a
+                    // chance to fix her/his configuration
+                    this.invalidConfigWarning(r);
+                }
+            } else {
+                this._currentBoard.resetConfig();
+                dc.configuration = undefined;
+            }
+        } else {
+            this._currentBoard = null;
+        }
+        this._onBoardTypeChanged.fire();
+        this.updateStatusBar();
+    }
+
+    /**
+     * Event callback if DeviceContext detected a configuration change
+     * - either when loaded from configuration file or when set by the
+     * doChangeBoardType member.
+     */
+    private onDeviceContextConfigurationChange() {
+        const dc = DeviceContext.getInstance();
+        if (this._currentBoard) {
+            const r = this._currentBoard.loadConfig(dc.configuration);
+            if (r !== BoardConfigResult.Success && r !== BoardConfigResult.SuccessNoChange) {
+                this._currentBoard.resetConfig();
+                // We reset the configuration here but do not write it back
+                // to the configuration file - this can be annoying when
+                // someone tries to set a special configuration and doesn't
+                // get it right the first time.
+                this.invalidConfigWarning(r);
+            }
+        }
+    }
+
+    private invalidConfigWarning(result: BoardConfigResult) {
+        let what = "";
+        switch (result) {
+            case BoardConfigResult.InvalidFormat:
+                what = ": Invalid format must be of the form \"key1=value2,key1=value2,...\"";
+                break;
+            case BoardConfigResult.InvalidConfigID:
+                what = ": Invalid configuration key";
+                break;
+            case BoardConfigResult.InvalidOptionID:
+                what = ": Invalid configuration value";
+                break;
+        }
+        vscode.window.showWarningMessage(`Invalid board configuration detected in configuration file${what}. Falling back to defaults.`);
     }
 
     private loadInstalledPlatforms() {
@@ -392,6 +477,23 @@ export class BoardManager {
             const res = parseBoardDescriptor(boardContent, plat);
             res.forEach((bd) => {
                 this._boards.set(bd.key, bd);
+            });
+        }
+    }
+
+    private loadInstalledProgrammers(): void {
+        this._programmers = new Map<string, IProgrammer>();
+        this._installedPlatforms.forEach((plat) => {
+            this.loadInstalledProgrammersFromPlatform(plat);
+        });
+    }
+
+    private loadInstalledProgrammersFromPlatform(plat: IPlatform) {
+        if (util.fileExistsSync(path.join(plat.rootBoardPath, "programmers.txt"))) {
+            const programmersContent = fs.readFileSync(path.join(plat.rootBoardPath, "programmers.txt"), "utf8");
+            const res = parseProgrammerDescriptor(programmersContent, plat);
+            res.forEach((prog) => {
+                this._programmers.set(prog.name, prog);
             });
         }
     }

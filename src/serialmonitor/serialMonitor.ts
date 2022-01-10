@@ -9,10 +9,11 @@ import * as Logger from "../logger/logger";
 import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
-    path: string;
-    manufacturer: string;
-    vendorId: string;
-    productId: string;
+  port: string;
+  desc: string;
+  hwid: string;
+  vendorId: string;
+  productId: string;
 }
 
 export class SerialMonitor implements vscode.Disposable {
@@ -22,7 +23,7 @@ export class SerialMonitor implements vscode.Disposable {
     public static DEFAULT_BAUD_RATE: number = 115200;
 
     public static listBaudRates(): number[] {
-        return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
+        return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000];
     }
 
     public static getInstance(): SerialMonitor {
@@ -48,18 +49,6 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _outputChannel: vscode.OutputChannel;
 
-    private constructor() {
-        const dc = DeviceContext.getInstance();
-        dc.onDidChange(() => {
-            if (dc.port) {
-                if (!this.initialized) {
-                    this.initialize();
-                }
-                this.updatePortListStatus(null);
-            }
-        });
-    }
-
     public initialize() {
         let defaultBaudRate;
         if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
@@ -84,7 +73,12 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.command = "arduino.changeBaudRate";
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = defaultBaudRate.toString();
-        this.updatePortListStatus(null);
+        this.updatePortListStatus();
+
+        const dc = DeviceContext.getInstance();
+        dc.onChangePort(() => {
+            this.updatePortListStatus();
+        });
     }
     public get initialized(): boolean {
         return !!this._outputChannel;
@@ -115,13 +109,13 @@ export class SerialMonitor implements vscode.Disposable {
                 return false;
             });
             if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {
-                this.updatePortListStatus(foundPort.path);
+                this.updatePortListStatus(foundPort.port);
             }
         } else {
             const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
                 return {
-                    description: l.manufacturer,
-                    label: l.path,
+                    description: l.desc,
+                    label: l.port,
                 };
             }).sort((a, b): number => {
                 return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
@@ -185,15 +179,15 @@ export class SerialMonitor implements vscode.Disposable {
         const rates = SerialMonitor.listBaudRates();
         const chosen = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
         if (!chosen) {
-            Logger.warn("No rate is selected, keep baud rate no changed.");
+            Logger.warn("No baud rate selected, keeping previous baud rate.");
             return;
         }
         if (!parseInt(chosen, 10)) {
-            Logger.warn("Invalid baud rate, keep baud rate no changed.", { value: chosen });
+            Logger.warn("Invalid baud rate, keeping previous baud rate.", { value: chosen });
             return;
         }
         if (!this._serialPortCtrl) {
-            Logger.warn("Serial Monitor have not been started.");
+            Logger.warn("Serial Monitor has not been started.");
             return;
         }
         const selectedRate: number = parseInt(chosen, 10);
@@ -217,7 +211,7 @@ export class SerialMonitor implements vscode.Disposable {
         }
     }
 
-    private updatePortListStatus(port: string) {
+    private updatePortListStatus(port?: string) {
         const dc = DeviceContext.getInstance();
         if (port) {
             dc.port = port;

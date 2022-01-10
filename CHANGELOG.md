@@ -1,6 +1,128 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.8
+
+- Release date: November 9, 2021
+
+### Changed
+
+- Fix application insights key [31dd3a9](https://github.com/microsoft/vscode-arduino/commit/31dd3a94c64eb12a5483038c5bfe668abad36f91)
+
+## Version 0.4.7
+
+- Release date: November 5, 2021
+
+### Changed
+
+- Add support for ST-Link v3.0 [#1366](https://github.com/microsoft/vscode-arduino/pull/1366)
+- Fix empty board and examples list [#1367](https://github.com/microsoft/vscode-arduino/pull/1367)
+- Fix ESLint parsing for enums [#1368](https://github.com/microsoft/vscode-arduino/pull/1368)
+- Fix build cwd [#1375](https://github.com/microsoft/vscode-arduino/pull/1375)
+- Fix stack overflow in board configuration view [#1379](https://github.com/microsoft/vscode-arduino/pull/1379)
+
+## Version 0.4.6
+
+- Release date: September 29, 2021
+
+### Changed
+
+- Fix send serial message [#1356](https://github.com/microsoft/vscode-arduino/pull/1356)
+- Update eslint to latest version and fix issues reported [#1352](https://github.com/microsoft/vscode-arduino/pull/1352)
+
+## Version 0.4.5
+
+- Release date: September 21, 2021
+
+### Changed
+- Various minor updates to documentation [#1349](https://github.com/microsoft/vscode-arduino/pull/1349)
+- Don't set `commandPath` when `arduino-cli` is `true` [#1297](https://github.com/microsoft/vscode-arduino/pull/1297)
+
+## Version 0.4.4
+
+- Release date: August 26, 2021
+
+### Changed
+- Serial monitor uses a new backend which doesn't break with updates of VSCode. [#1322](https://github.com/microsoft/vscode-arduino/pull/1322)
+
+## Version 0.4.3
+
+- Release date: May 12, 2021
+
+### Fixed
+- Update node-usb-native to v0.0.20 to fix serial and port selecting [#1257](https://github.com/microsoft/vscode-arduino/issues/1257)
+- Updated dependencies
+
+## Version 0.4.2
+
+- Release date: April 22, 2021
+
+### Fixed
+- Update app insights key
+
+## Version 0.4.1
+
+- Release date: April 19, 2021
+
+### Added
+- Quickpick sketch selection [#1128](https://github.com/microsoft/vscode-arduino/pull/1128) Thanks [@maddogjt](https://github.com/maddogjt)
+
+### Fixed
+- Arduino CLI on MacOS [#1221](https://github.com/microsoft/vscode-arduino/issues/1221) Thanks [@awmichel](https://github.com/awmichel)
+- Typos [#1226](https://github.com/microsoft/vscode-arduino/pull/1226), [#1225](https://github.com/microsoft/vscode-arduino/pull/1225), [#1191](https://github.com/microsoft/vscode-arduino/pull/1191) Thanks [@jogo-](https://github.com/jogo-) [@CBielstein](https://github.com/CBielstein)
+- add USBCON back into IntelliSense config [#1216](https://github.com/microsoft/vscode-arduino/issues/1216)
+- Update dependencies
+- App Insights key in Actions [#1236](https://github.com/microsoft/vscode-arduino/pull/1236)
+
+## Version 0.4.0
+
+- Release date: March 22. 2021
+
+### Added
+- Support for Arduino CLI #1017
+
+### Changed
+- Autogenerate c_cpp_properties.json with all complier arguments and libraries for IntelliSense #1183
+- Detects available programmers for selected board #1118
+
+### Fixed
+- Typos
+
+### Breaking Changes
+- Unifies all build commands under a single
+
+### Known Issues
+- Arduino CLI doesn't work on Mac [#1205](https://github.com/microsoft/vscode-arduino/issues/1205)
+
+## Version 0.3.5
+
+- Release date: November 22, 2020
+
+### Fixes
+- Update to node-usb-native 0.0.19
+
+## Version 0.3.4
+
+- Release date: November 22, 2020
+
+### Changed
+- Add DTR and RTS signals on serial open and baud rate change
+- Improves c_cpp_properties.json autogeneration for IntelliSense
+
+## Version 0.3.3
+
+- Release date: October 29, 2020
+
+### Changed
+- Update node-usb-native dependency to fix serial port issue from VS Code's Electron version update.
+
+## Version 0.3.2
+
+- Release date: August 26, 2020
+
+### Changed
+- Update dependencies.
+
 ## Version 0.3.1
 
 - Release date: June 9, 2020
@@ -22,7 +144,7 @@ All notable changes to this project will be documented in this file.
 - Fix issue of "Fail to debug on Ubuntu". [[#933](https://github.com/microsoft/vscode-arduino/issues/933)]
 - Remove line ending selection. Fix the issue of "Save the last used end of line". [[#952](https://github.com/microsoft/vscode-arduino/issues/952)]
 - Fix the issue of "Can't install libraries from VS Code for ESP8266". [[#930](https://github.com/microsoft/vscode-arduino/issues/930)]
-- Fix the issue of "Project path can not be changed". [[#978](https://github.com/microsoft/vscode-arduino/issues/978)]
+- Fix the issue of "Project path cannot be changed". [[#978](https://github.com/microsoft/vscode-arduino/issues/978)]
 
 Special thanks to [raomin](https://github.com/raomin), thanks for your contributions and feedbacks.
 
@@ -35,7 +157,7 @@ Special thanks to [raomin](https://github.com/raomin), thanks for your contribut
 
 ## Version 0.2.28
 
-- Release data: November 15, 2019
+- Release date: November 15, 2019
 
 ### Fixed
 
@@ -111,7 +233,7 @@ Special thanks to [Deqing Sun](https://github.com/DeqingSun), thank you for your
 - Add sketches folder into examples view [#652](https://github.com/Microsoft/vscode-arduino/issues/652)
 
 ### Changed
-- Change Arduino langauge ID to C++ [#686](https://github.com/Microsoft/vscode-arduino/issues/686)
+- Change Arduino language ID to C++ [#686](https://github.com/Microsoft/vscode-arduino/issues/686)
 - Use VS Code new webview API [#701](https://github.com/Microsoft/vscode-arduino/issues/701)
 
 ### Fixed
@@ -134,7 +256,7 @@ Special thanks to [Deqing Sun](https://github.com/DeqingSun), [Takashi Matsuoka]
 - Fix the output path not exist issue [#641](https://github.com/Microsoft/vscode-arduino/issues/641)
 - Update arduino.path instruction [#635](https://github.com/Microsoft/vscode-arduino/issues/635)
 
-Special thanks to [aster94](https://github.com/aster94), [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you foryour contributions and feedbacks.
+Special thanks to [aster94](https://github.com/aster94), [Niels van der Veer](https://github.com/n9iels), [AntoineGirafe](https://github.com/AntoineGirafe), thank you for your contributions and feedbacks.
 
 ## Version 0.2.20
 
@@ -159,7 +281,7 @@ Special thanks to [aster94](https://github.com/aster94), [Niels van der Veer](ht
 - Add Wio 3G board and WeMos D1 board [#223](https://github.com/Microsoft/vscode-arduino/pull/223)
 
 ### Fixed
-- Fix intellisense issue of `c_cpp_properties.json`
+- Fix IntelliSense issue of `c_cpp_properties.json`
 - Fix "Verifying" is misspelled issue [#591](https://github.com/Microsoft/vscode-arduino/issues/591)
 - Improve config setting descriptions [#605](https://github.com/Microsoft/vscode-arduino/issues/605)
 
@@ -194,13 +316,13 @@ Special thanks to [Thad House](https://github.com/ThadHouse), [Carlos Gomez](htt
 ### Added
 - Add a sketch file button in status bar to reset sketch file [#481](https://github.com/Microsoft/vscode-arduino/issues/481)
 - Add loading status bar for verify and build command [#137](https://github.com/Microsoft/vscode-arduino/issues/137)
-- Add `prebuild` support in `arduio.json` [#411](https://github.com/Microsoft/vscode-arduino/issues/411)
+- Add `prebuild` support in `arduino.json` [#411](https://github.com/Microsoft/vscode-arduino/issues/411)
 - Add upload using programmer command [#407](https://github.com/Microsoft/vscode-arduino/issues/407)
 - Add ignore option for board detection notification [#495](https://github.com/Microsoft/vscode-arduino/issues/495)
 - Add settings for disable/enable serial monitor TestingOpen [#530](https://github.com/Microsoft/vscode-arduino/issues/530)
 
 ### Fixed
-- Fix intellisense issue of `c_cpp_properties.json` (preview) [#438](https://github.com/Microsoft/vscode-arduino/issues/438)
+- Fix IntelliSense issue of `c_cpp_properties.json` (preview) [#438](https://github.com/Microsoft/vscode-arduino/issues/438)
 
 Special thanks to [Joel Santos](https://github.com/mundodisco8), [John](https://github.com/VashJuan), [mybayern1974](https://github.com/mybayern1974), [Maxime Paquatte](https://github.com/maxime-paquatte), [Joe Saavedra](https://github.com/jmsaavedra), [Kye Burchard](https://github.com/kyeb), [Laurent Haas - F6FVY](https://github.com/f6fvy), thank you for your feedbacks.
 
@@ -283,19 +405,19 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 
 - Release date: August 24, 2017
 
-### Added 
+### Added
 - Add settings for enabled/disable USB detection
 - Add Arduino Example tree explorer viewlet
 - Contribution from [DeqingSun](https://github.com/DeqingSun): Support multiple versions of Arduino on Mac [#375](https://github.com/Microsoft/vscode-arduino/pull/375)
 - Contribution from [DeqingSun](https://github.com/DeqingSun): Add board support for STM32F1 with Arudino_STM32 [#377](https://github.com/Microsoft/vscode-arduino/pull/377)
 
-### Changed 
-- Leverage the ouput path config to speedup upload/verify
+### Changed
+- Leverage the output path config to speedup upload/verify
 - Fix USB detection issue during uploading [#371](https://github.com/Microsoft/vscode-arduino/pull/371), [372](https://github.com/Microsoft/vscode-arduino/pull/372)
 - Contribution from [lialosiu](https://github.com/lialosiu): Fix encoding issue for non UTF-8 [#364](https://github.com/Microsoft/vscode-arduino/pull/364)
-- Update the documents with the helps of 
+- Update the documents with the helps of
     - [eduherminio](https://github.com/Microsoft/vscode-arduino/pull/361)
-    - [Atalanttore](https://github.com/Microsoft/vscode-arduino/pull/381), 
+    - [Atalanttore](https://github.com/Microsoft/vscode-arduino/pull/381),
 
 ## Version 0.2.4
 
@@ -314,7 +436,7 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 
 ### Changed
 - Use a new configuration page for switching arduino boards
-- Lazy load the arduino extension on start up, only usb detection works in background, when it detects an arduino board, the extension will fully activate
+- Lazy load the arduino extension on startup, only usb detection works in background, when it detects an arduino board, the extension will fully activate
 - Update unit test to some basic arduino commands
 - Fix some typos in code
 - Fix issue #289 #324 #327
@@ -370,7 +492,9 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 
 ## Version 0.1.1
 
-- HotFix: Update display tag. 
+- Release date: April 14, 2017
+
+- HotFix: Update display tag.
 
 ## Version 0.1.0
 
@@ -385,4 +509,4 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 - Built-in serial monitor
 - Snippets for sketches
 - Automatic Arduino project scaffolding
-- Commond Palette (F1) integration of frequently used commands (e.g. Verify, Upload...)
+- Command Palette (F1) integration of frequently used commands (e.g. Verify, Upload...)

@@ -1,0 +1,87 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Node 14 matches the version of Node used by VS Code when this was
+      # written, but it should be updated when VS Code updates its Node version.
+      # Node needs to be installed before OS-specific setup so that we can run
+      # the hash verification script.
+      - name: Use Node 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
+      - name: Windows setup
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          curl -LO https://downloads.arduino.cc/arduino-1.8.19-windows.zip
+          node build/checkHash.js arduino-1.8.19-windows.zip `
+          c704a821089eab2588f1deae775916219b1517febd1dd574ff29958dca873945
+          7z x arduino-1.8.19-windows.zip -o"$Env:TEMP\arduino-ide"
+          echo "$Env:TEMP\arduino-ide\arduino-1.8.19" | Out-File -FilePath $env:GITHUB_PATH -Append
+      - name: Linux setup
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
+          sleep 3
+          wget https://downloads.arduino.cc/arduino-1.8.19-linux64.tar.xz -P /home/$USER
+          node build/checkHash.js /home/$USER/arduino-1.8.19-linux64.tar.xz \
+          eb68bddc1d1c0120be2fca1350a03ee34531cf37f51847b21210b6e70545bc9b
+          tar -xvf /home/$USER/arduino-1.8.19-linux64.tar.xz -C /home/$USER/
+          sudo ln -s /home/$USER/arduino-1.8.19/arduino /usr/bin/arduino
+          sudo apt-get update
+          sudo apt-get install -y g++-multilib build-essential libudev-dev
+      - name: macOS setup
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+          brew install arduino --cask
+
+      # Windows agents already have gulp installed.
+      - name: Install gulp
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: npm install --global gulp
+      - name: Install global dependencies
+        run: npm install --global node-gyp vsce
+      - name: Install project dependencies
+        run: npm install
+
+      - name: Check for linting errors
+        run: gulp tslint
+      - name: Build and pack extension
+        run: vsce package --out vscode-arduino.vsix
+      - name: Publish extension VSIX as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: VS Code extension VSIX (${{ matrix.os }})
+          path: vscode-arduino.vsix
+
+      - name: Run tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: npm test --silent
