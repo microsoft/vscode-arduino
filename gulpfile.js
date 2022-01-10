@@ -1,8 +1,8 @@
 const gulp = require("gulp");
 const eslint = require("gulp-eslint");
 const tslint = require("gulp-tslint");
-const PluginError = require("plugin-error");
-const log = require("fancy-log");
+const PluginError = require("plugin-error");
+const log = require("fancy-log");
 const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
 const webpack = require("webpack");
@@ -21,7 +21,7 @@ gulp.task("tslint", () => {
 });
 
 gulp.task("eslint", () => {
-    return gulp.src(["!**/node_modules/**"])
+    return gulp.src(["**/*.ts", "**/*.tsx", "!**/*.d.ts", "!./vendor/**", "!node_modules/**", "!./src/views/node_modules/**", "!out/**"])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
@@ -106,7 +106,7 @@ gulp.task("clean", (done) => {
 
 gulp.task("genAikey", (done) => {
     const packageJson = JSON.parse(fs.readFileSync("package.json"));
-    packageJson.aiKey = process.env.PROD_AIKEY;
+    packageJson.aiKey = "f1e4de2f-62b0-45e1-b36e-9216f21bd08e";
     fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
     done();
 });

@@ -43,7 +43,7 @@ function versionArrayCompare(a: any[], b: any[]) {
         } else if (isNaN(na) && !isNaN(nb)) {
             return -1;
         } else {
-            const re = /\-|\+/;
+            const re = /-|\+/;
             const subA = a[i].split(re);
             const subB = b[i].split(re);
             if (subA.length > 1 || subB.length > 1 || subA[0] !== a[i] || subB[0] !== b[i]) {

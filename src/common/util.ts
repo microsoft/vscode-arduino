@@ -267,7 +267,7 @@ export function getArduinoL4jCodepage(filePath: string): string | undefined {
 }
 
 export function decodeData(data: Buffer, codepage: string): string {
-    if (encodingMapping.hasOwnProperty(codepage)) {
+    if (Object.prototype.hasOwnProperty.call(encodingMapping, codepage)) {
         return iconv.decode(data, encodingMapping[codepage]);
     }
     return data.toString();
