@@ -28,7 +28,7 @@ export class SerialPortCtrl {
   public static list(): Promise<ISerialPortDetail[]> {
     // TODO: Wrap this in a try catch block, catch error if no serial monitor at path
     const stdout =  execFileSync(SerialPortCtrl._serialCliPath, ["list-ports"]);
-    const lists = JSON.parse(stdout);
+    const lists = JSON.parse(stdout.toString("utf-8"));
     lists.forEach((port) => {
         const vidPid = this._parseVidPid(port["hwid"]);
         port["vendorId"] = vidPid["vid"];
@@ -123,12 +123,11 @@ export class SerialPortCtrl {
 
   public sendMessage(text: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (!text || !this._currentSerialPort || !this.isActive) {
+      if (!text || !this.isActive) {
         resolve();
         return;
       }
-
-      this._currentSerialPort.write(text + "\r\n", (error) => {
+      this._child.stdin.write(`{"cmd": "write", "payload": "${text}"}\n`, (error) => {
         if (!error) {
           resolve();
         } else {

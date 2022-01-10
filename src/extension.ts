@@ -55,7 +55,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(deviceContext);
 
     const commandExecution = async (command: string, commandBody: (...args: any[]) => any, args: any, getUserData?: () => any) => {
-        const guid = uuidModule().replace(/\-/g, "");
+        const guid = uuidModule().replace(/-/g, "");
         Logger.traceUserData(`start-command-` + command, { correlationId: guid });
         const timer1 = new Logger.Timer();
         let telemetryResult;

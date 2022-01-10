@@ -3,7 +3,7 @@ import { Button, ControlLabel, FormControl, FormGroup } from "react-bootstrap";
 import * as API from "../actions/api";
 import { chartConfig } from "./chartConfig";
 
-import Dygraph from "dygraphs";
+import "dygraphs";
 
 enum MessageType {
     Frame = "Frame",
