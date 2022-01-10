@@ -22,12 +22,12 @@ Either the Arduino IDE or Arduino CLI are required.
 The Arduino IDE can be installed the Arduino [download page](https://www.arduino.cc/en/main/software#download).
 - The supported Arduino IDE versions are `1.6.x` and later.
 - The Windows Store's version of the Arduino IDE is not supported because of the sandbox environment that the application runs in.
-- *Note:* Arduino IDE `1.8.7` has some breaking changes, causing board package and library installation failures.
+- *Note:* Arduino IDE `1.8.7` had some breaking changes, causing board package and library installation failures.  These failures were corrected in `1.8.8` and later.
 
 ### Arduino CLI
 The Arduino CLI can be downloaded from the repository's [release page](https://github.com/arduino/arduino-cli/releases/tag/0.13.0)
 - The extension has only been tested with v0.13.0.
-- If you use the CLI you will have to set `arduino.path` since the CLI does not have a defualt path. 
+- If you use the CLI you will have to set `arduino.path` since the CLI does not have a default path.
 
 ## Installation
 Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
@@ -60,7 +60,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Upload Using Programmer**: Upload using an external programmer.
 - **Arduino: CLI Upload Using Programmer**: Upload using an external programmer without building sketch (CLI only).
 - **Arduino: Verify**: Build sketch.
-- **Arduino: Rebuild IntelliSense Configuration**: Forced/manual rebuild of the IntelliSense configuration. The extension analyzes Arduino's build output and sets the Intellisense include paths, defines, compiler arguments accordingly.
+- **Arduino: Rebuild IntelliSense Configuration**: Forced/manual rebuild of the IntelliSense configuration. The extension analyzes Arduino's build output and sets the IntelliSense include paths, defines, compiler arguments accordingly.
 
 ## Keybindings
 - **Arduino: Upload** <kbd>Alt</kbd> + <kbd>Cmd</kbd> + <kbd>U</kbd> *or* <kbd>Alt</kbd> + <kbd>Ctrl</kbd> + <kbd>U</kbd>
@@ -71,10 +71,10 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | Option | Description |
 | --- | --- |
 | `arduino.path`  | Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path. |
-| `arduino.commandPath` | Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for windows,`Contents/MacOS/Arduino` for Mac and `arduino` for Linux, You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux. |
+| `arduino.commandPath` | Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for Windows, `Contents/MacOS/Arduino` for Mac and `arduino` for Linux, You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux. |
 | `arduino.additionalUrls` | Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma(`,`) as separator, or have a string array. The default value is empty. |
 | `arduino.logLevel` | CLI output log level. Could be info or verbose. The default value is `"info"`. |
-| `arduino.allowPDEFiletype` | Allow the VSCode Arduino extension to open .pde files from pre-1.0.0 versions of Ardiuno. Note that this will break Processing code. Default value is `false`. |
+| `arduino.allowPDEFiletype` | Allow the VSCode Arduino extension to open .pde files from pre-1.0.0 versions of Arduino. Note that this will break Processing code. Default value is `false`. |
 | `arduino.enableUSBDetection` | Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport `npm install -g serialport` `serialport-list -f jsonline`|
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
@@ -138,14 +138,14 @@ The following settings are as per sketch settings of the Arduino extension. You 
 
 ## Pre- and Post-Build Commands
 On Windows the commands run within a `cmd`-, on Linux and OSX within a `bash`-instance. Therefore your command can be anything what you can run within those shells. Instead of running a command you can invoke a script. This makes writing more complex pre-/post-build mechanisms much easier and opens up the possibility to run python or other scripting languages.
-The commands run within the workspace root directory and vscode-arduino sets the following environment variables:  
-**`VSCA_BUILD_MODE`** The current build mode, one of `Verifying`, `Uploading`, `Uploading (programmer)` or `Analyzing`. This allows you to run your script on certain build modes only.  
-**`VSCA_SKETCH`** The sketch file relative to your workspace root directory.  
-**`VSCA_BOARD`** Your board and configuration, e.g. `arduino:avr:nano:cpu=atmega328`.  
-**`VSCA_WORKSPACE_DIR`** The absolute path of your workspace root directory.  
-**`VSCA_LOG_LEVEL`** The current log level. This allows you to control the verbosity of your scripts.  
-**`VSCA_SERIAL`** The serial port used for uploading. Not set if you haven't set one in your `arduino.json`.  
-**`VSCA_BUILD_DIR`** The build directory. Not set if you haven't set one in your `arduino.json`.  
+The commands run within the workspace root directory and vscode-arduino sets the following environment variables:
+**`VSCA_BUILD_MODE`** The current build mode, one of `Verifying`, `Uploading`, `Uploading (programmer)` or `Analyzing`. This allows you to run your script on certain build modes only.
+**`VSCA_SKETCH`** The sketch file relative to your workspace root directory.
+**`VSCA_BOARD`** Your board and configuration, e.g. `arduino:avr:nano:cpu=atmega328`.
+**`VSCA_WORKSPACE_DIR`** The absolute path of your workspace root directory.
+**`VSCA_LOG_LEVEL`** The current log level. This allows you to control the verbosity of your scripts.
+**`VSCA_SERIAL`** The serial port used for uploading. Not set if you haven't set one in your `arduino.json`.
+**`VSCA_BUILD_DIR`** The build directory. Not set if you haven't set one in your `arduino.json`.
 
 For example under Windows the following `arduino.json` setup
 ```json
@@ -160,7 +160,7 @@ will produce
 ```
 [Starting] Verifying sketch 'test.ino'
 Running pre-build command: "IF "%VSCA_BUILD_MODE%"=="Verifying" (echo VSCA_BUILD_MODE=%VSCA_BUILD_MODE% && echo VSCA_BOARD=%VSCA_BOARD%)"
-VSCA_BUILD_MODE=Verifying 
+VSCA_BUILD_MODE=Verifying
 VSCA_BOARD=arduino:avr:nano:cpu=atmega328
 Loading configuration...
 <...>
@@ -221,8 +221,8 @@ You can find the full list of issues on the [Issue Tracker](https://github.com/M
 Installation prerequisites:
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (>= 6.5.0)
-- [Npm](https://www.npmjs.com/) (>= 3.10.3)
+- [Node.js](https://nodejs.org/) (>= 12.x)
+- [Npm](https://www.npmjs.com/) (>= 6.x)
 
 To *run and develop*, do the following:
 - `git clone https://github.com/microsoft/vscode-arduino`

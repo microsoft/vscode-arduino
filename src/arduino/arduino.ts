@@ -39,7 +39,7 @@ export enum BuildMode {
     CliUpload = "Uploading using Arduino CLI",
     UploadProgrammer = "Uploading (programmer)",
     CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
-};
+}
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -343,6 +343,7 @@ export class ArduinoApp {
         function tmpName(name) {
             let counter = 0;
             let candidateName = name;
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (!util.fileExistsSync(candidateName) && !util.directoryExistsSync(candidateName)) {
                     return candidateName;
@@ -763,7 +764,7 @@ export class ArduinoApp {
         return await util.spawn(
             this._settings.commandPath,
             args,
-            undefined,
+            { cwd: ArduinoWorkspace.rootPath },
             { /*channel: arduinoChannel.channel,*/ stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             const ret = await cleanup("ok");

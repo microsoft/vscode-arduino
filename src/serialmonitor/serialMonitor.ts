@@ -9,10 +9,11 @@ import * as Logger from "../logger/logger";
 import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
-    path: string;
-    manufacturer: string;
-    vendorId: string;
-    productId: string;
+  port: string;
+  desc: string;
+  hwid: string;
+  vendorId: string;
+  productId: string;
 }
 
 export class SerialMonitor implements vscode.Disposable {
@@ -108,13 +109,13 @@ export class SerialMonitor implements vscode.Disposable {
                 return false;
             });
             if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {
-                this.updatePortListStatus(foundPort.path);
+                this.updatePortListStatus(foundPort.port);
             }
         } else {
             const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
                 return {
-                    description: l.manufacturer,
-                    label: l.path,
+                    description: l.desc,
+                    label: l.port,
                 };
             }).sort((a, b): number => {
                 return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);

@@ -10,7 +10,6 @@ import { IPlatform, IProgrammer } from "../src/arduino/package";
 import { Programmer } from "../src/arduino/programmer";
 import { ProgrammerManager } from "../src/arduino/programmerManager";
 import { DeviceContext } from "../src/deviceContext";
-import * as Resources from "./resources";
 
 suite("Arduino: Programmer Manager.", () => {
     let programmerManager: ProgrammerManager;

@@ -52,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(deviceContext);
 
     const commandExecution = async (command: string, commandBody: (...args: any[]) => any, args: any, getUserData?: () => any) => {
-        const guid = uuidModule().replace(/\-/g, "");
+        const guid = uuidModule().replace(/-/g, "");
         Logger.traceUserData(`start-command-` + command, { correlationId: guid });
         const timer1 = new Logger.Timer();
         let telemetryResult;
@@ -156,24 +156,40 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
-    registerArduinoCommand("arduino.setSketchFile", async () => {
+    registerArduinoCommand("arduino.selectSketch", async () => {
         const sketchFileName = deviceContext.sketch;
-        const newSketchFileName = await vscode.window.showInputBox({
-            placeHolder: sketchFileName,
-            validateInput: (value) => {
-                if (value && /\.((ino)|(cpp)|c)$/.test(value.trim())) {
-                    return null;
-                } else {
-                    return "Invalid sketch file name. Should be *.ino/*.cpp/*.c";
-                }
-            },
-        });
+
+        // Include any ino, cpp, or c files under the workspace folder
+        const includePattern = "**/*.{ino,cpp,c}";
+
+        // The sketchbook folder may contain hardware & library folders, any sketches under these paths
+        // should be excluded
+        const sketchbookPath = arduinoContextModule.default.arduinoApp.settings.sketchbookPath;
+        const excludePatterns = [
+            path.relative(ArduinoWorkspace.rootPath, sketchbookPath + "/hardware/**"),
+            path.relative(ArduinoWorkspace.rootPath, sketchbookPath + "/libraries/**")];
+
+        // If an output path is specified, it should be excluded as well
+        if (deviceContext.output) {
+            const outputPath = path.relative(ArduinoWorkspace.rootPath,
+                path.resolve(ArduinoWorkspace.rootPath, deviceContext.output));
+            excludePatterns.push(`${outputPath}/**`);
+        }
+        const excludePattern = `{${excludePatterns.map((p) => p.replace("\\", "/")).join(",")}}`;
+
+        const fileUris = await vscode.workspace.findFiles(includePattern, excludePattern);
+        const newSketchFileName = await vscode.window.showQuickPick(fileUris.map((fileUri) =>
+            ({
+                label: path.relative(ArduinoWorkspace.rootPath, fileUri.fsPath),
+                description: fileUri.fsPath,
+            })),
+            { placeHolder: sketchFileName, matchOnDescription: true });
 
         if (!newSketchFileName) {
             return;
         }
 
-        deviceContext.sketch = newSketchFileName;
+        deviceContext.sketch = newSketchFileName.label;
         deviceContext.showStatusBar();
     });
 

@@ -3,11 +3,10 @@
 
 import * as os from "os";
 import * as path from "path";
-import * as vscode from "vscode";
 import * as WinReg from "winreg";
 import * as util from "../common/util";
 
-import { resolveArduinoPath, validateArduinoPath } from "../common/platform";
+import { resolveArduinoPath } from "../common/platform";
 
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -72,7 +71,7 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._sketchbookPath = path.join(process.env.HOME, "Arduino");
             }
 
-            if (this._commandPath === "") {
+            if (this._commandPath === "" && !this._useArduinoCli) {
                 this._commandPath = "arduino";
             }
         } else if (platform === "darwin") {
@@ -92,7 +91,7 @@ export class ArduinoSettings implements IArduinoSettings {
                 this._sketchbookPath = path.join(process.env.HOME, "Documents/Arduino");
             }
 
-            if (this._commandPath === "") {
+            if (this._commandPath === "" && !this._useArduinoCli) {
                 this._commandPath = "/Contents/MacOS/Arduino";
             }
         }
@@ -104,7 +103,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultExamplePath(): string {
         if (os.platform() === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), "/Contents/Java/examples");
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), "/Contents/Java/examples");
         } else {
             return path.join(this._arduinoPath, "examples");
         }
@@ -116,7 +115,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultPackagePath(): string {
         if (os.platform() === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), "/Contents/Java/hardware");
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), "/Contents/Java/hardware");
         } else { // linux and win32.
             return path.join(this._arduinoPath, "hardware");
         }
@@ -124,7 +123,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultLibPath(): string {
         if (os.platform() === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), "/Contents/Java/libraries");
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), "/Contents/Java/libraries");
         } else { // linux and win32
             return path.join(this._arduinoPath, "libraries");
         }
@@ -133,7 +132,7 @@ export class ArduinoSettings implements IArduinoSettings {
     public get commandPath(): string {
         const platform = os.platform();
         if (platform === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath), path.normalize(this._commandPath));
+            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), path.normalize(this._commandPath));
         } else {
             return path.join(this._arduinoPath, path.normalize(this._commandPath));
         }

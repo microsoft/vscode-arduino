@@ -254,7 +254,7 @@ export function spawn(
 }
 
 export function decodeData(data: Buffer, codepage: string): string {
-    if (encodingMapping.hasOwnProperty(codepage)) {
+    if (Object.prototype.hasOwnProperty.call(encodingMapping, codepage)) {
         return iconv.decode(data, encodingMapping[codepage]);
     }
     return data.toString();
@@ -426,8 +426,8 @@ export function convertToHex(number, width = 0) {
  * in case you named Arduino with a version number
  * @argument {string} arduinoPath
  */
-export function resolveMacArduinoAppPath(arduinoPath: string): string {
-    if (/Arduino.*\.app/.test(arduinoPath)) {
+export function resolveMacArduinoAppPath(arduinoPath: string, useArduinoCli = false): string {
+    if (useArduinoCli || /Arduino.*\.app/.test(arduinoPath)) {
         return arduinoPath;
     } else {
         return path.join(arduinoPath, "Arduino.app");

@@ -1,36 +1,64 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { ChildProcess, execFileSync, spawn  } from "child_process";
 import * as os from "os";
+import * as path from "path";
 import { OutputChannel } from "vscode";
-import { VscodeSettings } from "../arduino/vscodeSettings";
+import { DeviceContext } from "../deviceContext";
 
 interface ISerialPortDetail {
-  path: string;
-  manufacturer: string;
+  port: string;
+  desc: string;
+  hwid: string;
   vendorId: string;
   productId: string;
 }
 
 export class SerialPortCtrl {
-  public static get serialport(): any {
-    if (!SerialPortCtrl._serialport) {
-      SerialPortCtrl._serialport = require("node-usb-native").SerialPort;
-    }
-    return SerialPortCtrl._serialport;
+
+/**
+ * Launches the serial monitor to check which external usb devices are connected.
+ *
+ * @returns An array of ISerialPortDetail from external serial devices.
+ *
+ */
+  public static list(): Promise<ISerialPortDetail[]> {
+    // TODO: Wrap this in a try catch block, catch error if no serial monitor at path
+    const stdout =  execFileSync(SerialPortCtrl._serialCliPath, ["list-ports"]);
+    const lists = JSON.parse(stdout.toString("utf-8"));
+    lists.forEach((port) => {
+        const vidPid = this._parseVidPid(port["hwid"]);
+        port["vendorId"] = vidPid["vid"];
+        port["productId"] = vidPid["pid"];
+    });
+    return lists;
   }
 
-  public static async list(): Promise<ISerialPortDetail[]> {
-    try {
-      const lists = SerialPortCtrl.serialport.list();
-      return lists;
-    } catch (err) {
-      throw err;
-    }
+  /**
+   * Parse out vendor id and product id from the hardware id provided by the device.
+   *
+   * @param hwid: The hardware information for a sepcific device
+   *
+   * @returns vendor id and product id values in an array. Returns null if none are found.
+   */
+  private static _parseVidPid(hwid: string): any {
+    const result = hwid.match(/VID:PID=(?<vid>\w+):(?<pid>\w+)/i);
+    return result !== null ? result["groups"] : [null, null];
   }
 
-  private static _serialport: any;
+  private static get _serialCliPath(): string {
+    let fileName: string;
+    if (os.platform() === "win32") {
+        fileName = "main.exe"
+    } else if (os.platform() === "linux" || os.platform() === "darwin") {
+        fileName = "main"
+    }
+    const deviceContext = DeviceContext.getInstance();
+    return path.resolve(deviceContext.extensionPath, "out", "serial-monitor-cli", `${os.platform}`, fileName);
+  }
 
+  private _child: ChildProcess;
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
@@ -40,74 +68,54 @@ export class SerialPortCtrl {
     this._currentPort = port;
   }
 
+  /*
+  * Return true if child proccess is currently running
+  */
   public get isActive(): boolean {
-    return this._currentSerialPort && this._currentSerialPort.isOpen;
+    return this._child ? true : false;
   }
 
   public get currentPort(): string {
     return this._currentPort;
   }
 
-  public open(): Promise<any> {
+  public open(): Promise<void> {
     this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
+    this._outputChannel.show();
+
+    if (this._child) {
+        this.stop();
+    }
+
     return new Promise((resolve, reject) => {
-      if (this._currentSerialPort && this._currentSerialPort.isOpen) {
-        this._currentSerialPort.close((err) => {
-          if (err) {
-            return reject(err);
-          }
-          this._currentSerialPort = null;
-          return this.open().then(() => {
-            resolve();
-          }, (error) => {
-            reject(error);
-          });
-        });
-      } else {
-        this._currentSerialPort = new SerialPortCtrl.serialport(this._currentPort, { baudRate: this._currentBaudRate, hupcl: false });
-        this._outputChannel.show();
-        this._currentSerialPort.on("open", () => {
-          if (VscodeSettings.getInstance().disableTestingOpen) {
-            this._outputChannel.appendLine("[Warning] Auto checking serial port open is disabled");
-            return resolve();
-          }
+        this._child = spawn(SerialPortCtrl._serialCliPath,
+            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "--json"])
 
-          this._currentSerialPort.write("TestingOpen" + "\r\n", (err) => {
-            // TODO: Fix this on the serial port lib: https://github.com/EmergingTechnologyAdvisors/node-serialport/issues/795
-            if (err && !(err.message.indexOf("Writing to COM port (GetOverlappedResult): Unknown error code 121") >= 0)) {
-              this._outputChannel.appendLine(`[Error] Failed to open the serial port - ${this._currentPort}`);
-              reject(err);
-            } else {
-              this._outputChannel.appendLine(`[Info] Opened the serial port - ${this._currentPort}`);
-              this._currentSerialPort.set(["dtr=true", "rts=true"], (err) => {
-                if (err) {
-                  reject(err);
-                }
-              });
-              resolve();
-            }
-          });
+        this._child.on("error", (err) => {
+            reject(err)
         });
 
-        this._currentSerialPort.on("data", (_event) => {
-          this._outputChannel.append(_event.toString());
+        this._child.stdout.on("data", (data) => {
+            const jsonObj = JSON.parse(data.toString())
+            this._outputChannel.append(jsonObj["payload"] + "\n");
         });
+        // TODO: add message check to ensure _child spawned without errors
+        resolve();
+        // The spawn event is only supported in node v15+ vscode
+        // this._child.on("spawn", (spawn) => {
+        //     resolve();
+        // });
 
-        this._currentSerialPort.on("error", (_error) => {
-          this._outputChannel.appendLine("[Error]" + _error.toString());
-        });
-      }
-    });
+     });
   }
 
-  public sendMessage(text: string): Promise<any> {
+  public sendMessage(text: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (!text || !this._currentSerialPort || !this.isActive) {
+      if (!text || !this.isActive) {
         resolve();
         return;
       }
-
-      this._currentSerialPort.write(text + "\r\n", (error) => {
+      this._child.stdin.write(`{"cmd": "write", "payload": "${text}"}\n`, (error) => {
         if (!error) {
           resolve();
         } else {
@@ -117,7 +125,7 @@ export class SerialPortCtrl {
     });
   }
 
-  public changePort(newPort: string): Promise<any> {
+  public changePort(newPort: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (newPort === this._currentPort) {
         resolve();
@@ -139,45 +147,40 @@ export class SerialPortCtrl {
     });
   }
 
-  public stop(): Promise<any> {
+  public stop(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (!this._currentSerialPort || !this.isActive) {
+      if (!this.isActive) {
         resolve(false);
         return;
       }
-      this._currentSerialPort.close((err) => {
+      try {
+        this._child.stdin.write('{"cmd": "close"}\n');
         if (this._outputChannel) {
           this._outputChannel.appendLine(`[Done] Closed the serial port ${os.EOL}`);
         }
-        this._currentSerialPort = null;
-        if (err) {
-          reject(err);
-        } else {
-          resolve(true);
-        }
+        this._child = null;
+        resolve(true);
+      } catch (error) {
+          reject(error);
+      }
       });
-    });
   }
-  public changeBaudRate(newRate: number): Promise<any> {
+
+  public changeBaudRate(newRate: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this._currentBaudRate = newRate;
-      if (!this._currentSerialPort || !this.isActive) {
+      if (!this._child || !this.isActive) {
         resolve();
         return;
-      }
-      this._currentSerialPort.update({ baudRate: this._currentBaudRate }, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          this._currentSerialPort.set(["dtr=true", "rts=true"], (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
+      } else {
+            try {
+                this.stop();
+                this.open();
+                resolve();
+            } catch (error) {
+                reject(error);
             }
-          });
         }
-      });
     });
   }
 }
