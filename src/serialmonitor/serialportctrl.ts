@@ -4,7 +4,9 @@
 import { ChildProcess, execFileSync, spawn  } from "child_process";
 import * as os from "os";
 import * as path from "path";
+import * as vscode from "vscode";
 import { OutputChannel } from "vscode";
+import { VscodeSettings } from "../arduino/vscodeSettings";
 import { DeviceContext } from "../deviceContext";
 
 interface ISerialPortDetail {
@@ -62,10 +64,14 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
+  private _lineEmitter: vscode.EventEmitter<string>;
+  private _lineBuffer: Buffer;
 
   public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
+    this._lineEmitter = new vscode.EventEmitter();
+    this._lineBuffer = Buffer.alloc(0);
   }
 
   /*
@@ -77,6 +83,10 @@ export class SerialPortCtrl {
 
   public get currentPort(): string {
     return this._currentPort;
+  }
+
+  public onLine(listener: (string) => {}): vscode.Disposable {
+      return this._lineEmitter.event(listener);
   }
 
   public open(): Promise<void> {
@@ -98,6 +108,8 @@ export class SerialPortCtrl {
         this._child.stdout.on("data", (data) => {
             const jsonObj = JSON.parse(data.toString())
             this._outputChannel.append(jsonObj["payload"] + "\n");
+
+            this.readLines(jsonObj["payload"]).forEach((line) => this._lineEmitter.fire(line));
         });
         // TODO: add message check to ensure _child spawned without errors
         resolve();
@@ -182,5 +194,16 @@ export class SerialPortCtrl {
             }
         }
     });
+  }
+
+  private readLines(buf: Buffer): string[] {
+    this._lineBuffer = Buffer.concat([this._lineBuffer, buf]);
+
+    const lastEndingIdx = this._lineBuffer.lastIndexOf("\r\n");
+    const lines = this._lineBuffer.slice(0, lastEndingIdx).toString().split("\r\n");
+
+    this._lineBuffer = this._lineBuffer.slice(lastEndingIdx + 1);
+
+    return lines;
   }
 }

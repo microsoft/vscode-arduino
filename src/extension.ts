@@ -16,7 +16,7 @@ const arduinoActivatorModule = impor("./arduinoActivator") as typeof import ("./
 const arduinoContextModule = impor("./arduinoContext") as typeof import ("./arduinoContext");
 import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
-    LIBRARY_MANAGER_URI,
+    LIBRARY_MANAGER_URI, SERIAL_PLOTTER_URI,
 } from "./common/constants";
 import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
@@ -29,7 +29,10 @@ const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
 import { BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
+import { SerialPlotterPanel } from "./serialmonitor/serialPlotterPanel";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
+
+const status: any = {};
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
@@ -129,7 +132,6 @@ export async function activate(context: vscode.ExtensionContext) {
                 arduinoContextModule.default.boardManager.currentBoard.name,
         };
     });
-
     registerArduinoCommand("arduino.upload", async () => {
         if (!arduinoContextModule.default.arduinoApp.building) {
             await vscode.window.withProgress({
@@ -281,8 +283,10 @@ export async function activate(context: vscode.ExtensionContext) {
     // serial monitor commands
     const serialMonitor = SerialMonitor.getInstance();
     context.subscriptions.push(serialMonitor);
+
     registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null));
     registerNonArduinoCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor());
+    registerNonArduinoCommand("arduino.openSerialPlotter", () => serialMonitor.openSerialPlotter());
     registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
     registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
     registerNonArduinoCommand("arduino.closeSerialMonitor", (port, showWarning = true) => serialMonitor.closeSerialMonitor(port, showWarning));
@@ -405,6 +409,12 @@ export async function activate(context: vscode.ExtensionContext) {
                 board: (arduinoContextModule.default.boardManager.currentBoard === null) ? null :
                     arduinoContextModule.default.boardManager.currentBoard.name,
             };
+        });
+        registerArduinoCommand("arduino.showSerialPlotter", async () => {
+            const html = await arduinoManagerProvider.provideTextDocumentContent(SERIAL_PLOTTER_URI);
+            const serialPlotter = SerialMonitor.getInstance().serialPlotter;
+
+            SerialPlotterPanel.createOrShow({serialPlotter, html});
         });
     }, 100);
 

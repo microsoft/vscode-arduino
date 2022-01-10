@@ -6,6 +6,7 @@ import ArduinoContext from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
+import { SerialPlotter } from "./serialPlotter";
 import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
@@ -35,6 +36,8 @@ export class SerialMonitor implements vscode.Disposable {
 
     private static _serialMonitor: SerialMonitor = null;
 
+    private _serialPlotter: SerialPlotter = null;
+
     private _currentPort: string;
 
     private _currentBaudRate: number;
@@ -45,9 +48,18 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _baudRateStatusBar: vscode.StatusBarItem;
 
+    // TODO: Remove?
+    private _endingStatusBar: vscode.StatusBarItem;
+
+    private _plotterStatusBar: vscode.StatusBarItem;
+
     private _serialPortCtrl: SerialPortCtrl = null;
 
     private _outputChannel: vscode.OutputChannel;
+
+    private constructor() {
+        this._serialPlotter = new SerialPlotter();
+    }
 
     public initialize() {
         let defaultBaudRate;
@@ -75,16 +87,34 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.text = defaultBaudRate.toString();
         this.updatePortListStatus();
 
+        // this._endingStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.ENDING);
+        // this._endingStatusBar.command = "arduino.changeEnding";
+        // this._endingStatusBar.tooltip = "Serial Port Line Ending";
+        // this._endingStatusBar.text = `No line ending`;
+
+        this._plotterStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_SERIAL_PLOTTER);
+        this._plotterStatusBar.command = "arduino.openSerialPlotter";
+        this._plotterStatusBar.tooltip = "Open Serial Plotter";
+        this._plotterStatusBar.text = "Plotter";
+        this._plotterStatusBar.show();
+
         const dc = DeviceContext.getInstance();
         dc.onChangePort(() => {
             this.updatePortListStatus();
         });
+
     }
     public get initialized(): boolean {
         return !!this._outputChannel;
     }
 
+    public get serialPlotter() {
+        return this._serialPlotter;
+    }
+
     public dispose() {
+        this._serialPlotter.dispose();
+
         if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
             return this._serialPortCtrl.stop();
         }
@@ -154,12 +184,22 @@ export class SerialMonitor implements vscode.Disposable {
         }
 
         try {
+            this._serialPlotter.reset();
             await this._serialPortCtrl.open();
             this.updatePortStatus(true);
         } catch (error) {
             Logger.notifyUserWarning("openSerialMonitorError", error,
                 `Failed to open serial port ${this._currentPort} due to error: + ${error.toString()}`);
         }
+    }
+
+    public async openSerialPlotter() {
+        if (!this._serialPortCtrl || !this._serialPortCtrl.isActive) {
+            await this.openSerialMonitor();
+        }
+
+        this._serialPlotter.setSerialPortCtrl(this._serialPortCtrl);
+        this._serialPlotter.open();
     }
 
     public async sendMessageToSerialPort() {
