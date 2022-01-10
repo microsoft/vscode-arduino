@@ -16,3 +16,5 @@ gulpfile.js
 webpack.config.js
 node_modules/**
 vendor/**
+azure-pipelines.yml
+build/**
