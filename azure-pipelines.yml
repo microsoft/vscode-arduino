@@ -3,15 +3,25 @@
 
 name: $(Date:yyyyMMdd)$(Rev:.r).0-$(SourceBranchName)
 
+parameters:
+  - name: SignTypeOverride
+    displayName: Signing type override
+    type: string
+    default: default
+    values:
+      - default
+      - test
+      - real
+
 pr:
-  - master
-  - dev
+  - main
+  - release
 
 trigger:
   branches:
     include:
-      - master
-      - dev
+      - main
+      - release
   tags:
     include:
       - v*
@@ -19,7 +29,27 @@ trigger:
 pool:
   name: VSEngSS-MicroBuild2019-1ES
 
+variables:
+  # MicroBuild requires TeamName to be set.
+  TeamName: C++ Cross Platform and Cloud
+  # If the user didn't override the signing type, then only real-sign on tags,
+  # main, or release.
+  ${{ if ne(parameters.SignTypeOverride, 'default') }}:
+    SignType: ${{ parameters.SignTypeOverride }}
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release'))) }}:
+    SignType: real
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release')))) }}:
+    SignType: test
+
 steps:
+  - task: MicroBuildSigningPlugin@3
+    displayName: Install MicroBuild Signing
+    inputs:
+      signType: $(SignType)
+      zipSources: false
+    # MicroBuild signing will always fail on public PRs.
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
   # Run these scanners first so that they don't detect issues in dependencies.
   # Failures won't break the build until "Check for compliance errors" step.
   - task: CredScan@2
@@ -48,23 +78,60 @@ steps:
   - script: gulp genAikey
     displayName: Use production AI key
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+  # Pack the extension now even though it's unsigned so that we ignore files
+  # from .vscodeignore. This will reduce load on the signing server later and
+  # ensure we only attempt to sign shipping files.
   - script: vsce package --out vscode-arduino.vsix
     displayName: Build and pack extension
-  - publish: vscode-arduino.vsix
-    artifact: VS Code extension VSIX
-    displayName: Publish extension VSIX as artifact
 
   - task: ComponentGovernanceComponentDetection@0
     displayName: Detect components
+
+  # Extract the VSIX, sign what we can, then pack it back up and publish it.
+  - task: ExtractFiles@1
+    displayName: Extract extension for signing
+    inputs:
+      archiveFilePatterns: vscode-arduino.vsix
+      destinationFolder: $(Build.StagingDirectory)\vscode-arduino
+  - task: NuGetToolInstaller@1
+    displayName: Install NuGet
+  - task: NuGetAuthenticate@0
+    displayName: Authenticate NuGet
+  - script: nuget restore .\build\SignFiles.proj -PackagesDirectory .\build\packages
+    displayName: Restore MicroBuild Core
+    # MicroBuild signing will always fail on public PRs.
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: MSBuild@1
+    displayName: Sign files
+    inputs:
+      solution: .\build\SignFiles.proj
+      msbuildArguments: /p:SignType=$(SignType)
+    # MicroBuild signing will always fail on public PRs.
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: ArchiveFiles@2
+    displayName: Pack signed files
+    inputs:
+      rootFolderOrFile: $(Build.StagingDirectory)\vscode-arduino
+      includeRootFolder: false
+      archiveType: zip
+      archiveFile: $(Build.StagingDirectory)\vscode-arduino.vsix
+  - task: MSBuild@1
+    displayName: Sign VSIX
+    inputs:
+      solution: .\build\SignVsix.proj
+      msbuildArguments: /p:SignType=$(SignType)
+    # MicroBuild signing will always fail on public PRs.
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - publish: $(Build.StagingDirectory)\vscode-arduino.vsix
+    artifact: VS Code extension VSIX
+    displayName: Publish extension VSIX as artifact
 
   # Install the Arduino IDE and run tests.
   - script: curl -LO https://downloads.arduino.cc/arduino-1.8.19-windows.zip
     displayName: Download Arduino IDE
   - script: >-
-      node --eval "process.exit(require('crypto').createHash('sha256').update(
-      require('fs').readFileSync('arduino-1.8.19-windows.zip')).digest('hex')
-      == 'c704a821089eab2588f1deae775916219b1517febd1dd574ff29958dca873945'
-      ? 0 : 1)"
+      node build/checkHash.js arduino-1.8.19-windows.zip
+      c704a821089eab2588f1deae775916219b1517febd1dd574ff29958dca873945
     displayName: Verify Arduino IDE
   - task: ExtractFiles@1
     displayName: Extract Arduino IDE
@@ -116,6 +183,9 @@ steps:
       action: create
       target: $(Build.SourceVersion)
       tagSource: auto
-      assets: $(Build.SourcesDirectory)\vscode-arduino.vsix
+      assets: $(Build.StagingDirectory)\vscode-arduino.vsix
       isPreRelease: $[contains(variables['Build.SourceBranch'], '-rc')]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+
+  - task: MicroBuildCleanup@1
+    displayName: Clean up MicroBuild
