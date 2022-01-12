@@ -151,7 +151,11 @@ export class SerialMonitor implements vscode.Disposable {
                 return;
             }
         } else {
-            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._bufferedOutputChannel, this._outputChannel.show);
+            this._serialPortCtrl = new SerialPortCtrl(
+                this._currentPort,
+                this._currentBaudRate,
+                this._bufferedOutputChannel,
+                this._outputChannel.show);
         }
 
         if (!this._serialPortCtrl.currentPort) {

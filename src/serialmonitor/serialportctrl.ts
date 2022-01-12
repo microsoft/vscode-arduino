@@ -63,7 +63,11 @@ export class SerialPortCtrl {
   private _currentBaudRate: number;
   private _currentSerialPort = null;
 
-  public constructor(port: string, baudRate: number, private _bufferedOutputChannel: BufferedOutputChannel, private showOutputChannel: (preserveFocus?: boolean) => void) {
+  public constructor(
+      port: string,
+      baudRate: number,
+      private _bufferedOutputChannel: BufferedOutputChannel,
+      private showOutputChannel: (preserveFocus?: boolean) => void) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
   }
