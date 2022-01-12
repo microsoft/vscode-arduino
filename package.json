@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.4.8",
+  "version": "0.4.9-rc",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -18,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/Microsoft/vscode-arduino/issues"
   },
-  "homepage": "https://github.com/Microsoft/vscode-arduino/blob/master/README.md",
+  "homepage": "https://github.com/Microsoft/vscode-arduino/blob/release/README.md",
   "categories": [
     "Programming Languages",
     "Debuggers",
@@ -495,6 +495,11 @@
             "info",
             "verbose"
           ]
+        },
+        "arduino.clearOutputOnBuild": {
+          "type": "boolean",
+          "default": false,
+          "description": "Clear the output logs before uploading or verifying."
         },
         "arduino.openPDEFiletype": {
           "type": "boolean",
