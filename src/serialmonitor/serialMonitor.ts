@@ -60,7 +60,7 @@ export class SerialMonitor implements vscode.Disposable {
             defaultBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         }
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
-        this._bufferedOutputChannel = new BufferedOutputChannel(this._outputChannel.append);
+        this._bufferedOutputChannel = new BufferedOutputChannel(this._outputChannel.append, 300);
         this._currentBaudRate = defaultBaudRate;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
@@ -85,13 +85,15 @@ export class SerialMonitor implements vscode.Disposable {
         });
     }
     public get initialized(): boolean {
-        return !!this._bufferedOutputChannel;
+        return !!this._outputChannel;
     }
 
     public dispose() {
         if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
             return this._serialPortCtrl.stop();
         }
+        this._outputChannel.dispose();
+        this._bufferedOutputChannel.dispose();
     }
 
     public async selectSerialPort(vid: string, pid: string) {
