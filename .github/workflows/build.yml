@@ -6,14 +6,14 @@ name: CI
 on:
   push:
     branches:
-      - master
-      - dev
+      - main
+      - release
     tags:
       - v*
   pull_request:
     branches:
-      - master
-      - dev
+      - main
+      - release
 
 jobs:
   build:

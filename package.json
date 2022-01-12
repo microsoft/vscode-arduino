@@ -18,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/Microsoft/vscode-arduino/issues"
   },
-  "homepage": "https://github.com/Microsoft/vscode-arduino/blob/master/README.md",
+  "homepage": "https://github.com/Microsoft/vscode-arduino/blob/release/README.md",
   "categories": [
     "Programming Languages",
     "Debuggers",
