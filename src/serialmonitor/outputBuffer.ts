@@ -6,12 +6,12 @@ import * as vscode from "vscode";
 
 export class BufferedOutputChannel implements vscode.Disposable {
     private _buffer: string[];
-    private timer: NodeJS.Timer;
+    private _timer: NodeJS.Timer;
     private _lastFlushTime: number;
 
-    public constructor(private outputCallback: (value: string) => void, private flushIntervalMs: number) {
+    public constructor(private readonly outputCallback: (value: string) => void, private readonly flushIntervalMs: number) {
         this._buffer = [];
-        this.timer = setInterval(() => this.tryFlush(), this.flushIntervalMs);
+        this._timer = setInterval(() => this.tryFlush(), this.flushIntervalMs);
         this._lastFlushTime = Number.NEGATIVE_INFINITY;
     }
 
@@ -24,7 +24,8 @@ export class BufferedOutputChannel implements vscode.Disposable {
     }
 
     public dispose() {
-        clearInterval(this.timer);
+        this.tryFlush();
+        clearInterval(this._timer);
     }
 
     private add(value: string) {
