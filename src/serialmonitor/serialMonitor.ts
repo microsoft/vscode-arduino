@@ -6,6 +6,7 @@ import ArduinoContext from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
+import { BufferedOutputChannel } from "./outputBuffer";
 import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
@@ -49,6 +50,8 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _outputChannel: vscode.OutputChannel;
 
+    private _bufferedOutputChannel: BufferedOutputChannel;
+
     public initialize() {
         let defaultBaudRate;
         if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
@@ -57,6 +60,7 @@ export class SerialMonitor implements vscode.Disposable {
             defaultBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         }
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
+        this._bufferedOutputChannel = new BufferedOutputChannel(this._outputChannel.append);
         this._currentBaudRate = defaultBaudRate;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
@@ -81,7 +85,7 @@ export class SerialMonitor implements vscode.Disposable {
         });
     }
     public get initialized(): boolean {
-        return !!this._outputChannel;
+        return !!this._bufferedOutputChannel;
     }
 
     public dispose() {
@@ -145,7 +149,7 @@ export class SerialMonitor implements vscode.Disposable {
                 return;
             }
         } else {
-            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._outputChannel);
+            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._bufferedOutputChannel, this._outputChannel.show);
         }
 
         if (!this._serialPortCtrl.currentPort) {

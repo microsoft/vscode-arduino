@@ -4,8 +4,8 @@
 import { ChildProcess, execFileSync, spawn  } from "child_process";
 import * as os from "os";
 import * as path from "path";
-import { OutputChannel } from "vscode";
 import { DeviceContext } from "../deviceContext";
+import { BufferedOutputChannel } from "./outputBuffer";
 
 interface ISerialPortDetail {
   port: string;
@@ -63,7 +63,7 @@ export class SerialPortCtrl {
   private _currentBaudRate: number;
   private _currentSerialPort = null;
 
-  public constructor(port: string, baudRate: number, private _outputChannel: OutputChannel) {
+  public constructor(port: string, baudRate: number, private _bufferedOutputChannel: BufferedOutputChannel, private showOutputChannel: (preserveFocus?: boolean) => void) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
   }
@@ -80,8 +80,8 @@ export class SerialPortCtrl {
   }
 
   public open(): Promise<void> {
-    this._outputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
-    this._outputChannel.show();
+    this._bufferedOutputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
+    this.showOutputChannel();
 
     if (this._child) {
         this.stop();
@@ -96,8 +96,10 @@ export class SerialPortCtrl {
         });
 
         this._child.stdout.on("data", (data) => {
-            const jsonObj = JSON.parse(data.toString())
-            this._outputChannel.append(jsonObj["payload"] + "\n");
+            if (this.isActive) {
+                const jsonObj = JSON.parse(data.toString())
+                this._bufferedOutputChannel.append(jsonObj["payload"] + "\n");
+            }
         });
         // TODO: add message check to ensure _child spawned without errors
         resolve();
@@ -155,8 +157,8 @@ export class SerialPortCtrl {
       }
       try {
         this._child.stdin.write('{"cmd": "close"}\n');
-        if (this._outputChannel) {
-          this._outputChannel.appendLine(`[Done] Closed the serial port ${os.EOL}`);
+        if (this._bufferedOutputChannel) {
+          this._bufferedOutputChannel.appendLine(`[Done] Closed the serial port ${os.EOL}`);
         }
         this._child = null;
         resolve(true);
