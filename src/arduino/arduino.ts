@@ -596,13 +596,10 @@ export class ArduinoApp {
             } else {
                 args.push("--upload",
                     "--useprogrammer",
-                    "--pref", `programmer=arduino:${programmer}`);
+                    "--pref", `programmer=${programmer}`);
             }
 
             args.push("--port", dc.port);
-            if (!this.useArduinoCli()) {
-                args.push("--verify");
-            }
         } else if (buildMode === BuildMode.CliUploadProgrammer) {
             const programmer = this.programmerManager.currentProgrammer;
             if (!programmer) {
