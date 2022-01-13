@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.9
+
+- Release date: January 12, 2022
+
+### Changed
+
+- vid and pid for Adafruit Grand Central M4 (SAMD51) [#1218](https://github.com/microsoft/vscode-arduino/pull/1218)
+- Add clear output on build option [#1057](https://github.com/microsoft/vscode-arduino/pull/1057)
+- Added buffering to prevent heavy logging issues [#1412](https://github.com/microsoft/vscode-arduino/pull/1412)
+
 ## Version 0.4.8
 
 - Release date: November 9, 2021
