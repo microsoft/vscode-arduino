@@ -258,7 +258,7 @@ export function spawn(
 
 export function getArduinoL4jCodepage(filePath: string): string | undefined {
     const encoding = parseConfigFile(filePath).get("-Dfile.encoding");
-    if(encoding === "UTF8") {
+    if (encoding === "UTF8") {
         return "65001";
     }
     return Object.keys(encodingMapping).reduce((r, key) => {
