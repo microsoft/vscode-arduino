@@ -14,14 +14,14 @@ parameters:
       - real
 
 pr:
-  - master
-  - dev
+  - main
+  - release
 
 trigger:
   branches:
     include:
-      - master
-      - dev
+      - main
+      - release
   tags:
     include:
       - v*
@@ -33,12 +33,12 @@ variables:
   # MicroBuild requires TeamName to be set.
   TeamName: C++ Cross Platform and Cloud
   # If the user didn't override the signing type, then only real-sign on tags,
-  # master, or dev.
+  # main, or release.
   ${{ if ne(parameters.SignTypeOverride, 'default') }}:
     SignType: ${{ parameters.SignTypeOverride }}
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'dev'))) }}:
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release'))) }}:
     SignType: real
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.SourceBranchName'], 'dev')))) }}:
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release')))) }}:
     SignType: test
 
 steps:
