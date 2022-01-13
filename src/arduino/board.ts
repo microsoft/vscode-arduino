@@ -4,7 +4,7 @@
 import { BoardConfigResult, IBoard, IBoardConfigItem, IPlatform } from "./package";
 
 export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): Map<string, IBoard> {
-    const boardLineRegex = /([^\.]+)\.(\S+)=(.+)/;
+    const boardLineRegex = /([^.]+)\.(\S+)=(.+)/;
 
     const result = new Map<string, IBoard>();
     const lines = boardDescriptor.split(/(?:\r|\r\n|\n)/);
@@ -38,7 +38,7 @@ export function parseBoardDescriptor(boardDescriptor: string, plat: IPlatform): 
     return result;
 }
 
-const MENU_REGEX = /menu\.([^\.]+)\.([^\.]+)(\.?(\S+)?)/;
+const MENU_REGEX = /menu\.([^.]+)\.([^.]+)(\.?(\S+)?)/;
 
 export class Board implements IBoard {
     public name?: string;
@@ -126,7 +126,7 @@ export class Board implements IBoard {
                 default:
                     return r;
             }
-        };
+        }
         return result;
     }
 

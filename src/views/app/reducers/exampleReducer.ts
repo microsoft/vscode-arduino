@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 import * as actions from "../actions";
-import * as util from "../utils/util";
 
 const initalState = {
     requesting: false,

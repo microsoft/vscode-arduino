@@ -1,7 +1,63 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.9
+
+- Release date: January 12, 2022
+
+### Changed
+
+- vid and pid for Adafruit Grand Central M4 (SAMD51) [#1218](https://github.com/microsoft/vscode-arduino/pull/1218)
+- Add clear output on build option [#1057](https://github.com/microsoft/vscode-arduino/pull/1057)
+- Added buffering to prevent heavy logging issues [#1412](https://github.com/microsoft/vscode-arduino/pull/1412)
+
+## Version 0.4.8
+
+- Release date: November 9, 2021
+
+### Changed
+
+- Fix application insights key [31dd3a9](https://github.com/microsoft/vscode-arduino/commit/31dd3a94c64eb12a5483038c5bfe668abad36f91)
+
+## Version 0.4.7
+
+- Release date: November 5, 2021
+
+### Changed
+
+- Add support for ST-Link v3.0 [#1366](https://github.com/microsoft/vscode-arduino/pull/1366)
+- Fix empty board and examples list [#1367](https://github.com/microsoft/vscode-arduino/pull/1367)
+- Fix ESLint parsing for enums [#1368](https://github.com/microsoft/vscode-arduino/pull/1368)
+- Fix build cwd [#1375](https://github.com/microsoft/vscode-arduino/pull/1375)
+- Fix stack overflow in board configuration view [#1379](https://github.com/microsoft/vscode-arduino/pull/1379)
+
+## Version 0.4.6
+
+- Release date: September 29, 2021
+
+### Changed
+
+- Fix send serial message [#1356](https://github.com/microsoft/vscode-arduino/pull/1356)
+- Update eslint to latest version and fix issues reported [#1352](https://github.com/microsoft/vscode-arduino/pull/1352)
+
+## Version 0.4.5
+
+- Release date: September 21, 2021
+
+### Changed
+- Various minor updates to documentation [#1349](https://github.com/microsoft/vscode-arduino/pull/1349)
+- Don't set `commandPath` when `arduino-cli` is `true` [#1297](https://github.com/microsoft/vscode-arduino/pull/1297)
+
+## Version 0.4.4
+
+- Release date: August 26, 2021
+
+### Changed
+- Serial monitor uses a new backend which doesn't break with updates of VSCode. [#1322](https://github.com/microsoft/vscode-arduino/pull/1322)
+
 ## Version 0.4.3
+
+- Release date: May 12, 2021
 
 ### Fixed
 - Update node-usb-native to v0.0.20 to fix serial and port selecting [#1257](https://github.com/microsoft/vscode-arduino/issues/1257)
@@ -9,10 +65,14 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.4.2
 
+- Release date: April 22, 2021
+
 ### Fixed
 - Update app insights key
 
 ## Version 0.4.1
+
+- Release date: April 19, 2021
 
 ### Added
 - Quickpick sketch selection [#1128](https://github.com/microsoft/vscode-arduino/pull/1128) Thanks [@maddogjt](https://github.com/maddogjt)
@@ -25,6 +85,8 @@ All notable changes to this project will be documented in this file.
 - App Insights key in Actions [#1236](https://github.com/microsoft/vscode-arduino/pull/1236)
 
 ## Version 0.4.0
+
+- Release date: March 22. 2021
 
 ### Added
 - Support for Arduino CLI #1017
@@ -353,19 +415,19 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 
 - Release date: August 24, 2017
 
-### Added 
+### Added
 - Add settings for enabled/disable USB detection
 - Add Arduino Example tree explorer viewlet
 - Contribution from [DeqingSun](https://github.com/DeqingSun): Support multiple versions of Arduino on Mac [#375](https://github.com/Microsoft/vscode-arduino/pull/375)
 - Contribution from [DeqingSun](https://github.com/DeqingSun): Add board support for STM32F1 with Arudino_STM32 [#377](https://github.com/Microsoft/vscode-arduino/pull/377)
 
-### Changed 
+### Changed
 - Leverage the output path config to speedup upload/verify
 - Fix USB detection issue during uploading [#371](https://github.com/Microsoft/vscode-arduino/pull/371), [372](https://github.com/Microsoft/vscode-arduino/pull/372)
 - Contribution from [lialosiu](https://github.com/lialosiu): Fix encoding issue for non UTF-8 [#364](https://github.com/Microsoft/vscode-arduino/pull/364)
-- Update the documents with the helps of 
+- Update the documents with the helps of
     - [eduherminio](https://github.com/Microsoft/vscode-arduino/pull/361)
-    - [Atalanttore](https://github.com/Microsoft/vscode-arduino/pull/381), 
+    - [Atalanttore](https://github.com/Microsoft/vscode-arduino/pull/381),
 
 ## Version 0.2.4
 
@@ -440,7 +502,9 @@ Special thanks to [GarethE](https://github.com/keyoke), thank you for your contr
 
 ## Version 0.1.1
 
-- HotFix: Update display tag. 
+- Release date: April 14, 2017
+
+- HotFix: Update display tag.
 
 ## Version 0.1.0
 
