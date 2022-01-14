@@ -60,14 +60,14 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get additionalUrls(): string[] {
         const value = this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
-        
+
         // Even though the schema says value must be a string array, version
         // 0.4.9 and earlier also allowed a single comma delimeted string. We
         // continue to unofficially support that format to avoid breaking
         // existing settings, but we immediately write back the correctly
         // formatted version.
         const split = toStringArray(value);
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
             this.updateAdditionalUrls(split);
         }
 

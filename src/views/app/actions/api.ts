@@ -39,7 +39,7 @@ export function openLink(link) {
 
 export function openSettings(query) {
     return postHTTP("/api/opensettings", {
-        query
+        query,
     }).then((response) => response.json());
 }
 
