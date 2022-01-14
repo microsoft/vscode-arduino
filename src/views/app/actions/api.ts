@@ -37,8 +37,10 @@ export function openLink(link) {
     }).then((response) => response.json());
 }
 
-export function openSettings() {
-    return postHTTP("/api/opensettings", {}).then((response) => response.json());
+export function openSettings(query) {
+    return postHTTP("/api/opensettings", {
+        query
+    }).then((response) => response.json());
 }
 
 export function getLibraries(update) {

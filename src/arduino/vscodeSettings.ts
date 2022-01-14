@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import * as vscode from "vscode";
+import { toStringArray } from "../common/util";
 
 const configKeys = {
     ARDUINO_PATH: "arduino.path",
@@ -23,7 +24,7 @@ const configKeys = {
 export interface IVscodeSettings {
     arduinoPath: string;
     commandPath: string;
-    additionalUrls: string | string[];
+    additionalUrls: string[];
     logLevel: string;
     clearOutputOnBuild: boolean;
     allowPDEFiletype: boolean;
@@ -34,7 +35,7 @@ export interface IVscodeSettings {
     defaultBaudRate: number;
     useArduinoCli: boolean;
     disableIntelliSenseAutoGen: boolean;
-    updateAdditionalUrls(urls: string | string[]): void;
+    updateAdditionalUrls(urls: string[]): void;
 }
 
 export class VscodeSettings implements IVscodeSettings {
@@ -57,8 +58,20 @@ export class VscodeSettings implements IVscodeSettings {
         return this.getConfigValue<string>(configKeys.ARDUINO_COMMAND_PATH);
     }
 
-    public get additionalUrls(): string | string[] {
-        return this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
+    public get additionalUrls(): string[] {
+        const value = this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
+        
+        // Even though the schema says value must be a string array, version
+        // 0.4.9 and earlier also allowed a single comma delimeted string. We
+        // continue to unofficially support that format to avoid breaking
+        // existing settings, but we immediately write back the correctly
+        // formatted version.
+        const split = toStringArray(value);
+        if (typeof value === 'string') {
+            this.updateAdditionalUrls(split);
+        }
+
+        return split;
     }
 
     public get logLevel(): string {
