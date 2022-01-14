@@ -71,7 +71,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | --- | --- |
 | `arduino.path`  | Path to Arduino, you can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path. |
 | `arduino.commandPath` | Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for Windows, `Contents/MacOS/Arduino` for Mac and `arduino` for Linux, You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux. |
-| `arduino.additionalUrls` | Additional Boards Manager URLs for 3rd party packages. You can have multiple URLs in one string with a comma(`,`) as separator, or have a string array. The default value is empty. |
+| `arduino.additionalUrls` | Additional Boards Manager URLs for 3rd party packages as a string array. The default value is empty. |
 | `arduino.logLevel` | CLI output log level. Could be info or verbose. The default value is `"info"`. |
 | `arduino.clearOutputOnBuild` | Clear the output logs before uploading or verifying. Default value is `false`. |
 | `arduino.allowPDEFiletype` | Allow the VSCode Arduino extension to open .pde files from pre-1.0.0 versions of Arduino. Note that this will break Processing code. Default value is `false`. | 
