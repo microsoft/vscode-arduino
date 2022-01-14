@@ -446,3 +446,25 @@ export function resolveMacArduinoAppPath(arduinoPath: string, useArduinoCli = fa
         return path.join(arduinoPath, "Arduino.app");
     }
 }
+
+/**
+ * If given an string, splits the string on commas. If given an array, returns
+ * the array. All strings in the output are trimmed.
+ * @param value String or string array to convert.
+ * @returns Array of strings split from the input.
+ */
+export function toStringArray(value: string | string[]): string[] {
+    if (value) {
+        let result: string[];
+
+        if (typeof value === "string") {
+            result = value.split(",");
+        } else {
+            result = <string[]>value;
+        }
+
+        return trim(result);
+    }
+
+    return [];
+}
