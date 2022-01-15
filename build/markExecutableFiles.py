@@ -1,8 +1,9 @@
 import os
 import zipfile
 
-input_archive_path = f"{os.getenv('BUILD_STAGINGDIRECTORY')})/vscode-arduino.vsix"
-output_archive_path = f"{os.getenv('BUILD_STAGINGDIRECTORY')})/vscode-arduino-out.vsix"
+staging_directory = os.getenv('BUILD_STAGINGDIRECTORY')
+input_archive_path = f"{staging_directory}/vscode-arduino.vsix"
+output_archive_path = f"{staging_directory}/vscode-arduino-out.vsix"
 
 filenames = [
     "extension/out/serial-monitor-cli/darwin/main",
