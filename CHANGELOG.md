@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.10
+
+- Release date: January 14, 2022
+
+### Changed
+
+- Fix for uploading with programmer [#1369](https://github.com/microsoft/vscode-arduino/pull/1369)
+- Output sketch memory usage in non-verbose mode [#1383](https://github.com/microsoft/vscode-arduino/pull/1383)
+- Using the codepage with arduino.l4j.ini on win32 [#1271](https://github.com/microsoft/vscode-arduino/pull/1271)
+- Improve additionalUrls settings UI [#1419](https://github.com/microsoft/vscode-arduino/pull/1419)
+- Mark serial monitor as executable on Mac and Linux [#1420](https://github.com/microsoft/vscode-arduino/pull/1420)
+
 ## Version 0.4.9
 
 - Release date: January 12, 2022
