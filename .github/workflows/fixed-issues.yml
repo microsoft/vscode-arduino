@@ -15,6 +15,7 @@ jobs:
         days-before-stale: 0
         days-before-close: 0
         ignore-updates: true
+        remove-stale-when-updated: false
         close-issue-message: >-
           This issue has been fixed in the latest release of this extension,
           which is available in the VS Code extension marketplace.
