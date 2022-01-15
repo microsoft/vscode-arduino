@@ -29,4 +29,3 @@ input_archive.close()
 output_archive.close()
 
 os.replace(output_archive_path, input_archive_path)
-os.remove(output_archive_path)
