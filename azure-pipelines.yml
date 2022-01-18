@@ -13,10 +13,6 @@ parameters:
       - test
       - real
 
-pr:
-  - main
-  - release
-
 trigger:
   branches:
     include:
