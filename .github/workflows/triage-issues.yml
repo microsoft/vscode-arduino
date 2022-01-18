@@ -6,6 +6,9 @@ on:
       - opened
       - reopened
 
+permissions:
+  issues: write
+
 jobs:
   label_issues:
     runs-on: ubuntu-latest
