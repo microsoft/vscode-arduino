@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as actions from "../actions";
 import * as util from "../utils/util";
 
@@ -28,7 +29,7 @@ export default function boardManagerReducer(state = initalState, action) {
             const categories = util.parseGroups(action.platforms, "category");
             // Sorting versions in descending order.
             action.platforms.forEach((element) => {
-                element.versions = element.versions.sort(util.versionCompare).reverse();
+                element.versions = element.versions.sort(versionCompare).reverse();
             });
             return {
                 ...state,

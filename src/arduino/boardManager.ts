@@ -9,6 +9,7 @@ import * as util from "../common/util";
 
 import * as constants from "../common/constants";
 import { arduinoChannel } from "../common/outputChannel";
+import { versionCompare } from "../common/sharedUtilities/utils";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
@@ -228,6 +229,11 @@ export class BoardManager {
                     // });
                     if (addedPlatform.name === plat.name) {
                         addedPlatform.versions.push(plat.version);
+                        // Check if this is the latest version. Packages typically support more boards in later versions.
+                        addedPlatform.versions.sort(versionCompare);
+                        if (plat.version === addedPlatform.versions[addedPlatform.versions.length - 1]) {
+                            addedPlatform.boards = plat.boards;
+                        }
                     }
                 } else {
                     plat.versions = [plat.version];
