@@ -1,3 +1,5 @@
+TEST CHANGE DO NOT MERGE
+
 # Visual Studio Code extension for Arduino
 
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/Microsoft/vscode-arduino)
