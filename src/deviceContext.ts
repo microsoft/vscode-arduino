@@ -312,29 +312,14 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
             .then(async (fileUris) => {
                 if (fileUris.length === 0) {
                     let newSketchFileName = await vscode.window.showInputBox({
-                        value: "my-sketch.ino",
+                        value: "sketch.ino",
                         prompt: "No sketch (*.ino) found in workspace, please provide a name",
                         placeHolder: "Sketch file name (*.ino or *.cpp)",
                         validateInput: (value) => {
-                            /* TODO (EW, 2020-02-18):
-                             * is 'c' actually allowed? Also found on within other files.
-                             * And the regular expression doesn't need the internal groups.
-                             * The outer group can be an anonymous group.
-                             * And \w doesn't match dashes - so any sketch containing dashes
-                             * will not be found.
-                             * The correct expression therefore would be something like this:
-                             *
-                             *   /^[\w\-]+\.(?:ino|cpp)$/
-                             *
-                             * I'd recommend to define such regular expressions (including)
-                             * line splitting etc.) at the global constants file.
-                             * This is true for any hard coded paths (like the snippets below)
-                             * as well.
-                             */
-                            if (value && /^\w+\.((ino)|(cpp)|c)$/.test(value.trim())) {
+                            if (value && /^[\w-]+\.(?:ino|cpp)$/.test(value.trim())) {
                                 return null;
                             } else {
-                                return "Invalid sketch file name. Should be *.ino/*.cpp/*.c";
+                                return "Invalid sketch file name. Should be *.ino/*.cpp";
                             }
                         },
                     });
@@ -343,6 +328,8 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
                         const snippets = fs.readFileSync(path.join(this.extensionPath, "snippets", "sample.ino"));
                         fs.writeFileSync(path.join(ArduinoWorkspace.rootPath, newSketchFileName), snippets);
                         this.sketch = newSketchFileName;
+                        // Set a build directory in new configurations to avoid warnings about slow builds.
+                        this.output = "build";
                         // Open the new sketch file.
                         const textDocument = await vscode.workspace.openTextDocument(path.join(ArduinoWorkspace.rootPath, newSketchFileName));
                         vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One, true);

@@ -1,0 +1,195 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: $(Date:yyyyMMdd)$(Rev:.r).0-$(SourceBranchName)
+
+parameters:
+  - name: SignTypeOverride
+    displayName: Signing type override
+    type: string
+    default: default
+    values:
+      - default
+      - test
+      - real
+
+trigger:
+  branches:
+    include:
+      - main
+      - release
+  tags:
+    include:
+      - v*
+
+pool:
+  name: VSEngSS-MicroBuild2019-1ES
+
+variables:
+  # MicroBuild requires TeamName to be set.
+  TeamName: C++ Cross Platform and Cloud
+  # If the user didn't override the signing type, then only real-sign on tags,
+  # main, or release.
+  ${{ if ne(parameters.SignTypeOverride, 'default') }}:
+    SignType: ${{ parameters.SignTypeOverride }}
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release'))) }}:
+    SignType: real
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release')))) }}:
+    SignType: test
+
+steps:
+  - task: MicroBuildSigningPlugin@3
+    displayName: Install MicroBuild Signing
+    inputs:
+      signType: $(SignType)
+      zipSources: false
+    # MicroBuild signing will always fail on public PRs.
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
+  # Run these scanners first so that they don't detect issues in dependencies.
+  # Failures won't break the build until "Check for compliance errors" step.
+  - task: CredScan@2
+    displayName: Run CredScan
+    inputs:
+      toolMajorVersion: V2
+  - task: PoliCheck@1
+    displayName: Run PoliCheck
+    inputs:
+      targetType: F
+      targetArgument: $(Build.SourcesDirectory)
+
+  # Node 14 matches the version of Node used by VS Code when this was written,
+  # but it should be updated when VS Code updates its Node version.
+  - task: NodeTool@0
+    displayName: Use Node 14.x
+    inputs:
+      versionSpec: 14.x
+  - script: npm install --global gulp node-gyp vsce
+    displayName: Install global dependencies
+  - script: npm install
+    displayName: Install project dependencies
+
+  - script: gulp tslint
+    displayName: Check for linting errors
+  - script: gulp genAikey
+    displayName: Use production AI key
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+  # Pack the extension now even though it's unsigned so that we ignore files
+  # from .vscodeignore. This will reduce load on the signing server later and
+  # ensure we only attempt to sign shipping files.
+  - script: vsce package --out vscode-arduino.vsix
+    displayName: Build and pack extension
+
+  - task: ComponentGovernanceComponentDetection@0
+    displayName: Detect components
+
+  # Extract the VSIX, sign what we can, then pack it back up and publish it.
+  - task: ExtractFiles@1
+    displayName: Extract extension for signing
+    inputs:
+      archiveFilePatterns: vscode-arduino.vsix
+      destinationFolder: $(Build.StagingDirectory)\vscode-arduino
+  - task: NuGetToolInstaller@1
+    displayName: Install NuGet
+  - task: NuGetAuthenticate@0
+    displayName: Authenticate NuGet
+  - script: nuget restore .\build\SignFiles.proj -PackagesDirectory .\build\packages
+    displayName: Restore MicroBuild Core
+    # MicroBuild signing will always fail on public PRs.
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: MSBuild@1
+    displayName: Sign files
+    inputs:
+      solution: .\build\SignFiles.proj
+      msbuildArguments: /p:SignType=$(SignType)
+    # MicroBuild signing will always fail on public PRs.
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: ArchiveFiles@2
+    displayName: Pack signed files
+    inputs:
+      rootFolderOrFile: $(Build.StagingDirectory)\vscode-arduino
+      includeRootFolder: false
+      archiveType: zip
+      archiveFile: $(Build.StagingDirectory)\vscode-arduino.vsix
+  - script: python .\build\markExecutableFiles.py
+    displayName: Make serial monitor executable
+  - task: MSBuild@1
+    displayName: Sign VSIX
+    inputs:
+      solution: .\build\SignVsix.proj
+      msbuildArguments: /p:SignType=$(SignType)
+    # MicroBuild signing will always fail on public PRs.
+    # TODO: Signing the VSIX strips out the "main" executables for
+    # serial-monitor-cli on Mac and Linux, completely breaking serial
+    # functionality in the extension on these platforms. For now we disable VSIX
+    # signing because it's not a strict requirement, but we should investigate
+    # if we can either add extensions to these files or support extensionless
+    # files in VSIX signing.
+    condition: and(false, ne(variables['Build.Reason'], 'PullRequest'))
+  - publish: $(Build.StagingDirectory)\vscode-arduino.vsix
+    artifact: VS Code extension VSIX
+    displayName: Publish extension VSIX as artifact
+
+  # Install the Arduino IDE and run tests.
+  - script: curl -LO https://downloads.arduino.cc/arduino-1.8.19-windows.zip
+    displayName: Download Arduino IDE
+  - script: >-
+      node build/checkHash.js arduino-1.8.19-windows.zip
+      c704a821089eab2588f1deae775916219b1517febd1dd574ff29958dca873945
+    displayName: Verify Arduino IDE
+  - task: ExtractFiles@1
+    displayName: Extract Arduino IDE
+    inputs:
+      archiveFilePatterns: arduino-1.8.19-windows.zip
+      destinationFolder: arduino-ide
+  - script: "echo ##vso[task.prependpath]$(Build.SourcesDirectory)\\arduino-ide\\arduino-1.8.19"
+    displayName: Add Arduino IDE to PATH
+  - script: npm test --silent
+    displayName: Run tests
+
+  - task: PostAnalysis@1
+    displayName: Check for compliance errors
+    # To avoid spirious warnings about missing logs, explicitly declare what we scanned.
+    inputs:
+      CredScan: true
+      PoliCheck: true
+
+  # Trust Services Automation (TSA) can automatically open bugs for compliance issues.
+  # https://www.1eswiki.com/wiki/Trust_Services_Automation_(TSA)
+  - task: TSAUpload@1
+    displayName: Upload logs to TSA
+    inputs:
+      tsaVersion: TsaV2
+      codebase: NewOrUpdate
+      codeBaseName: vscode-arduino
+      notificationAlias: embeddeddev@microsoft.com
+      instanceUrlForTsaV2: DEVDIV
+      projectNameDEVDIV: DevDiv
+      areaPath: DevDiv\Cpp Developer Experience\Cross Platform\Embedded
+      iterationPath: DevDiv
+      # To avoid spurious warnings about missing logs, explicitly declare what we don't upload.
+      uploadAPIScan: false
+      uploadBinSkim: false
+      uploadFortifySCA: false
+      uploadFxCop: false
+      uploadModernCop: false
+      uploadPREfast: false
+      uploadRoslyn: false
+      uploadTSLint: false
+    # Don't open bugs for PR builds
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
+  - task: GitHubRelease@0
+    displayName: Publish to GitHub
+    inputs:
+      gitHubConnection: embeddedbot
+      repositoryName: microsoft/vscode-arduino
+      action: create
+      target: $(Build.SourceVersion)
+      tagSource: auto
+      assets: $(Build.StagingDirectory)\vscode-arduino.vsix
+      isPreRelease: $[contains(variables['Build.SourceBranch'], '-rc')]
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+
+  - task: MicroBuildCleanup@1
+    displayName: Clean up MicroBuild

@@ -4,7 +4,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { browserHistory, IndexRoute, Link, Route, Router } from "react-router";
+import { browserHistory, Route, Router } from "react-router";
 import { applyMiddleware, createStore } from "redux";
 import BoardConfig from "./components/BoardConfig";
 import BoardManager from "./components/BoardManager";

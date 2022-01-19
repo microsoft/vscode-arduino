@@ -155,11 +155,19 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         }
     }
 
-    public openSettings(req, res) {
-        vscode.commands.executeCommand("workbench.action.openGlobalSettings");
-        return res.json({
-            status: "OK",
-        });
+    public async openSettings(req, res) {
+        if (!req.body.query) {
+            return res.status(400).send("BAD Request! Missing { query } parameter!");
+        } else {
+            try {
+                await vscode.commands.executeCommand("workbench.action.openGlobalSettings", { query: req.body.query });
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Cannot open the setting with error message "${error}"`);
+            }
+        }
     }
 
     public async getLibraries(req, res) {

@@ -39,7 +39,7 @@ export enum BuildMode {
     CliUpload = "Uploading using Arduino CLI",
     UploadProgrammer = "Uploading (programmer)",
     CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
-};
+}
 
 /**
  * Represent an Arduino application based on the official Arduino IDE.
@@ -348,6 +348,7 @@ export class ArduinoApp {
         function tmpName(name) {
             let counter = 0;
             let candidateName = name;
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (!util.fileExistsSync(candidateName) && !util.directoryExistsSync(candidateName)) {
                     return candidateName;
@@ -500,6 +501,15 @@ export class ArduinoApp {
     }
 
     /**
+     * Checks if the line contains memory usage information
+     * @param line output line to check
+     * @returns {bool} true if line contains memory usage information
+     */
+    private isMemoryUsageInformation(line: string) {
+        return line.startsWith("Sketch uses ") || line.startsWith("Global variables use ");
+    }
+
+    /**
      * Private implementation. Not to be called directly. The wrapper build()
      * manages the build state.
      * @param buildMode See build()
@@ -600,13 +610,10 @@ export class ArduinoApp {
             } else {
                 args.push("--upload",
                     "--useprogrammer",
-                    "--pref", `programmer=arduino:${programmer}`);
+                    "--pref", `programmer=${programmer}`);
             }
 
             args.push("--port", dc.port);
-            if (!this.useArduinoCli()) {
-                args.push("--verify");
-            }
         } else if (buildMode === BuildMode.CliUploadProgrammer) {
             const programmer = this.programmerManager.currentProgrammer;
             if (!programmer) {
@@ -658,6 +665,9 @@ export class ArduinoApp {
         // we prepare the channel here since all following code will
         // or at leas can possibly output to it
         arduinoChannel.show();
+        if (VscodeSettings.getInstance().clearOutputOnBuild) {
+            arduinoChannel.clear();
+        }
         arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
         if (buildDir || dc.output) {
@@ -740,6 +750,11 @@ export class ArduinoApp {
             }
             if (verbose) {
                 arduinoChannel.channel.append(line);
+            } else {
+                // Output sketch memory usage in non-verbose mode
+                if (this.isMemoryUsageInformation(line)) {
+                    arduinoChannel.channel.append(line);
+                }
             }
         }
         const stderrcb = (line: string) => {
@@ -772,7 +787,7 @@ export class ArduinoApp {
         return await util.spawn(
             this._settings.commandPath,
             args,
-            undefined,
+            { cwd: ArduinoWorkspace.rootPath },
             { /*channel: arduinoChannel.channel,*/ stdout: stdoutcb, stderr: stderrcb },
         ).then(async () => {
             const ret = await cleanup("ok");

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as actions from "../actions";
 import * as util from "../utils/util";
 
@@ -24,11 +25,11 @@ export default function boardManagerReducer(state = initalState, action) {
                 requesting: true,
                 categories: ["All", "Updatable", "Installed"],
             };
-        case actions.BOARD_PACKAGES_SUCCESS:
+        case actions.BOARD_PACKAGES_SUCCESS: {
             const categories = util.parseGroups(action.platforms, "category");
             // Sorting versions in descending order.
             action.platforms.forEach((element) => {
-                element.versions = element.versions.sort(util.versionCompare).reverse();
+                element.versions = element.versions.sort(versionCompare).reverse();
             });
             return {
                 ...state,
@@ -37,6 +38,7 @@ export default function boardManagerReducer(state = initalState, action) {
                 platforms: action.platforms,
                 categories: ["All", "Updatable", "Installed"].concat(categories.sort()),
             };
+        }
         case actions.BOARD_PACKAGES_FAILURE:
             return {
                 ...state,

@@ -9,6 +9,7 @@ import * as util from "../common/util";
 
 import * as constants from "../common/constants";
 import { arduinoChannel } from "../common/outputChannel";
+import { versionCompare } from "../common/sharedUtilities/utils";
 import { DeviceContext } from "../deviceContext";
 import { ArduinoApp } from "./arduino";
 import { IArduinoSettings } from "./arduinoSettings";
@@ -115,7 +116,7 @@ export class BoardManager {
         let allUrls = this.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
-            await VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
+            VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
             await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
         }
         return true;
@@ -228,6 +229,11 @@ export class BoardManager {
                     // });
                     if (addedPlatform.name === plat.name) {
                         addedPlatform.versions.push(plat.version);
+                        // Check if this is the latest version. Platforms typically support more boards in later versions.
+                        addedPlatform.versions.sort(versionCompare);
+                        if (plat.version === addedPlatform.versions[addedPlatform.versions.length - 1]) {
+                            addedPlatform.boards = plat.boards;
+                        }
                     }
                 } else {
                     plat.versions = [plat.version];
@@ -518,26 +524,12 @@ export class BoardManager {
     }
 
     private getAdditionalUrls(): string[] {
-        function formatUrls(urls): string[] {
-            if (urls) {
-                let _urls: string[];
-
-                if (!Array.isArray(urls) && typeof urls === "string") {
-                    _urls = (<string>urls).split(",");
-                } else {
-                    _urls = <string[]>urls;
-                }
-
-                return util.trim(_urls);
-            }
-            return [];
-        }
         // For better compatibility, merge urls both in user settings and arduino IDE preferences.
-        const settingsUrls = formatUrls(VscodeSettings.getInstance().additionalUrls);
+        const settingsUrls = VscodeSettings.getInstance().additionalUrls;
         let preferencesUrls = [];
         const preferences = this._settings.preferences;
         if (preferences && preferences.has("boardsmanager.additional.urls")) {
-            preferencesUrls = formatUrls(preferences.get("boardsmanager.additional.urls"));
+            preferencesUrls = util.toStringArray(preferences.get("boardsmanager.additional.urls"));
         }
         return util.union(settingsUrls, preferencesUrls);
     }

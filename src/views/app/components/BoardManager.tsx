@@ -5,9 +5,9 @@ import * as React from "react";
 import { Button, DropdownButton, MenuItem } from "react-bootstrap";
 import { connect } from "react-redux";
 import SearchInput, { createFilter } from "react-search-input";
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as actions from "../actions";
 import * as API from "../actions/api";
-import { versionCompare } from "../utils/util";
 import BoardItemView from "./BoardItemView";
 
 interface IBoardManagerProps extends React.Props<any> {
@@ -109,9 +109,9 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
             uninstallBoard: this.props.uninstallBoard,
         };
 
-        const isOperating = this.props.installingBoardName || this.props.uninstallingBoardName;
+        const isOperating = !!this.props.installingBoardName || !!this.props.uninstallingBoardName;
         return (
-            <div className={"boardmanager " + (!!isOperating ? "disabled" : "")}>
+            <div className={"boardmanager " + (isOperating ? "disabled" : "")}>
                 {
                     this.props.requesting && (
                         <div className="mask theme-bgcolor">Loading...</div>
@@ -141,7 +141,7 @@ class BoardManager extends React.Component<IBoardManagerProps, IBoardManagerStat
                 <div className="arduinomanager-footer theme-bgcolor">
                     <span>{totalCountTips}</span>
                     <a className="help-link right-side" title="Configure Additional Boards Manager URLs"
-                        onClick={() => API.openSettings()}>Additional URLs</a>
+                        onClick={() => API.openSettings("arduino.additionalUrls")}>Additional URLs</a>
                 </div>
 
             </div>);

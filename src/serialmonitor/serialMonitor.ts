@@ -6,13 +6,15 @@ import ArduinoContext from "../arduinoContext";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
+import { BufferedOutputChannel } from "./outputBuffer";
 import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
-    path: string;
-    manufacturer: string;
-    vendorId: string;
-    productId: string;
+  port: string;
+  desc: string;
+  hwid: string;
+  vendorId: string;
+  productId: string;
 }
 
 export class SerialMonitor implements vscode.Disposable {
@@ -48,6 +50,8 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _outputChannel: vscode.OutputChannel;
 
+    private _bufferedOutputChannel: BufferedOutputChannel;
+
     public initialize() {
         let defaultBaudRate;
         if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
@@ -56,6 +60,7 @@ export class SerialMonitor implements vscode.Disposable {
             defaultBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         }
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
+        this._bufferedOutputChannel = new BufferedOutputChannel(this._outputChannel.append, 300);
         this._currentBaudRate = defaultBaudRate;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
@@ -87,6 +92,8 @@ export class SerialMonitor implements vscode.Disposable {
         if (this._serialPortCtrl && this._serialPortCtrl.isActive) {
             return this._serialPortCtrl.stop();
         }
+        this._outputChannel.dispose();
+        this._bufferedOutputChannel.dispose();
     }
 
     public async selectSerialPort(vid: string, pid: string) {
@@ -108,13 +115,13 @@ export class SerialMonitor implements vscode.Disposable {
                 return false;
             });
             if (foundPort && !(this._serialPortCtrl && this._serialPortCtrl.isActive)) {
-                this.updatePortListStatus(foundPort.path);
+                this.updatePortListStatus(foundPort.port);
             }
         } else {
             const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
                 return {
-                    description: l.manufacturer,
-                    label: l.path,
+                    description: l.desc,
+                    label: l.port,
                 };
             }).sort((a, b): number => {
                 return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
@@ -144,7 +151,11 @@ export class SerialMonitor implements vscode.Disposable {
                 return;
             }
         } else {
-            this._serialPortCtrl = new SerialPortCtrl(this._currentPort, this._currentBaudRate, this._outputChannel);
+            this._serialPortCtrl = new SerialPortCtrl(
+                this._currentPort,
+                this._currentBaudRate,
+                this._bufferedOutputChannel,
+                this._outputChannel.show);
         }
 
         if (!this._serialPortCtrl.currentPort) {

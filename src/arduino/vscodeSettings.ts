@@ -2,12 +2,14 @@
 // Licensed under the MIT license.
 
 import * as vscode from "vscode";
+import { toStringArray } from "../common/util";
 
 const configKeys = {
     ARDUINO_PATH: "arduino.path",
     ARDUINO_COMMAND_PATH: "arduino.commandPath",
     ADDITIONAL_URLS: "arduino.additionalUrls",
     LOG_LEVEL: "arduino.logLevel",
+    CLEAR_OUTPUT_ON_START: "arduino.clearOutputOnBuild",
     AUTO_UPDATE_INDEX_FILES: "arduino.autoUpdateIndexFiles",
     ALLOW_PDE_FILETYPE: "arduino.allowPDEFiletype",
     ENABLE_USB_DETECTION: "arduino.enableUSBDetection",
@@ -22,8 +24,9 @@ const configKeys = {
 export interface IVscodeSettings {
     arduinoPath: string;
     commandPath: string;
-    additionalUrls: string | string[];
+    additionalUrls: string[];
     logLevel: string;
+    clearOutputOnBuild: boolean;
     allowPDEFiletype: boolean;
     enableUSBDetection: boolean;
     disableTestingOpen: boolean;
@@ -32,7 +35,7 @@ export interface IVscodeSettings {
     defaultBaudRate: number;
     useArduinoCli: boolean;
     disableIntelliSenseAutoGen: boolean;
-    updateAdditionalUrls(urls: string | string[]): void;
+    updateAdditionalUrls(urls: string[]): void;
 }
 
 export class VscodeSettings implements IVscodeSettings {
@@ -55,12 +58,28 @@ export class VscodeSettings implements IVscodeSettings {
         return this.getConfigValue<string>(configKeys.ARDUINO_COMMAND_PATH);
     }
 
-    public get additionalUrls(): string | string[] {
-        return this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
+    public get additionalUrls(): string[] {
+        const value = this.getConfigValue<string | string[]>(configKeys.ADDITIONAL_URLS);
+
+        // Even though the schema says value must be a string array, version
+        // 0.4.9 and earlier also allowed a single comma delimeted string. We
+        // continue to unofficially support that format to avoid breaking
+        // existing settings, but we immediately write back the correctly
+        // formatted version.
+        const split = toStringArray(value);
+        if (typeof value === "string") {
+            this.updateAdditionalUrls(split);
+        }
+
+        return split;
     }
 
     public get logLevel(): string {
         return this.getConfigValue<string>(configKeys.LOG_LEVEL) || "info";
+    }
+
+    public get clearOutputOnBuild(): boolean {
+        return this.getConfigValue<boolean>(configKeys.CLEAR_OUTPUT_ON_START);
     }
 
     public get allowPDEFiletype(): boolean {

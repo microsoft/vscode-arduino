@@ -207,13 +207,16 @@ export function spawn(
 
         let codepage = "65001";
         if (os.platform() === "win32") {
-            try {
-                const chcp = child_process.execSync("chcp.com");
-                codepage = chcp.toString().split(":").pop().trim();
-            } catch (error) {
-                arduinoChannel.warning(`Defaulting to code page 850 because chcp.com failed.\
-                \rEnsure your path includes %SystemRoot%\\system32\r${error.message}`);
-                codepage = "850";
+            codepage = getArduinoL4jCodepage(command.replace(/.exe$/i, ".l4j.ini"));
+            if (!codepage) {
+                try {
+                    const chcp = child_process.execSync("chcp.com");
+                    codepage = chcp.toString().split(":").pop().trim();
+                } catch (error) {
+                    arduinoChannel.warning(`Defaulting to code page 850 because chcp.com failed.\
+                    \rEnsure your path includes %SystemRoot%\\system32\r${error.message}`);
+                    codepage = "850";
+                }
             }
         }
 
@@ -253,8 +256,18 @@ export function spawn(
     });
 }
 
+export function getArduinoL4jCodepage(filePath: string): string | undefined {
+    const encoding = parseConfigFile(filePath).get("-Dfile.encoding");
+    if (encoding === "UTF8") {
+        return "65001";
+    }
+    return Object.keys(encodingMapping).reduce((r, key) => {
+        return encodingMapping[key] === encoding ? key : r;
+    }, undefined);
+}
+
 export function decodeData(data: Buffer, codepage: string): string {
-    if (encodingMapping.hasOwnProperty(codepage)) {
+    if (Object.prototype.hasOwnProperty.call(encodingMapping, codepage)) {
         return iconv.decode(data, encodingMapping[codepage]);
     }
     return data.toString();
@@ -432,4 +445,26 @@ export function resolveMacArduinoAppPath(arduinoPath: string, useArduinoCli = fa
     } else {
         return path.join(arduinoPath, "Arduino.app");
     }
+}
+
+/**
+ * If given an string, splits the string on commas. If given an array, returns
+ * the array. All strings in the output are trimmed.
+ * @param value String or string array to convert.
+ * @returns Array of strings split from the input.
+ */
+export function toStringArray(value: string | string[]): string[] {
+    if (value) {
+        let result: string[];
+
+        if (typeof value === "string") {
+            result = value.split(",");
+        } else {
+            result = <string[]>value;
+        }
+
+        return trim(result);
+    }
+
+    return [];
 }
