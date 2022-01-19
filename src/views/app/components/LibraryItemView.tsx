@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { Button, DropdownButton, MenuItem } from "react-bootstrap";
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as API from "../actions/api";
 import * as util from "../utils/util";
 
@@ -133,7 +134,7 @@ export default class LibraryItemView extends React.Component<ILibraryProps, ILib
                             )
                         }
                         {
-                            lib.versions && lib.versions.length && util.versionCompare(lib.versions[0], lib.version) > 0 && (
+                            lib.versions && lib.versions.length && versionCompare(lib.versions[0], lib.version) > 0 && (
                                 <Button className="operation-btn" onClick={() => this.installLibrary(lib.name, lib.versions[0])}>Update</Button>
                             )
                         }

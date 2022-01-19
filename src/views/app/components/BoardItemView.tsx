@@ -3,8 +3,8 @@
 
 import * as React from "react";
 import { Button, DropdownButton, MenuItem } from "react-bootstrap";
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as API from "../actions/api";
-import { versionCompare } from "../utils/util";
 
 interface IBoardProps extends React.Props<any> {
     platform: any;

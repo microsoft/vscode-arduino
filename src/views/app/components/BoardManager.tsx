@@ -5,9 +5,9 @@ import * as React from "react";
 import { Button, DropdownButton, MenuItem } from "react-bootstrap";
 import { connect } from "react-redux";
 import SearchInput, { createFilter } from "react-search-input";
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as actions from "../actions";
 import * as API from "../actions/api";
-import { versionCompare } from "../utils/util";
 import BoardItemView from "./BoardItemView";
 
 interface IBoardManagerProps extends React.Props<any> {

@@ -6,8 +6,8 @@ import { Button, Checkbox, DropdownButton, MenuItem } from "react-bootstrap";
 import * as ReactList from "react-list";
 import { connect } from "react-redux";
 import SearchInput, { createFilter } from "react-search-input";
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as actions from "../actions";
-import { versionCompare } from "../utils/util";
 import LibraryItemView from "./LibraryItemView";
 
 interface ILibraryManagerProps extends React.Props<any> {

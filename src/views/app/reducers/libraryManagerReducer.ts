@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { versionCompare } from "../../../common/sharedUtilities/utils";
 import * as actions from "../actions";
 import * as util from "../utils/util";
 
@@ -30,7 +31,7 @@ export default function libraryManagerReducer(state = initalState, action) {
             // Sorting versions in descending order.
             // for loop is faster than forEach iterator.
             for (const element of action.libraries) {
-                element.versions = element.versions ? element.versions.sort(util.versionCompare).reverse() : element.versions;
+                element.versions = element.versions ? element.versions.sort(versionCompare).reverse() : element.versions;
             }
             return {
                 ...state,
