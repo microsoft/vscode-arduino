@@ -62,7 +62,7 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
-  private _timestampFormat: string;
+  private _currentTimestampFormat: string;
 
   public constructor(
       port: string,
@@ -72,7 +72,7 @@ export class SerialPortCtrl {
       private showOutputChannel: (preserveFocus?: boolean) => void) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
-    this._timestampFormat = timestampFormat;
+    this._currentTimestampFormat = timestampFormat;
   }
 
   /*
@@ -96,7 +96,7 @@ export class SerialPortCtrl {
 
     return new Promise((resolve, reject) => {
         this._child = spawn(SerialPortCtrl._serialCliPath,
-            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "-t", this._timestampFormat, "--json"])
+            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "-t", this._currentTimestampFormat, "--json"])
 
         this._child.on("error", (err) => {
             reject(err)
@@ -178,6 +178,24 @@ export class SerialPortCtrl {
   public changeBaudRate(newRate: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this._currentBaudRate = newRate;
+      if (!this._child || !this.isActive) {
+        resolve();
+        return;
+      } else {
+            try {
+                this.stop();
+                this.open();
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        }
+    });
+  }
+
+  public changeTimestampFormat(newTimestampFormat: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._currentTimestampFormat = newTimestampFormat;
       if (!this._child || !this.isActive) {
         resolve();
         return;

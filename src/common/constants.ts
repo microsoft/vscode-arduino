@@ -47,4 +47,5 @@ export const statusBarPriority = {
     ENDING: 70,
     SKETCH: 80,
     PROGRAMMER: 90,
+    TIMESTAMP_FORMAT: 100,
 };

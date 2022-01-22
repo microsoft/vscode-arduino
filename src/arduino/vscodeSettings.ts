@@ -19,7 +19,7 @@ const configKeys = {
     DEFAULT_BAUD_RATE: "arduino.defaultBaudRate",
     USE_ARDUINO_CLI: "arduino.useArduinoCli",
     DISABLE_INTELLISENSE_AUTO_GEN: "arduino.disableIntelliSenseAutoGen",
-    TIMESTAMP_FORMAT: "arduino.timestampFormat",
+    DEFAULT_TIMESTAMP_FORMAT: "arduino.defaultTimestampFormat",
 };
 
 export interface IVscodeSettings {
@@ -121,7 +121,7 @@ export class VscodeSettings implements IVscodeSettings {
     }
 
     public get defaultTimestampFormat(): string {
-        return this.getConfigValue<string>(configKeys.TIMESTAMP_FORMAT);
+        return this.getConfigValue<string>(configKeys.DEFAULT_TIMESTAMP_FORMAT);
     }
 
     public async updateAdditionalUrls(value) {

@@ -42,11 +42,15 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _currentBaudRate: number;
 
+    private _currentTimestampFormat: string;
+
     private _portsStatusBar: vscode.StatusBarItem;
 
     private _openPortStatusBar: vscode.StatusBarItem;
 
     private _baudRateStatusBar: vscode.StatusBarItem;
+
+    private _timestampFormatStatusBar: vscode.StatusBarItem;
 
     private _serialPortCtrl: SerialPortCtrl = null;
 
@@ -54,7 +58,6 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _bufferedOutputChannel: BufferedOutputChannel;
 
-    private _timestampFormat: string;
 
     public initialize() {
         let defaultBaudRate;
@@ -64,7 +67,7 @@ export class SerialMonitor implements vscode.Disposable {
             defaultBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
         }
         let defaultTimestampFormat;
-        if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
+        if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultTimestampFormat) {
             defaultTimestampFormat = ArduinoContext.arduinoApp.settings.defaultTimestampFormat;
         } else {
             defaultTimestampFormat = SerialMonitor.DEFAULT_TIMESTAMP_FORMAT;
@@ -72,7 +75,7 @@ export class SerialMonitor implements vscode.Disposable {
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._bufferedOutputChannel = new BufferedOutputChannel(this._outputChannel.append, 300);
         this._currentBaudRate = defaultBaudRate;
-        this._timestampFormat = defaultTimestampFormat;
+        this._currentTimestampFormat = defaultTimestampFormat;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
         this._portsStatusBar.tooltip = "Select Serial Port";
@@ -88,6 +91,11 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.command = "arduino.changeBaudRate";
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = defaultBaudRate.toString();
+
+        this._timestampFormatStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.TIMESTAMP_FORMAT);
+        this._timestampFormatStatusBar.command = "arduino.changeTimestampFormat";
+        this._timestampFormatStatusBar.tooltip = "Timestamp Format";
+        this._timestampFormatStatusBar.text = defaultTimestampFormat;
         this.updatePortListStatus();
 
         const dc = DeviceContext.getInstance();
@@ -165,7 +173,7 @@ export class SerialMonitor implements vscode.Disposable {
             this._serialPortCtrl = new SerialPortCtrl(
                 this._currentPort,
                 this._currentBaudRate,
-                this._timestampFormat,
+                this._currentTimestampFormat,
                 this._bufferedOutputChannel,
                 this._outputChannel.show);
         }
@@ -216,6 +224,13 @@ export class SerialMonitor implements vscode.Disposable {
         await this._serialPortCtrl.changeBaudRate(selectedRate);
         this._currentBaudRate = selectedRate;
         this._baudRateStatusBar.text = chosen;
+    }
+
+    public async changeTimestampFormat() {
+        const timestampFormat = await vscode.window.showInputBox();
+        await this._serialPortCtrl.changeTimestampFormat(timestampFormat);
+        this._currentTimestampFormat = timestampFormat;
+        this._timestampFormatStatusBar.text = timestampFormat;
     }
 
     public async closeSerialMonitor(port: string, showWarning: boolean = true): Promise<boolean> {
