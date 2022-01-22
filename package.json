@@ -531,6 +531,11 @@
           "type": "boolean",
           "default": false,
           "description": "When disabled vscode-arduino will not auto-generate an IntelliSense configuration (i.e. c_cpp_properties.json) by analyzing the compiler output."
+        },
+        "arduino.timestampFormat": {
+          "type": "string",
+          "default": "",
+          "description": "Format of timestamp added before each line. List of all possible formats: https://strftime.org"
         }
       }
     },

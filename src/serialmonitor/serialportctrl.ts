@@ -62,14 +62,17 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
+  private _timestampFormat: string;
 
   public constructor(
       port: string,
       baudRate: number,
+      timestampFormat: string,
       private _bufferedOutputChannel: BufferedOutputChannel,
       private showOutputChannel: (preserveFocus?: boolean) => void) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
+    this._timestampFormat = timestampFormat;
   }
 
   /*
@@ -93,7 +96,7 @@ export class SerialPortCtrl {
 
     return new Promise((resolve, reject) => {
         this._child = spawn(SerialPortCtrl._serialCliPath,
-            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "--json"])
+            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "-t", this._timestampFormat, "--json"])
 
         this._child.on("error", (err) => {
             reject(err)

@@ -23,6 +23,8 @@ export class SerialMonitor implements vscode.Disposable {
 
     public static DEFAULT_BAUD_RATE: number = 115200;
 
+    public static DEFAULT_TIMESTAMP_FORMAT: string = "";
+
     public static listBaudRates(): number[] {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000];
     }
@@ -52,12 +54,20 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _bufferedOutputChannel: BufferedOutputChannel;
 
+    private _timestampFormat: string;
+
     public initialize() {
         let defaultBaudRate;
         if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
             defaultBaudRate = ArduinoContext.arduinoApp.settings.defaultBaudRate;
         } else {
             defaultBaudRate = SerialMonitor.DEFAULT_BAUD_RATE;
+        }
+        let defaultTimestampFormat;
+        if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
+            defaultTimestampFormat = ArduinoContext.arduinoApp.settings.defaultTimestampFormat;
+        } else {
+            defaultTimestampFormat = SerialMonitor.DEFAULT_TIMESTAMP_FORMAT;
         }
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._bufferedOutputChannel = new BufferedOutputChannel(this._outputChannel.append, 300);
@@ -154,6 +164,7 @@ export class SerialMonitor implements vscode.Disposable {
             this._serialPortCtrl = new SerialPortCtrl(
                 this._currentPort,
                 this._currentBaudRate,
+                this._timestampFormat,
                 this._bufferedOutputChannel,
                 this._outputChannel.show);
         }
