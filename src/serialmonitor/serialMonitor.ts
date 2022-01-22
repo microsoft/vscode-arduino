@@ -72,6 +72,7 @@ export class SerialMonitor implements vscode.Disposable {
         this._outputChannel = vscode.window.createOutputChannel(SerialMonitor.SERIAL_MONITOR);
         this._bufferedOutputChannel = new BufferedOutputChannel(this._outputChannel.append, 300);
         this._currentBaudRate = defaultBaudRate;
+        this._timestampFormat = defaultTimestampFormat;
         this._portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this._portsStatusBar.command = "arduino.selectSerialPort";
         this._portsStatusBar.tooltip = "Select Serial Port";
