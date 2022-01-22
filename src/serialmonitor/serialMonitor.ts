@@ -58,7 +58,6 @@ export class SerialMonitor implements vscode.Disposable {
 
     private _bufferedOutputChannel: BufferedOutputChannel;
 
-
     public initialize() {
         let defaultBaudRate;
         if (ArduinoContext.arduinoApp && ArduinoContext.arduinoApp.settings && ArduinoContext.arduinoApp.settings.defaultBaudRate) {
@@ -92,7 +91,8 @@ export class SerialMonitor implements vscode.Disposable {
         this._baudRateStatusBar.tooltip = "Baud Rate";
         this._baudRateStatusBar.text = defaultBaudRate.toString();
 
-        this._timestampFormatStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.TIMESTAMP_FORMAT);
+        this._timestampFormatStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right,
+                                                                           constants.statusBarPriority.TIMESTAMP_FORMAT);
         this._timestampFormatStatusBar.command = "arduino.changeTimestampFormat";
         this._timestampFormatStatusBar.tooltip = "Timestamp Format";
         this._timestampFormatStatusBar.text = defaultTimestampFormat;
