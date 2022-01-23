@@ -540,7 +540,7 @@
         "arduino.defaultTimestampFormat": {
           "type": "string",
           "default": "",
-          "description": "Format of timestamp added before each line. List of all possible formats: https://strftime.org"
+          "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://strftime.org)."
         }
       }
     },
