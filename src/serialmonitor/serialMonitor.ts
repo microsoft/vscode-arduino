@@ -228,6 +228,10 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async changeTimestampFormat() {
         const timestampFormat = await vscode.window.showInputBox();
+        if (!timestampFormat) {
+            Logger.warn("No timestamp format inputted, keeping previous timestamp format.");
+            return;
+        }
         await this._serialPortCtrl.changeTimestampFormat(timestampFormat);
         this._currentTimestampFormat = timestampFormat;
         this._timestampFormatStatusBar.tooltip = `Timestamp Format: "${timestampFormat}"`;
