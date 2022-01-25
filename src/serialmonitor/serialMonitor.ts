@@ -232,6 +232,10 @@ export class SerialMonitor implements vscode.Disposable {
             Logger.warn("No timestamp format inputted, keeping previous timestamp format.");
             return;
         }
+        if (!this._serialPortCtrl) {
+            Logger.warn("Serial Monitor has not been started.");
+            return;
+        }
         await this._serialPortCtrl.changeTimestampFormat(timestampFormat);
         this._currentTimestampFormat = timestampFormat;
         this._timestampFormatStatusBar.tooltip = `Timestamp Format: "${timestampFormat}"`;
