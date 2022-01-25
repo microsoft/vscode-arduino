@@ -43,9 +43,9 @@ export const statusBarPriority = {
     PORT: 20,
     OPEN_PORT: 30,
     BAUD_RATE: 40,
+    TIMESTAMP_FORMAT: 50,
     BOARD: 60,
     ENDING: 70,
     SKETCH: 80,
     PROGRAMMER: 90,
-    TIMESTAMP_FORMAT: 100,
 };
