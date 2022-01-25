@@ -268,11 +268,13 @@ export class SerialMonitor implements vscode.Disposable {
             this._openPortStatusBar.text = `$(x)`;
             this._openPortStatusBar.tooltip = "Close Serial Monitor";
             this._baudRateStatusBar.show();
+            this._timestampFormatStatusBar.show();
         } else {
             this._openPortStatusBar.command = "arduino.openSerialMonitor";
             this._openPortStatusBar.text = `$(plug)`;
             this._openPortStatusBar.tooltip = "Open Serial Monitor";
             this._baudRateStatusBar.hide();
+            this._timestampFormatStatusBar.hide();
         }
 
     }
