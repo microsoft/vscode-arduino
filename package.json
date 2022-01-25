@@ -44,6 +44,7 @@
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.selectSketch",
     "onCommand:arduino.changeBaudRate",
+    "onCommand:arduino.changeTimestampFormat",
     "onCommand:arduino.openSerialMonitor",
     "onCommand:arduino.sendMessageToSerialPort",
     "onCommand:arduino.closeSerialMonitor",
@@ -127,6 +128,10 @@
       {
         "command": "arduino.changeBaudRate",
         "title": "Arduino: Change Baud Rate"
+      },
+      {
+        "command": "arduino.changeTimestampFormat",
+        "title": "Arduino: Change Timestamp Format"
       },
       {
         "command": "arduino.openSerialMonitor",
@@ -531,6 +536,11 @@
           "type": "boolean",
           "default": false,
           "description": "When disabled vscode-arduino will not auto-generate an IntelliSense configuration (i.e. c_cpp_properties.json) by analyzing the compiler output."
+        },
+        "arduino.defaultTimestampFormat": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://strftime.org)."
         }
       }
     },

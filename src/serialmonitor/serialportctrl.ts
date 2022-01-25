@@ -62,14 +62,17 @@ export class SerialPortCtrl {
   private _currentPort: string;
   private _currentBaudRate: number;
   private _currentSerialPort = null;
+  private _currentTimestampFormat: string;
 
   public constructor(
       port: string,
       baudRate: number,
+      timestampFormat: string,
       private _bufferedOutputChannel: BufferedOutputChannel,
       private showOutputChannel: (preserveFocus?: boolean) => void) {
     this._currentBaudRate = baudRate;
     this._currentPort = port;
+    this._currentTimestampFormat = timestampFormat;
   }
 
   /*
@@ -93,7 +96,7 @@ export class SerialPortCtrl {
 
     return new Promise((resolve, reject) => {
         this._child = spawn(SerialPortCtrl._serialCliPath,
-            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "--json"])
+            ["open", this._currentPort, "-b", this._currentBaudRate.toString(), "-t", this._currentTimestampFormat, "--json"])
 
         this._child.on("error", (err) => {
             reject(err)
@@ -102,7 +105,7 @@ export class SerialPortCtrl {
         this._child.stdout.on("data", (data) => {
             if (this.isActive) {
                 const jsonObj = JSON.parse(data.toString())
-                this._bufferedOutputChannel.append(jsonObj["payload"] + "\n");
+                this._bufferedOutputChannel.append(jsonObj["timestamp"] + jsonObj["payload"] + "\n");
             }
         });
         // TODO: add message check to ensure _child spawned without errors
@@ -175,6 +178,24 @@ export class SerialPortCtrl {
   public changeBaudRate(newRate: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this._currentBaudRate = newRate;
+      if (!this._child || !this.isActive) {
+        resolve();
+        return;
+      } else {
+            try {
+                this.stop();
+                this.open();
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        }
+    });
+  }
+
+  public changeTimestampFormat(newTimestampFormat: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._currentTimestampFormat = newTimestampFormat;
       if (!this._child || !this.isActive) {
         resolve();
         return;

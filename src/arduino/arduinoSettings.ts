@@ -22,6 +22,7 @@ export interface IArduinoSettings {
     defaultBaudRate: number;
     preferences: Map<string, string>;
     useArduinoCli: boolean;
+    defaultTimestampFormat: string;
     reloadPreferences(): void;
 }
 
@@ -40,6 +41,8 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _useArduinoCli: boolean;
 
+    private _defaultTimestampFormat: string;
+
     public constructor() {
     }
 
@@ -49,6 +52,7 @@ export class ArduinoSettings implements IArduinoSettings {
         this._useArduinoCli = VscodeSettings.getInstance().useArduinoCli;
         await this.tryResolveArduinoPath();
         await this.tryGetDefaultBaudRate();
+        await this.tryGetDefaultTimestampFormat();
         if (platform === "win32") {
             await this.updateWindowsPath();
             if (this._commandPath === "") {
@@ -161,6 +165,10 @@ export class ArduinoSettings implements IArduinoSettings {
         return this._defaultBaudRate;
     }
 
+    public get defaultTimestampFormat() {
+        return this._defaultTimestampFormat;
+    }
+
     public reloadPreferences() {
         this._preferences = util.parseConfigFile(this.preferencePath);
         if (this.preferences.get("sketchbook.path")) {
@@ -232,6 +240,15 @@ export class ArduinoSettings implements IArduinoSettings {
             this._defaultBaudRate = 0;
         } else {
             this._defaultBaudRate = configValue;
+        }
+    }
+
+    private async tryGetDefaultTimestampFormat(): Promise<void> {
+        const configValue = VscodeSettings.getInstance().defaultTimestampFormat;
+        if (!configValue) {
+            this._defaultTimestampFormat = "";
+        } else {
+            this._defaultTimestampFormat = configValue;
         }
     }
 }

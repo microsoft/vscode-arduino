@@ -47,6 +47,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: Board Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in the board manager.
 - **Arduino: Change Baud Rate**: Change the baud rate of the selected serial port.
 - **Arduino: Change Board Type**: Change board type or platform.
+- **Arduino: Change Timestamp Format**: Change format of timestamp printed before each line of Serial Monitor output.
 - **Arduino: Close Serial Monitor**: Stop the serial monitor and release the serial port.
 - **Arduino: Examples**: Show list of examples.
 - **Arduino: Initialize**: Scaffold a VS Code project with an Arduino sketch.
@@ -79,6 +80,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
 | `arduino.defaultBaudRate` | Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000 |
+| `arduino.defaultTimestampFormat` | Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://strftime.org). |
 | `arduino.disableIntelliSenseAutoGen` | When `true` vscode-arduino will not auto-generate an IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`) by analyzing Arduino's compiler output. |
 
 The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
