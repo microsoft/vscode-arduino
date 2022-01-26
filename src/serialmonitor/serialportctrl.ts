@@ -105,7 +105,7 @@ export class SerialPortCtrl {
         this._child.stdout.on("data", (data) => {
             if (this.isActive) {
                 const jsonObj = JSON.parse(data.toString())
-                this._bufferedOutputChannel.append(jsonObj["timestamp"] + jsonObj["payload"] + "\n");
+                this._bufferedOutputChannel.append(jsonObj["timestamp"] + jsonObj["payload"]);
             }
         });
         // TODO: add message check to ensure _child spawned without errors
