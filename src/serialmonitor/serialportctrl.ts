@@ -52,7 +52,7 @@ export class SerialPortCtrl {
     if (os.platform() === "win32") {
         fileName = "main.exe"
     } else if (os.platform() === "linux" || os.platform() === "darwin") {
-        fileName = "main"
+        fileName = "main.out"
     }
     const deviceContext = DeviceContext.getInstance();
     return path.resolve(deviceContext.extensionPath, "out", "serial-monitor-cli", `${os.platform}`, fileName);

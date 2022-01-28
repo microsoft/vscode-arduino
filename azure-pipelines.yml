@@ -115,21 +115,19 @@ steps:
       includeRootFolder: false
       archiveType: zip
       archiveFile: $(Build.StagingDirectory)\vscode-arduino.vsix
-  - script: python .\build\markExecutableFiles.py
-    displayName: Make serial monitor executable
   - task: MSBuild@1
     displayName: Sign VSIX
     inputs:
       solution: .\build\SignVsix.proj
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
-    # TODO: Signing the VSIX strips out the "main" executables for
-    # serial-monitor-cli on Mac and Linux, completely breaking serial
-    # functionality in the extension on these platforms. For now we disable VSIX
-    # signing because it's not a strict requirement, but we should investigate
-    # if we can either add extensions to these files or support extensionless
-    # files in VSIX signing.
-    condition: and(false, ne(variables['Build.Reason'], 'PullRequest'))
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  # VSIX signing removes the executable attributes on files. Luckily, the
+  # signature only seems to be based on the content of the files, not the
+  # attributes, so we can safely go back and mark the serial monitor as
+  # executable without invalidating the signature.
+  - script: python .\build\markExecutableFiles.py
+    displayName: Make serial monitor executable
   - publish: $(Build.StagingDirectory)\vscode-arduino.vsix
     artifact: VS Code extension VSIX
     displayName: Publish extension VSIX as artifact

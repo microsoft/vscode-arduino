@@ -6,8 +6,8 @@ input_archive_path = f"{staging_directory}/vscode-arduino.vsix"
 output_archive_path = f"{staging_directory}/vscode-arduino-out.vsix"
 
 filenames = [
-    "extension/out/serial-monitor-cli/darwin/main",
-    "extension/out/serial-monitor-cli/linux/main"
+    "extension/out/serial-monitor-cli/darwin/main.out",
+    "extension/out/serial-monitor-cli/linux/main.out"
 ]
 
 input_archive = zipfile.ZipFile(input_archive_path, 'r')
