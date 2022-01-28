@@ -115,8 +115,6 @@ steps:
       includeRootFolder: false
       archiveType: zip
       archiveFile: $(Build.StagingDirectory)\vscode-arduino.vsix
-  - script: python .\build\markExecutableFiles.py
-    displayName: Make serial monitor executable
   - task: MSBuild@1
     displayName: Sign VSIX
     inputs:
@@ -124,6 +122,12 @@ steps:
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
     condition: ne(variables['Build.Reason'], 'PullRequest')
+  # VSIX signing removes the executable attributes on files. Luckily, the
+  # signature only seems to be based on the content of the files, not the
+  # attributes, so we can safely go back and mark the serial monitor as
+  # executable without invalidating the signature.
+  - script: python .\build\markExecutableFiles.py
+    displayName: Make serial monitor executable
   - publish: $(Build.StagingDirectory)\vscode-arduino.vsix
     artifact: VS Code extension VSIX
     displayName: Publish extension VSIX as artifact
