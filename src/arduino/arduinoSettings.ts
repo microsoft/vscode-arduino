@@ -50,7 +50,10 @@ export class ArduinoSettings implements IArduinoSettings {
         const platform = os.platform();
         this._commandPath = VscodeSettings.getInstance().commandPath;
         this._useArduinoCli = VscodeSettings.getInstance().useArduinoCli;
-        await this.tryResolveArduinoPath();
+        if(this._useArduinoCli && !this._commandPath) {
+             this._commandPath = 'arduino-cli';
+        }
+        await this.tryResolveArduinoPath(this._useArduinoCli);
         await this.tryGetDefaultBaudRate();
         await this.tryGetDefaultTimestampFormat();
         if (platform === "win32") {
@@ -136,7 +139,8 @@ export class ArduinoSettings implements IArduinoSettings {
     public get commandPath(): string {
         const platform = os.platform();
         if (platform === "darwin") {
-            return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), path.normalize(this._commandPath));
+            let cmdPath = path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), path.normalize(this._commandPath));
+            return cmdPath;
         } else {
             return path.join(this._arduinoPath, path.normalize(this._commandPath));
         }
@@ -220,14 +224,14 @@ export class ArduinoSettings implements IArduinoSettings {
         }
     }
 
-    private async tryResolveArduinoPath(): Promise<void> {
+    private async tryResolveArduinoPath(useArduinoCli = false): Promise<void> {
         // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
         // "usual software installation directory for each os".
         // 1. Search vscode user settings first.
         const configValue = VscodeSettings.getInstance().arduinoPath;
         if (!configValue || !configValue.trim()) {
             // 2 & 3. Resolve arduino path from system environment variables and usual software installation directory.
-            this._arduinoPath = await Promise.resolve(resolveArduinoPath());
+            this._arduinoPath = await Promise.resolve(resolveArduinoPath(useArduinoCli));
         } else {
             this._arduinoPath = configValue;
         }

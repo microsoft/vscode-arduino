@@ -5,21 +5,36 @@ import * as childProcess from "child_process";
 import * as path from "path";
 import { directoryExistsSync, fileExistsSync, resolveMacArduinoAppPath } from "../util";
 
-export function resolveArduinoPath(): string {
+export function resolveArduinoPath(useArduinoCli = false): string {
     let result;
 
-    const defaultCommonPaths = [path.join(process.env.HOME, "Applications"), "/Applications"];
+    const appName = useArduinoCli ? 'arduino-cli' : 'Arduino.app'
+    const defaultCommonPaths = [path.join(process.env.HOME, "Applications"), "/Applications", '/opt/homebrew/bin'];
     for (const scanPath of defaultCommonPaths) {
-        if (directoryExistsSync(path.join(scanPath, "Arduino.app"))) {
+        if (directoryExistsSync(path.join(scanPath, appName))) {
             result = scanPath;
             break;
         }
+    }
+    if(!result) {
+        result = which(appName);
     }
     return result || "";
 }
 
 export function validateArduinoPath(arduinoPath: string, useArduinoCli = false): boolean {
-    return fileExistsSync(path.join(resolveMacArduinoAppPath(arduinoPath, useArduinoCli), useArduinoCli ? "arduino-cli" : "/Contents/MacOS/Arduino"));
+    let fileExists = fileExistsSync(path.join(resolveMacArduinoAppPath(arduinoPath, useArduinoCli), useArduinoCli 
+        ? "arduino-cli" : 
+          "/Contents/MacOS/Arduino"));
+    return fileExists;
+}
+
+function which(programName: string) {
+    let location = childProcess.execSync(`which ${programName}`, { encoding: "utf8" }).trim();
+    if(location ===  `${programName} not found`) {
+        return undefined;
+    }
+    return location.substring(0, location.length - programName.length);
 }
 
 export function findFile(fileName: string, cwd: string): string {

@@ -9,8 +9,8 @@ export const isLinux = (process.platform === "linux");
 /*tslint:disable:no-var-requires*/
 const internalSysLib = require(path.join(__dirname, `sys/${process.platform}`));
 
-export function resolveArduinoPath(): string {
-    return internalSysLib.resolveArduinoPath();
+export function resolveArduinoPath(useArduinoCli = false): string {
+    return internalSysLib.resolveArduinoPath(useArduinoCli);
 }
 
 export function validateArduinoPath(arduinoPath: string, useArduinoCli = false): boolean {

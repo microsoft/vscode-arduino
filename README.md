@@ -24,9 +24,9 @@ The Arduino IDE can be installed the Arduino [download page](https://www.arduino
 - *Note:* Arduino IDE `1.8.7` had some breaking changes, causing board package and library installation failures.  These failures were corrected in `1.8.8` and later.
 
 ### Arduino CLI
-The Arduino CLI can be downloaded from the repository's [release page](https://github.com/arduino/arduino-cli/releases/tag/0.13.0)
+The Arduino CLI can be downloaded from the repository's [release page](https://github.com/arduino/arduino-cli/releases/tag/0.13.0) or by using `brew install arduino-cli` if you use Homebrew.
 - The extension has only been tested with v0.13.0.
-- If you use the CLI you will have to set `arduino.path` since the CLI does not have a default path.
+- If you install the CLI without the use of a package manager, you will have to set `arduino.path` since the CLI does not have a default path.
 
 ## Installation
 Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
