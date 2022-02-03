@@ -3,6 +3,7 @@
 
 import { ArduinoApp } from "./arduino/arduino";
 import { BoardManager } from "./arduino/boardManager";
+import { hostPlatform } from "./common/platform";
 import { DebuggerManager } from "./debug/debuggerManager";
 import { DeviceContext } from "./deviceContext";
 
@@ -34,7 +35,8 @@ class ArduinoContext {
             this._debuggerManager = new DebuggerManager(
                 DeviceContext.getInstance().extensionPath,
                 this.arduinoApp.settings,
-                this.boardManager);
+                this.boardManager,
+                hostPlatform());
             this._debuggerManager.initialize();
         }
         return this._debuggerManager;

@@ -4,9 +4,8 @@
 import * as os from "os";
 import * as path from "path";
 import * as WinReg from "winreg";
+import { IHostPlatform } from "../common/i-host-platform";
 import * as util from "../common/util";
-
-import { resolveArduinoPath } from "../common/platform";
 
 import { VscodeSettings } from "./vscodeSettings";
 
@@ -43,7 +42,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _defaultTimestampFormat: string;
 
-    public constructor() {
+    public constructor(private _platform: IHostPlatform) {
     }
 
     public async initialize() {
@@ -231,7 +230,7 @@ export class ArduinoSettings implements IArduinoSettings {
         const configValue = VscodeSettings.getInstance().arduinoPath;
         if (!configValue || !configValue.trim()) {
             // 2 & 3. Resolve arduino path from system environment variables and usual software installation directory.
-            this._arduinoPath = await Promise.resolve(resolveArduinoPath(useArduinoCli));
+            this._arduinoPath = await Promise.resolve(this._platform.resolveArduinoPath(useArduinoCli));
         } else {
             this._arduinoPath = configValue;
         }

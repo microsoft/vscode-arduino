@@ -1,29 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
-import * as path from "path";
+import { IHostPlatform } from "./i-host-platform";
+import { DarwinPlatform } from "./sys/darwin";
+import { LinuxPlatform } from "./sys/linux";
+import { WindowsPlatform } from "./sys/win32";
 
-export const isWindows = (process.platform === "win32");
-export const isMacintosh = (process.platform === "darwin");
-export const isLinux = (process.platform === "linux");
-
-/*tslint:disable:no-var-requires*/
-const internalSysLib = require(path.join(__dirname, `sys/${process.platform}`));
-
-export function resolveArduinoPath(useArduinoCli = false): string {
-    return internalSysLib.resolveArduinoPath(useArduinoCli);
-}
-
-export function validateArduinoPath(arduinoPath: string, useArduinoCli = false): boolean {
-    return internalSysLib.validateArduinoPath(arduinoPath, useArduinoCli);
-}
-
-export function findFile(fileName: string, cwd: string): string {
-    return internalSysLib.findFile(fileName, cwd);
-}
-
-export function getExecutableFileName(fileName: string): string {
-    if (isWindows) {
-        return `${fileName}.exe`;
+export function hostPlatform(): IHostPlatform {
+    switch(process.platform) {
+        case 'win32':
+            return new WindowsPlatform();
+        case 'darwin':
+            return new DarwinPlatform();
+        case 'linux':
+            return new LinuxPlatform();
+        default:
+            return new LinuxPlatform();
     }
-    return fileName;
 }

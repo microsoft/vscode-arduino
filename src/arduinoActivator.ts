@@ -11,6 +11,7 @@ import { ExampleProvider } from "./arduino/exampleProvider";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ProgrammerManager } from "./arduino/programmerManager";
 import ArduinoContext from "./arduinoContext";
+import { hostPlatform } from "./common/platform";
 import { DeviceContext } from "./deviceContext";
 
 class ArduinoActivator {
@@ -22,7 +23,7 @@ class ArduinoActivator {
         }
 
         this._initializePromise = (async () => {
-            const arduinoSettings = new ArduinoSettings();
+            const arduinoSettings = new ArduinoSettings(hostPlatform());
             await arduinoSettings.initialize();
             const arduinoApp = new ArduinoApp(arduinoSettings);
             await arduinoApp.initialize();
