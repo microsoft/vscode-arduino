@@ -95,7 +95,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli)) {
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
-            } else if (!commandPath || !util.fileExistsSync(commandPath)) {
+            } else if (commandPath && !util.fileExistsSync(commandPath)) {
                 Logger.notifyUserError("InvalidCommandPath", new Error(constants.messages.INVALID_COMMAND_PATH + commandPath));
             } else {
                 await commandExecution(command, commandBody, args, getUserData);

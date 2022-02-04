@@ -134,6 +134,9 @@ export class ArduinoSettings implements IArduinoSettings {
     }
 
     public get commandPath(): string {
+        if(!this._commandPath) {
+            return this._commandPath;
+        }
         const platform = os.platform();
         if (platform === "darwin") {
             return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), path.normalize(this._commandPath));
