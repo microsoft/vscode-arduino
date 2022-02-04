@@ -10,7 +10,8 @@ export class LinuxPlatform implements IHostPlatform {
     public resolveArduinoPath(useArduinoCli?: boolean): string {
         let pathString;
         try {
-            pathString = childProcess.execSync("readlink -f $(which arduino)", { encoding: "utf8" });
+            const appName = useArduinoCli ? 'arduino-cli' : 'arduino'
+            pathString = childProcess.execSync(`readlink -f $(which ${appName})`, { encoding: "utf8" });
             pathString = path.resolve(pathString).trim();
             if (fileExistsSync(pathString)) {
                 pathString = path.dirname(path.resolve(pathString));

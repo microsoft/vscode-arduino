@@ -18,7 +18,8 @@ export class WindowsPlatform implements IHostPlatform {
             return pathString;
         }
         try {
-            pathString = childProcess.execSync("where arduino", { encoding: "utf8" });
+            const appName = useArduinoCli ? 'arduino-cli' : 'arduino';
+            pathString = childProcess.execSync(`where ${appName}`, { encoding: "utf8" });
             pathString = path.resolve(pathString).trim();
             if (fileExistsSync(pathString)) {
                 pathString = path.dirname(path.resolve(pathString));
