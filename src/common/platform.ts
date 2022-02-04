@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+import * as childProcess from "child_process";
 import * as path from "path";
 
 export const isWindows = (process.platform === "win32");

@@ -29,6 +29,8 @@ const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
 import { BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
+import { platform } from "os";
+import { execFileSync } from "child_process";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -98,6 +100,9 @@ export async function activate(context: vscode.ExtensionContext) {
             } else if (commandPath && !util.fileExistsSync(commandPath)) {
                 Logger.notifyUserError("InvalidCommandPath", new Error(constants.messages.INVALID_COMMAND_PATH + commandPath));
             } else {
+                if(commandPath) {
+                    execFileSync(commandPath);
+                }
                 await commandExecution(command, commandBody, args, getUserData);
             }
         }));
