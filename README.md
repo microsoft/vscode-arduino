@@ -29,9 +29,9 @@ The Arduino CLI can be downloaded from the repository's [release page](https://g
 - If you use the CLI you will have to set `arduino.path` since the CLI does not have a default path.
 
 ## Installation
-Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
+Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> *or* <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
 
-Or launch VS Code Quick Open (<kbd>Ctrl</kbd> + <kbd>P</kbd>), paste the following command, and press enter.
+Or launch VS Code Quick Open (<kbd>Ctrl</kbd> + <kbd>P</kbd> *or* <kbd>Cmd</kbd> + <kbd>P</kbd> ), paste the following command, and press enter.
 ```bash
 ext install vscode-arduino
 ```
@@ -42,7 +42,7 @@ You can also install directly from the Marketplace within Visual Studio Code, se
 You can find code samples and tutorials each time that you connect a supported device. Alternatively you can visit our [IoT Developer Blog Space](https://devblogs.microsoft.com/iotdev/) or [Get Started Tutorials](https://docs.microsoft.com/azure/iot-hub/iot-hub-arduino-iot-devkit-az3166-get-started).
 
 ## Commands
-This extension provides several commands in the Command Palette (<kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) for working with `*.ino` files:
+This extension provides several commands in the Command Palette (<kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> *or* <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) for working with `*.ino` files:
 
 - **Arduino: Board Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in the board manager.
 - **Arduino: Change Baud Rate**: Change the baud rate of the selected serial port.
@@ -83,7 +83,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.defaultTimestampFormat` | Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://strftime.org). |
 | `arduino.disableIntelliSenseAutoGen` | When `true` vscode-arduino will not auto-generate an IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`) by analyzing Arduino's compiler output. |
 
-The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
+The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> *or* <kbd>Cmd</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
 
 ```json
 {
@@ -198,7 +198,7 @@ Make sure that your Arduino board can work with [STLink](http://www.st.com/en/de
 
 Steps to start debugging:
 1. Plug in your board to your development machine properly. For those boards that do not have an on-board debugging chip, you need to use a STLink or JLink connector.
-2. Go to the **Debug View** (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd>). and set breakpoints in your source files.
+2. Go to the **Debug View** (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> *or* <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd>). and set breakpoints in your source files.
 3. Press <kbd>F5</kbd> to select your debugging environment.
 4. When your breakpoint is hit, you can see variables and add expression(s) to watch on the Debug Side Bar.
 
