@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import * as os from "os";
+import { SerialPort } from "serialport";
+import * as strftime from "strftime";
 import { BufferedOutputChannel } from "./outputBuffer";
-import { SerialPort } from 'serialport';
-import * as strftime from 'strftime';
 
 interface ISerialPortDetail {
   port: string;
@@ -22,12 +22,12 @@ export class SerialPortCtrl {
  *
  */
   public static async list(): Promise<ISerialPortDetail[]> {
-    return (await SerialPort.list()).map(port => {
+    return (await SerialPort.list()).map((port) => {
       return {
         port: port.path,
         desc: (port as any).friendlyName ?? port.manufacturer,
         vendorId: port.vendorId,
-        productId: port.productId
+        productId: port.productId,
       };
     });
   }
@@ -60,30 +60,33 @@ export class SerialPortCtrl {
     this._bufferedOutputChannel.appendLine(`[Starting] Opening the serial port - ${this._currentPort}`);
     this.showOutputChannel();
 
-    if (this.isActive) await this.close();
+    if (this.isActive) { await this.close(); }
 
     await new Promise<void>((resolve, reject) => {
       this._port = new SerialPort(
         { autoOpen: false, path: this._currentPort, baudRate: this._currentBaudRate },
         (err) => {
-          if (err) reject(err);
+          if (err) { reject(err); }
         });
       this._port.open((err) => {
-        if (err) reject(err);
-        else resolve();
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
       });
     });
 
     let lastDataEndedWithNewline = true;
     this._port.on("data", (data) => {
-      const text: string = data.toString('utf8');
+      const text: string = data.toString("utf8");
       if (this._currentTimestampFormat) {
         const timestamp = strftime(this._currentTimestampFormat);
         this._bufferedOutputChannel.append(
           // Timestamps should only be added at the beginning of a line.
           // Look for newlines except at the very end of the string.
-          (lastDataEndedWithNewline ? timestamp : '') +
-          text.replace(/\n(?!$)/g, "\n" + timestamp)
+          (lastDataEndedWithNewline ? timestamp : "") +
+          text.replace(/\n(?!$)/g, "\n" + timestamp),
         );
         lastDataEndedWithNewline = text.endsWith("\n");
       } else {
@@ -109,14 +112,14 @@ export class SerialPortCtrl {
   }
 
   public async changePort(newPort: string): Promise<void> {
-    if (newPort === this._currentPort) return;
+    if (newPort === this._currentPort) { return; }
     this._currentPort = newPort;
-    if (!this.isActive) return;
+    if (!this.isActive) { return; }
     await this.close();
   }
 
   public async stop(): Promise<boolean> {
-    if (!this.isActive) return false;
+    if (!this.isActive) { return false; }
 
     await this.close();
     if (this._bufferedOutputChannel) {
@@ -128,7 +131,7 @@ export class SerialPortCtrl {
 
   public async changeBaudRate(newRate: number): Promise<void> {
     this._currentBaudRate = newRate;
-    if (!this.isActive) return;
+    if (!this.isActive) { return; }
     await this.stop();
     await this.open();
   }
@@ -140,9 +143,12 @@ export class SerialPortCtrl {
   private close(): Promise<void> {
     return new Promise((resolve, reject) => {
       this._port.close((err) => {
-        if (err) reject(err);
-        this._port = undefined;
-        resolve();
+        if (err) {
+          reject(err);
+        } else {
+          this._port = undefined;
+          resolve();
+        }
       })
     });
   }
