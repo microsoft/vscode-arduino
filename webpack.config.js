@@ -19,12 +19,14 @@ function getEntry() {
     fs.copySync(p, 'out/node_modules/' + mod);
   }
 
+  // The nan module is nested inside usb-detection, so it was already copied.
+  const noEntryModules = unbundledModule.concat(['nan']);
   const list = getDependenciesFromNpm(mod);
   const moduleList = list.filter((value, index, self) => {
     // Some entries in the list of unbundled modules are really namespaces, so
     // we do a prefix match to see if the module should be excluded. This isn't
     // perfect, but works for the set of modules we care about.
-    return self.indexOf(value) === index && unbundledModule.filter(m => value.startsWith(m)).length === 0 && !/^@types\//.test(value);
+    return self.indexOf(value) === index && noEntryModules.filter(m => value.startsWith(m)).length === 0 && !/^@types\//.test(value);
   });
 
   for (const mod of moduleList) {
