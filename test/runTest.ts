@@ -17,7 +17,9 @@ async function main() {
         // Download VS Code, unzip it and run the integration test
         await runTests({ extensionDevelopmentPath, extensionTestsPath , launchArgs: [testWorkspace]});
     } catch (err) {
+        /* tslint:disable */
         console.error("Failed to run tests", err);
+        /* tslint:enable */
         process.exit(1);
     }
 }
