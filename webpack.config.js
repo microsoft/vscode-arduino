@@ -12,16 +12,21 @@ function getEntry() {
   const mod = JSON.parse(npmListRes);
   const unbundledModule = ['impor', 'uuid',
   // usb-native modules can not be bundled
-  'node-usb-native', 'usb-detection', '@serialport/bindings', 'bindings', 'serialport'];
+  'usb-detection', '@serialport', 'bindings', 'serialport'];
   
   for (const mod of unbundledModule) {
     const p = 'node_modules/' + mod;
     fs.copySync(p, 'out/node_modules/' + mod);
   }
 
+  // The nan module is nested inside usb-detection, so it was already copied.
+  const noEntryModules = unbundledModule.concat(['nan']);
   const list = getDependenciesFromNpm(mod);
   const moduleList = list.filter((value, index, self) => {
-    return self.indexOf(value) === index && unbundledModule.indexOf(value) === -1 && !/^@types\//.test(value);
+    // Some entries in the list of unbundled modules are really namespaces, so
+    // we do a prefix match to see if the module should be excluded. This isn't
+    // perfect, but works for the set of modules we care about.
+    return self.indexOf(value) === index && noEntryModules.filter(m => value.startsWith(m)).length === 0 && !/^@types\//.test(value);
   });
 
   for (const mod of moduleList) {
@@ -56,7 +61,8 @@ const config = {
         devtoolModuleFilenameTemplate: "../[resource-path]",
     },
     externals: {
-        vscode: "commonjs vscode"
+        vscode: "commonjs vscode",
+        serialport: "serialport"
     },
     resolve: {
         extensions: ['.js', '.json']

@@ -47,7 +47,7 @@ export class UsbDetector {
         if (os.platform() === "linux" || !enableUSBDetection) {
             return;
         }
-        this._usbDetector = require("node-usb-native").detector;
+        this._usbDetector = require("usb-detection");
 
         if (!this._usbDetector) {
             return;
