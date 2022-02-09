@@ -9,8 +9,7 @@ There are many ways that you can contribute, beyond writing code. The goal of th
 If you are interested in writing code to fix issues, first look at the issues with the [help-wanted](https://github.com/Microsoft/vscode-arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label. They should have the context and code pointers needed to get started. If not, then feel free to ask for some, and we will be happy to provide any guidance you need.
 
 When you are doing code fix, please work against [main](https://github.com/microsoft/vscode-arduino/tree/main)
-branch and also submit pull request to `main` branch.
-Changes will be merged into `release` branch after production release.
+branch and also submit pull request to `main` branch. Production releases will be tagged from `main`.
 
 
 
