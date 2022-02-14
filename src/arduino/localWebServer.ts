@@ -5,6 +5,7 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as http from "http";
 import * as path from "path";
+import { Uri } from "vscode";
 
 export default class LocalWebServer {
     private app = express();
@@ -19,8 +20,9 @@ export default class LocalWebServer {
     public getServerUrl(): string {
         return `http://localhost:${this.server.address().port}`;
     }
-    public getEndpointUri(type: string): string {
-        return `http://localhost:${this.server.address().port}/${type}`;
+
+    public getEndpointUri(type: string): Uri {
+        return Uri.parse(`http://localhost:${this.server.address().port}/${type}`);
     }
 
     public addHandler(url: string, handler: (req, res) => void): void {
