@@ -77,7 +77,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                     var backgroundcolor = styles.getPropertyValue('--background-color') || '#1e1e1e';
                     var color = styles.getPropertyValue('--color') || '#d4d4d4';
                     var theme = document.body.className || 'vscode-dark';
-                    var url = "${this._webserver.getEndpointUri(type)}?" +
+                    var url = "${(await vscode.env.asExternalUri(this._webserver.getEndpointUri(type))).toString()}?" +
                             "theme=" + encodeURIComponent(theme.trim()) +
                             "&backgroundcolor=" + encodeURIComponent(backgroundcolor.trim()) +
                             "&color=" + encodeURIComponent(color.trim());
