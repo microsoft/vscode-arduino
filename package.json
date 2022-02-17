@@ -606,7 +606,7 @@
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
     "acorn": "^7.4.0",
-    "ajv": "^5.0.0",
+    "ajv": "^6.12.3",
     "del": "^2.2.2",
     "download": "^8.0.0",
     "eslint": "^7.32.0",
