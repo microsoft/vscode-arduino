@@ -176,13 +176,13 @@ export class ArduinoApp {
      * @param buildDir Override the build directory set by the project settings
      * with the given directory.
      * @returns true on success, false if
-     *  * another build is currently in progress
+     *  * another build or burn bootloader operation is currently in progress
      *  * board- or programmer-manager aren't initialized yet
      *  * or something went wrong during the build
      */
     public async build(buildMode: BuildMode, buildDir?: string) {
 
-        if (!this._boardManager || !this._programmerManager || this._state) {
+        if (!this._boardManager || !this._programmerManager || this._state !== ArduinoState.Idle) {
             return false;
         }
 
@@ -200,8 +200,16 @@ export class ArduinoApp {
         }
     }
 
+    /** 
+     * Burns the bootloader onto the currently selected board using the currently
+     * selected programmer.
+     * @returns true on success, false if
+     *  * another build or burn bootloader operation is currently in progress
+     *  * board- or programmer-manager aren't initialized yet
+     *  * something went wrong while burning the bootloader
+     */
     public async burnBootloader() {
-        if (!this._boardManager || !this.programmerManager || this._state) {
+        if (!this._boardManager || !this.programmerManager || this._state !== ArduinoState.Idle) {
             return false;
         }
 
