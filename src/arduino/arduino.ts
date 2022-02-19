@@ -190,7 +190,7 @@ export class ArduinoApp {
 
         try {
             return await this._build(buildMode, buildDir);
-        } catch(reason) {
+        } catch (reason) {
             logger.notifyUserError("ArduinoApp.build",
                                    reason,
                                    `Unhandled exception when cleaning up build "${buildMode}": ${JSON.stringify(reason)}`);
@@ -208,7 +208,7 @@ export class ArduinoApp {
         this._state = ArduinoState.BurningBootloader;
         try {
             return await this._burnBootloader();
-        } catch(reason) {
+        } catch (reason) {
             logger.notifyUserError("ArduinoApp.burnBootloader",
                                    reason,
                                    `Unhandled exception burning bootloader: ${JSON.stringify(reason)}`);
