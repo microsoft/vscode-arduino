@@ -59,6 +59,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 - **Arduino: CLI Upload**: Upload complied code without building sketch (CLI only).
 - **Arduino: Upload Using Programmer**: Upload using an external programmer.
 - **Arduino: CLI Upload Using Programmer**: Upload using an external programmer without building sketch (CLI only).
+- **Arduino: CLI Burn Bootloader**: Burn bootloader using external programmer (CLI Only).
 - **Arduino: Verify**: Build sketch.
 - **Arduino: Rebuild IntelliSense Configuration**: Forced/manual rebuild of the IntelliSense configuration. The extension analyzes Arduino's build output and sets the IntelliSense include paths, defines, compiler arguments accordingly.
 
