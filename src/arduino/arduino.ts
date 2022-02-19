@@ -200,7 +200,7 @@ export class ArduinoApp {
         }
     }
 
-    /** 
+    /**
      * Burns the bootloader onto the currently selected board using the currently
      * selected programmer.
      * @returns true on success, false if
