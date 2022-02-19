@@ -82,7 +82,7 @@ export class ArduinoApp {
     constructor(private _settings: IArduinoSettings) {
         const analysisDelayMs = 1000 * 3;
         this._analysisManager = new AnalysisManager(
-            () => this._state === ArduinoState.Idle,
+            () => this._state !== ArduinoState.Idle,
             async () => { await this.build(BuildMode.Analyze); },
             analysisDelayMs);
     }
@@ -188,18 +188,16 @@ export class ArduinoApp {
 
         this._state = ArduinoState.Building;
 
-        return await this._build(buildMode, buildDir)
-        .then((ret) => {
-            this._state = ArduinoState.Idle;
-            return ret;
-        })
-        .catch((reason) => {
-            this._state = ArduinoState.Idle;
+        try {
+            return await this._build(buildMode, buildDir);
+        } catch(reason) {
             logger.notifyUserError("ArduinoApp.build",
                                    reason,
                                    `Unhandled exception when cleaning up build "${buildMode}": ${JSON.stringify(reason)}`);
             return false;
-        });
+        } finally {
+            this._state = ArduinoState.Idle;
+        }
     }
 
     public async burnBootloader() {
@@ -208,17 +206,16 @@ export class ArduinoApp {
         }
 
         this._state = ArduinoState.BurningBootloader;
-        return await this._burnBootloader().
-        then((ret) => {
-            this._state = ArduinoState.Idle;
-        })
-        .catch((reason) => {
-            this._state = ArduinoState.Idle;
+        try {
+            return await this._burnBootloader();
+        } catch(reason) {
             logger.notifyUserError("ArduinoApp.burnBootloader",
                                    reason,
                                    `Unhandled exception burning bootloader: ${JSON.stringify(reason)}`);
             return false;
-        });
+        } finally {
+            this._state = ArduinoState.Idle;
+        }
     }
 
     // Include the *.h header files from selected library to the arduino sketch.
