@@ -39,13 +39,13 @@ export enum BuildMode {
     CliUpload = "Uploading using Arduino CLI",
     UploadProgrammer = "Uploading (programmer)",
     CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
-    CliBurnBootloader = "Burning Bootloader using Arduino CLI"
+    CliBurnBootloader = "Burning Bootloader using Arduino CLI",
 }
 
 export enum ArduinoState {
     Idle,
     Building,
-    BurningBootloader
+    BurningBootloader,
 }
 
 /**
@@ -871,7 +871,7 @@ export class ArduinoApp {
             logger.notifyUserError("programmerManager.currentProgrammer", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
             return false;
         }
-        args.push('--programmer', programmer);
+        args.push("--programmer", programmer);
 
         // We always build verbosely but filter the output based on the settings
         args.push("--verbose");

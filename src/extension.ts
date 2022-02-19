@@ -224,7 +224,7 @@ export async function activate(context: vscode.ExtensionContext) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Using CLI to burn bootloader...",
-            }, async() => {
+            }, async () => {
                 await arduinoContextModule.default.arduinoApp.burnBootloader();
             });
         }
