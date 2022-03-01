@@ -884,6 +884,14 @@ export class ArduinoApp {
         // We always build verbosely but filter the output based on the settings
         args.push("--verbose");
 
+        if (dc.buildPreferences) {
+            for (const pref of dc.buildPreferences) {
+                // Note: BuildPrefSetting makes sure that each preference
+                // value consists of exactly two items (key and value).
+                args.push("--build-property", `${pref[0]}=${pref[1]}`);
+            }
+        }
+
         // we prepare the channel here since all following code will
         // or at least can possibly output to it
         arduinoChannel.show();
