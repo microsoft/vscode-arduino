@@ -15,13 +15,11 @@ parameters:
 
 pr:
   - main
-  - release
 
 trigger:
   branches:
     include:
       - main
-      - release
   tags:
     include:
       - v*
@@ -32,13 +30,13 @@ pool:
 variables:
   # MicroBuild requires TeamName to be set.
   TeamName: C++ Cross Platform and Cloud
-  # If the user didn't override the signing type, then only real-sign on tags,
-  # main, or release.
+  # If the user didn't override the signing type, then only real-sign on tags or
+  # the main branch.
   ${{ if ne(parameters.SignTypeOverride, 'default') }}:
     SignType: ${{ parameters.SignTypeOverride }}
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release'))) }}:
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'))) }}:
     SignType: real
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.SourceBranchName'], 'release')))) }}:
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main')))) }}:
     SignType: test
 
 steps:
@@ -122,12 +120,6 @@ steps:
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
     condition: ne(variables['Build.Reason'], 'PullRequest')
-  # VSIX signing removes the executable attributes on files. Luckily, the
-  # signature only seems to be based on the content of the files, not the
-  # attributes, so we can safely go back and mark the serial monitor as
-  # executable without invalidating the signature.
-  - script: python .\build\markExecutableFiles.py
-    displayName: Make serial monitor executable
   - publish: $(Build.StagingDirectory)\vscode-arduino.vsix
     artifact: VS Code extension VSIX
     displayName: Publish extension VSIX as artifact

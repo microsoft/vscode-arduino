@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.11
+
+- Release date: February 10, 2022
+
+### Changed
+
+This release includes a major change in internal handling of serial port
+communication ([#1450](https://github.com/microsoft/vscode-arduino/pull/1450)),
+which is designed to address antivirus false positives from the old serial
+monitor. Please report any issues you see with the serial monitor.
+
+- Show all supported boards and set default build directory [#1425](https://github.com/microsoft/vscode-arduino/pull/1425)
+- Add option for printing timestamp before each line of Serial Monitor output [#1430](https://github.com/microsoft/vscode-arduino/pull/1430)
+- Fix problem with stripping whitespace [#1433](https://github.com/microsoft/vscode-arduino/pull/1433)
+- Added Mac shortcuts on readme [#1439](https://github.com/microsoft/vscode-arduino/pull/1439)
+- Switch from serial-monitor-cli to node-serialport [#1450](https://github.com/microsoft/vscode-arduino/pull/1450)
+
 ## Version 0.4.10
 
 - Release date: January 14, 2022

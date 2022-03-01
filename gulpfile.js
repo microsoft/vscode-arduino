@@ -63,28 +63,6 @@ gulp.task("node_modules-webpack", (done) => {
     });
 });
 
-gulp.task("insert-serial-monitor-cli", async (done) => {
-    const platforms = [
-        "linux",
-        "darwin",
-        "win32",
-    ];
-    const release = "latest";
-    const destDir = path.resolve("out", "serial-monitor-cli");
-
-    async function downloadAndUnzip(platform) {
-        const fileName = `${platform}.zip`;
-        const zipPath = path.join(destDir, fileName);
-        await download(`https://github.com/microsoft/serial-monitor-cli/releases/${release}/download/${fileName}`,
-                       destDir,
-                       );
-        await extract(zipPath, { dir: path.join(destDir, platform) });
-        fs.rmSync(zipPath);
-    }
-
-    Promise.all(platforms.map(downloadAndUnzip)).then(done);
-});
-
 gulp.task("ts-compile", () => {
     const tsProject = ts.createProject("./tsconfig.json");
     return tsProject.src()
@@ -156,7 +134,7 @@ gulp.task("test", (done) => {
     });
 });
 
-gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack", "insert-serial-monitor-cli"));
+gulp.task("build", gulp.series("clean", "ts-compile", "html-webpack", "node_modules-webpack"));
 
 gulp.task("build_without_view", gulp.series("clean", "ts-compile"));
 
