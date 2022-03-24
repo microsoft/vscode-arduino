@@ -33,12 +33,12 @@
     "C++"
   ],
   "activationEvents": [
-    "*",
+    "onLanguage:cpp",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.cliUpload",
     "onCommand:arduino.uploadUsingProgrammer",
-    "onCommand:arduiono.cliUploadUsingProgrammer",
+    "onCommand:arduino.cliUploadUsingProgrammer",
     "onCommand:arduino.rebuildIntelliSenseConfig",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
