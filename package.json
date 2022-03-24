@@ -33,7 +33,7 @@
     "C++"
   ],
   "activationEvents": [
-    "onLanguage:cpp",
+    "workspaceContains:**/*.ino",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.cliUpload",
