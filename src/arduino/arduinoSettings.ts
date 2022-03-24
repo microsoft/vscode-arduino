@@ -23,6 +23,7 @@ export interface IArduinoSettings {
     preferences: Map<string, string>;
     useArduinoCli: boolean;
     defaultTimestampFormat: string;
+    analyzeOnSettingChange: boolean;
     reloadPreferences(): void;
 }
 
@@ -167,6 +168,10 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get defaultTimestampFormat() {
         return this._defaultTimestampFormat;
+    }
+
+    public get analyzeOnSettingChange(): boolean {
+        return VscodeSettings.getInstance().analyzeOnSettingChange;
     }
 
     public reloadPreferences() {
