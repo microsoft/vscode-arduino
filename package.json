@@ -541,6 +541,11 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://github.com/samsonjs/strftime#supported-specifiers)."
+        },
+        "arduino.analyzeOnOpen": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "When true, automatically run analysis when the project is opened."
         }
       }
     },
