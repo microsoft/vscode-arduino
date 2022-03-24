@@ -544,8 +544,13 @@
         },
         "arduino.analyzeOnOpen": {
           "type": "boolean",
-          "default": false,
-          "markdownDescription": "When true, automatically run analysis when the project is opened."
+          "default": true,
+          "markdownDescription": "When true, automatically run analysis when the project is opened. Only works when `arduino.analyzeOnSettingChange` is true."
+        },
+        "arduino.analyzeOnSettingChange": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When true, automatically run analysis when board, configuration, or sketch settings are changed."
         }
       }
     },

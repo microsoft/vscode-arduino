@@ -21,6 +21,7 @@ const configKeys = {
     DISABLE_INTELLISENSE_AUTO_GEN: "arduino.disableIntelliSenseAutoGen",
     DEFAULT_TIMESTAMP_FORMAT: "arduino.defaultTimestampFormat",
     ANALYZE_ON_OPEN: "arduino.analyzeOnOpen",
+    ANALYZE_ON_SETTING_CHANGE: "arduino.analyzeOnSettingChange",
 };
 
 export interface IVscodeSettings {
@@ -39,6 +40,7 @@ export interface IVscodeSettings {
     disableIntelliSenseAutoGen: boolean;
     defaultTimestampFormat: string;
     analyzeOnOpen: boolean;
+    analyzeOnSettingChange: boolean;
     updateAdditionalUrls(urls: string[]): void;
 }
 
@@ -128,6 +130,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get analyzeOnOpen(): boolean {
         return this.getConfigValue<boolean>(configKeys.ANALYZE_ON_OPEN);
+    }
+
+    public get analyzeOnSettingChange(): boolean {
+        return this.getConfigValue<boolean>(configKeys.ANALYZE_ON_SETTING_CHANGE);
     }
 
     public async updateAdditionalUrls(value) {
