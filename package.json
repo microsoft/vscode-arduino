@@ -633,7 +633,7 @@
     "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^5.0.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.6",
     "mocha": "^6.2.3",
     "node-gyp": "^6.1.0",
     "plugin-error": "^1.0.1",
