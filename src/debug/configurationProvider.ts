@@ -118,9 +118,15 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
         const dc = DeviceContext.getInstance();
 
         if (!config.program || config.program === "${file}") {
-            // make a unique temp folder because keeping same temp folder will corrupt the build when board is changed
-            const outputFolder = path.join(dc.output || `.build`, ArduinoContext.boardManager.currentBoard.board);
-            util.mkdirRecursivelySync(path.join(ArduinoWorkspace.rootPath, outputFolder));
+            const outputFolder = path.join(dc.output || `.build`);
+            const outputPath = path.join(ArduinoWorkspace.rootPath, outputFolder);
+            
+             // if the directory was already there, clear the folder so that it's not corrupted from previous builds.
+            if (util.directoryExistsSync(outputPath)) {
+                util.rmdirRecursivelySync(outputPath);
+            }
+
+            util.mkdirRecursivelySync(outputPath);
             if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
                 await dc.resolveMainSketch();
             }
@@ -134,7 +140,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
                 vscode.window.showErrorMessage(`Cannot find ${dc.sketch}, Please specify the sketch in the arduino.json file`);
                 return false;
             }
-            config.program = path.join(ArduinoWorkspace.rootPath, outputFolder, `${path.basename(dc.sketch)}.elf`);
+            config.program = path.join(outputPath, `${path.basename(dc.sketch)}.elf`);
 
             // always compile elf to make sure debug the right elf
             if (!await ArduinoContext.arduinoApp.build(BuildMode.Verify, outputFolder)) {
