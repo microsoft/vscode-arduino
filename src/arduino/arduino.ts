@@ -681,7 +681,6 @@ export class ArduinoApp {
                 buildDir = path.resolve(ArduinoWorkspace.rootPath, buildDir);
             }
 
-
             const dirPath = path.dirname(buildDir);
             if (!util.directoryExistsSync(dirPath)) {
                 util.mkdirRecursivelySync(dirPath);
