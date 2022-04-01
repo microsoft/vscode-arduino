@@ -675,7 +675,7 @@ export class ArduinoApp {
             //   What if the user specifies an output directory "../builds/my project"
 
             // the first choice of the path should be from the users explicit settings.
-            if (dc.output) { 
+            if (dc.output) {
                 buildDir = path.resolve(ArduinoWorkspace.rootPath, dc.output);
             } else {
                 buildDir = path.resolve(ArduinoWorkspace.rootPath, buildDir);

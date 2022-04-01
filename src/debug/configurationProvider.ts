@@ -120,8 +120,8 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
         if (!config.program || config.program === "${file}") {
             const outputFolder = path.join(dc.output || `.build`);
             const outputPath = path.join(ArduinoWorkspace.rootPath, outputFolder);
-            
-             // if the directory was already there, clear the folder so that it's not corrupted from previous builds.
+
+            // if the directory was already there, clear the folder so that it's not corrupted from previous builds.
             if (util.directoryExistsSync(outputPath)) {
                 util.rmdirRecursivelySync(outputPath);
             }
