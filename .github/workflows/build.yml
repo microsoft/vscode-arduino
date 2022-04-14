@@ -25,14 +25,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Node 14 matches the version of Node used by VS Code when this was
-      # written, but it should be updated when VS Code updates its Node version.
+      # updated to Node 16
       # Node needs to be installed before OS-specific setup so that we can run
       # the hash verification script.
-      - name: Use Node 14.x
+      - name: Use Node 16.x
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 16.x
 
       - name: Windows setup
         if: ${{ matrix.os == 'windows-latest' }}
