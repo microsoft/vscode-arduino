@@ -25,7 +25,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # updated to Node 16
+      # Node 16 matches the version of Node used by VS Code when this was
+-     # written, but it should be updated when VS Code updates its Node version.
       # Node needs to be installed before OS-specific setup so that we can run
       # the hash verification script.
       - name: Use Node 16.x

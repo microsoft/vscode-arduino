@@ -38,8 +38,8 @@
   },
   "dependencies": {},
   "overrides": {
-    "qs": "6.10.3",
-    "async": "3.2.3",
+    "qs": "~6.10.3",
+    "async": "~3.2.3",
     "node-sass": "^7.0.0"
   }
 }

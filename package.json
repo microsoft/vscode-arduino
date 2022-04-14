@@ -663,7 +663,7 @@
     "winston": "^2.4.5"
   },
   "overrides": {
-    "async": "3.2.3",
+    "async": "~3.2.3",
     "node-sass": "^7.0.0"
   }
 }
