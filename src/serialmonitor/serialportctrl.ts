@@ -72,7 +72,16 @@ export class SerialPortCtrl {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          // These pins are tied to boot and reset on some devices like the
+          // ESP32. We need to pull them high to avoid unexpected behavior when
+          // opening the serial monitor.
+          this._port.set({ dtr: true, cts: true, rts: true }, (err2) => {
+            if (err2) {
+              reject(err2);
+            } else {
+              resolve();
+            }
+          });
         }
       });
     });

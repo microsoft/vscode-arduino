@@ -13,7 +13,9 @@ suite("Arduino: Commands Tests", () => {
        const extension = vscode.extensions.getExtension("vsciot-vscode.vscode-arduino");
        if (!extension.isActive) {
             extension.activate().then((api) => {
-                done();
+                // The extension waits 100ms before registering some commands,
+                // so add a longer delay here before running tests.
+                setTimeout(() => done(), 200);
             }, () => {
                 done("Failed to activate extension");
             });

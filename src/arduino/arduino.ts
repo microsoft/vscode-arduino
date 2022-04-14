@@ -101,16 +101,18 @@ export class ArduinoApp {
             }
         }
 
-        // set up event handling for IntelliSense analysis
-        const requestAnalysis = async () => {
-            if (isCompilerParserEnabled()) {
-                await this._analysisManager.requestAnalysis();
-            }
-        };
-        const dc = DeviceContext.getInstance();
-        dc.onChangeBoard(requestAnalysis);
-        dc.onChangeConfiguration(requestAnalysis);
-        dc.onChangeSketch(requestAnalysis);
+        if (this._settings.analyzeOnSettingChange) {
+            // set up event handling for IntelliSense analysis
+            const requestAnalysis = async () => {
+                if (isCompilerParserEnabled()) {
+                    await this._analysisManager.requestAnalysis();
+                }
+            };
+            const dc = DeviceContext.getInstance();
+            dc.onChangeBoard(requestAnalysis);
+            dc.onChangeConfiguration(requestAnalysis);
+            dc.onChangeSketch(requestAnalysis);
+        }
     }
 
     /**
