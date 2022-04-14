@@ -63,9 +63,9 @@ steps:
   # Node 14 matches the version of Node used by VS Code when this was written,
   # but it should be updated when VS Code updates its Node version.
   - task: NodeTool@0
-    displayName: Use Node 14.x
+    displayName: Use Node 16.x
     inputs:
-      versionSpec: 14.x
+      versionSpec: 16.x
   - script: npm install --global gulp node-gyp vsce
     displayName: Install global dependencies
   - script: npm install
