@@ -746,7 +746,25 @@ export class ArduinoApp {
             }
             return ret;
         }
-        const stdoutcb = (line: string) => {
+
+        // Wrap line-oriented callbacks to accept arbitrary chunks of data.
+        const wrapLineCallback = (callback: (line: string) => void) => {
+            let buffer = "";
+            return (data: string) => {
+                buffer += data;
+                for (;;) {
+                    const pos = buffer.indexOf(os.EOL);
+                    if (pos < 0) {
+                        break;
+                    }
+                    const line = buffer.substring(0, pos + os.EOL.length);
+                    buffer = buffer.substring(pos + os.EOL.length);
+                    callback(line);
+                }
+            };
+        }
+
+        const stdoutcb = wrapLineCallback((line: string) => {
             if (cocopa.callback) {
                 cocopa.callback(line);
             }
@@ -758,8 +776,8 @@ export class ArduinoApp {
                     arduinoChannel.channel.append(line);
                 }
             }
-        }
-        const stderrcb = (line: string) => {
+        });
+        const stderrcb = wrapLineCallback((line: string) => {
             if (os.platform() === "win32") {
                 line = line.trim();
                 if (line.length <= 0) {
@@ -784,7 +802,7 @@ export class ArduinoApp {
                 }
             }
             arduinoChannel.channel.append(line);
-        }
+        });
 
         return await util.spawn(
             this._settings.commandPath,
