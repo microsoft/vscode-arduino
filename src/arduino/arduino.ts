@@ -675,11 +675,17 @@ export class ArduinoApp {
         if (buildDir || dc.output) {
             // 2020-02-29, EW: This whole code appears a bit wonky to me.
             //   What if the user specifies an output directory "../builds/my project"
-            buildDir = path.resolve(ArduinoWorkspace.rootPath, buildDir || dc.output);
+
+            // the first choice of the path should be from the users explicit settings.
+            if (dc.output) {
+                buildDir = path.resolve(ArduinoWorkspace.rootPath, dc.output);
+            } else {
+                buildDir = path.resolve(ArduinoWorkspace.rootPath, buildDir);
+            }
+
             const dirPath = path.dirname(buildDir);
             if (!util.directoryExistsSync(dirPath)) {
-                logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + buildDir));
-                return false;
+                util.mkdirRecursivelySync(dirPath);
             }
 
             if (this.useArduinoCli()) {
@@ -794,6 +800,8 @@ export class ArduinoApp {
                     /^Picked\sup\sJAVA_TOOL_OPTIONS:\s+/,
                     /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\s(?:INFO|WARN)\s/,
                     /^(?:DEBUG|TRACE|INFO)\s+/,
+                    // 2022-04-09 22:48:46.204 Arduino[55373:2073803] Arg 25: '--pref'
+                    /^[\d\-.:\s]*Arduino\[[\d:]*\]/,
                 ];
                 for (const f of filters) {
                     if (line.match(f)) {
