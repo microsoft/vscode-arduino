@@ -1,6 +1,27 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.12
+
+- Release date: April 29, 2022
+
+### Added
+
+- Support Remote Development Board Selection [#1459](https://github.com/microsoft/vscode-arduino/pull/1459)
+- Add analyzeOnOpen and analyzeOnSettingChange [#1480](https://github.com/microsoft/vscode-arduino/pull/1480)
+
+### Changed
+
+- Fix Launch Extension gulp Not Found on Linux [#1461](https://github.com/microsoft/vscode-arduino/pull/1461)
+- Change link to list of all available placeholders [#1470](https://github.com/microsoft/vscode-arduino/pull/1470)
+- Keep DTR, CTS, and RTS high [#1479](https://github.com/microsoft/vscode-arduino/pull/1479)
+- Don't use * activation event [#1481](https://github.com/microsoft/vscode-arduino/pull/1481)
+- Scope activation to only *.ino files [#1484](https://github.com/microsoft/vscode-arduino/pull/1484)
+- Remove the addition of the board name to create specific temp files [#1486](https://github.com/microsoft/vscode-arduino/pull/1486)
+- Fix out of date packages [#1493](https://github.com/microsoft/vscode-arduino/pull/1493)
+- Fix line-oriented callbacks [#1494](https://github.com/microsoft/vscode-arduino/pull/1494)
+- Add additional verbose output regex [#1498](https://github.com/microsoft/vscode-arduino/pull/1498)
+
 ## Version 0.4.11
 
 - Release date: February 10, 2022
