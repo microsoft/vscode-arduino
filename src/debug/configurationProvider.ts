@@ -10,15 +10,15 @@ import ArduinoContext from "../arduinoContext";
 
 import { VscodeSettings } from "../arduino/vscodeSettings";
 import * as constants from "../common/constants";
-import * as platform from "../common/platform";
 import * as util from "../common/util";
 import { ArduinoWorkspace } from "../common/workspace";
 import { DeviceContext } from "../deviceContext";
 import * as Logger from "../logger/logger";
+import { IHostPlatform } from "../common/i-host-platform";
 
 export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 
-    constructor() { }
+    constructor(private _platform: IHostPlatform) { }
 
     public provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken):
         vscode.ProviderResult<vscode.DebugConfiguration[]> {
@@ -165,7 +165,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
 
     private resolveDebuggerPath(config) {
         if (!config.miDebuggerPath) {
-            config.miDebuggerPath = platform.findFile(platform.getExecutableFileName("arm-none-eabi-gdb"),
+            config.miDebuggerPath = this._platform.findFile(this._platform.getExecutableFileName("arm-none-eabi-gdb"),
                 path.join(ArduinoContext.arduinoApp.settings.packagePath, "packages", ArduinoContext.boardManager.currentBoard.getPackageName()));
         }
         if (!util.fileExistsSync(config.miDebuggerPath)) {
@@ -180,7 +180,7 @@ export class ArduinoDebugConfigurationProvider implements vscode.DebugConfigurat
 
     private resolveOpenOcd(config) {
         if (!config.debugServerPath) {
-            config.debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
+            config.debugServerPath = this._platform.findFile(this._platform.getExecutableFileName("openocd"),
                 path.join(ArduinoContext.arduinoApp.settings.packagePath, "packages",
                     ArduinoContext.boardManager.currentBoard.getPackageName()));
         }

@@ -18,7 +18,6 @@ import {
     ARDUINO_CONFIG_FILE, ARDUINO_MANAGER_PROTOCOL, ARDUINO_MODE, BOARD_CONFIG_URI, BOARD_MANAGER_URI, EXAMPLES_URI,
     LIBRARY_MANAGER_URI,
 } from "./common/constants";
-import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
 import { ArduinoWorkspace } from "./common/workspace";
 const arduinoDebugConfigurationProviderModule = impor("./debug/configurationProvider") as typeof import ("./debug/configurationProvider");
@@ -29,9 +28,12 @@ const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
 import { BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
+import { hostPlatform } from "./common/platform";
+import { IHostPlatform } from "./common/i-host-platform";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
 export async function activate(context: vscode.ExtensionContext) {
+    const _platform: IHostPlatform = hostPlatform()
     Logger.configure(context);
     const activeGuid = uuidModule().replace(/-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
@@ -92,7 +94,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const commandPath = arduinoContextModule.default.arduinoApp.settings.commandPath;
             const useArduinoCli = arduinoContextModule.default.arduinoApp.settings.useArduinoCli;
             // Pop up vscode User Settings page when cannot resolve arduino path.
-            if (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli)) {
+            if (!arduinoPath && !_platform.validateArduinoPath(arduinoPath, useArduinoCli)) {
                 Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             } else if (!commandPath || !util.fileExistsSync(commandPath)) {
@@ -291,7 +293,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const completionProvider = new completionProviderModule.CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
     context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("arduino", new
-        arduinoDebugConfigurationProviderModule.ArduinoDebugConfigurationProvider()));
+        arduinoDebugConfigurationProviderModule.ArduinoDebugConfigurationProvider(_platform)));
 
     if (ArduinoWorkspace.rootPath && (
         util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))

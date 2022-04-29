@@ -7,7 +7,7 @@ import * as vscode from "vscode";
 
 import { IArduinoSettings } from "../arduino/arduinoSettings";
 import { BoardManager } from "../arduino/boardManager";
-import * as platform from "../common/platform";
+import { IHostPlatform } from "../common/i-host-platform";
 import * as util from "../common/util";
 import { DeviceContext } from "../deviceContext";
 
@@ -20,7 +20,8 @@ export class DebuggerManager {
     constructor(
         private _extensionRoot: string,
         private _arduinoSettings: IArduinoSettings,
-        private _boardManager: BoardManager) {
+        private _boardManager: BoardManager,
+        private _platform: IHostPlatform) {
     }
 
     public initialize() {
@@ -47,13 +48,13 @@ export class DebuggerManager {
         // I swapped it out for the old import to remove dependency on "node-usb-native",
         // but otherwise anything that was broken before is still broken.
         this._usbDetector = require("usb-detection");
-        this._debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
+        this._debugServerPath = this._platform.findFile(this._platform.getExecutableFileName("openocd"),
             path.join(this._arduinoSettings.packagePath, "packages"));
         if (!util.fileExistsSync(this._debugServerPath)) {
             this._debugServerPath = "";
         }
 
-        this._miDebuggerPath = platform.findFile(platform.getExecutableFileName("arm-none-eabi-gdb"),
+        this._miDebuggerPath = this._platform.findFile(this._platform.getExecutableFileName("arm-none-eabi-gdb"),
             path.join(this._arduinoSettings.packagePath, "packages"));
         if (!util.fileExistsSync(this._miDebuggerPath)) {
             this._miDebuggerPath = "";

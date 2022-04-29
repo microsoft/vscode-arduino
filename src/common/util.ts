@@ -438,6 +438,7 @@ export function convertToHex(number, width = 0) {
  * This will accept any Arduino*.app on Mac OS,
  * in case you named Arduino with a version number
  * @argument {string} arduinoPath
+ * @argument {boolean?} useArduinoCli
  */
 export function resolveMacArduinoAppPath(arduinoPath: string, useArduinoCli = false): string {
     if (useArduinoCli || /Arduino.*\.app/.test(arduinoPath)) {
