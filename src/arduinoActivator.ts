@@ -10,6 +10,7 @@ import { ExampleManager } from "./arduino/exampleManager";
 import { ExampleProvider } from "./arduino/exampleProvider";
 import { LibraryManager } from "./arduino/libraryManager";
 import { ProgrammerManager } from "./arduino/programmerManager";
+import { VscodeSettings } from "./arduino/vscodeSettings";
 import ArduinoContext from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
 
@@ -25,11 +26,22 @@ class ArduinoActivator {
             const arduinoSettings = new ArduinoSettings();
             await arduinoSettings.initialize();
             const arduinoApp = new ArduinoApp(arduinoSettings);
-            await arduinoApp.initialize();
+
+            // Initializing the app before the device context will cause a
+            // setting changed event that triggers analysis.
+            const analyzeOnOpen = VscodeSettings.getInstance().analyzeOnOpen;
+            if (analyzeOnOpen) {
+                await arduinoApp.initialize();
+            }
 
             // TODO: After use the device.json config, should remove the dependency on the ArduinoApp object.
             const deviceContext = DeviceContext.getInstance();
             await deviceContext.loadContext();
+
+            if (!analyzeOnOpen) {
+                await arduinoApp.initialize();
+            }
+
             // Show sketch status bar, and allow user to change sketch in config file
             deviceContext.showStatusBar();
             // Arduino board manager & library manager

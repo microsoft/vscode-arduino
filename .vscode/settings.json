@@ -11,5 +11,12 @@
         "**/.git/objects/**": true,
         "**/out/*": true,
         "**/node_modules/**": true
+    },
+    "terminal.integrated.automationProfile.linux":  { 
+        "path": "${env:SHELL}",
+        "env": {
+            "HOME": "${env:HOME}",
+            "USER": "${env:USER}"
+        }
     }
 }

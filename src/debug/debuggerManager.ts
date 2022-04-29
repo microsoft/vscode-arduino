@@ -43,7 +43,10 @@ export class DebuggerManager {
                 }
             }
         }
-        this._usbDetector = require("node-usb-native").detector;
+        // For anyone looking at blame history, I doubt this import works as-is.
+        // I swapped it out for the old import to remove dependency on "node-usb-native",
+        // but otherwise anything that was broken before is still broken.
+        this._usbDetector = require("usb-detection");
         this._debugServerPath = platform.findFile(platform.getExecutableFileName("openocd"),
             path.join(this._arduinoSettings.packagePath, "packages"));
         if (!util.fileExistsSync(this._debugServerPath)) {

@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -18,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/Microsoft/vscode-arduino/issues"
   },
-  "homepage": "https://github.com/Microsoft/vscode-arduino/blob/release/README.md",
+  "homepage": "https://github.com/Microsoft/vscode-arduino",
   "categories": [
     "Programming Languages",
     "Debuggers",
@@ -33,12 +33,12 @@
     "C++"
   ],
   "activationEvents": [
-    "*",
+    "workspaceContains:**/*.ino",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.cliUpload",
     "onCommand:arduino.uploadUsingProgrammer",
-    "onCommand:arduiono.cliUploadUsingProgrammer",
+    "onCommand:arduino.cliUploadUsingProgrammer",
     "onCommand:arduino.rebuildIntelliSenseConfig",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
@@ -540,7 +540,17 @@
         "arduino.defaultTimestampFormat": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://strftime.org)."
+          "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://github.com/samsonjs/strftime#supported-specifiers)."
+        },
+        "arduino.analyzeOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When true, automatically run analysis when the project is opened. Only works when `arduino.analyzeOnSettingChange` is true."
+        },
+        "arduino.analyzeOnSettingChange": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When true, automatically run analysis when board, configuration, or sketch settings are changed."
         }
       }
     },
@@ -587,7 +597,7 @@
   },
   "scripts": {
     "vscode:prepublish": "gulp build --mode=production",
-    "postinstall": "cd ./src/views && npm install && node ../../node_modules/node-usb-native/scripts/rebuild-serialport.js",
+    "postinstall": "cd ./src/views && npm install",
     "test": "gulp test"
   },
   "extensionDependencies": [
@@ -599,13 +609,14 @@
     "@types/glob": "^7.1.4",
     "@types/mocha": "^5.2.7",
     "@types/node": "^16.9.6",
+    "@types/strftime": "^0.9.2",
     "@types/uuid": "^8.3.1",
     "@types/vscode": "^1.43.0",
     "@types/winreg": "^1.2.30",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
     "acorn": "^7.4.0",
-    "ajv": "^5.0.0",
+    "ajv": "^6.12.3",
     "del": "^2.2.2",
     "download": "^8.0.0",
     "eslint": "^7.32.0",
@@ -622,7 +633,7 @@
     "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^5.0.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.6",
     "mocha": "^6.2.3",
     "node-gyp": "^6.1.0",
     "plugin-error": "^1.0.1",
@@ -642,8 +653,10 @@
     "glob": "^7.1.1",
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
-    "node-usb-native": "^0.0.20",
     "properties": "^1.2.1",
+    "serialport": "^10.2.2",
+    "strftime": "^0.9.2",
+    "usb-detection": "^4.13.0",
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.1.6",
     "winreg": "^1.2.3",
