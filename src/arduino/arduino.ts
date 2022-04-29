@@ -782,6 +782,8 @@ export class ArduinoApp {
                     /^Picked\sup\sJAVA_TOOL_OPTIONS:\s+/,
                     /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\s(?:INFO|WARN)\s/,
                     /^(?:DEBUG|TRACE|INFO)\s+/,
+                    // 2022-04-09 22:48:46.204 Arduino[55373:2073803] Arg 25: '--pref'
+                    /^[\d\-.:\s]*Arduino\[[\d:]*\]/,
                 ];
                 for (const f of filters) {
                     if (line.match(f)) {
