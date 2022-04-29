@@ -36,5 +36,11 @@
     "ts-loader": "^4.5.0",
     "webpack": "^4.44.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "overrides": {
+    "qs": "~6.10.3",
+    "async": "~3.2.3",
+    "node-sass": "^7.0.0",
+    "es5-ext": "0.10.53"
+  }
 }
