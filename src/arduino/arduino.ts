@@ -756,15 +756,18 @@ export class ArduinoApp {
         // Wrap line-oriented callbacks to accept arbitrary chunks of data.
         const wrapLineCallback = (callback: (line: string) => void) => {
             let buffer = "";
+            let startIndex = 0;
             return (data: string) => {
                 buffer += data;
-                for (;;) {
-                    const pos = buffer.indexOf(os.EOL);
+                while (true) {
+                    const pos = buffer.indexOf(os.EOL, startIndex);
                     if (pos < 0) {
+                        startIndex = buffer.length;
                         break;
                     }
                     const line = buffer.substring(0, pos + os.EOL.length);
                     buffer = buffer.substring(pos + os.EOL.length);
+                    startIndex = 0;
                     callback(line);
                 }
             };
