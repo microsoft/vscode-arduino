@@ -137,6 +137,10 @@ class LibraryManager extends React.Component<ILibraryManagerProps, ILibraryManag
         const isOperating = !!this.props.installingLibraryName || !!this.props.uninstallingLibraryName;
 
         const itemRenderer = (index, key) => {
+            // On updating a list, ReactList can call itemRenderer with large indices.
+            if (index >= filteredLibraries.length) {
+                return null;
+            }
             return (<LibraryItemView key={filteredLibraries[index].name} library={filteredLibraries[index]} {...libraryItemProps}/>);
         };
         const itemSizeEstimator = (index, cache) => {
