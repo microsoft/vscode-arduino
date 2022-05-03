@@ -12,7 +12,7 @@ function getEntry() {
   const mod = JSON.parse(npmListRes);
   const unbundledModule = ['impor', 'uuid',
   // usb-native modules can not be bundled
-  'usb-detection', '@serialport', 'bindings', 'serialport'];
+  'usb-detection', '@serialport', 'bindings', 'serialport', 'debug', 'ms', 'node-gyp-build', 'node-addon-api'];
   
   for (const mod of unbundledModule) {
     const p = 'node_modules/' + mod;
