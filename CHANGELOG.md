@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## Version 0.4.12
 
-- Release date: April 29, 2022
+- Release date: May 3, 2022
 
 ### Added
 
