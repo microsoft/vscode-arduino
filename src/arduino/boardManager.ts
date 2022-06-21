@@ -229,7 +229,7 @@ export class BoardManager {
                     // });
 
                     // Check if platform name is the same, if not, we should use the name from the latest version.
-                    if (addedPlatform.name != plat.name) {
+                    if (addedPlatform.name !== plat.name) {
                         addedPlatform.name = plat.name;
                     }
 
