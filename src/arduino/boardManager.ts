@@ -227,13 +227,17 @@ export class BoardManager {
                     // addedPlatform.boards = util.union(addedPlatform.boards, plat.boards, (a, b) => {
                     //     return a.name === b.name;
                     // });
-                    if (addedPlatform.name === plat.name) {
-                        addedPlatform.versions.push(plat.version);
-                        // Check if this is the latest version. Platforms typically support more boards in later versions.
-                        addedPlatform.versions.sort(versionCompare);
-                        if (plat.version === addedPlatform.versions[addedPlatform.versions.length - 1]) {
-                            addedPlatform.boards = plat.boards;
-                        }
+
+                    // Check if platform name is the same, if not, we should use the name from the latest version.
+                    if (addedPlatform.name !== plat.name) {
+                        addedPlatform.name = plat.name;
+                    }
+
+                    addedPlatform.versions.push(plat.version);
+                    // Check if this is the latest version. Platforms typically support more boards in later versions.
+                    addedPlatform.versions.sort(versionCompare);
+                    if (plat.version === addedPlatform.versions[addedPlatform.versions.length - 1]) {
+                        addedPlatform.boards = plat.boards;
                     }
                 } else {
                     plat.versions = [plat.version];
