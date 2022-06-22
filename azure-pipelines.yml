@@ -71,6 +71,14 @@ steps:
   - script: npm install
     displayName: Install project dependencies
 
+  - task: ComponentGovernanceComponentDetection@0
+    displayName: Detect components
+  - task: notice@0
+    displayName: Generate NOTICE file
+    inputs:
+      outputfile: $(Build.SourcesDirectory)/NOTICE.txt
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
   - script: gulp tslint
     displayName: Check for linting errors
   - script: gulp genAikey
@@ -81,9 +89,6 @@ steps:
   # ensure we only attempt to sign shipping files.
   - script: vsce package --out vscode-arduino.vsix
     displayName: Build and pack extension
-
-  - task: ComponentGovernanceComponentDetection@0
-    displayName: Detect components
 
   # Extract the VSIX, sign what we can, then pack it back up and publish it.
   - task: ExtractFiles@1
