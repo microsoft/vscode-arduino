@@ -19,9 +19,10 @@ Either the Arduino IDE or Arduino CLI are required.
 
 ### Arduino IDE
 The Arduino IDE can be installed the Arduino [download page](https://www.arduino.cc/en/main/software#download).
-- The supported Arduino IDE versions are `1.6.x` and later.
+- The supported Arduino IDE versions are `1.6.x` and up to, but not including, 2.0.0.
 - The Windows Store's version of the Arduino IDE is not supported because of the sandbox environment that the application runs in.
 - *Note:* Arduino IDE `1.8.7` had some breaking changes, causing board package and library installation failures.  These failures were corrected in `1.8.8` and later.
+- *Note:* Arduino IDE `2.X.Y` is not supported at this time [issue 1477](https://github.com/microsoft/vscode-arduino/issues/1477)
 
 ### Arduino CLI
 The Arduino CLI can be downloaded from the repository's [release page](https://github.com/arduino/arduino-cli/releases/tag/0.13.0)
