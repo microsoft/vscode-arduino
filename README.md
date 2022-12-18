@@ -19,9 +19,10 @@ Either the Arduino IDE or Arduino CLI are required.
 
 ### Arduino IDE
 The Arduino IDE can be installed the Arduino [download page](https://www.arduino.cc/en/main/software#download).
-- The supported Arduino IDE versions are `1.6.x` and later.
+- The supported Arduino IDE versions are `1.6.x` and up to, but not including, 2.0.0.
 - The Windows Store's version of the Arduino IDE is not supported because of the sandbox environment that the application runs in.
 - *Note:* Arduino IDE `1.8.7` had some breaking changes, causing board package and library installation failures.  These failures were corrected in `1.8.8` and later.
+- *Note:* Arduino IDE `2.X.Y` is not supported at this time [issue 1477](https://github.com/microsoft/vscode-arduino/issues/1477)
 
 ### Arduino CLI
 The Arduino CLI can be downloaded from the repository's [release page](https://github.com/arduino/arduino-cli/releases/tag/0.13.0)
@@ -81,8 +82,10 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
 | `arduino.defaultBaudRate` | Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000 |
-| `arduino.defaultTimestampFormat` | Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://strftime.org). |
+| `arduino.defaultTimestampFormat` | Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://github.com/samsonjs/strftime#supported-specifiers). |
 | `arduino.disableIntelliSenseAutoGen` | When `true` vscode-arduino will not auto-generate an IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`) by analyzing Arduino's compiler output. |
+| `arduino.analyzeOnOpen` | When true, automatically run analysis when the project is opened. Only works when `arduino.analyzeOnSettingChange` is true. |
+| `arduino.analyzeOnSettingChange` | When true, automatically run analysis when board, configuration, or sketch settings are changed. |
 
 The following Visual Studio Code settings are available for the Arduino extension. These can be set in global user preferences <kbd>Ctrl</kbd> + <kbd>,</kbd> *or* <kbd>Cmd</kbd> + <kbd>,</kbd> or workspace settings (`.vscode/settings.json`). The latter overrides the former.
 

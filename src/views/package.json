@@ -36,5 +36,12 @@
     "ts-loader": "^4.5.0",
     "webpack": "^4.44.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "overrides": {
+    "qs": "~6.10.3",
+    "async": "~3.2.3",
+    "node-sass": "^7.0.0",
+    "es5-ext": "0.10.53",
+    "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz"
+  }
 }

@@ -63,13 +63,21 @@ steps:
   # Node 14 matches the version of Node used by VS Code when this was written,
   # but it should be updated when VS Code updates its Node version.
   - task: NodeTool@0
-    displayName: Use Node 14.x
+    displayName: Use Node 16.x
     inputs:
-      versionSpec: 14.x
+      versionSpec: 16.x
   - script: npm install --global gulp node-gyp vsce
     displayName: Install global dependencies
   - script: npm install
     displayName: Install project dependencies
+
+  - task: ComponentGovernanceComponentDetection@0
+    displayName: Detect components
+  - task: notice@0
+    displayName: Generate NOTICE file
+    inputs:
+      outputfile: $(Build.SourcesDirectory)/NOTICE.txt
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
 
   - script: gulp tslint
     displayName: Check for linting errors
@@ -81,9 +89,6 @@ steps:
   # ensure we only attempt to sign shipping files.
   - script: vsce package --out vscode-arduino.vsix
     displayName: Build and pack extension
-
-  - task: ComponentGovernanceComponentDetection@0
-    displayName: Detect components
 
   # Extract the VSIX, sign what we can, then pack it back up and publish it.
   - task: ExtractFiles@1

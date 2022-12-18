@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "publisher": "vsciot-vscode",
   "aiKey": "83dd2c27-6594-41d3-85a9-bdb22070eb42",
   "preview": true,
@@ -33,12 +33,12 @@
     "C++"
   ],
   "activationEvents": [
-    "*",
+    "workspaceContains:**/*.ino",
     "onCommand:arduino.verify",
     "onCommand:arduino.upload",
     "onCommand:arduino.cliUpload",
     "onCommand:arduino.uploadUsingProgrammer",
-    "onCommand:arduiono.cliUploadUsingProgrammer",
+    "onCommand:arduino.cliUploadUsingProgrammer",
     "onCommand:arduino.rebuildIntelliSenseConfig",
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
@@ -544,7 +544,17 @@
         "arduino.defaultTimestampFormat": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://strftime.org)."
+          "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://github.com/samsonjs/strftime#supported-specifiers)."
+        },
+        "arduino.analyzeOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When true, automatically run analysis when the project is opened. Only works when `arduino.analyzeOnSettingChange` is true."
+        },
+        "arduino.analyzeOnSettingChange": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When true, automatically run analysis when board, configuration, or sketch settings are changed."
         }
       }
     },
@@ -627,7 +637,7 @@
     "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^5.0.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.6",
     "mocha": "^6.2.3",
     "node-gyp": "^6.1.0",
     "plugin-error": "^1.0.1",
@@ -654,6 +664,12 @@
     "uuid": "^3.0.1",
     "vscode-extension-telemetry": "0.1.6",
     "winreg": "^1.2.3",
-    "winston": "^2.3.1"
+    "winston": "^2.4.5"
+  },
+  "overrides": {
+    "async": "~3.2.3",
+    "node-sass": "^7.0.0",
+    "es5-ext": "0.10.53",
+    "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz"
   }
 }

@@ -36,7 +36,6 @@ export const messages = {
     SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
     SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",
     NO_PROGRAMMMER_SELECTED: "Please select the programmer first.",
-    INVALID_OUTPUT_PATH: "Please check the \"output\" in the sketch Settings.Cannot find the output path:",
 };
 
 export const statusBarPriority = {

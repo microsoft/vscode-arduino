@@ -43,7 +43,7 @@ export class ExampleProvider implements vscode.TreeDataProvider<ExampleItem> {
         this._exmaples = null;
         this._exampleManager.loadExamples().then((examples) => {
             this._exmaples = examples;
-            this._onDidChangeTreeData.fire();
+            this._onDidChangeTreeData.fire(null);
         });
     }
 
