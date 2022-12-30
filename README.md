@@ -141,6 +141,12 @@ The following settings are as per sketch settings of the Arduino extension. You 
 }
 ```
 
+## Known limitations/restrictions
+
+- Header files to include in a `.ino` sketch have to be in a sub-directory (e.g. put a header into `foo/foo.h` and then use `#include foo/foo.h`).  Without this subdirectory (e.g. `foo.h` directly next to the `.ino` file using `#include "foo.h"`), the compile step will fail. ([issue 1389](https://github.com/microsoft/vscode-arduino/issues/1389)
+
+
+
 ## Pre- and Post-Build Commands
 On Windows the commands run within a `cmd`-, on Linux and OSX within a `bash`-instance. Therefore your command can be anything what you can run within those shells. Instead of running a command you can invoke a script. This makes writing more complex pre-/post-build mechanisms much easier and opens up the possibility to run python or other scripting languages.
 The commands run within the workspace root directory and vscode-arduino sets the following environment variables:
