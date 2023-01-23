@@ -94,10 +94,10 @@ suite("Arduino: Library Manager.", () => {
         try {
             // Library Manager: remove extenal libarary.
             const arduinoSettings = ArduinoContext.arduinoApp.settings;
-            const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
+            const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "FastLED");
 
             if (util.directoryExistsSync(libPath)) {
-                ArduinoContext.arduinoApp.uninstallLibrary("AzureIoTHub", libPath);
+                ArduinoContext.arduinoApp.uninstallLibrary("FastLED", libPath);
                 assert.equal(util.directoryExistsSync(libPath), false,
                  "Library path still exist after calling uninstall library,remove the library failure");
             }
