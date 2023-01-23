@@ -71,15 +71,15 @@ suite("Arduino: Library Manager.", () => {
         this.timeout(3 * 60 * 1000);
         try {
             // Library Manager: Install extenal libarary.
-            ArduinoContext.arduinoApp.installLibrary("AzureIoTHub", "1.0.35", true).then((result) => {
+            ArduinoContext.arduinoApp.installLibrary("FastLED", "3.5.0", true).then((result) => {
                 // check if the installation succeeds or not
                 const arduinoSettings = ArduinoContext.arduinoApp.settings;
-                const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "AzureIoTHub");
+                const libPath = Path.join(arduinoSettings.sketchbookPath, "libraries", "FastLED");
 
                 if (util.directoryExistsSync(libPath)) {
                     done();
                 } else {
-                    done(new Error("AzureIoTHub library install failure, can't find library path: " + libPath));
+                    done(new Error("FastLED library install failure, can't find library path: " + libPath));
                 }
             });
 
