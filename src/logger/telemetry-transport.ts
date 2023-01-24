@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import * as vscode from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
+import TelemetryReporter from "@vscode/extension-telemetry";
 import * as winston from "winston";
 import { LogLevel } from "./logger";
 interface IPackageInfo {
@@ -12,14 +12,12 @@ interface IPackageInfo {
 }
 
 function getPackageInfo(context: vscode.ExtensionContext): IPackageInfo {
-    const extensionPackage = require(context.asAbsolutePath("./package.json"));
-    if (extensionPackage) {
-        return {
-            name: extensionPackage.name,
-            version: extensionPackage.version,
-            aiKey: extensionPackage.aiKey,
-        };
-    }
+    const packageJson = context.extension.packageJSON;
+    return {
+        name: context.extension.id,
+        version: packageJson.version,
+        aiKey: packageJson.aiKey,
+    };
 }
 
 function isNumeric(n) {
@@ -40,7 +38,10 @@ export class TelemetryTransport extends winston.Transport {
             winston.error("Failed to initialize telemetry due to no aiKey in package.json.");
             return;
         }
-        this.reporter = new TelemetryReporter(packageInfo.name, packageInfo.version, packageInfo.aiKey, true);
+        this.reporter = new TelemetryReporter(
+            packageInfo.name, packageInfo.version, packageInfo.aiKey, true,
+            // These are potentially sensitive fields from errors that should be filtered out.
+            [{ lookup: /^(message|notification|errorLine)$/ }]);
     }
 
     protected log(level: string, message: string, metadata?: any, callback?: (arg1, arg2) => void) {
@@ -64,7 +65,7 @@ export class TelemetryTransport extends winston.Transport {
                 if (level === LogLevel.Info) {
                     this.reporter.sendTelemetryEvent(message, properties, measures);
                 } else {
-                    this.reporter.sendTelemetryErrorEvent(message, properties, measures, ["message", "notification", "errorLine"]);
+                    this.reporter.sendTelemetryErrorEvent(message, properties, measures);
                 }
             } catch (telemetryErr) {
                 // If sending telemetry event fails ignore it so it won"t break the extension

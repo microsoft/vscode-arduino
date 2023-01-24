@@ -68,6 +68,22 @@ const config = {
     },
     resolve: {
         extensions: ['.js', '.json']
+    },
+    module: {
+        rules: [
+            // For some reason, webpack 4 was unable to bundle the
+            // telemetryReporter.node.min.js file. Babel seems to handle it, so
+            // use that as a workaround until we can upgrade to webpack 5.
+            {
+                test: /telemetryReporter\.node\.min\.js$/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    }
+                }
+            }
+        ]
     }
 }
 

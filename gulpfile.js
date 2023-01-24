@@ -84,7 +84,7 @@ gulp.task("clean", (done) => {
 
 gulp.task("genAikey", (done) => {
     const packageJson = JSON.parse(fs.readFileSync("package.json"));
-    packageJson.aiKey = "f1e4de2f-62b0-45e1-b36e-9216f21bd08e";
+    packageJson.aiKey = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
     fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + "\n");
     done();
 });
