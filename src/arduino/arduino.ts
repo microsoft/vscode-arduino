@@ -23,9 +23,9 @@ import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { ArduinoWorkspace } from "../common/workspace";
+import { SerialMonitorReplacement } from "../serialmonitor/serialMonitorReplacement";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
-import { SerialMonitorReplacement } from "../serialmonitor/serialMonitorReplacement";
 
 /**
  * Supported build modes. For further explanation see the documentation

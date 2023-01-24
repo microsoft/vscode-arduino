@@ -1,16 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+import { getSerialMonitorApi,  LineEnding, Parity, SerialMonitorApi, StopBits, Version } from "@microsoft/vscode-serial-monitor-api";
 import * as vscode from "vscode";
-import {SerialMonitorApi, Version, getSerialMonitorApi, LineEnding, Parity, StopBits} from '@microsoft/vscode-serial-monitor-api';
-import { SerialPortCtrl } from "./serialportctrl";
 import { ISerialPortDetail } from "./serialMonitor";
+import { SerialPortCtrl } from "./serialportctrl";
 
 export class SerialMonitorReplacement implements vscode.Disposable {
-    private static _serialMonitor: SerialMonitorReplacement = null;
-    private serialMonitorApi: SerialMonitorApi | undefined;
-    private extensionContext: vscode.ExtensionContext;
-    private currentPort: string;
-
     public static listBaudRates(): number[] {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000];
     }
@@ -22,9 +17,23 @@ export class SerialMonitorReplacement implements vscode.Disposable {
         return SerialMonitorReplacement._serialMonitor;
     }
 
+    private static _serialMonitor: SerialMonitorReplacement = null;
+
+    private serialMonitorApi: SerialMonitorApi | undefined;
+    private extensionContext: vscode.ExtensionContext;
+    private currentPort: string;
+
+    private _openPortStatusBar: vscode.StatusBarItem;
+
     public async initialize(extensionContext: vscode.ExtensionContext) {
         this.extensionContext = extensionContext;
-        this.serialMonitorApi = await getSerialMonitorApi(Version.latest, extensionContext); 
+        this.serialMonitorApi = await getSerialMonitorApi(Version.latest, extensionContext);
+
+        this._openPortStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.OPEN_PORT);
+        this._openPortStatusBar.command = "arduino.openSerialMonitor";
+        this._openPortStatusBar.text = `$(plug)`;
+        this._openPortStatusBar.tooltip = "Open Serial Monitor";
+        this._openPortStatusBar.show();
     }
 
     public get initialized(): boolean {
@@ -47,7 +56,6 @@ export class SerialMonitorReplacement implements vscode.Disposable {
             return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
         }), { placeHolder: "Select a serial port" });
 
-
         this.currentPort = chosen.label;
         return chosen ? chosen.label : undefined;
     }
@@ -55,7 +63,7 @@ export class SerialMonitorReplacement implements vscode.Disposable {
     public async selectBaudRate(): Promise<number | undefined> {
         const rates = SerialMonitorReplacement.listBaudRates();
         const chosen = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
-        if (!chosen) {            
+        if (!chosen) {
             return undefined;
         }
         if (!parseInt(chosen, 10)) {
@@ -91,7 +99,7 @@ export class SerialMonitorReplacement implements vscode.Disposable {
             lineEnding: LineEnding.None,
             dataBits: 8,
             stopBits: StopBits.One,
-            parity: Parity.None
+            parity: Parity.None,
         })
     }
 
