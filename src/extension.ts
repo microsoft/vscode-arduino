@@ -28,7 +28,7 @@ import * as Logger from "./logger/logger";
 const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
 import { BuildMode } from "./arduino/arduino";
-import { SerialMonitor } from "./serialmonitor/serialMonitor";
+import { SerialMonitorReplacement } from "./serialmonitor/serialMonitorReplacement";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -84,8 +84,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 await arduinoActivatorModule.default.activate();
             }
 
-            if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+            if (!SerialMonitorReplacement.getInstance().initialized) {
+                SerialMonitorReplacement.getInstance().initialize(context);
             }
 
             const arduinoPath = arduinoContextModule.default.arduinoApp.settings.arduinoPath;
@@ -105,8 +105,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const registerNonArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
-            if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+            if (!SerialMonitorReplacement.getInstance().initialized) {
+                SerialMonitorReplacement.getInstance().initialize(context);
             }
             await commandExecution(command, commandBody, args, getUserData);
         }));
@@ -279,14 +279,11 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     // serial monitor commands
-    const serialMonitor = SerialMonitor.getInstance();
+    const serialMonitor = SerialMonitorReplacement.getInstance();
     context.subscriptions.push(serialMonitor);
-    registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null));
+    registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort());
     registerNonArduinoCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor());
-    registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
-    registerNonArduinoCommand("arduino.changeTimestampFormat", () => serialMonitor.changeTimestampFormat());
-    registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
-    registerNonArduinoCommand("arduino.closeSerialMonitor", (port, showWarning = true) => serialMonitor.closeSerialMonitor(port, showWarning));
+    registerNonArduinoCommand("arduino.closeSerialMonitor", (port, showWarning = true) => serialMonitor.closeSerialMonitor(port));
 
     const completionProvider = new completionProviderModule.CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
@@ -301,8 +298,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 await arduinoActivatorModule.default.activate();
             }
 
-            if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+            if (!SerialMonitorReplacement.getInstance().initialized) {
+                SerialMonitorReplacement.getInstance().initialize(context);
             }
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
@@ -316,8 +313,8 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!arduinoContextModule.default.initialized) {
                 await arduinoActivatorModule.default.activate();
             }
-            if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+            if (!SerialMonitorReplacement.getInstance().initialized) {
+                SerialMonitorReplacement.getInstance().initialize(context);
             }
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         }
@@ -411,14 +408,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
     setTimeout(() => {
         // delay to detect usb
-        usbDetectorModule.UsbDetector.getInstance().initialize(context.extensionPath);
+        usbDetectorModule.UsbDetector.getInstance().initialize(context);
         usbDetectorModule.UsbDetector.getInstance().startListening();
     }, 200);
 }
 
 export async function deactivate() {
-    const monitor = SerialMonitor.getInstance();
-    await monitor.closeSerialMonitor(null, false);
+    const monitor = SerialMonitorReplacement.getInstance();
+    await monitor.closeSerialMonitor(null);
     usbDetectorModule.UsbDetector.getInstance().stopListening();
     Logger.traceUserData("deactivate-extension");
 }

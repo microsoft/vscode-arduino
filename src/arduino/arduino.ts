@@ -23,9 +23,9 @@ import { VscodeSettings } from "./vscodeSettings";
 
 import { arduinoChannel } from "../common/outputChannel";
 import { ArduinoWorkspace } from "../common/workspace";
-import { SerialMonitor } from "../serialmonitor/serialMonitor";
 import { UsbDetector } from "../serialmonitor/usbDetector";
 import { ProgrammerManager } from "./programmerManager";
+import { SerialMonitorReplacement } from "../serialmonitor/serialMonitorReplacement";
 
 /**
  * Supported build modes. For further explanation see the documentation
@@ -729,7 +729,7 @@ export class ArduinoApp {
             buildMode === BuildMode.UploadProgrammer ||
             buildMode === BuildMode.CliUpload ||
             buildMode === BuildMode.CliUploadProgrammer) {
-            restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
+            restoreSerialMonitor = await SerialMonitorReplacement.getInstance().closeSerialMonitor(dc.port);
             UsbDetector.getInstance().pauseListening();
         }
 
@@ -747,7 +747,7 @@ export class ArduinoApp {
             if (buildMode === BuildMode.Upload || buildMode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
                 if (restoreSerialMonitor) {
-                    await SerialMonitor.getInstance().openSerialMonitor();
+                    await SerialMonitorReplacement.getInstance().openSerialMonitor();
                 }
             }
             return ret;

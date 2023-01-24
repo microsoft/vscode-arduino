@@ -15,6 +15,7 @@ import { ArduinoWorkspace } from "../common/workspace";
 import * as util from "../common/util";
 import * as Logger from "../logger/logger";
 import { SerialMonitor } from "./serialMonitor";
+import { SerialMonitorReplacement } from "./serialMonitorReplacement";
 
 const HTML_EXT = ".html";
 const MARKDOWN_EXT = ".md";
@@ -35,11 +36,14 @@ export class UsbDetector {
 
     private _extensionRoot = null;
 
+    private _extensionContext = null;
+
     private constructor() {
     }
 
-    public initialize(extensionRoot: string) {
-        this._extensionRoot = extensionRoot;
+    public initialize(extensionContext: vscode.ExtensionContext) {
+        this._extensionRoot = extensionContext.extensionPath;
+        this._extensionContext = extensionContext;
     }
 
     public async startListening() {
@@ -73,8 +77,8 @@ export class UsbDetector {
                 if (!ArduinoContext.initialized) {
                     await ArduinoActivator.activate();
                 }
-                if (!SerialMonitor.getInstance().initialized) {
-                    SerialMonitor.getInstance().initialize();
+                if (!SerialMonitorReplacement.getInstance().initialized) {
+                    SerialMonitorReplacement.getInstance().initialize(this._extensionContext);
                 }
 
                 // TODO EW: this is board manager code which should be moved into board manager
@@ -128,8 +132,6 @@ export class UsbDetector {
                                 }
                             });
                     } else {
-                        const monitor = SerialMonitor.getInstance();
-                        monitor.selectSerialPort(deviceDescriptor.vid, deviceDescriptor.pid);
                         this.showReadMeAndExample(deviceDescriptor.readme);
                     }
                 } else {
@@ -163,8 +165,6 @@ export class UsbDetector {
 
     private switchBoard(bd: IBoard, deviceDescriptor, showReadMe: boolean = true) {
         ArduinoContext.boardManager.doChangeBoardType(bd);
-        const monitor = SerialMonitor.getInstance();
-        monitor.selectSerialPort(deviceDescriptor.vid, deviceDescriptor.pid);
         if (showReadMe) {
             this.showReadMeAndExample(deviceDescriptor.readme);
         }
