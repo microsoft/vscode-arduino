@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as vscode from "vscode";
 import TelemetryReporter from "@vscode/extension-telemetry";
+import * as vscode from "vscode";
 import * as winston from "winston";
 import { LogLevel } from "./logger";
 interface IPackageInfo {
