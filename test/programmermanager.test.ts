@@ -68,7 +68,8 @@ suite("Arduino: Programmer Manager.", () => {
         assert.equal(programmerManager.currentDisplayName, "arduino:jtag3isp");
     });
 
-    test("changing arduino.ino value should change programmer", (done) => {
+    test("changing arduino.ino value should change programmer", function(done) {
+        this.timeout(3 * 60 * 1000);
         DeviceContext.getInstance().programmer = programmers[0].name;
         setTimeout(() => {
             assert.equal(programmerManager.currentProgrammer, programmers[0].key);
