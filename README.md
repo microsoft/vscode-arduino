@@ -81,7 +81,6 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.enableUSBDetection` | Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport `npm install -g serialport` `serialport-list -f jsonline`|
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
-| `arduino.defaultBaudRate` | Default baud rate for the serial port monitor. The default value is 115200. Supported values are 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400 and 250000 |
 | `arduino.defaultTimestampFormat` | Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://github.com/samsonjs/strftime#supported-specifiers). |
 | `arduino.disableIntelliSenseAutoGen` | When `true` vscode-arduino will not auto-generate an IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`) by analyzing Arduino's compiler output. |
 | `arduino.analyzeOnOpen` | When true, automatically run analysis when the project is opened. Only works when `arduino.analyzeOnSettingChange` is true. |
@@ -102,7 +101,6 @@ The following Visual Studio Code settings are available for the Arduino extensio
         "https://raw.githubusercontent.com/VSChina/azureiotdevkit_tools/master/package_azureboard_index.json",
         "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
     ],
-    "arduino.defaultBaudRate": 115200
 }
 ```
 *Note:* You only need to set `arduino.path` in Visual Studio Code settings, other options are not required.
