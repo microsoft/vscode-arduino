@@ -46,16 +46,13 @@ You can find code samples and tutorials each time that you connect a supported d
 This extension provides several commands in the Command Palette (<kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> *or* <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) for working with `*.ino` files:
 
 - **Arduino: Board Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in the board manager.
-- **Arduino: Change Baud Rate**: Change the baud rate of the selected serial port.
 - **Arduino: Change Board Type**: Change board type or platform.
-- **Arduino: Change Timestamp Format**: Change format of timestamp printed before each line of Serial Monitor output.
 - **Arduino: Close Serial Monitor**: Stop the serial monitor and release the serial port.
 - **Arduino: Examples**: Show list of examples.
 - **Arduino: Initialize**: Scaffold a VS Code project with an Arduino sketch.
 - **Arduino: Library Manager**: Explore and manage libraries.
 - **Arduino: Open Serial Monitor**: Open the serial monitor in the integrated output window.
 - **Arduino: Select Serial Port**: Change the current serial port.
-- **Arduino: Send Text to Serial Port**: Send a line of text via the current serial port.
 - **Arduino: Upload**: Build sketch and upload to Arduino board.
 - **Arduino: CLI Upload**: Upload complied code without building sketch (CLI only).
 - **Arduino: Upload Using Programmer**: Upload using an external programmer.
@@ -81,7 +78,6 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 | `arduino.enableUSBDetection` | Enable/disable USB detection from the VSCode Arduino extension. The default value is `true`. When your device is plugged in to your computer, it will pop up a message "`Detected board ****, Would you like to switch to this board type`". After clicking the `Yes` button, it will automatically detect which serial port (COM) is connected a USB device. If your device does not support this feature, please provide us with the PID/VID of your device; the code format is defined in `misc/usbmapping.json`.To learn more about how to list the vid/pid, use the following tools: https://github.com/EmergingTechnologyAdvisors/node-serialport `npm install -g serialport` `serialport-list -f jsonline`|
 | `arduino.disableTestingOpen` | Enable/disable automatic sending of a test message to the serial port for checking the open status. The default value is `false` (a test message will be sent). |
 | `arduino.skipHeaderProvider` | Enable/disable the extension providing completion items for headers. This functionality is included in newer versions of the C++ extension. The default value is `false`.|
-| `arduino.defaultTimestampFormat` | Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://github.com/samsonjs/strftime#supported-specifiers). |
 | `arduino.disableIntelliSenseAutoGen` | When `true` vscode-arduino will not auto-generate an IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`) by analyzing Arduino's compiler output. |
 | `arduino.analyzeOnOpen` | When true, automatically run analysis when the project is opened. Only works when `arduino.analyzeOnSettingChange` is true. |
 | `arduino.analyzeOnSettingChange` | When true, automatically run analysis when board, configuration, or sketch settings are changed. |
