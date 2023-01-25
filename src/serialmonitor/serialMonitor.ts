@@ -26,6 +26,8 @@ export class SerialMonitor implements vscode.Disposable {
         return SerialMonitor._serialMonitor;
     }
 
+    public static DEFAULT_TIMESTAMP_FORMAT: string = "";
+
     private static _serialMonitor: SerialMonitor = null;
 
     private serialMonitorApi: SerialMonitorApi | undefined;
@@ -36,6 +38,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     private openPortStatusBar: vscode.StatusBarItem;
     private portsStatusBar: vscode.StatusBarItem;
+    private timestampFormatStatusBar: vscode.StatusBarItem;
 
     public async initialize(extensionContext: vscode.ExtensionContext) {
         this.extensionContext = extensionContext;
@@ -50,6 +53,13 @@ export class SerialMonitor implements vscode.Disposable {
         this.openPortStatusBar.text = `$(plug)`;
         this.openPortStatusBar.tooltip = "Open Serial Monitor";
         this.openPortStatusBar.show();
+
+        this.timestampFormatStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right,
+                                                                           constants.statusBarPriority.TIMESTAMP_FORMAT);
+        this.timestampFormatStatusBar.command = "arduino.viewTimestampFormat";
+        // Get the value from the serial monitor extension settings.
+        this.timestampFormatStatusBar.tooltip = `View timestamp format`;
+        this.timestampFormatStatusBar.text = `$(watch)`;
 
         this.updatePortListStatus();
 
@@ -109,11 +119,17 @@ export class SerialMonitor implements vscode.Disposable {
             this.openPortStatusBar.command = "arduino.closeSerialMonitor";
             this.openPortStatusBar.text = `$(x)`;
             this.openPortStatusBar.tooltip = "Close Serial Monitor";
+            this.timestampFormatStatusBar.show();
         } else {
             this.openPortStatusBar.command = "arduino.openSerialMonitor";
             this.openPortStatusBar.text = `$(plug)`;
             this.openPortStatusBar.tooltip = "Open Serial Monitor";
+            this.timestampFormatStatusBar.hide();
         }
+    }
+
+    public async viewTimestampFormat(): Promise<void> {
+        await vscode.commands.executeCommand("workbench.action.openSettings", "vscode-serial-monitor.timestampFormat");
     }
 
     public async selectBaudRate(): Promise<number | undefined> {

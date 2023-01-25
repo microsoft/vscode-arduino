@@ -41,6 +41,7 @@ export const messages = {
 export const statusBarPriority = {
     PORT: 20,
     OPEN_PORT: 30,
+    TIMESTAMP_FORMAT: 50,
     BOARD: 60,
     ENDING: 70,
     SKETCH: 80,
