@@ -32,6 +32,7 @@ export class SerialMonitor implements vscode.Disposable {
     private extensionContext: vscode.ExtensionContext;
     private currentPort: string;
     private activePort: Port | undefined;
+    private lastSelectedBaudRate: number = 9600; // arbitrary default.
 
     private openPortStatusBar: vscode.StatusBarItem;
     private portsStatusBar: vscode.StatusBarItem;
@@ -126,10 +127,11 @@ export class SerialMonitor implements vscode.Disposable {
             return undefined;
         }
         const selectedRate: number = parseInt(chosen, 10);
+        this.lastSelectedBaudRate = selectedRate;
         return selectedRate;
     }
 
-    public async openSerialMonitor(): Promise<void> {
+    public async openSerialMonitor(restore: boolean = false): Promise<void> {
         if (!this.currentPort) {
             const ans = await vscode.window.showInformationMessage("No serial port was selected, please select a serial port first", "Yes", "No");
             if (ans === "Yes") {
@@ -142,7 +144,8 @@ export class SerialMonitor implements vscode.Disposable {
             }
         }
 
-        const baudRate = await this.selectBaudRate();
+        // if we're restoring, we want to use the most recent baud rate selected, rather than popping UI.
+        const baudRate = restore ? this.lastSelectedBaudRate : await this.selectBaudRate();
 
         if (!baudRate) {
             return;
@@ -168,11 +171,10 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async closeSerialMonitor(port?: string): Promise<boolean> {
-        await this.serialMonitorApi.stopMonitoringPort(port ?? this.currentPort);
+        const closed = await this.serialMonitorApi.stopMonitoringPort(port ?? this.currentPort);
         this.updatePortStatus(false);
 
-        // TODO: Update API to return a boolean acknowledging whether monitor session was closed.
-        return true;
+        return closed;
     }
 
     public dispose() {
