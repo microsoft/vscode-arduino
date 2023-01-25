@@ -163,7 +163,7 @@ export class SerialMonitor implements vscode.Disposable {
             });
             this.updatePortStatus(true);
         } catch (err) {
-            vscode.window.showErrorMessage("error opening serial port");
+            vscode.window.showErrorMessage(`Error opening serial port: ${err.toString()}`);
         }
     }
 
