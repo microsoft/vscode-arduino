@@ -747,7 +747,7 @@ export class ArduinoApp {
             if (buildMode === BuildMode.Upload || buildMode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
                 if (restoreSerialMonitor) {
-                    await SerialMonitor.getInstance().openSerialMonitor();
+                    await SerialMonitor.getInstance().openSerialMonitor(true);
                 }
             }
             return ret;

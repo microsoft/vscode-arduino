@@ -56,9 +56,9 @@ export class SerialMonitor implements vscode.Disposable {
 
         this.timestampFormatStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right,
                                                                            constants.statusBarPriority.TIMESTAMP_FORMAT);
-        this.timestampFormatStatusBar.command = "arduino.viewTimestampFormat";
+        this.timestampFormatStatusBar.command = "arduino.changeTimestampFormat";
         // Get the value from the serial monitor extension settings.
-        this.timestampFormatStatusBar.tooltip = `View timestamp format`;
+        this.timestampFormatStatusBar.tooltip = `Change timestamp format`;
         this.timestampFormatStatusBar.text = `$(watch)`;
 
         this.updatePortListStatus();
@@ -128,7 +128,7 @@ export class SerialMonitor implements vscode.Disposable {
         }
     }
 
-    public async viewTimestampFormat(): Promise<void> {
+    public async changeTimestampFormat(): Promise<void> {
         await vscode.commands.executeCommand("workbench.action.openSettings", "vscode-serial-monitor.timestampFormat");
     }
 

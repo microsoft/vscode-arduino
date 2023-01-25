@@ -43,7 +43,7 @@
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.selectSketch",
     "onCommand:arduino.openSerialMonitor",
-    "onCommand:arduino.viewTimestampFormat",
+    "onCommand:arduino.changeTimestampFormat",
     "onCommand:arduino.closeSerialMonitor",
     "onCommand:arduino.changeBoardType",
     "onCommand:arduino.showBoardConfig",
@@ -127,8 +127,8 @@
         "title": "Arduino: Open Serial Monitor"
       },
       {
-        "command": "arduino.viewTimestampFormat",
-        "title": "Arduino: View Timestamp"
+        "command": "arduino.changeTimestampFormat",
+        "title": "Arduino: Change Timestamp"
       },
       {
         "command": "arduino.closeSerialMonitor",

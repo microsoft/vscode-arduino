@@ -283,7 +283,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(serialMonitor);
     registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort());
     registerNonArduinoCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor());
-    registerNonArduinoCommand("arduino.viewTimestampFormat", () => serialMonitor.viewTimestampFormat());
+    registerNonArduinoCommand("arduino.changeTimestampFormat", () => serialMonitor.changeTimestampFormat());
     registerNonArduinoCommand("arduino.closeSerialMonitor", (port) => serialMonitor.closeSerialMonitor(port));
 
     const completionProvider = new completionProviderModule.CompletionProvider();

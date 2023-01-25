@@ -47,7 +47,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.initialize",
                     "arduino.selectSerialPort",
                     "arduino.openSerialMonitor",
-                    "arduino.viewTimestampFormat",
+                    "arduino.changeTimestampFormat",
                     "arduino.closeSerialMonitor",
                     "arduino.reloadExample",
                     "arduino.showExampleExplorer",
