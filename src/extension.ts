@@ -85,7 +85,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+                SerialMonitor.getInstance().initialize(context);
             }
 
             const arduinoPath = arduinoContextModule.default.arduinoApp.settings.arduinoPath;
@@ -106,7 +106,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const registerNonArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
             if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+                SerialMonitor.getInstance().initialize(context);
             }
             await commandExecution(command, commandBody, args, getUserData);
         }));
@@ -281,12 +281,12 @@ export async function activate(context: vscode.ExtensionContext) {
     // serial monitor commands
     const serialMonitor = SerialMonitor.getInstance();
     context.subscriptions.push(serialMonitor);
-    registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort(null, null));
+    registerNonArduinoCommand("arduino.selectSerialPort", () => serialMonitor.selectSerialPort());
     registerNonArduinoCommand("arduino.openSerialMonitor", () => serialMonitor.openSerialMonitor());
-    registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
-    registerNonArduinoCommand("arduino.changeTimestampFormat", () => serialMonitor.changeTimestampFormat());
-    registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
-    registerNonArduinoCommand("arduino.closeSerialMonitor", (port, showWarning = true) => serialMonitor.closeSerialMonitor(port, showWarning));
+    //registerNonArduinoCommand("arduino.changeBaudRate", () => serialMonitor.changeBaudRate());
+    //registerNonArduinoCommand("arduino.changeTimestampFormat", () => serialMonitor.changeTimestampFormat());
+    //registerNonArduinoCommand("arduino.sendMessageToSerialPort", () => serialMonitor.sendMessageToSerialPort());
+    registerNonArduinoCommand("arduino.closeSerialMonitor", (port) => serialMonitor.closeSerialMonitor(port));
 
     const completionProvider = new completionProviderModule.CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
@@ -302,7 +302,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+                SerialMonitor.getInstance().initialize(context);
             }
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         })();
@@ -317,7 +317,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 await arduinoActivatorModule.default.activate();
             }
             if (!SerialMonitor.getInstance().initialized) {
-                SerialMonitor.getInstance().initialize();
+                SerialMonitor.getInstance().initialize(context);
             }
             vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
         }
@@ -411,14 +411,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
     setTimeout(() => {
         // delay to detect usb
-        usbDetectorModule.UsbDetector.getInstance().initialize(context.extensionPath);
+        usbDetectorModule.UsbDetector.getInstance().initialize(context);
         usbDetectorModule.UsbDetector.getInstance().startListening();
     }, 200);
 }
 
 export async function deactivate() {
     const monitor = SerialMonitor.getInstance();
-    await monitor.closeSerialMonitor(null, false);
+    await monitor.closeSerialMonitor(null);
     usbDetectorModule.UsbDetector.getInstance().stopListening();
     Logger.traceUserData("deactivate-extension");
 }
