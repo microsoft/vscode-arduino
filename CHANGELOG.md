@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.4.13
+
+- Release date: January 24, 2023
+
+### Changed
+
+- Upgrade dependencies to address security and deprecation issues.
+
 ## Version 0.4.12
 
 - Release date: May 3, 2022

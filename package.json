@@ -2,7 +2,7 @@
   "name": "vscode-arduino",
   "displayName": "Arduino",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "publisher": "vsciot-vscode",
   "preview": true,
   "engines": {
