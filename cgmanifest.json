@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json.schemastore.org/component-detection-manifest.json",
+  "version": 1,
+  "registrations": [
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Linux x64)",
+          "version": "0.29.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.29.0/arduino-cli_0.29.0_Linux_64bit.tar.gz",
+          "hash": "febc558bb36a9aeb881ebcce0af6fff955234afda14435791ca41daf492c9cac"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Linux ARM64)",
+          "version": "0.29.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.29.0/arduino-cli_0.29.0_Linux_ARM64.tar.gz",
+          "hash": "ce5cd44808462461c88ab3d2441363a7fa08035a1d0cc300823d357929223ae6"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Linux ARMv7)",
+          "version": "0.29.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.29.0/arduino-cli_0.29.0_Linux_ARMv7.tar.gz",
+          "hash": "b2b98400a643324219f8fca1a4eeef3a129d6fe87356e4d126b1b56f88635c94"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (macOS x64)",
+          "version": "0.29.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.29.0/arduino-cli_0.29.0_macOS_64bit.tar.gz",
+          "hash": "d2e5aa10c66440b27a55deca54d12fc6071bb4963423706aeae97bc68a5597de"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (macOS ARM64)",
+          "version": "0.29.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.29.0/arduino-cli_0.29.0_macOS_ARM64.tar.gz",
+          "hash": "19da609c94383c98748ec79a751ac19dab38ce012880d9bb3e0e7e1d70128107"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Windows x86)",
+          "version": "0.29.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.29.0/arduino-cli_0.29.0_Windows_32bit.zip",
+          "hash": "366a6d354083db5386ff5e0d92043d23940e11cba9c3a5cf46ccea5a849e21ea"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Windows x64)",
+          "version": "0.29.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.29.0/arduino-cli_0.29.0_Windows_64bit.zip",
+          "hash": "e7473a72e40c7d7a1b29c4a3ec4646f9b9163e46c35fd78e34f1e315c2dd1e38"
+        }
+      }
+    }
+  ]
+}
