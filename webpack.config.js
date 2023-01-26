@@ -11,10 +11,9 @@ function getEntry() {
   });
   const mod = JSON.parse(npmListRes);
   const unbundledModule = ['impor', 'uuid',
-  // usb-native modules can not be bundled
-  // added debug, ms, node-gyp-build, and node-addon-api as a workaround a break in packaging 
+  // usb-native modules can not be bundled 
   // that caused the extension to not work. 
-  'usb-detection', '@serialport', 'bindings', 'serialport', 'debug', 'ms', 'node-gyp-build', 'node-addon-api'];
+  'usb-detection', 'bindings'];
   
   for (const mod of unbundledModule) {
     const p = 'node_modules/' + mod;
@@ -64,7 +63,6 @@ const config = {
     },
     externals: {
         vscode: "commonjs vscode",
-        serialport: "serialport"
     },
     resolve: {
         extensions: ['.js', '.json']
