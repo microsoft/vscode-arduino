@@ -47,6 +47,7 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 
 - **Arduino: Board Manager**: Manage packages for boards. You can add 3rd party Arduino board by configuring `Additional Board Manager URLs` in the board manager.
 - **Arduino: Change Board Type**: Change board type or platform.
+- **Arduino: Change Timestamp Format**: Change format of timestamp printed before each line of Serial Monitor output.
 - **Arduino: Close Serial Monitor**: Stop the serial monitor and release the serial port.
 - **Arduino: Examples**: Show list of examples.
 - **Arduino: Initialize**: Scaffold a VS Code project with an Arduino sketch.

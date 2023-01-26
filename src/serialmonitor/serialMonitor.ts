@@ -1,18 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
-import { getSerialMonitorApi, LineEnding, Parity, Port, SerialMonitorApi, StopBits, Version } from "@microsoft/vscode-serial-monitor-api";
+import { getSerialMonitorApi, LineEnding, Parity, Port, PortInformation, SerialMonitorApi, StopBits, Version } from "@microsoft/vscode-serial-monitor-api";
 import * as vscode from "vscode";
 import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
-import { SerialPortCtrl } from "./serialportctrl";
-
-export interface ISerialPortDetail {
-  port: string;
-  desc: string;
-  hwid: string;
-  vendorId: string;
-  productId: string;
-}
+import * as Logger from "../logger/logger";
 
 export class SerialMonitor implements vscode.Disposable {
     public static DEFAULT_TIMESTAMP_FORMAT: string = "";
@@ -34,7 +26,7 @@ export class SerialMonitor implements vscode.Disposable {
     private extensionContext: vscode.ExtensionContext;
     private currentPort: string;
     private activePort: Port | undefined;
-    private lastSelectedBaudRate: number = 9600; // arbitrary default.
+    private lastSelectedBaudRate: number = 115200; // Same default as Arduino.
 
     private openPortStatusBar: vscode.StatusBarItem;
     private portsStatusBar: vscode.StatusBarItem;
@@ -54,10 +46,10 @@ export class SerialMonitor implements vscode.Disposable {
         this.openPortStatusBar.tooltip = "Open Serial Monitor";
         this.openPortStatusBar.show();
 
+        // This statusbar button will open the timestamp format setting in the serial monitor extension.
         this.timestampFormatStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right,
                                                                            constants.statusBarPriority.TIMESTAMP_FORMAT);
         this.timestampFormatStatusBar.command = "arduino.changeTimestampFormat";
-        // Get the value from the serial monitor extension settings.
         this.timestampFormatStatusBar.tooltip = `Change timestamp format`;
         this.timestampFormatStatusBar.text = `$(watch)`;
 
@@ -76,22 +68,22 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async selectSerialPort(): Promise<string | undefined> {
-        const lists = await SerialPortCtrl.list();
-        if (!lists.length) {
+        const ports = await this.serialMonitorApi.listAvailablePorts();
+        if (!ports.length) {
             vscode.window.showInformationMessage("No serial port is available.");
             return;
         }
 
-        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>lists.map((l: ISerialPortDetail): vscode.QuickPickItem => {
+        const chosen = await vscode.window.showQuickPick(<vscode.QuickPickItem[]>ports.map((l: PortInformation): vscode.QuickPickItem => {
             return {
-                description: l.desc,
-                label: l.port,
+                description: l.friendlyName,
+                label: l.portName,
             };
         }).sort((a, b): number => {
             return a.label === b.label ? 0 : (a.label > b.label ? 1 : -1);
         }), { placeHolder: "Select a serial port" });
 
-        if (chosen) {
+        if (chosen && chosen.label) {
             this.currentPort = chosen.label;
             this.updatePortListStatus(this.currentPort);
             return chosen.label;
@@ -108,10 +100,11 @@ export class SerialMonitor implements vscode.Disposable {
         const rates = SerialMonitor.listBaudRates();
         const chosen = await vscode.window.showQuickPick(rates.map((rate) => rate.toString()));
         if (!chosen) {
+            Logger.warn("No baud rate selected, keeping previous baud rate");
             return undefined;
         }
         if (!parseInt(chosen, 10)) {
-            vscode.window.showWarningMessage(`Invalid baud rate, keeping previous baud rate: ${chosen}`);
+            Logger.warn("Serial Monitor has not been started");
             return undefined;
         }
         const selectedRate: number = parseInt(chosen, 10);
@@ -121,8 +114,8 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async openSerialMonitor(restore: boolean = false): Promise<void> {
         if (!this.currentPort) {
-            const ans = await vscode.window.showInformationMessage("No serial port was selected, please select a serial port first", "Yes", "No");
-            if (ans === "Yes") {
+            const ans = await vscode.window.showInformationMessage("No serial port was selected, please select a serial port first", "Select", "Cancel");
+            if (ans === "Select") {
                 if (await this.selectSerialPort() === undefined) {
                     return;
                 }
@@ -133,11 +126,7 @@ export class SerialMonitor implements vscode.Disposable {
         }
 
         // if we're restoring, we want to use the most recent baud rate selected, rather than popping UI.
-        const baudRate = restore ? this.lastSelectedBaudRate : await this.selectBaudRate();
-
-        if (!baudRate) {
-            return;
-        }
+        const baudRate = restore ? this.lastSelectedBaudRate : await this.selectBaudRate() ?? this.lastSelectedBaudRate;
 
         try {
             this.activePort = await this.serialMonitorApi.startMonitoringPort({
@@ -154,12 +143,17 @@ export class SerialMonitor implements vscode.Disposable {
             });
             this.updatePortStatus(true);
         } catch (err) {
+            Logger.warn("Serial Monitor failed to open");
             vscode.window.showErrorMessage(`Error opening serial port: ${err.toString()}`);
         }
     }
 
     public async closeSerialMonitor(port?: string): Promise<boolean> {
-        const closed = await this.serialMonitorApi.stopMonitoringPort(port ?? this.currentPort);
+        const portToClose = port ?? this.currentPort;
+        let closed = false;
+        if (portToClose) {
+            closed = await this.serialMonitorApi.stopMonitoringPort(port ?? this.currentPort);
+        }
         this.updatePortStatus(false);
 
         return closed;
