@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
-import * as constants from "../common/constants";
-import { getSerialMonitorApi,  LineEnding, Parity, Port, SerialMonitorApi, StopBits, Version } from "@microsoft/vscode-serial-monitor-api";
+import { getSerialMonitorApi, LineEnding, Parity, Port, SerialMonitorApi, StopBits, Version } from "@microsoft/vscode-serial-monitor-api";
 import * as vscode from "vscode";
-import { SerialPortCtrl } from "./serialportctrl";
+import * as constants from "../common/constants";
 import { DeviceContext } from "../deviceContext";
+import { SerialPortCtrl } from "./serialportctrl";
 
 export interface ISerialPortDetail {
   port: string;
@@ -15,6 +15,8 @@ export interface ISerialPortDetail {
 }
 
 export class SerialMonitor implements vscode.Disposable {
+    public static DEFAULT_TIMESTAMP_FORMAT: string = "";
+
     public static listBaudRates(): number[] {
         return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000];
     }
@@ -25,8 +27,6 @@ export class SerialMonitor implements vscode.Disposable {
         }
         return SerialMonitor._serialMonitor;
     }
-
-    public static DEFAULT_TIMESTAMP_FORMAT: string = "";
 
     private static _serialMonitor: SerialMonitor = null;
 
@@ -42,7 +42,7 @@ export class SerialMonitor implements vscode.Disposable {
 
     public async initialize(extensionContext: vscode.ExtensionContext) {
         this.extensionContext = extensionContext;
-        
+
         this.portsStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, constants.statusBarPriority.PORT);
         this.portsStatusBar.command = "arduino.selectSerialPort";
         this.portsStatusBar.tooltip = "Select Serial Port";
@@ -67,7 +67,7 @@ export class SerialMonitor implements vscode.Disposable {
         dc.onChangePort(() => {
             this.updatePortListStatus();
         });
-        
+
         this.serialMonitorApi = await getSerialMonitorApi(Version.latest, extensionContext);
     }
 
@@ -98,34 +98,6 @@ export class SerialMonitor implements vscode.Disposable {
         }
 
         return undefined;
-    }
-
-    private updatePortListStatus(port?: string) {
-        const dc = DeviceContext.getInstance();
-        if (port) {
-            dc.port = port;
-        }
-        this.currentPort = dc.port;
-
-        if (dc.port) {
-            this.portsStatusBar.text = dc.port;
-        } else {
-            this.portsStatusBar.text = "<Select Serial Port>";
-        }
-    }
-
-    private updatePortStatus(isOpened: boolean) {
-        if (isOpened) {
-            this.openPortStatusBar.command = "arduino.closeSerialMonitor";
-            this.openPortStatusBar.text = `$(x)`;
-            this.openPortStatusBar.tooltip = "Close Serial Monitor";
-            this.timestampFormatStatusBar.show();
-        } else {
-            this.openPortStatusBar.command = "arduino.openSerialMonitor";
-            this.openPortStatusBar.text = `$(plug)`;
-            this.openPortStatusBar.tooltip = "Open Serial Monitor";
-            this.timestampFormatStatusBar.hide();
-        }
     }
 
     public async changeTimestampFormat(): Promise<void> {
@@ -195,5 +167,33 @@ export class SerialMonitor implements vscode.Disposable {
 
     public dispose() {
         this.serialMonitorApi.dispose();
+    }
+
+    private updatePortListStatus(port?: string) {
+        const dc = DeviceContext.getInstance();
+        if (port) {
+            dc.port = port;
+        }
+        this.currentPort = dc.port;
+
+        if (dc.port) {
+            this.portsStatusBar.text = dc.port;
+        } else {
+            this.portsStatusBar.text = "<Select Serial Port>";
+        }
+    }
+
+    private updatePortStatus(isOpened: boolean) {
+        if (isOpened) {
+            this.openPortStatusBar.command = "arduino.closeSerialMonitor";
+            this.openPortStatusBar.text = `$(x)`;
+            this.openPortStatusBar.tooltip = "Close Serial Monitor";
+            this.timestampFormatStatusBar.show();
+        } else {
+            this.openPortStatusBar.command = "arduino.openSerialMonitor";
+            this.openPortStatusBar.text = `$(plug)`;
+            this.openPortStatusBar.tooltip = "Open Serial Monitor";
+            this.timestampFormatStatusBar.hide();
+        }
     }
 }
