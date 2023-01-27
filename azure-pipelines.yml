@@ -66,7 +66,7 @@ steps:
     displayName: Use Node 16.x
     inputs:
       versionSpec: 16.x
-  - script: npm install --global gulp node-gyp vsce
+  - script: npm install --global gulp node-gyp @vscode/vsce
     displayName: Install global dependencies
   - script: npm install
     displayName: Install project dependencies
@@ -87,14 +87,14 @@ steps:
   # Pack the extension now even though it's unsigned so that we ignore files
   # from .vscodeignore. This will reduce load on the signing server later and
   # ensure we only attempt to sign shipping files.
-  - script: vsce package --out vscode-arduino.vsix
+  - script: node build/package.js
     displayName: Build and pack extension
 
-  # Extract the VSIX, sign what we can, then pack it back up and publish it.
+  # Extract the VSIXes, sign what we can, then pack it back up and publish it.
   - task: ExtractFiles@1
     displayName: Extract extension for signing
     inputs:
-      archiveFilePatterns: vscode-arduino.vsix
+      archiveFilePatterns: out\vsix\*.vsix
       destinationFolder: $(Build.StagingDirectory)\vscode-arduino
   - task: NuGetToolInstaller@1
     displayName: Install NuGet

@@ -6,7 +6,7 @@
   "publisher": "vsciot-vscode",
   "preview": true,
   "engines": {
-    "vscode": "^1.56.0"
+    "vscode": "^1.61.0"
   },
   "icon": "images/arduino.png",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -595,7 +595,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "gulp build --mode=production",
+    "build": "gulp build --mode=production",
     "postinstall": "cd ./src/views && npm install",
     "test": "gulp test"
   },
@@ -669,5 +669,8 @@
     "node-sass": "^7.0.0",
     "es5-ext": "0.10.53",
     "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz"
+  },
+  "vsce": {
+    "ignoreFile": "out/.vscodeignore"
   }
 }
