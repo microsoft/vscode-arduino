@@ -115,7 +115,10 @@ steps:
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
     condition: ne(variables['Build.Reason'], 'PullRequest')
-  - pwsh: Get-ChildItem -Directory $(Build.StagingDirectory)\vscode-arduino | Foreach-Object { 7z a ($_.FullName + ".vsix") ($_.FullName + "\*") -tzip }
+  - pwsh: |
+        Get-ChildItem -Directory $(Build.StagingDirectory)\vscode-arduino | Foreach-Object { 7z a ($_.FullName + ".vsix") ($_.FullName + "\*") -tzip }
+        New-Item -Path $(Build.StagingDirectory)\vscode-arduino\vsix -ItemType Directory
+        Get-Item $(Build.StagingDirectory)\vscode-arduino\*.vsix | Move-Item -Destination $(Build.StagingDirectory)\vscode-arduino\vsix
     displayName: Pack signed files
   - task: MSBuild@1
     displayName: Sign VSIXes
@@ -124,7 +127,7 @@ steps:
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
     condition: ne(variables['Build.Reason'], 'PullRequest')
-  - publish: $(Build.StagingDirectory)\vscode-arduino
+  - publish: $(Build.StagingDirectory)\vscode-arduino\vsix
     artifact: VS Code extension VSIXes
     displayName: Publish extension VSIXes as artifact
 
@@ -185,7 +188,7 @@ steps:
       action: create
       target: $(Build.SourceVersion)
       tagSource: auto
-      assets: $(Build.StagingDirectory)\vscode-arduino\*.vsix
+      assets: $(Build.StagingDirectory)\vscode-arduino\vsix\*.vsix
       isPreRelease: $[contains(variables['Build.SourceBranch'], '-rc')]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
 
