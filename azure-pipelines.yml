@@ -98,7 +98,7 @@ steps:
       Remove-Item $path
       Echo "##vso[task.prependpath]$Env:PROGRAMFILES\7-Zip\"
     displayName: Install 7zip
-  - pwsh: Get-ChildItem out\vsix | Foreach-Object { 7z e $_.FullName -o$(Build.StagingDirectory)\vscode-arduino\$_.BaseName }
+  - pwsh: Get-ChildItem out\vsix | Foreach-Object { 7z e $_.FullName -o$(Build.StagingDirectory)\vscode-arduino\$($_.BaseName) }
     displayName: Extract extension for signing
   - task: NuGetToolInstaller@1
     displayName: Install NuGet
