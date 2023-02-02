@@ -115,7 +115,7 @@ steps:
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
     condition: ne(variables['Build.Reason'], 'PullRequest')
-  - pwsh: Get-ChildItem -Directory $(Build.StagingDirectory)\vscode-arduino | Foreach-Object { 7z a ($_.FullName + ".vsix") $_.FullName\* -tzip }
+  - pwsh: Get-ChildItem -Directory $(Build.StagingDirectory)\vscode-arduino | Foreach-Object { 7z a ($_.FullName + ".vsix") ($_.FullName + "\*") -tzip }
     displayName: Pack signed files
   - task: MSBuild@1
     displayName: Sign VSIXes
