@@ -66,7 +66,7 @@ steps:
     displayName: Use Node 16.x
     inputs:
       versionSpec: 16.x
-  - script: npm install --global gulp node-gyp vsce
+  - script: npm install --global gulp node-gyp @vscode/vsce
     displayName: Install global dependencies
   - script: npm install
     displayName: Install project dependencies
@@ -87,15 +87,19 @@ steps:
   # Pack the extension now even though it's unsigned so that we ignore files
   # from .vscodeignore. This will reduce load on the signing server later and
   # ensure we only attempt to sign shipping files.
-  - script: vsce package --out vscode-arduino.vsix
+  - script: node build/package.js
     displayName: Build and pack extension
 
-  # Extract the VSIX, sign what we can, then pack it back up and publish it.
-  - task: ExtractFiles@1
+  # Extract the VSIXes, sign what we can, then pack it back up and publish it.
+  - pwsh: |
+      $path = Join-Path $Env:TEMP "7z-installer.exe"
+      Invoke-WebRequest https://www.7-zip.org/a/7z2201-x64.exe -OutFile $path
+      Start-Process -FilePath $path -Args "/S" -Verb RunAs -Wait
+      Remove-Item $path
+      Echo "##vso[task.prependpath]$Env:PROGRAMFILES\7-Zip\"
+    displayName: Install 7zip
+  - pwsh: Get-ChildItem out\vsix | Foreach-Object { 7z x $_.FullName -o$(Build.StagingDirectory)\vscode-arduino\$($_.BaseName) }
     displayName: Extract extension for signing
-    inputs:
-      archiveFilePatterns: vscode-arduino.vsix
-      destinationFolder: $(Build.StagingDirectory)\vscode-arduino
   - task: NuGetToolInstaller@1
     displayName: Install NuGet
   - task: NuGetAuthenticate@0
@@ -111,23 +115,21 @@ steps:
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
     condition: ne(variables['Build.Reason'], 'PullRequest')
-  - task: ArchiveFiles@2
+  - pwsh: |
+        Get-ChildItem -Directory $(Build.StagingDirectory)\vscode-arduino | Foreach-Object { 7z a ($_.FullName + ".vsix") ($_.FullName + "\*") -tzip }
+        New-Item -Path $(Build.StagingDirectory)\vscode-arduino\vsix -ItemType Directory
+        Get-Item $(Build.StagingDirectory)\vscode-arduino\*.vsix | Move-Item -Destination $(Build.StagingDirectory)\vscode-arduino\vsix
     displayName: Pack signed files
-    inputs:
-      rootFolderOrFile: $(Build.StagingDirectory)\vscode-arduino
-      includeRootFolder: false
-      archiveType: zip
-      archiveFile: $(Build.StagingDirectory)\vscode-arduino.vsix
   - task: MSBuild@1
-    displayName: Sign VSIX
+    displayName: Sign VSIXes
     inputs:
       solution: .\build\SignVsix.proj
       msbuildArguments: /p:SignType=$(SignType)
     # MicroBuild signing will always fail on public PRs.
     condition: ne(variables['Build.Reason'], 'PullRequest')
-  - publish: $(Build.StagingDirectory)\vscode-arduino.vsix
-    artifact: VS Code extension VSIX
-    displayName: Publish extension VSIX as artifact
+  - publish: $(Build.StagingDirectory)\vscode-arduino\vsix
+    artifact: VS Code extension VSIXes
+    displayName: Publish extension VSIXes as artifact
 
   # Install the Arduino IDE and run tests.
   - script: curl -LO https://downloads.arduino.cc/arduino-1.8.19-windows.zip
@@ -186,7 +188,7 @@ steps:
       action: create
       target: $(Build.SourceVersion)
       tagSource: auto
-      assets: $(Build.StagingDirectory)\vscode-arduino.vsix
+      assets: $(Build.StagingDirectory)\vscode-arduino\vsix\*.vsix
       isPreRelease: $[contains(variables['Build.SourceBranch'], '-rc')]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
 
