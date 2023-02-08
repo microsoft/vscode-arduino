@@ -42,6 +42,9 @@ export interface IVscodeSettings {
     analyzeOnOpen: boolean;
     analyzeOnSettingChange: boolean;
     updateAdditionalUrls(urls: string[]): void;
+    setUseArduinoCli(value: boolean): Promise<void>;
+    setArduinoPath(value: string): Promise<void>;
+    setCommandPath(value: string): Promise<void>;
 }
 
 export class VscodeSettings implements IVscodeSettings {
@@ -60,8 +63,16 @@ export class VscodeSettings implements IVscodeSettings {
         return this.getConfigValue<string>(configKeys.ARDUINO_PATH);
     }
 
+    public setArduinoPath(value: string): Promise<void> {
+        return this.setConfigValue(configKeys.ARDUINO_PATH, value, true);
+    }
+
     public get commandPath(): string {
         return this.getConfigValue<string>(configKeys.ARDUINO_COMMAND_PATH);
+    }
+
+    public setCommandPath(value: string): Promise<void> {
+        return this.setConfigValue(configKeys.ARDUINO_COMMAND_PATH, value, true);
     }
 
     public get additionalUrls(): string[] {
@@ -114,6 +125,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get useArduinoCli(): boolean {
         return this.getConfigValue<boolean>(configKeys.USE_ARDUINO_CLI);
+    }
+
+    public setUseArduinoCli(value: boolean): Promise<void> {
+        return this.setConfigValue(configKeys.USE_ARDUINO_CLI, value, true);
     }
 
     public get skipHeaderProvider(): boolean {

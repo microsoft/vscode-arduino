@@ -33,6 +33,7 @@ const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import 
 
 export async function activate(context: vscode.ExtensionContext) {
     Logger.configure(context);
+    arduinoActivatorModule.default.context = context;
     const activeGuid = uuidModule().replace(/-/g, "");
     Logger.traceUserData("start-activate-extension", { correlationId: activeGuid });
     // Show a warning message if the working file is not under the workspace folder.
@@ -78,6 +79,38 @@ export async function activate(context: vscode.ExtensionContext) {
 
         nsatModule.NSAT.takeSurvey(context);
     };
+
+    async function askSwitchToBundledCli(message: string): Promise<void> {
+        const result = await vscode.window.showErrorMessage(
+            message, "Use bundled arduino-cli", "View settings");
+        switch (result) {
+            case "Use bundled arduino-cli": {
+                    Logger.traceUserData("switched-to-bundled-arduino-cli");
+                    await vscodeSettings.setUseArduinoCli(true);
+                    await vscodeSettings.setArduinoPath(undefined);
+                    await vscodeSettings.setCommandPath(undefined);
+                    await vscode.commands.executeCommand("workbench.action.reloadWindow");
+                }
+                break;
+            case "View settings":
+                await vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+                break;
+        }
+    }
+
+    if (!vscodeSettings.useArduinoCli) {
+        // This notification is intentionally a little bit annoying (popping on
+        // workspace open with no permanent dismissal) because we want to move
+        // users off of Arduino IDE.
+        //
+        // Unfortunately, we can't simply switch the default value of
+        // useArduinoCli to true because that would break users that were
+        // intentionally using the Arduino IDE but relied on the current default
+        // value of false. A future will make this breaking change with
+        // appropriate messaging.
+        void askSwitchToBundledCli(constants.messages.REMOVE_ARDUINO_IDE_SUPPORT + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
+    }
+
     const registerArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
         return context.subscriptions.push(vscode.commands.registerCommand(command, async (...args: any[]) => {
             if (!arduinoContextModule.default.initialized) {
@@ -91,12 +124,20 @@ export async function activate(context: vscode.ExtensionContext) {
             const arduinoPath = arduinoContextModule.default.arduinoApp.settings.arduinoPath;
             const commandPath = arduinoContextModule.default.arduinoApp.settings.commandPath;
             const useArduinoCli = arduinoContextModule.default.arduinoApp.settings.useArduinoCli;
-            // Pop up vscode User Settings page when cannot resolve arduino path.
-            if (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli)) {
-                Logger.notifyUserError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
-                vscode.commands.executeCommand("workbench.action.openGlobalSettings");
+            const usingBundledArduinoCli = arduinoContextModule.default.arduinoApp.settings.usingBundledArduinoCli;
+
+            // Ask the user to switch to the bundled Arduino CLI if we can't resolve the specified path.
+            if (!usingBundledArduinoCli && (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli))) {
+                Logger.traceError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
+                await askSwitchToBundledCli(constants.messages.INVALID_ARDUINO_PATH + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
             } else if (!commandPath || !util.fileExistsSync(commandPath)) {
-                Logger.notifyUserError("InvalidCommandPath", new Error(constants.messages.INVALID_COMMAND_PATH + commandPath));
+                const error = new Error(constants.messages.INVALID_COMMAND_PATH + commandPath);
+                if (usingBundledArduinoCli) {
+                    Logger.notifyUserError("InvalidCommandPath", error);
+                } else {
+                    Logger.traceError("InvalidCommandPath", error);
+                    await askSwitchToBundledCli(error.message + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
+                }
             } else {
                 await commandExecution(command, commandBody, args, getUserData);
             }

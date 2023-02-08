@@ -473,7 +473,7 @@
         "arduino.useArduinoCli": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Use Arduino CLI installed instead of Arduino IDE. `#arduino.path#` must be set, as there is no default path for 'arduino-cli'. (Requires a restart after change)"
+          "markdownDescription": "Use Arduino CLI installed instead of Arduino IDE. If `#arduino.path#` and `#arduino.commandPath#` are not set, the extension will use a version of Arduino CLI bundled with the extension. (Requires a restart after change)"
         },
         "arduino.path": {
           "type": "string",
@@ -596,7 +596,7 @@
   },
   "scripts": {
     "build": "gulp build --mode=production",
-    "postinstall": "cd ./src/views && npm install",
+    "postinstall": "node ./build/downloadAssets.js && cd ./src/views && npm install",
     "test": "gulp test"
   },
   "extensionDependencies": [
