@@ -15,6 +15,7 @@ import ArduinoContext from "./arduinoContext";
 import { DeviceContext } from "./deviceContext";
 
 class ArduinoActivator {
+    public context: vscode.ExtensionContext;
     private _initializePromise: Promise<void>;
     public async activate() {
         if (this._initializePromise) {
@@ -23,7 +24,7 @@ class ArduinoActivator {
         }
 
         this._initializePromise = (async () => {
-            const arduinoSettings = new ArduinoSettings();
+            const arduinoSettings = new ArduinoSettings(this.context);
             await arduinoSettings.initialize();
             const arduinoApp = new ArduinoApp(arduinoSettings);
 

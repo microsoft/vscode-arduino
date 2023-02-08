@@ -1,13 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { chmod } from "fs/promises";
 import * as os from "os";
 import * as path from "path";
+import * as vscode from "vscode";
 import * as WinReg from "winreg";
 import * as util from "../common/util";
 
 import { resolveArduinoPath } from "../common/platform";
 
+import * as Logger from "../logger/logger";
 import { VscodeSettings } from "./vscodeSettings";
 
 export interface IArduinoSettings {
@@ -21,6 +24,7 @@ export interface IArduinoSettings {
     preferencePath: string;
     preferences: Map<string, string>;
     useArduinoCli: boolean;
+    usingBundledArduinoCli: boolean;
     analyzeOnSettingChange: boolean;
     reloadPreferences(): void;
 }
@@ -38,7 +42,20 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _useArduinoCli: boolean;
 
-    public constructor() {
+
+    private _usingBundledArduinoCli: boolean = false;
+
+    private readonly bundledArduinoCliName: { [platform: string]: string } = {
+        "darwin-arm64": "arduino-cli.app",
+        "darwin-x64": "arduino-cli.app",
+        "linux-arm64": "arduino-cli.app",
+        "linux-armhf": "arduino-cli.app",
+        "linux-x64": "arduino-cli.app",
+        "win32-ia32": "arduino-cli.exe",
+        "win32-x64": "arduino-cli.exe",
+    };
+
+    public constructor(private readonly _context: vscode.ExtensionContext) {
     }
 
     public async initialize() {
@@ -128,7 +145,7 @@ export class ArduinoSettings implements IArduinoSettings {
 
     public get commandPath(): string {
         const platform = os.platform();
-        if (platform === "darwin") {
+        if (platform === "darwin" && !this._usingBundledArduinoCli) {
             return path.join(util.resolveMacArduinoAppPath(this._arduinoPath, this._useArduinoCli), path.normalize(this._commandPath));
         } else {
             return path.join(this._arduinoPath, path.normalize(this._commandPath));
@@ -154,6 +171,9 @@ export class ArduinoSettings implements IArduinoSettings {
         return this._useArduinoCli;
     }
 
+    public get usingBundledArduinoCli() {
+        return this._usingBundledArduinoCli;
+    }
     public get analyzeOnSettingChange(): boolean {
         return VscodeSettings.getInstance().analyzeOnSettingChange;
     }
@@ -209,14 +229,35 @@ export class ArduinoSettings implements IArduinoSettings {
         }
     }
 
+    private async bundledArduinoCliPath(): Promise<string | undefined> {
+        const platform = await util.getPlatform();
+        const name = this.bundledArduinoCliName[platform];
+        if (!name) {
+            return undefined;
+        }
+        return this._context.asAbsolutePath(path.join("assets", "platform", platform, "arduino-cli", name));
+    }
+
     private async tryResolveArduinoPath(): Promise<void> {
         // Query arduino path sequentially from the following places such as "vscode user settings", "system environment variables",
         // "usual software installation directory for each os".
         // 1. Search vscode user settings first.
         const configValue = VscodeSettings.getInstance().arduinoPath;
         if (!configValue || !configValue.trim()) {
-            // 2 & 3. Resolve arduino path from system environment variables and usual software installation directory.
-            this._arduinoPath = await Promise.resolve(resolveArduinoPath());
+            // 2. Resolve arduino path from the bundled arduino-cli, if CLI support is enabled.
+            const bundledPath = await this.bundledArduinoCliPath();
+            if (bundledPath && this._useArduinoCli && !this._commandPath) {
+                // The extension VSIX stripped the executable bit, so we need to set it.
+                // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
+                await chmod(bundledPath, 0o755);
+                this._usingBundledArduinoCli = true;
+                Logger.traceUserData("using-bundled-arduino-cli");
+                this._arduinoPath = path.dirname(bundledPath);
+                this._commandPath = path.basename(bundledPath);
+            } else {
+                // 3 & 4. Resolve arduino path from system environment variables and usual software installation directory.
+                this._arduinoPath = await Promise.resolve(resolveArduinoPath());
+            }
         } else {
             this._arduinoPath = configValue;
         }
