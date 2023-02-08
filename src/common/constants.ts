@@ -29,10 +29,10 @@ export const EXAMPLES_URI = vscode.Uri.parse("arduino-manager://arduino/arduino-
 export const messages = {
     ARDUINO_FILE_ERROR: "The arduino.json file format is not correct.",
     NO_BOARD_SELECTED: "Please select the board type first.",
-    INVALID_ARDUINO_PATH: "Cannot find Arduino IDE.",
+    INVALID_ARDUINO_PATH: "Cannot find Arduino tools.",
     INVALID_COMMAND_PATH: "Cannot find the command file:",
-    SWITCH_TO_BUNDLED_CLI:  "Use arduino-cli bundled with this extension instead?",
-    REMOVE_ARDUINO_IDE_SUPPORT: "Support for the Arduino IDE will be removed soon.",
+    SWITCH_TO_BUNDLED_CLI:  "Use Arduino CLI bundled with this extension instead?",
+    REMOVE_ARDUINO_IDE_SUPPORT: "Support for the legacy Arduino IDE will be removed soon.",
     FAILED_SEND_SERIALPORT: "Failed to send message to serial port.",
     SERIAL_PORT_NOT_STARTED: "Serial Monitor has not been started.",
     SEND_BEFORE_OPEN_SERIALPORT: "Please open a serial port first.",

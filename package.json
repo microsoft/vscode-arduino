@@ -473,7 +473,7 @@
         "arduino.useArduinoCli": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Use Arduino CLI installed instead of Arduino IDE. If `#arduino.path#` and `#arduino.commandPath#` are not set, the extension will use a version of Arduino CLI bundled with the extension. (Requires a restart after change)"
+          "markdownDescription": "Use Arduino CLI installed instead of the legacy Arduino IDE. If `#arduino.path#` and `#arduino.commandPath#` are not set, the extension will use a version of Arduino CLI bundled with the extension. (Requires a restart after change)"
         },
         "arduino.path": {
           "type": "string",

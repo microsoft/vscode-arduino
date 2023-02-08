@@ -108,6 +108,7 @@ export async function activate(context: vscode.ExtensionContext) {
         // intentionally using the Arduino IDE but relied on the current default
         // value of false. A future will make this breaking change with
         // appropriate messaging.
+        Logger.traceUserData("using-legacy-arduino-ide");
         void askSwitchToBundledCli(constants.messages.REMOVE_ARDUINO_IDE_SUPPORT + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
     }
 

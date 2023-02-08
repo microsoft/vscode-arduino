@@ -15,9 +15,10 @@ Welcome to the Visual Studio Code extension for **Arduino** <sup>preview</sup> !
 * Integrated Arduino Debugging <sup>New</sup>
 
 ## Prerequisites
-Either the Arduino IDE or Arduino CLI are required. The recommended approach is
-to use the version of Arduino CLI that comes bundled with the extension, which
-works out of the box.
+Either the legacy Arduino IDE or Arduino CLI are required. The recommended
+approach is to use the version of Arduino CLI that comes bundled with the
+extension, which works out of the box. Support for the legacy Arduino IDE will
+be removed in a future version of the extension.
 
 ### Arduino CLI
 To use the bundled version of Arduino CLI, `arduino.useArduinoCli` should be `true`,
@@ -31,12 +32,14 @@ the repository's [release page](https://github.com/arduino/arduino-cli/releases/
 For custom versions, `arduino.path` must be set to the directory containing the
 Arduino CLI executable.
 
-### Arduino IDE
-The Arduino IDE can be installed the Arduino [download page](https://www.arduino.cc/en/main/software#download).
-- The supported Arduino IDE versions are `1.6.x` and up to, but not including, 2.0.0.
+### Legacy Arduino IDE
+Use of the legacy Arduino IDE is not recommended, and support for the legacy
+Arduino IDE will be removed in a future version of the extension. The legacy
+Arduino IDE can be installed from the Arduino [download page](https://www.arduino.cc/en/main/software#download).
+- The supported legacy Arduino IDE versions are `1.6.x` and up to, but not including, `2.0.0`.
 - The Windows Store's version of the Arduino IDE is not supported because of the sandbox environment that the application runs in.
 - *Note:* Arduino IDE `1.8.7` had some breaking changes, causing board package and library installation failures.  These failures were corrected in `1.8.8` and later.
-- *Note:* Arduino IDE `2.X.Y` is not supported at this time [issue 1477](https://github.com/microsoft/vscode-arduino/issues/1477)
+- *Note:* Arduino IDE `2.X.Y` is not supported and there are no plans for support in the future ([issue 1477](https://github.com/microsoft/vscode-arduino/issues/1477)).
 
 ## Installation
 Open VS Code and press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> *or* <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open command palette, select **Install Extension** and type `vscode-arduino`.
@@ -80,8 +83,8 @@ This extension provides several commands in the Command Palette (<kbd>F1</kbd> o
 ## Options
 | Option | Description |
 | --- | --- |
-| `arduino.useArduinoCli` | Whether to use the Arduino CLI (`true`) or the Arduino IDE (`false`) -- defaults to `false`. If using `true`, either leave the `arduino.path` and `arduino.commandPath` values unset to use the bundled version of Arduino CLI, or point them at a custom version of Arduino CLI. Note that a future version of the extension will change this default to `true` and remove support for Arduino IDE. |
-| `arduino.path`  | Path to the Arduino installation.  You can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your Arduino IDE installation path. To use the Arduino CLI, use the path that contains the `arduino-cli` executable (e.g. `/usr/local/bin`), or leave it unset to use the bundled version of Arduino CLI. |
+| `arduino.useArduinoCli` | Whether to use the Arduino CLI (`true`) or the legacy Arduino IDE (`false`) -- defaults to `false`. If using `true`, either leave the `arduino.path` and `arduino.commandPath` values unset to use the bundled version of Arduino CLI, or point them at a custom version of Arduino CLI. Note that a future version of the extension will change this default to `true` and remove support for legacy Arduino IDE. |
+| `arduino.path`  | Path to the Arduino installation.  You can use a custom version of Arduino by modifying this setting to include the full path. Example: `C:\\Program Files\\Arduino` for Windows, `/Applications` for Mac, `/home/<username>/Downloads/arduino-1.8.1` for Linux. (Requires a restart after change). The default value is automatically detected from your legacy Arduino IDE installation path. To use the Arduino CLI, use the path that contains the `arduino-cli` executable (e.g. `/usr/local/bin`), or leave it unset to use the bundled version of Arduino CLI. |
 | `arduino.commandPath` | Path to an executable (or script) relative to `arduino.path`. The default value is `arduino_debug.exe` for Windows, `Contents/MacOS/Arduino` for Mac and `arduino` for Linux, You also can use a custom launch script to run Arduino by modifying this setting. (Requires a restart after change) Example: `run-arduino.bat` for Windows, `Contents/MacOS/run-arduino.sh` for Mac and `bin/run-arduino.sh` for Linux. To use the bundled version of Arduino CLI, leave this option unset. To use a custom version of Arduino CLI, use `arduino-cli`. |
 | `arduino.additionalUrls` | Additional Boards Manager URLs for 3rd party packages as a string array. The default value is empty. |
 | `arduino.logLevel` | CLI output log level. Could be info or verbose. The default value is `"info"`. |
