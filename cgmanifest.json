@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/component-detection-manifest.json",
+  "version": 1,
+  "registrations": [
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Linux x64)",
+          "version": "0.30.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.30.0/arduino-cli_0.30.0_Linux_64bit.tar.gz",
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Linux ARM64)",
+          "version": "0.30.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.30.0/arduino-cli_0.30.0_Linux_ARM64.tar.gz",
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Linux ARMv7)",
+          "version": "0.30.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.30.0/arduino-cli_0.30.0_Linux_ARMv7.tar.gz",
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (macOS x64)",
+          "version": "0.30.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.30.0/arduino-cli_0.30.0_macOS_64bit.tar.gz",
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (macOS ARM64)",
+          "version": "0.30.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.30.0/arduino-cli_0.30.0_macOS_ARM64.tar.gz",
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Windows x86)",
+          "version": "0.30.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.30.0/arduino-cli_0.30.0_Windows_32bit.zip",
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "arduino-cli (Windows x64)",
+          "version": "0.30.0",
+          "downloadUrl": "https://github.com/arduino/arduino-cli/releases/download/0.30.0/arduino-cli_0.30.0_Windows_64bit.zip",
+        }
+      }
+    }
+  ]
+}

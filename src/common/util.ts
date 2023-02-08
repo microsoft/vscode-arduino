@@ -468,3 +468,32 @@ export function toStringArray(value: string | string[]): string[] {
 
     return [];
 }
+
+// Ideally VS Code would provide an API to get the target platform name. For
+// now, copy the logic from VS Code.
+// https://github.com/microsoft/vscode/issues/170196
+// tslint:disable-next-line
+// https://github.com/microsoft/vscode/blob/78d05ca56a6881e7503a5173131c9803b059012d/src/vs/platform/extensionManagement/common/extensionManagementUtil.ts#L171-L196
+export async function getPlatform(): Promise<string> {
+    let platform: string = process.platform;
+    if (platform === "linux") {
+        let content: string | undefined;
+        try {
+            content = await fs.promises.readFile("/etc/os-release", "ascii");
+        } catch (error) {
+            try {
+                content = await fs.promises.readFile("/usr/lib/os-release", "ascii");
+            } catch (error) {
+                /* Ignore */
+            }
+        }
+        if (
+            !!content &&
+            // eslint-disable-next-line no-control-regex
+            (content.match(/^ID=([^\u001b\r\n]*)/m) || [])[1] === "alpine"
+        ) {
+            platform = "alpine";
+        }
+    }
+    return `${platform}-${process.arch}`;
+}

@@ -6,3 +6,4 @@ node_modules
 src/views/app/sprites-generated
 test/**/c_cpp_properties.json
 *.vsix
+assets/platform/*/arduino-cli
