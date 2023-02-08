@@ -263,7 +263,7 @@ export class ArduinoSettings implements IArduinoSettings {
             // 2. Resolve arduino path from the bundled arduino-cli, if CLI support is enabled.
             const bundledPath = await this.bundledArduinoCliPath();
             if (bundledPath && this._useArduinoCli && !this._commandPath) {
-                // The extension VSIX stipped the executable bit, so we need to set it.
+                // The extension VSIX stripped the executable bit, so we need to set it.
                 // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
                 await chmod(bundledPath, 0o755);
                 this._usingBundledArduinoCli = true;
