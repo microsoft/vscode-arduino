@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { chmod } from "fs/promises";
 import * as os from "os";
 import * as path from "path";
+import * as vscode from "vscode";
 import * as WinReg from "winreg";
-import * as vscode from 'vscode';
-import { chmod } from "fs/promises";
 import * as util from "../common/util";
 
 import { resolveArduinoPath } from "../common/platform";
 
-import { VscodeSettings } from "./vscodeSettings";
 import * as Logger from "../logger/logger";
+import { VscodeSettings } from "./vscodeSettings";
 
 export interface IArduinoSettings {
     arduinoPath: string;
@@ -49,6 +49,16 @@ export class ArduinoSettings implements IArduinoSettings {
     private _defaultTimestampFormat: string;
 
     private _usingBundledArduinoCli: boolean = false;
+
+    private readonly bundledArduinoCliName: { [platform: string]: string } = {
+        "darwin-arm64": "arduino-cli.app",
+        "darwin-x64": "arduino-cli.app",
+        "linux-arm64": "arduino-cli.app",
+        "linux-armhf": "arduino-cli.app",
+        "linux-x64": "arduino-cli.app",
+        "win32-ia32": "arduino-cli.exe",
+        "win32-x64": "arduino-cli.exe",
+    };
 
     public constructor(private readonly _context: vscode.ExtensionContext) {
     }
@@ -235,21 +245,13 @@ export class ArduinoSettings implements IArduinoSettings {
         }
     }
 
-    private readonly bundledArduinoCliName: { [platform: string]: string } = {
-        'darwin-arm64': 'arduino-cli.app',
-        'darwin-x64': 'arduino-cli.app',
-        'linux-arm64': 'arduino-cli.app',
-        'linux-armhf': 'arduino-cli.app',
-        'linux-x64': 'arduino-cli.app',
-        'win32-ia32': 'arduino-cli.exe',
-        'win32-x64': 'arduino-cli.exe',
-    };
-
     private async bundledArduinoCliPath(): Promise<string | undefined> {
         const platform = await util.getPlatform();
         const name = this.bundledArduinoCliName[platform];
-        if (!name) return undefined;
-        return this._context.asAbsolutePath(path.join('assets', 'platform', platform, 'arduino-cli', name));
+        if (!name) {
+            return undefined;
+        }
+        return this._context.asAbsolutePath(path.join("assets", "platform", platform, "arduino-cli", name));
     }
 
     private async tryResolveArduinoPath(): Promise<void> {

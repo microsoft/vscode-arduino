@@ -49,7 +49,12 @@ for (const asset in config.assets) {
       // Extract to an "arduino-cli" directory.
       const extractDirectory = resolve(directory, "arduino-cli");
       mkdirSync(extractDirectory, { recursive: true });
-      run(`tar -xf ${destination} -C ${extractDirectory}`);
+      // tar on Linux doesn't understand zip files.
+      if (asset.endsWith(".zip") && process.platform === 'linux') {
+        run(`unzip ${destination} -d ${extractDirectory}`);
+      } else {
+        run(`tar -xf ${destination} -C ${extractDirectory}`);
+      }
 
       // Remove the downloaded archive. We don't need to ship it.
       rmSync(destination);

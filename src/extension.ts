@@ -90,8 +90,8 @@ export async function activate(context: vscode.ExtensionContext) {
                     await vscodeSettings.setArduinoPath(undefined);
                     await vscodeSettings.setCommandPath(undefined);
                     await vscode.commands.executeCommand("workbench.action.reloadWindow");
+                    break;
                 }
-                break;
             case "View settings":
                 await vscode.commands.executeCommand("workbench.action.openGlobalSettings");
                 break;
