@@ -42,7 +42,6 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _useArduinoCli: boolean;
 
-
     private _usingBundledArduinoCli: boolean = false;
 
     private readonly bundledArduinoCliName: { [platform: string]: string } = {
