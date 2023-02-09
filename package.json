@@ -591,7 +591,6 @@
   "devDependencies": {
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.6",
-    "@types/compare-versions": "^3.0.0",
     "@types/express": "^4.17.13",
     "@types/glob": "^7.1.4",
     "@types/mocha": "^5.2.7",
@@ -636,7 +635,6 @@
     "@vscode/extension-telemetry": "~0.6.2",
     "body-parser": "^1.16.1",
     "cocopa": "0.0.13",
-    "compare-versions": "^3.4.0",
     "eventemitter2": "^4.1.0",
     "express": "^4.14.1",
     "extract-zip": "^2.0.1",
