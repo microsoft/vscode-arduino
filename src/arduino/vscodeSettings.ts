@@ -16,10 +16,8 @@ const configKeys = {
     DISABLE_TESTING_OPEN: "arduino.disableTestingOpen",
     IGNORE_BOARDS: "arduino.ignoreBoards",
     SKIP_HEADER_PROVIDER: "arduino.skipHeaderProvider",
-    DEFAULT_BAUD_RATE: "arduino.defaultBaudRate",
     USE_ARDUINO_CLI: "arduino.useArduinoCli",
     DISABLE_INTELLISENSE_AUTO_GEN: "arduino.disableIntelliSenseAutoGen",
-    DEFAULT_TIMESTAMP_FORMAT: "arduino.defaultTimestampFormat",
     ANALYZE_ON_OPEN: "arduino.analyzeOnOpen",
     ANALYZE_ON_SETTING_CHANGE: "arduino.analyzeOnSettingChange",
 };
@@ -35,10 +33,8 @@ export interface IVscodeSettings {
     disableTestingOpen: boolean;
     ignoreBoards: string[];
     skipHeaderProvider: boolean;
-    defaultBaudRate: number;
     useArduinoCli: boolean;
     disableIntelliSenseAutoGen: boolean;
-    defaultTimestampFormat: string;
     analyzeOnOpen: boolean;
     analyzeOnSettingChange: boolean;
     updateAdditionalUrls(urls: string[]): void;
@@ -119,10 +115,6 @@ export class VscodeSettings implements IVscodeSettings {
         this.setConfigValue(configKeys.IGNORE_BOARDS, value, true);
     }
 
-    public get defaultBaudRate(): number {
-        return this.getConfigValue<number>(configKeys.DEFAULT_BAUD_RATE);
-    }
-
     public get useArduinoCli(): boolean {
         return this.getConfigValue<boolean>(configKeys.USE_ARDUINO_CLI);
     }
@@ -137,10 +129,6 @@ export class VscodeSettings implements IVscodeSettings {
 
     public get disableIntelliSenseAutoGen(): boolean {
         return this.getConfigValue<boolean>(configKeys.DISABLE_INTELLISENSE_AUTO_GEN);
-    }
-
-    public get defaultTimestampFormat(): string {
-        return this.getConfigValue<string>(configKeys.DEFAULT_TIMESTAMP_FORMAT);
     }
 
     public get analyzeOnOpen(): boolean {

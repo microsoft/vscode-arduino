@@ -42,10 +42,8 @@
     "onCommand:arduino.selectProgrammer",
     "onCommand:arduino.selectSerialPort",
     "onCommand:arduino.selectSketch",
-    "onCommand:arduino.changeBaudRate",
-    "onCommand:arduino.changeTimestampFormat",
     "onCommand:arduino.openSerialMonitor",
-    "onCommand:arduino.sendMessageToSerialPort",
+    "onCommand:arduino.changeTimestampFormat",
     "onCommand:arduino.closeSerialMonitor",
     "onCommand:arduino.changeBoardType",
     "onCommand:arduino.showBoardConfig",
@@ -125,16 +123,12 @@
         "title": "Arduino: Select Serial Port"
       },
       {
-        "command": "arduino.changeBaudRate",
-        "title": "Arduino: Change Baud Rate"
+        "command": "arduino.openSerialMonitor",
+        "title": "Arduino: Open Serial Monitor"
       },
       {
         "command": "arduino.changeTimestampFormat",
         "title": "Arduino: Change Timestamp Format"
-      },
-      {
-        "command": "arduino.openSerialMonitor",
-        "title": "Arduino: Open Serial Monitor"
       },
       {
         "command": "arduino.closeSerialMonitor",
@@ -527,19 +521,10 @@
           "type": "boolean",
           "default": false
         },
-        "arduino.defaultBaudRate": {
-          "type": "number",
-          "default": 115200
-        },
         "arduino.disableIntelliSenseAutoGen": {
           "type": "boolean",
           "default": false,
           "description": "When disabled vscode-arduino will not auto-generate an IntelliSense configuration (i.e. c_cpp_properties.json) by analyzing the compiler output."
-        },
-        "arduino.defaultTimestampFormat": {
-          "type": "string",
-          "default": "",
-          "markdownDescription": "Format of timestamp printed before each line of Serial Monitor output. You can find list of all available placeholders [here](https://github.com/samsonjs/strftime#supported-specifiers)."
         },
         "arduino.analyzeOnOpen": {
           "type": "boolean",
@@ -600,7 +585,8 @@
     "test": "gulp test"
   },
   "extensionDependencies": [
-    "ms-vscode.cpptools"
+    "ms-vscode.cpptools",
+    "ms-vscode.vscode-serial-monitor"
   ],
   "devDependencies": {
     "@babel/core": "^7.15.5",
@@ -646,6 +632,7 @@
     "webpack": "^4.44.1"
   },
   "dependencies": {
+    "@microsoft/vscode-serial-monitor-api": "^0.1.5",
     "@vscode/extension-telemetry": "~0.6.2",
     "body-parser": "^1.16.1",
     "cocopa": "0.0.13",
@@ -657,7 +644,6 @@
     "iconv-lite": "^0.4.18",
     "impor": "^0.1.1",
     "properties": "^1.2.1",
-    "serialport": "^10.2.2",
     "strftime": "^0.9.2",
     "usb-detection": "^4.13.0",
     "uuid": "^3.0.1",

@@ -22,11 +22,9 @@ export interface IArduinoSettings {
     defaultLibPath: string;
     sketchbookPath: string;
     preferencePath: string;
-    defaultBaudRate: number;
     preferences: Map<string, string>;
     useArduinoCli: boolean;
     usingBundledArduinoCli: boolean;
-    defaultTimestampFormat: string;
     analyzeOnSettingChange: boolean;
     reloadPreferences(): void;
 }
@@ -40,13 +38,9 @@ export class ArduinoSettings implements IArduinoSettings {
 
     private _sketchbookPath: string;
 
-    private _defaultBaudRate: number;
-
     private _preferences: Map<string, string>;
 
     private _useArduinoCli: boolean;
-
-    private _defaultTimestampFormat: string;
 
     private _usingBundledArduinoCli: boolean = false;
 
@@ -68,8 +62,6 @@ export class ArduinoSettings implements IArduinoSettings {
         this._commandPath = VscodeSettings.getInstance().commandPath;
         this._useArduinoCli = VscodeSettings.getInstance().useArduinoCli;
         await this.tryResolveArduinoPath();
-        await this.tryGetDefaultBaudRate();
-        await this.tryGetDefaultTimestampFormat();
         if (platform === "win32") {
             await this.updateWindowsPath();
             if (this._commandPath === "") {
@@ -181,15 +173,6 @@ export class ArduinoSettings implements IArduinoSettings {
     public get usingBundledArduinoCli() {
         return this._usingBundledArduinoCli;
     }
-
-    public get defaultBaudRate() {
-        return this._defaultBaudRate;
-    }
-
-    public get defaultTimestampFormat() {
-        return this._defaultTimestampFormat;
-    }
-
     public get analyzeOnSettingChange(): boolean {
         return VscodeSettings.getInstance().analyzeOnSettingChange;
     }
@@ -276,25 +259,6 @@ export class ArduinoSettings implements IArduinoSettings {
             }
         } else {
             this._arduinoPath = configValue;
-        }
-    }
-
-    private async tryGetDefaultBaudRate(): Promise<void> {
-        const supportBaudRates = [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000];
-        const configValue = VscodeSettings.getInstance().defaultBaudRate;
-        if (!configValue || supportBaudRates.indexOf(configValue) === -1) {
-            this._defaultBaudRate = 0;
-        } else {
-            this._defaultBaudRate = configValue;
-        }
-    }
-
-    private async tryGetDefaultTimestampFormat(): Promise<void> {
-        const configValue = VscodeSettings.getInstance().defaultTimestampFormat;
-        if (!configValue) {
-            this._defaultTimestampFormat = "";
-        } else {
-            this._defaultTimestampFormat = configValue;
         }
     }
 }
