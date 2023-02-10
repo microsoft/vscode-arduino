@@ -24,10 +24,8 @@ import { ArduinoWorkspace } from "./common/workspace";
 const arduinoDebugConfigurationProviderModule = impor("./debug/configurationProvider") as typeof import ("./debug/configurationProvider");
 import { DeviceContext } from "./deviceContext";
 const completionProviderModule = impor("./langService/completionProvider") as typeof import ("./langService/completionProvider");
-import * as Logger from "./logger/logger";
-const nsatModule =
-    impor("./nsat") as typeof import ("./nsat");
 import { BuildMode } from "./arduino/arduino";
+import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
@@ -76,8 +74,6 @@ export async function activate(context: vscode.ExtensionContext) {
             correlationId: guid,
             duration: timer1.end(),
         });
-
-        nsatModule.NSAT.takeSurvey(context);
     };
 
     async function askSwitchToBundledCli(message: string): Promise<void> {
