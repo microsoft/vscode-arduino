@@ -107,6 +107,10 @@
         "title": "Arduino CLI: Upload Using Programmer"
       },
       {
+        "command": "arduino.cliBurnBootloader",
+        "title": "Arduino CLI: Burn Bootloader"
+      },
+      {
         "command": "arduino.rebuildIntelliSenseConfig",
         "title": "Arduino: Rebuild IntelliSense Configuration"
       },

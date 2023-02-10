@@ -39,6 +39,13 @@ export enum BuildMode {
     CliUpload = "Uploading using Arduino CLI",
     UploadProgrammer = "Uploading (programmer)",
     CliUploadProgrammer = "Uploading (programmer) using Arduino CLI",
+    CliBurnBootloader = "Burning Bootloader using Arduino CLI",
+}
+
+export enum ArduinoState {
+    Idle,
+    Building,
+    BurningBootloader,
 }
 
 /**
@@ -64,10 +71,10 @@ export class ArduinoApp {
     private _analysisManager: AnalysisManager;
 
     /**
-     * Indicates if a build is currently in progress.
-     * If so any call to this.build() will return false immediately.
+     * Indicates if a build or bootloader burn is currently in progress.
+     * If so any call to this.build() or this.burnBootloader() will return false immediately.
      */
-    private _building: boolean = false;
+    private _state: ArduinoState = ArduinoState.Idle;
 
     /**
      * @param {IArduinoSettings} _settings ArduinoSetting object.
@@ -75,7 +82,7 @@ export class ArduinoApp {
     constructor(private _settings: IArduinoSettings) {
         const analysisDelayMs = 1000 * 3;
         this._analysisManager = new AnalysisManager(
-            () => this._building,
+            () => this._state !== ArduinoState.Idle,
             async () => { await this.build(BuildMode.Analyze); },
             analysisDelayMs);
     }
@@ -148,10 +155,10 @@ export class ArduinoApp {
     }
 
     /**
-     * Returns true if a build is currently in progress.
+     * Returns true if a build or bootloader burn is currently in progress.
      */
-    public get building() {
-        return this._building;
+    public get state() {
+        return this._state;
     }
 
     /**
@@ -171,30 +178,54 @@ export class ArduinoApp {
      * @param buildDir Override the build directory set by the project settings
      * with the given directory.
      * @returns true on success, false if
-     *  * another build is currently in progress
+     *  * another build or burn bootloader operation is currently in progress
      *  * board- or programmer-manager aren't initialized yet
      *  * or something went wrong during the build
      */
     public async build(buildMode: BuildMode, buildDir?: string) {
 
-        if (!this._boardManager || !this._programmerManager || this._building) {
+        if (!this._boardManager || !this._programmerManager || this._state !== ArduinoState.Idle) {
             return false;
         }
 
-        this._building = true;
+        this._state = ArduinoState.Building;
 
-        return await this._build(buildMode, buildDir)
-        .then((ret) => {
-            this._building = false;
-            return ret;
-        })
-        .catch((reason) => {
-            this._building = false;
+        try {
+            return await this._build(buildMode, buildDir);
+        } catch (reason) {
             logger.notifyUserError("ArduinoApp.build",
                                    reason,
                                    `Unhandled exception when cleaning up build "${buildMode}": ${JSON.stringify(reason)}`);
             return false;
-        });
+        } finally {
+            this._state = ArduinoState.Idle;
+        }
+    }
+
+    /**
+     * Burns the bootloader onto the currently selected board using the currently
+     * selected programmer.
+     * @returns true on success, false if
+     *  * another build or burn bootloader operation is currently in progress
+     *  * board- or programmer-manager aren't initialized yet
+     *  * something went wrong while burning the bootloader
+     */
+    public async burnBootloader() {
+        if (!this._boardManager || !this.programmerManager || this._state !== ArduinoState.Idle) {
+            return false;
+        }
+
+        this._state = ArduinoState.BurningBootloader;
+        try {
+            return await this._burnBootloader();
+        } catch (reason) {
+            logger.notifyUserError("ArduinoApp.burnBootloader",
+                                   reason,
+                                   `Unhandled exception burning bootloader: ${JSON.stringify(reason)}`);
+            return false;
+        } finally {
+            this._state = ArduinoState.Idle;
+        }
     }
 
     // Include the *.h header files from selected library to the arduino sketch.
@@ -512,8 +543,21 @@ export class ArduinoApp {
     }
 
     /**
+     * Triggers serial selection prompt. Used in build and burnBootloader
+     * processes if no serial port selected already.
+     */
+    private async _selectSerial(): Promise<void> {
+        const choice = await vscode.window.showInformationMessage(
+            "Serial port is not specified. Do you want to select a serial port for uploading?",
+            "Yes", "No");
+        if (choice === "Yes") {
+            vscode.commands.executeCommand("arduino.selectSerialPort");
+        }
+    }
+
+    /**
      * Private implementation. Not to be called directly. The wrapper build()
-     * manages the build state.
+     * manages the busy state.
      * @param buildMode See build()
      * @param buildDir See build()
      * @see https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc
@@ -554,18 +598,9 @@ export class ArduinoApp {
             }
         }
 
-        const selectSerial = async () => {
-            const choice = await vscode.window.showInformationMessage(
-                "Serial port is not specified. Do you want to select a serial port for uploading?",
-                "Yes", "No");
-            if (choice === "Yes") {
-                vscode.commands.executeCommand("arduino.selectSerialPort");
-            }
-        }
-
         if (buildMode === BuildMode.Upload) {
             if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
-                await selectSerial();
+                await this._selectSerial();
                 return false;
             }
 
@@ -580,7 +615,7 @@ export class ArduinoApp {
             }
         } else if (buildMode === BuildMode.CliUpload) {
             if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
-                await selectSerial();
+                await this._selectSerial();
                 return false;
             }
 
@@ -601,7 +636,7 @@ export class ArduinoApp {
                 return false;
             }
             if (!dc.port) {
-                await selectSerial();
+                await this._selectSerial();
                 return false;
             }
 
@@ -623,7 +658,7 @@ export class ArduinoApp {
                 return false;
             }
             if (!dc.port) {
-                await selectSerial();
+                await this._selectSerial();
                 return false;
             }
             if (!this.useArduinoCli()) {
@@ -665,7 +700,7 @@ export class ArduinoApp {
         await vscode.workspace.saveAll(false);
 
         // we prepare the channel here since all following code will
-        // or at leas can possibly output to it
+        // or at least can possibly output to it
         arduinoChannel.show();
         if (VscodeSettings.getInstance().clearOutputOnBuild) {
             arduinoChannel.clear();
@@ -832,6 +867,128 @@ export class ArduinoApp {
                 ? `Exit with code=${reason.code}`
                 : JSON.stringify(reason);
             arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
+            return false;
+        });
+    }
+
+    /**
+     * Private implementation. Not to be called directly. The wrapper burnBootloader()
+     * manages the busy state.
+     * @see https://arduino.github.io/arduino-cli/
+     * @see https://github.com/arduino/Arduino/issues/11765
+     * @remarks Currently this is only supported by `arduino-cli`. A request has been
+     * made with the Arduino repo.
+     */
+    private async _burnBootloader(): Promise<boolean> {
+        const dc = DeviceContext.getInstance();
+        const args: string[] = [];
+        let restoreSerialMonitor: boolean = false;
+        const verbose = VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose;
+
+        if (!this.boardManager.currentBoard) {
+            logger.notifyUserError("boardManager.currentBoard", new Error(constants.messages.NO_BOARD_SELECTED));
+            return false;
+        }
+        const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
+
+        if (this.useArduinoCli()) {
+            args.push("burn-bootloader",
+                "-b", boardDescriptor);
+        } else {
+            arduinoChannel.error("This command is only available when using the Arduino CLI");
+            return false;
+        }
+
+        if (!dc.port) {
+            await this._selectSerial();
+            return false;
+        }
+        args.push("--port", dc.port);
+
+        const programmer = this.programmerManager.currentProgrammer;
+        if (!programmer) {
+            logger.notifyUserError("programmerManager.currentProgrammer", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
+            return false;
+        }
+        args.push("--programmer", programmer);
+
+        // We always build verbosely but filter the output based on the settings
+        args.push("--verbose");
+
+        if (dc.buildPreferences) {
+            for (const pref of dc.buildPreferences) {
+                // Note: BuildPrefSetting makes sure that each preference
+                // value consists of exactly two items (key and value).
+                args.push("--build-property", `${pref[0]}=${pref[1]}`);
+            }
+        }
+
+        // we prepare the channel here since all following code will
+        // or at least can possibly output to it
+        arduinoChannel.show();
+        if (VscodeSettings.getInstance().clearOutputOnBuild) {
+            arduinoChannel.clear();
+        }
+        arduinoChannel.start(`Burning booloader for ${boardDescriptor} using programmer ${programmer}'`);
+
+        restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
+        UsbDetector.getInstance().pauseListening();
+
+        const cleanup = async () => {
+            UsbDetector.getInstance().resumeListening();
+            if (restoreSerialMonitor) {
+                await SerialMonitor.getInstance().openSerialMonitor();
+            }
+        }
+
+        const stdoutcb = (line: string) => {
+            if (verbose) {
+                arduinoChannel.channel.append(line);
+            }
+        }
+
+        const stderrcb = (line: string) => {
+            if (os.platform() === "win32") {
+                line = line.trim();
+                if (line.length <= 0) {
+                    return;
+                }
+                line = line.replace(/(?:\r|\r\n|\n)+/g, os.EOL);
+                line = `${line}${os.EOL}`;
+            }
+            if (!verbose) {
+                // Don't spill log with spurious info from the backend. This
+                // list could be fetched from a config file to accommodate
+                // messages of unknown board packages, newer backend revisions
+                const filters = [
+                    /^Picked\sup\sJAVA_TOOL_OPTIONS:\s+/,
+                    /^\d+\d+-\d+-\d+T\d+:\d+:\d+.\d+Z\s(?:INFO|WARN)\s/,
+                    /^(?:DEBUG|TRACE|INFO)\s+/,
+                ];
+                for (const f of filters) {
+                    if (line.match(f)) {
+                        return;
+                    }
+                }
+            }
+            arduinoChannel.channel.append(line);
+        }
+
+        return await util.spawn(
+            this._settings.commandPath,
+            args,
+            { cwd: ArduinoWorkspace.rootPath },
+            { /*channel: arduinoChannel.channel,*/ stdout: stdoutcb, stderr: stderrcb },
+        ).then(async () => {
+            await cleanup();
+            arduinoChannel.end(`Burning booloader for ${boardDescriptor} using programmer ${programmer}'`);
+            return true;
+        }, async (reason) => {
+            await cleanup();
+            const msg = reason.code
+                ? `Exit with code=${reason.code}`
+                : JSON.stringify(reason);
+            arduinoChannel.error(`Burning booloader for ${boardDescriptor} using programmer ${programmer}': ${msg}${os.EOL}`);
             return false;
         });
     }

@@ -56,6 +56,7 @@ suite("Arduino: Extension Tests", () => {
                     "arduino.selectSketch",
                     "arduino.cliUpload",
                     "arduino.cliUploadUsingProgrammer",
+                    "arduino.cliBurnBootloader",
                 ];
 
                 const foundArduinoCommands = commands.filter((value) => {

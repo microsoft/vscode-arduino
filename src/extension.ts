@@ -27,7 +27,7 @@ const completionProviderModule = impor("./langService/completionProvider") as ty
 import * as Logger from "./logger/logger";
 const nsatModule =
     impor("./nsat") as typeof import ("./nsat");
-import { BuildMode } from "./arduino/arduino";
+import { ArduinoState, BuildMode } from "./arduino/arduino";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
@@ -157,7 +157,7 @@ export async function activate(context: vscode.ExtensionContext) {
     registerArduinoCommand("arduino.initialize", async () => await deviceContext.initialize());
 
     registerArduinoCommand("arduino.verify", async () => {
-        if (!arduinoContextModule.default.arduinoApp.building) {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Verifying...",
@@ -173,7 +173,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.upload", async () => {
-        if (!arduinoContextModule.default.arduinoApp.building) {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Uploading...",
@@ -186,7 +186,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.cliUpload", async () => {
-        if (!arduinoContextModule.default.arduinoApp.building) {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Using CLI to upload...",
@@ -236,7 +236,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.uploadUsingProgrammer", async () => {
-        if (!arduinoContextModule.default.arduinoApp.building) {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Uploading (programmer)...",
@@ -249,7 +249,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
     registerArduinoCommand("arduino.cliUploadUsingProgrammer", async () => {
-        if (!arduinoContextModule.default.arduinoApp.building) {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Using CLI to upload (programmer)...",
@@ -261,8 +261,21 @@ export async function activate(context: vscode.ExtensionContext) {
         return { board: arduinoContextModule.default.boardManager.currentBoard.name };
     });
 
+    registerArduinoCommand("arduino.cliBurnBootloader", async () => {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Arduino: Using CLI to burn bootloader...",
+            }, async () => {
+                await arduinoContextModule.default.arduinoApp.burnBootloader();
+            });
+        }
+    }, () => {
+        return { board: arduinoContextModule.default.boardManager.currentBoard.name }
+    });
+
     registerArduinoCommand("arduino.rebuildIntelliSenseConfig", async () => {
-        if (!arduinoContextModule.default.arduinoApp.building) {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: "Arduino: Rebuilding IS Configuration...",
@@ -280,7 +293,7 @@ export async function activate(context: vscode.ExtensionContext) {
         // it seems not to be possible to trigger building while setting
         // the programmer. If the timed IntelliSense analysis is triggered
         // this is not a problem, since it doesn't use the programmer.
-        if (!arduinoContextModule.default.arduinoApp.building) {
+        if (arduinoContextModule.default.arduinoApp.state === ArduinoState.Idle) {
             try {
                 await arduinoContextModule.default.arduinoApp.programmerManager.selectProgrammer();
             } catch (ex) {
