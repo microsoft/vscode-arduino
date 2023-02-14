@@ -656,7 +656,7 @@ export class ArduinoApp {
 
         // We always build verbosely but filter the output based on the settings
 
-        this._settings.useArduinoCli ? args.push("--verbose") : args.push("--verbose-build");
+        this._settings.useArduinoCli ? args.push("--verbose", "--no-color") : args.push("--verbose-build");
 
         if (verbose && !this._settings.useArduinoCli) {
             args.push("--verbose-upload");
@@ -757,16 +757,17 @@ export class ArduinoApp {
         const wrapLineCallback = (callback: (line: string) => void) => {
             let buffer = "";
             let startIndex = 0;
+            const eol = this.useArduinoCli() ? "\n" : os.EOL;
             return (data: string) => {
                 buffer += data;
                 while (true) {
-                    const pos = buffer.indexOf(os.EOL, startIndex);
+                    const pos = buffer.indexOf(eol, startIndex);
                     if (pos < 0) {
                         startIndex = buffer.length;
                         break;
                     }
-                    const line = buffer.substring(0, pos + os.EOL.length);
-                    buffer = buffer.substring(pos + os.EOL.length);
+                    const line = buffer.substring(0, pos + eol.length);
+                    buffer = buffer.substring(pos + eol.length);
                     startIndex = 0;
                     callback(line);
                 }
