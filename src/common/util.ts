@@ -246,7 +246,11 @@ export function spawn(
         }
 
         child.on("error", (error) => reject({ error }));
-        child.on("exit", (code) => {
+
+        // It's important to use use the "close" event instead of "exit" here.
+        // There could still be buffered data in stdout or stderr when the
+        // process exits that we haven't received yet.
+        child.on("close", (code) => {
             if (code === 0) {
                 resolve({ code });
             } else {
