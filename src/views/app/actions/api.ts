@@ -43,6 +43,12 @@ export function openSettings(query) {
     }).then((response) => response.json());
 }
 
+export function runCommand(command) {
+    return postHTTP("/api/runcommand", {
+        command,
+    }).then((response) => response.json());
+}
+
 export function getLibraries(update) {
     return window.fetch(`/api/libraries?update=${update}`).then((response) => response.json());
 }

@@ -41,6 +41,7 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
         this.addHandlerWithLogger("load-configitems", "/api/configitems", async (req, res) => await this.getBoardConfig(req, res));
         this.addHandlerWithLogger("update-selectedboard", "/api/updateselectedboard", (req, res) => this.updateSelectedBoard(req, res), true);
         this.addHandlerWithLogger("update-config", "/api/updateconfig", async (req, res) => await this.updateConfig(req, res), true);
+        this.addHandlerWithLogger("run-command", "/api/runcommand", (req, res) => this.runCommand(req, res), true);
 
         // Arduino Examples TreeView
         this.addHandlerWithLogger("show-examplesview", "/examples", (req, res) => this.getHtmlView(req, res));
@@ -166,6 +167,21 @@ export class ArduinoContentProvider implements vscode.TextDocumentContentProvide
                 });
             } catch (error) {
                 return res.status(500).send(`Cannot open the setting with error message "${error}"`);
+            }
+        }
+    }
+
+    public async runCommand(req, res) {
+        if (!req.body.command) {
+            return res.status(400).send("BAD Request! Missing { command } parameter!");
+        } else {
+            try {
+                await vscode.commands.executeCommand(req.body.command);
+                return res.json({
+                    status: "OK",
+                });
+            } catch (error) {
+                return res.status(500).send(`Cannot run command with error message "${error}"`);
             }
         }
     }
