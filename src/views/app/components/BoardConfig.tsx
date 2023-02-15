@@ -5,6 +5,7 @@ import * as React from "react";
 import { Grid, Row } from "react-bootstrap";
 import { connect } from "react-redux";
 import * as actions from "../actions";
+import * as API from "../actions/api";
 import BoardConfigItemView from "./BoardConfigItemView";
 import BoardSelector from "./BoardSelector";
 
@@ -41,20 +42,31 @@ class BoardConfig extends React.Component<IBoardConfigProps, React.Props<any>> {
     }
 
     public render() {
-        return (<div className="boardConfig">
-            <Grid fluid>
-                <Row key="board-selector">
-                    <BoardSelector installedBoards={this.props.installedBoards} loadConfigItems={this.props.loadConfigItems} />
-                </Row>
-                {
-                    this.props.configitems.map((configitem, index) => {
-                        return (<Row key={configitem.id}>
-                            <BoardConfigItemView configitem={configitem} />
-                        </Row>);
-                    })
-                }
-            </Grid>
-        </div>);
+        let installWarning;
+        if (this.props.installedBoards.length === 0) {
+            installWarning = (<div className="theme-bgcolor arduinomanager-toolbar">
+                No boards are installed. <a className="help-link"
+                    onClick={() => API.runCommand("arduino.showBoardManager")}>Install a board with the Boards Manager.</a>
+            </div>);
+        }
+        return (
+            <div>
+                {installWarning}
+                <div className="boardConfig">
+                    <Grid fluid>
+                        <Row key="board-selector">
+                            <BoardSelector installedBoards={this.props.installedBoards} loadConfigItems={this.props.loadConfigItems} />
+                        </Row>
+                        {
+                            this.props.configitems.map((configitem, index) => {
+                                return (<Row key={configitem.id}>
+                                    <BoardConfigItemView configitem={configitem} />
+                                </Row>);
+                            })
+                        }
+                    </Grid>
+                </div>
+            </div>);
     }
 }
 
