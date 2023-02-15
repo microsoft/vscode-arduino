@@ -1,6 +1,27 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.5.0
+
+- Release date: February 16, 2023
+
+**Support for the legacy Arduino IDE will be removed in the next release of this extension.** Please start using the Arduino CLI as soon as possible.
+
+### Added
+
+- [Arduino CLI](https://arduino.github.io/arduino-cli/0.30/) version 0.30.0 is now bundled with the extension [#1584](https://github.com/microsoft/vscode-arduino/pull/1584). To use the bundled version of Arduino CLI, `arduino.useArduinoCli` should be `true`, and `arduino.path` and `arduino.commandPath` should be empty or unset. Additionally, prompts will appear to switch to the bundled version whenever the legacy Arduino IDE is used or manually specified Arduino tools cannot be found.
+
+### Changed
+
+- The extension's built-in serial monitor has been removed and replaced by a dependency on the [Serial Monitor extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-serial-monitor) [#1577](https://github.com/microsoft/vscode-arduino/pull/1577). There are a few breaking changes as a result of this change:
+  - `arduino.defaultBaudRate` and `arduino.defaultTimestampFormat` have been removed. Equivalent functionality is available through the `vscode-serial-monitor.customBaudRates` and `vscode-serial-monitor.timestampFormat` settings.
+  - The "Change Baud Rate" command has been removed. Equivalent functionality is available in the Serial Monitor UI or via the Serial Monitor extension API.
+- Survey prompts have been removed. [#1588](https://github.com/microsoft/vscode-arduino/pull/1588)
+
+### Fixed
+
+- The IntelliSense configuration step can now correctly parse Arduino CLI output [#1591](https://github.com/microsoft/vscode-arduino/pull/1591).
+
 ## Version 0.4.13
 
 - Release date: January 24, 2023
