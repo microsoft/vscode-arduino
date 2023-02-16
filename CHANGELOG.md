@@ -10,7 +10,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - [Arduino CLI](https://arduino.github.io/arduino-cli/0.30/) version 0.30.0 is now bundled with the extension [#1584](https://github.com/microsoft/vscode-arduino/pull/1584). To use the bundled version of Arduino CLI, `arduino.useArduinoCli` should be `true`, and `arduino.path` and `arduino.commandPath` should be empty or unset. Additionally, prompts will appear to switch to the bundled version whenever the legacy Arduino IDE is used or manually specified Arduino tools cannot be found.
-- A warning will appear in the Board Configuration view when no boards are installed. This warning links to the Board Manager view to install boards. [#1592](https://github.com/microsoft/vscode-arduino/pull/1584)
+- A warning will appear in the Board Configuration view when no boards are installed. This warning links to the Board Manager view to install boards. [#1592](https://github.com/microsoft/vscode-arduino/pull/1592)
+- A warning will appear in the Arduino Examples view when no examples are installed. [#1594](https://github.com/microsoft/vscode-arduino/pull/1594)
 
 ### Changed
 

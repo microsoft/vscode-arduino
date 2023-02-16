@@ -15,7 +15,7 @@ export class ExampleProvider implements vscode.TreeDataProvider<ExampleItem> {
     // tslint:disable-next-line:member-ordering
     public readonly onDidChangeTreeData: vscode.Event<null> = this._onDidChangeTreeData.event;
 
-    private _exmaples: IExampleNode[] = null;
+    private _examples: IExampleNode[] = null;
 
     constructor(private _exampleManager: ExampleManager, private _boardManager: BoardManager) {
         this._boardManager.onBoardTypeChanged(() => {
@@ -28,23 +28,31 @@ export class ExampleProvider implements vscode.TreeDataProvider<ExampleItem> {
     }
 
     public getChildren(element?: ExampleItem): ExampleItem[] {
-        if (!this._exmaples) {
+        if (!this._examples) {
             this.loadData();
             return null;
         }
         if (!element) {
-            return this.createExampleItemList(this._exmaples);
+            return this.createExampleItemList(this._examples);
         } else {
             return this.createExampleItemList(element.getChildren());
         }
     }
 
     private loadData() {
-        this._exmaples = null;
+        this._examples = null;
         this._exampleManager.loadExamples().then((examples) => {
-            this._exmaples = examples;
+            this._examples = examples;
+            if (!this.hasAnyExamples(this._examples)) {
+                // Reset the examples list to get the welcome message (defined in package.json) to appear.
+                this._examples = [];
+            }
             this._onDidChangeTreeData.fire(null);
         });
+    }
+
+    private hasAnyExamples(nodes?: IExampleNode[]): boolean {
+        return nodes && (nodes.find((node) => node.isLeaf || this.hasAnyExamples(node.children)) !== undefined);
     }
 
     private createExampleItemList(examples: IExampleNode[]): ExampleItem[] {

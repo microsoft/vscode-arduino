@@ -182,6 +182,12 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "arduinoExampleExplorer",
+        "contents": "No examples are installed. [Find additional examples online.](https://go.microsoft.com/fwlink/?linkid=2225276)"
+      }
+    ],
     "debuggers": [
       {
         "type": "arduino",
