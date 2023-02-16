@@ -147,7 +147,6 @@ export class SerialMonitor implements vscode.Disposable {
             if (err.message) {
                 vscode.window.showErrorMessage(`Error opening serial port: ${err.message}`);
             }
-            
         }
     }
 
