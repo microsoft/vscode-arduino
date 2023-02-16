@@ -7,6 +7,9 @@ import { connect } from "react-redux";
 import * as actions from "../actions";
 import * as API from "../actions/api";
 
+// TODO: I'm pretty sure this entire view is unused and can be removed.
+// See exampleProvider.ts which instead uses the built-in VS Code Tree View API.
+
 interface IExampleViewProps extends React.Props<any> {
     examples: any[];
     loadExamples: () => void;

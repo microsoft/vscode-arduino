@@ -43,8 +43,16 @@ export class ExampleProvider implements vscode.TreeDataProvider<ExampleItem> {
         this._exmaples = null;
         this._exampleManager.loadExamples().then((examples) => {
             this._exmaples = examples;
+            if (!this.hasAnyExamples(this._exmaples)) {
+                // Reset the examples list to get the welcome message (defined in package.json) to appear.
+                this._exmaples = [];
+            }
             this._onDidChangeTreeData.fire(null);
         });
+    }
+
+    private hasAnyExamples(nodes?: IExampleNode[]): boolean {
+        return nodes && (nodes.find((node) => node.isLeaf || this.hasAnyExamples(node.children)) !== undefined);
     }
 
     private createExampleItemList(examples: IExampleNode[]): ExampleItem[] {
