@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { chmod } from "fs/promises";
+import { constants as fsconstants, promises as fs } from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as WinReg from "winreg";
 import * as util from "../common/util";
 
+import { messages } from "../common/constants";
 import { resolveArduinoPath } from "../common/platform";
 
 import * as Logger from "../logger/logger";
@@ -248,7 +249,26 @@ export class ArduinoSettings implements IArduinoSettings {
             if (bundledPath && this._useArduinoCli && !this._commandPath) {
                 // The extension VSIX stripped the executable bit, so we need to set it.
                 // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
-                await chmod(bundledPath, 0o755);
+                // There have been reports of the executable bit already being set on M1
+                // Macs, but this call failing, so first check to see if the file is
+                // already executable.
+                // https://github.com/microsoft/vscode-arduino/issues/1599
+                let isExecutable = false;
+                try {
+                    await fs.access(bundledPath, fsconstants.X_OK);
+                    isExecutable = true;
+                } catch {
+                    // Nothing to do. isExecutable is already false.
+                }
+
+                if (!isExecutable) {
+                    try {
+                        await fs.chmod(bundledPath, 0o755);
+                    } catch (e) {
+                        Logger.notifyUserError("arduino-cli-not-executable", e, messages.ARDUINO_CLI_NOT_EXECUTABLE + " " + bundledPath);
+                    }
+                }
+
                 this._usingBundledArduinoCli = true;
                 Logger.traceUserData("using-bundled-arduino-cli");
                 this._arduinoPath = path.dirname(bundledPath);
