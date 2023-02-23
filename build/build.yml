@@ -24,11 +24,11 @@ jobs:
 
       # Run these scanners first so that they don't detect issues in dependencies.
       # Failures won't break the build until "Check for compliance errors" step.
-      - task: CredScan@2
+      - task: CredScan@3
         displayName: Run CredScan
         inputs:
           toolMajorVersion: V2
-      - task: PoliCheck@1
+      - task: PoliCheck@2
         displayName: Run PoliCheck
         inputs:
           targetType: F
@@ -131,7 +131,7 @@ jobs:
       - script: npm test --silent
         displayName: Run tests
 
-      - task: PostAnalysis@1
+      - task: PostAnalysis@2
         displayName: Check for compliance errors
         # To avoid spirious warnings about missing logs, explicitly declare what we scanned.
         inputs:
@@ -140,7 +140,7 @@ jobs:
 
       # Trust Services Automation (TSA) can automatically open bugs for compliance issues.
       # https://www.1eswiki.com/wiki/Trust_Services_Automation_(TSA)
-      - task: TSAUpload@1
+      - task: TSAUpload@2
         displayName: Upload logs to TSA
         inputs:
           tsaVersion: TsaV2
