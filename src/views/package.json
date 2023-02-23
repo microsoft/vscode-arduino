@@ -34,7 +34,7 @@
     "style-loader": "^0.13.1",
     "svg-url-loader": "^2.0.2",
     "ts-loader": "^4.5.0",
-    "webpack": "^4.44.1"
+    "webpack": "^5.75.0"
   },
   "dependencies": {},
   "overrides": {
