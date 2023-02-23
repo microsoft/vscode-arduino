@@ -15,8 +15,7 @@ schedules:
         - main
 
 variables:
-  # TODO: change this to real sign after getting signing approval.
-  SignType: test
+  SignType: real
 
 jobs:
   - template: ./build.yml
