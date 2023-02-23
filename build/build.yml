@@ -143,23 +143,8 @@ jobs:
       - task: TSAUpload@2
         displayName: Upload logs to TSA
         inputs:
-          tsaVersion: TsaV2
-          codebase: NewOrUpdate
-          codeBaseName: vscode-arduino
-          notificationAlias: embeddeddev@microsoft.com
-          instanceUrlForTsaV2: DEVDIV
-          projectNameDEVDIV: DevDiv
-          areaPath: DevDiv\Cpp Developer Experience\Cross Platform\Embedded
-          iterationPath: DevDiv
-          # To avoid spurious warnings about missing logs, explicitly declare what we don't upload.
-          uploadAPIScan: false
-          uploadBinSkim: false
-          uploadFortifySCA: false
-          uploadFxCop: false
-          uploadModernCop: false
-          uploadPREfast: false
-          uploadRoslyn: false
-          uploadTSLint: false
+          GdnPublishTsaOnboard: true
+          GdnPublishTsaConfigFile: $(Build.SourcesDirectory)\build\tsa.gdntsa
         # Don't open bugs for PR builds
         condition: ne(variables['Build.Reason'], 'PullRequest')
 
