@@ -1,0 +1,43 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# This will become the patch digit on the extension version. To avoid potential
+# issues, it uses a two digit year to keep the entire number well under 2^31-1.
+name: $(Date:yyMMdd)$(Rev:rrr)
+
+trigger: none
+pr: none
+schedules:
+  - cron: "0 2 * * *"
+    displayName: Daily 2 AM
+    branches:
+      include:
+        - main
+
+variables:
+  # TODO: change this to real sign after getting signing approval.
+  SignType: test
+
+jobs:
+  - template: ./build.yml
+    parameters:
+      prerelease: true
+  - job: PublishExtensions
+    displayName: Publish extensions
+    dependsOn: Build
+    pool:
+      name: "AzurePipelines-EO"
+    steps:
+      - checkout: none
+      - download: current
+        artifact: extension-vsixes
+      - task: NodeTool@0
+        displayName: Use Node 16.x
+        inputs:
+          versionSpec: 16.x
+      - script: npm install --global @vscode/vsce
+        displayName: Install vsce
+      - script: for f in $(Pipeline.Workspace)/extension-vsixes/*.vsix; do vsce publish --packagePath $f; done
+        displayName: Publish vscode-arduino
+        env:
+          VSCE_PAT: $(vscePat)
