@@ -1,32 +1,32 @@
 {
-  "version": "0.30.0",
+  "version": "0.31.0",
   "assets": {
-    "arduino-cli_0.30.0_Linux_64bit.tar.gz": {
-      "hash": "f6b1cddf3459b1b6ca9dafe36315c2fa1f6f77386ab3795bbad6a117cbe4230b",
+    "arduino-cli_0.31.0_Linux_64bit.tar.gz": {
+      "hash": "9659820fd6b1078e006b674f5865134363378f1f7a37400b67e26f44fd95722d",
       "platforms": ["linux-x64"]
     },
-    "arduino-cli_0.30.0_Linux_ARM64.tar.gz": {
-      "hash": "20d2d036a5af4586b5a046f65d926ed012f7fd85469b484a5fc57ef9ef72fb4b",
+    "arduino-cli_0.31.0_Linux_ARM64.tar.gz": {
+      "hash": "7424766d20eb6bbcf7e1fc6359c41d8a7ea00b6334a1042639f74feb332a78d8",
       "platforms": ["linux-arm64"]
     },
-    "arduino-cli_0.30.0_Linux_ARMv7.tar.gz": {
-      "hash": "1d873f3cb2b939b2df5a7d25e998bded9a4f0c8ac1226d1d5f9abc2bd95a66c3",
+    "arduino-cli_0.31.0_Linux_ARMv7.tar.gz": {
+      "hash": "bef464b6c6c445b766a00d39bcd8507a2fd66a880d9878b7bbbed479a0f3f8c5",
       "platforms": ["linux-armhf"]
     },
-    "arduino-cli_0.30.0_macOS_64bit.tar.gz": {
-      "hash": "ece83e0bd15813e728d07ce584388a278d62e54529deb84ad07d1521bfe74748",
+    "arduino-cli_0.31.0_macOS_64bit.tar.gz": {
+      "hash": "bd968c364212f99795930c1129cec019a39de6bf5a8ed337b5e9ba2c40f2678b",
       "platforms": ["darwin-x64"]
     },
-    "arduino-cli_0.30.0_macOS_ARM64.tar.gz": {
-      "hash": "e6c1a35df995ecb464ffa85fe8a96b82bd06135ea5ae961cb34d9c9e99e6c2fa",
+    "arduino-cli_0.31.0_macOS_ARM64.tar.gz": {
+      "hash": "fff28ea8e1475bac2c24f65611e8116b22fb5206f283fdaa4a6c6ff9927c5ee6",
       "platforms": ["darwin-arm64"]
     },
-    "arduino-cli_0.30.0_Windows_32bit.zip": {
-      "hash": "cccd4b90524581783cf78a3e4942a5c6bf7508a2a5ec4e008bb9c43f1cdb5dbe",
+    "arduino-cli_0.31.0_Windows_32bit.zip": {
+      "hash": "be98351586bf07ea61ab3bf497d4b01616fc74d2e12b9922e09d7cf574622bd6",
       "platforms": ["win32-ia32"]
     },
-    "arduino-cli_0.30.0_Windows_64bit.zip": {
-      "hash": "1808d288382f16594ad73f4797303058b2074b1b375fbb19fca0978033a633af",
+    "arduino-cli_0.31.0_Windows_64bit.zip": {
+      "hash": "dfafc6f793b4b7906df4ea5fb9cd6a92bbc367b6ee30ce82bc5ec492bf4bc7d4",
       "platforms": ["win32-x64"]
     }
   }

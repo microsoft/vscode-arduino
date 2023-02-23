@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Release date: TBD
+
+### Changed
+
+- The bundled version of the Arduino CLI was updated to [version 0.31.0](https://github.com/arduino/arduino-cli/releases/tag/0.31.0). [#1606](https://github.com/microsoft/vscode-arduino/pull/1606)
+
+### Fixed
+
+- When using the bundled Arduino CLI, the extension will no longer attempt to make the CLI executable if it is already executable. Additionally, any errors that occur while attempting to make the CLI executable are shown in a notification. [#1601](https://github.com/microsoft/vscode-arduino/pull/1601)
+
 ## Version 0.5.0
 
 - Release date: February 16, 2023
