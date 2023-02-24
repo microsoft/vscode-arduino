@@ -21,7 +21,6 @@ import {
 import { validateArduinoPath } from "./common/platform";
 import * as util from "./common/util";
 import { ArduinoWorkspace } from "./common/workspace";
-const arduinoDebugConfigurationProviderModule = impor("./debug/configurationProvider") as typeof import ("./debug/configurationProvider");
 import { DeviceContext } from "./deviceContext";
 const completionProviderModule = impor("./langService/completionProvider") as typeof import ("./langService/completionProvider");
 import { BuildMode } from "./arduino/arduino";
@@ -326,8 +325,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const completionProvider = new completionProviderModule.CompletionProvider();
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(ARDUINO_MODE, completionProvider, "<", '"', "."));
-    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("arduino", new
-        arduinoDebugConfigurationProviderModule.ArduinoDebugConfigurationProvider()));
 
     if (ArduinoWorkspace.rootPath && (
         util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, ARDUINO_CONFIG_FILE))

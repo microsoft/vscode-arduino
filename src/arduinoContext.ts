@@ -3,8 +3,6 @@
 
 import { ArduinoApp } from "./arduino/arduino";
 import { BoardManager } from "./arduino/boardManager";
-import { DebuggerManager } from "./debug/debuggerManager";
-import { DeviceContext } from "./deviceContext";
 
 class ArduinoContext {
     public get initialized(): boolean {
@@ -29,23 +27,11 @@ class ArduinoContext {
         this._boardManager = value;
     }
 
-    public get debuggerManager(): DebuggerManager {
-        if (this._debuggerManager === null) {
-            this._debuggerManager = new DebuggerManager(
-                DeviceContext.getInstance().extensionPath,
-                this.arduinoApp.settings,
-                this.boardManager);
-            this._debuggerManager.initialize();
-        }
-        return this._debuggerManager;
-    }
-
     // TODO EW: You don't have to initialize members to null
     //  if they don't get a default value or aren't initialized
     //  within a constructor they are "undefined" by default.
     //  This makes comparing against null (above) superfluous.
     private _arduinoApp: ArduinoApp = null;
-    private _debuggerManager: DebuggerManager = null;
     private _boardManager: BoardManager = null;
 }
 

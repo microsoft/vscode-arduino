@@ -137,7 +137,6 @@ export class DeviceSettings {
     public board = new StrSetting();
     public sketch = new StrSetting();
     public output = new StrSetting();
-    public debugger = new StrSetting();
     public intelliSenseGen = new StrSetting();
     public configuration = new StrSetting();
     public prebuild = new StrSetting();
@@ -154,7 +153,6 @@ export class DeviceSettings {
                this.board.modified ||
                this.sketch.modified ||
                this.output.modified ||
-               this.debugger.modified ||
                this.intelliSenseGen.modified ||
                this.configuration.modified ||
                this.prebuild.modified ||
@@ -170,7 +168,6 @@ export class DeviceSettings {
         this.board.commit();
         this.sketch.commit();
         this.output.commit();
-        this.debugger.commit();
         this.intelliSenseGen.commit();
         this.configuration.commit();
         this.prebuild.commit();
@@ -188,7 +185,6 @@ export class DeviceSettings {
         this.board.reset();
         this.sketch.reset();
         this.output.reset();
-        this.debugger.reset();
         this.intelliSenseGen.reset();
         this.configuration.reset();
         this.prebuild.reset();
@@ -215,7 +211,6 @@ export class DeviceSettings {
             this.sketch.value = settings.sketch;
             this.configuration.value = settings.configuration;
             this.output.value = settings.output;
-            this.debugger.value = settings.debugger;
             this.intelliSenseGen.value = settings.intelliSenseGen;
             this.prebuild.value = settings.prebuild;
             this.postbuild.value = settings.postbuild;
@@ -261,7 +256,6 @@ export class DeviceSettings {
         settings.port = this.port.value;
         settings.board = this.board.value;
         settings.output = this.output.value;
-        settings.debugger = this.debugger.value;
         settings.intelliSenseGen = this.intelliSenseGen.value;
         settings.configuration = this.configuration.value;
         settings.programmer = this.programmer.value;

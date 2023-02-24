@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - The bundled version of the Arduino CLI was updated to [version 0.31.0](https://github.com/arduino/arduino-cli/releases/tag/0.31.0). [#1606](https://github.com/microsoft/vscode-arduino/pull/1606)
+- All functionality related to the `arduino` debug type was removed from the extension. The built-in debugging support was rarely used and not actively maintained. [#1610](https://github.com/microsoft/vscode-arduino/pull/1610)
 
 ### Fixed
 
