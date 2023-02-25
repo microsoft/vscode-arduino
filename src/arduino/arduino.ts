@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as child_process from 'child_process';
 import * as fs from "fs";
 import * as glob from "glob";
 import * as os from "os";
@@ -127,6 +128,17 @@ export class ArduinoApp {
             } catch (ex) {
             }
         }
+    }
+
+    public getAdditionalUrls(): string[] {
+        // For better compatibility, merge urls both in user settings and arduino IDE preferences.
+        const settingsUrls = VscodeSettings.getInstance().additionalUrls;
+        let preferencesUrls = [];
+        const preferences = this._settings.preferences;
+        if (preferences && preferences.has("boardsmanager.additional.urls")) {
+            preferencesUrls = util.toStringArray(preferences.get("boardsmanager.additional.urls"));
+        }
+        return util.union(settingsUrls, preferencesUrls);
     }
 
     /**
@@ -259,10 +271,17 @@ export class ArduinoApp {
         arduinoChannel.info(`${packageName}${arch && ":" + arch}${version && ":" + version}`);
         try {
             if (this.useArduinoCli()) {
-                await util.spawn(this._settings.commandPath,
-                    ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`],
-                    undefined,
-                    { channel: showOutput ? arduinoChannel.channel : null });
+                if (updatingIndex) {
+                    await this.spawnCli(
+                        ["core", "update-index"],
+                        undefined,
+                        { channel: showOutput ? arduinoChannel.channel : null });
+                } else {
+                    await this.spawnCli(
+                        ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`],
+                        undefined,
+                        { channel: showOutput ? arduinoChannel.channel : null });
+                }
             } else {
                 await util.spawn(this._settings.commandPath,
                     ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`],
@@ -311,10 +330,17 @@ export class ArduinoApp {
         }
         try {
             if (this.useArduinoCli()) {
-                await  util.spawn(this._settings.commandPath,
-                    ["lib", "install", `${libName}${version && "@" + version}`],
-                    undefined,
-                    { channel: showOutput ? arduinoChannel.channel : undefined });
+                if (updatingIndex) {
+                    this.spawnCli(
+                        ["lib", "update-index"],
+                        undefined,
+                        { channel: showOutput ? arduinoChannel.channel : undefined });
+                } else {
+                    await this.spawnCli(
+                        ["lib", "install", `${libName}${version && "@" + version}`],
+                        undefined,
+                        { channel: showOutput ? arduinoChannel.channel : undefined });
+                }
             } else {
                 await util.spawn(this._settings.commandPath,
                     ["--install-library", `${libName}${version && ":" + version}`],
@@ -816,7 +842,12 @@ export class ArduinoApp {
             arduinoChannel.channel.append(line);
         });
 
-        return await util.spawn(
+        const run = (...args: any[]) =>
+            this.useArduinoCli() ?
+            this.spawnCli(...(args.slice(1))) :
+            util.spawn.apply(undefined, args);
+
+        return await run(
             this._settings.commandPath,
             args,
             { cwd: ArduinoWorkspace.rootPath },
@@ -835,5 +866,20 @@ export class ArduinoApp {
             arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
             return false;
         });
+    }
+
+    private spawnCli(
+        args: string[] = [],
+        options: child_process.SpawnOptions = {},
+        output?: {channel?: vscode.OutputChannel,
+                  stdout?: (s: string) => void,
+                  stderr?: (s: string) => void},
+    ): Thenable<object> {
+        const additionalUrls = this.getAdditionalUrls();
+        return util.spawn(
+            this._settings.commandPath,
+            args.concat(['--additional-urls', additionalUrls.join(',')]),
+            options,
+            output);
     }
 }
