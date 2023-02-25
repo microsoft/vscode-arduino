@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as child_process from 'child_process';
+import * as child_process from "child_process";
 import * as fs from "fs";
 import * as glob from "glob";
 import * as os from "os";
@@ -878,7 +878,7 @@ export class ArduinoApp {
         const additionalUrls = this.getAdditionalUrls();
         return util.spawn(
             this._settings.commandPath,
-            args.concat(['--additional-urls', additionalUrls.join(',')]),
+            args.concat(["--additional-urls", additionalUrls.join(",")]),
             options,
             output);
     }
