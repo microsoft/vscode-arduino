@@ -47,7 +47,7 @@ export class BoardManager {
         this._platforms = [];
         this._installedPlatforms = [];
 
-        const additionalUrls = this.getAdditionalUrls();
+        const additionalUrls = this._arduinoApp.getAdditionalUrls();
         if (update) { // Update index files.
             await this.setPreferenceUrls(additionalUrls);
             await this._arduinoApp.initialize(true);
@@ -113,11 +113,11 @@ export class BoardManager {
     }
 
     public async updatePackageIndex(indexUri: string): Promise<boolean> {
-        let allUrls = this.getAdditionalUrls();
+        let allUrls = this._arduinoApp.getAdditionalUrls();
         if (!(allUrls.indexOf(indexUri) >= 0)) {
             allUrls = allUrls.concat(indexUri);
             VscodeSettings.getInstance().updateAdditionalUrls(allUrls);
-            await this._arduinoApp.setPref("boardsmanager.additional.urls", this.getAdditionalUrls().join(","));
+            await this._arduinoApp.setPref("boardsmanager.additional.urls", this._arduinoApp.getAdditionalUrls().join(","));
         }
         return true;
     }
@@ -525,17 +525,6 @@ export class BoardManager {
             return;
         }
         return normalizedUrl.pathname.substr(normalizedUrl.pathname.lastIndexOf("/") + 1);
-    }
-
-    private getAdditionalUrls(): string[] {
-        // For better compatibility, merge urls both in user settings and arduino IDE preferences.
-        const settingsUrls = VscodeSettings.getInstance().additionalUrls;
-        let preferencesUrls = [];
-        const preferences = this._settings.preferences;
-        if (preferences && preferences.has("boardsmanager.additional.urls")) {
-            preferencesUrls = util.toStringArray(preferences.get("boardsmanager.additional.urls"));
-        }
-        return util.union(settingsUrls, preferencesUrls);
     }
 
     private async setPreferenceUrls(additionalUrls: string[]) {

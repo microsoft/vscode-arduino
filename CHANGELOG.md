@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - When using the bundled Arduino CLI, the extension will no longer attempt to make the CLI executable if it is already executable. Additionally, any errors that occur while attempting to make the CLI executable are shown in a notification. [#1601](https://github.com/microsoft/vscode-arduino/pull/1601)
+- Refreshing the index in the board manager or library manager now works correctly with the Arduino CLI, and additional URLs from the `arduino.additionalUrls` setting are passed to the Arduino CLI. [#1611](https://github.com/microsoft/vscode-arduino/pull/1611)
 
 ## Version 0.5.0
 
