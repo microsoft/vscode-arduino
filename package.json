@@ -374,7 +374,7 @@
     "webpack": "^4.44.1"
   },
   "dependencies": {
-    "@microsoft/vscode-serial-monitor-api": "^0.1.5",
+    "@microsoft/vscode-serial-monitor-api": "^1.0.0",
     "@vscode/extension-telemetry": "~0.6.2",
     "body-parser": "^1.16.1",
     "cocopa": "0.0.13",
