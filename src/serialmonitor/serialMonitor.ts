@@ -61,6 +61,10 @@ export class SerialMonitor implements vscode.Disposable {
         });
 
         this.serialMonitorApi = await getSerialMonitorApi(Version.latest, extensionContext);
+
+        if (this.serialMonitorApi === undefined) {
+            Logger.error("Serial Monitor API was not retrieved. You may not have the most recent version of the Serial Monitor extension installed.")
+        }
     }
 
     public get initialized(): boolean {
