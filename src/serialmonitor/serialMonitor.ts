@@ -62,9 +62,7 @@ export class SerialMonitor implements vscode.Disposable {
 
         this.serialMonitorApi = await getSerialMonitorApi(Version.latest, extensionContext);
 
-        if (this.serialMonitorApi === undefined) {
-            Logger.error("Serial Monitor API was not retrieved. You may not have the most recent version of the Serial Monitor extension installed.")
-        }
+        this.checkForUndefinedSerialMonitorApi();
     }
 
     public get initialized(): boolean {
@@ -72,6 +70,8 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async selectSerialPort(): Promise<string | undefined> {
+        this.checkForUndefinedSerialMonitorApi(true);
+
         const ports = await this.serialMonitorApi.listAvailablePorts();
         if (!ports.length) {
             vscode.window.showInformationMessage("No serial port is available.");
@@ -117,6 +117,8 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async openSerialMonitor(restore: boolean = false): Promise<void> {
+        this.checkForUndefinedSerialMonitorApi(true);
+
         if (!this.currentPort) {
             const ans = await vscode.window.showInformationMessage("No serial port was selected, please select a serial port first", "Select", "Cancel");
             if (ans === "Select") {
@@ -155,6 +157,8 @@ export class SerialMonitor implements vscode.Disposable {
     }
 
     public async closeSerialMonitor(port?: string): Promise<boolean> {
+        this.checkForUndefinedSerialMonitorApi(true);
+
         const portToClose = port ?? this.currentPort;
         let closed = false;
         if (portToClose) {
@@ -167,6 +171,16 @@ export class SerialMonitor implements vscode.Disposable {
 
     public dispose() {
         this.serialMonitorApi.dispose();
+    }
+
+    private checkForUndefinedSerialMonitorApi(showError: boolean = false): void {
+        const errorString = "Serial Monitor API was not retrieved. You may not have the most recent version of the Serial Monitor extension installed.";
+        if (this.serialMonitorApi === undefined) {
+            Logger.error(errorString)
+            if (showError) {
+                vscode.window.showErrorMessage(errorString);
+            }
+        }
     }
 
     private updatePortListStatus(port?: string) {
