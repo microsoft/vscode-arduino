@@ -176,9 +176,10 @@ export class SerialMonitor implements vscode.Disposable {
     private checkForUndefinedSerialMonitorApi(showError: boolean = false): void {
         const errorString = "Serial Monitor API was not retrieved. You may not have the most recent version of the Serial Monitor extension installed.";
         if (this.serialMonitorApi === undefined) {
-            Logger.error(errorString)
             if (showError) {
-                vscode.window.showErrorMessage(errorString);
+                Logger.notifyUserError("UndefinedSerialMonitorApi", new Error(errorString));
+            } else {
+                Logger.traceError("UndefinedSerialMonitorApi", new Error(errorString));
             }
         }
     }
