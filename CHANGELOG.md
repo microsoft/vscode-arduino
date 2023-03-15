@@ -1,9 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## Version 0.6.0
 
-- Release date: TBD
+- Release date: March 15, 2023
+
+### Added
+
+- Prerelease versions are now published nightly to the VS Code Marketplace if there were changes to the repo. Prerelease versions will always have a non-zero patch digit in their version number.
 
 ### Changed
 
