@@ -214,6 +214,8 @@ export class ArduinoSettings implements IArduinoSettings {
             this._packagePath = path.join(this._arduinoPath, "portable");
         } else if (util.fileExistsSync(path.join(this._arduinoPath, "AppxManifest.xml"))) {
             this._packagePath = path.join(folder, "ArduinoData");
+        } else if (process.env.hasOwnProperty('ARDUINO_DIRECTORIES_DATA')) {
+            this._packagePath = process.env.ARDUINO_DIRECTORIES_DATA
         } else {
             this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
         }
