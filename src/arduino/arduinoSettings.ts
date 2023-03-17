@@ -219,7 +219,7 @@ export class ArduinoSettings implements IArduinoSettings {
         } else {
             this._packagePath = path.join(process.env.LOCALAPPDATA, "Arduino15");
         }
-
+       
         if (this.preferences.get("sketchbook.path")) {
             if (util.directoryExistsSync(path.join(this._arduinoPath, "portable"))) {
                 this._sketchbookPath = path.join(this._arduinoPath, "portable", this.preferences.get("sketchbook.path"));
