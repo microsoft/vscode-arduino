@@ -682,7 +682,7 @@ export class ArduinoApp {
 
         // We always build verbosely but filter the output based on the settings
 
-        this._settings.useArduinoCli ? args.push("--verbose", "--no-color") : args.push("--verbose-build");
+        this._settings.useArduinoCli ? args.push("--verbose", "--color off") : args.push("--verbose-build");
 
         if (verbose && !this._settings.useArduinoCli) {
             args.push("--verbose-upload");
