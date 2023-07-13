@@ -57,7 +57,7 @@ export class ProgrammerManager {
         DeviceContext.getInstance().programmer = this._programmerValue;
     }
 
-    private setProgrammerValue(programmerName: string | null) {
+    public setProgrammerValue(programmerName: string | null) {
         const programmer = this._arduinoApp.boardManager.installedProgrammers.get(programmerName);
         this._programmerValue = this._settings.useArduinoCli ? programmerName : programmer ? programmer.key : programmerName;
         this._programmerDisplayName = this._programmerValue
@@ -71,7 +71,7 @@ export class ProgrammerManager {
         return programmer ? programmer.displayName : programmerName;
     }
 
-    private getAvailableProgrammers(currentBoard: IBoard): IProgrammer[] {
+    public getAvailableProgrammers(currentBoard: IBoard): IProgrammer[] {
         if (!currentBoard || !currentBoard.platform) {
             return [];
         }
