@@ -14,7 +14,7 @@
     "@types/react-dom": "^0.14.23",
     "@types/react-redux": "^4.4.36",
     "@types/react-router": "^3.0.3",
-    "css-loader": "^3.2.0",
+    "css-loader": "^6.8.1",
     "file-loader": "^5.0.2",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.8.0",
