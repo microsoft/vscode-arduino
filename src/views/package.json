@@ -17,8 +17,7 @@
     "css-loader": "^3.2.0",
     "file-loader": "^5.0.2",
     "html-webpack-plugin": "^3.2.0",
-    "mini-css-extract-plugin": "^0.8.0",
-    "node-sass": "^7.0.0",
+    "mini-css-extract-plugin": "^1.6.2",
     "rc-tree": "~1.4.5",
     "react": "^15.4.2",
     "react-bootstrap": "^0.30.7",
@@ -29,18 +28,17 @@
     "react-search-input": "^0.10.4",
     "react-select": "^1.0.0-rc.10",
     "redux": "^3.6.0",
-    "sass-loader": "^6.0.1",
+    "sass": "^1.70.0",
+    "sass-loader": "^10.5.2",
     "source-map-loader": "^0.1.6",
     "style-loader": "^0.13.1",
     "svg-url-loader": "^2.0.2",
     "ts-loader": "^4.5.0",
     "webpack": "^4.44.1"
   },
-  "dependencies": {},
   "overrides": {
     "qs": "~6.10.3",
     "async": "~3.2.3",
-    "node-sass": "^7.0.0",
     "es5-ext": "0.10.53",
     "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz"
   }

@@ -63,6 +63,7 @@ const config = {
     },
     externals: {
         vscode: "commonjs vscode",
+        'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics'
     },
     resolve: {
         extensions: ['.js', '.json']
