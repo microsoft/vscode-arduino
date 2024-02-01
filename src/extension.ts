@@ -123,7 +123,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const usingBundledArduinoCli = arduinoContextModule.default.arduinoApp.settings.usingBundledArduinoCli;
 
             // Ask the user to switch to the bundled Arduino CLI if we can't resolve the specified path.
-            if (!usingBundledArduinoCli && (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli))) {
+            if (!usingBundledArduinoCli && !useArduinoCli && (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli))) {
                 Logger.traceError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
                 await askSwitchToBundledCli(constants.messages.INVALID_ARDUINO_PATH + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
             } else if (!commandPath || !util.fileExistsSync(commandPath)) {
