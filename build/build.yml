@@ -18,6 +18,7 @@ jobs:
       displayName: 'Publish extension VSIXes as artifact'
       targetPath: $(Build.StagingDirectory)\vscode-arduino\vsix
       artifactName: extension-vsixes
+      sbomBuildDropPath: $(Build.SourcesDirectory)
   steps:
   - task: MicroBuildSigningPlugin@3
     displayName: Install MicroBuild Signing
