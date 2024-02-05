@@ -46,6 +46,8 @@ extends:
       name: VSEngSS-MicroBuild2022-1ES
     sdl:
       sourceAnalysisPool: VSEngSS-MicroBuild2022-1ES
+      spotBugs:
+        enabled: false # Turn this off, this isn't java.
     customBuildTags:
     - ES365AIMigrationTooling
     stages:

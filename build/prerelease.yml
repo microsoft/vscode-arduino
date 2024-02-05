@@ -36,6 +36,8 @@ extends:
         name: AzurePipelines-EO
         image: AzurePipelinesWindows2022compliantGPT
         os: windows
+      spotBugs:
+        enabled: false # Turn this off, this isn't java.
     customBuildTags:
     - ES365AIMigrationTooling
     stages:
