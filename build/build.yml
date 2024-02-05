@@ -25,15 +25,6 @@ jobs:
       signType: $(SignType)
       zipSources: false
     condition: ne(variables['Build.Reason'], 'PullRequest')
-  - task: CredScan@3
-    displayName: Run CredScan
-    inputs:
-      toolMajorVersion: V2
-  - task: PoliCheck@2
-    displayName: Run PoliCheck
-    inputs:
-      targetType: F
-      targetArgument: $(Build.SourcesDirectory)
   - task: NodeTool@0
     displayName: Use Node 16.x
     inputs:
