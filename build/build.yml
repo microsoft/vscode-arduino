@@ -13,6 +13,12 @@ jobs:
   variables:
     TeamName: C++ Cross Platform and Cloud
   templateContext:
+    sdl:
+    - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+      tsa:
+        enabled: true
+        GdnPublishTsaOnboard: true
+        GdnPublishTsaConfigFile: $(Build.SourcesDirectory)\build\tsa.gdntsa
     outputs:
     - output: pipelineArtifact
       displayName: 'Publish extension VSIXes as artifact'
@@ -106,11 +112,6 @@ jobs:
     inputs:
       CredScan: true
       PoliCheck: true
-  - task: TSAUpload@2
-    displayName: Upload logs to TSA
-    inputs:
-      GdnPublishTsaOnboard: true
-      GdnPublishTsaConfigFile: $(Build.SourcesDirectory)\build\tsa.gdntsa
     condition: ne(variables['Build.Reason'], 'PullRequest')
   - task: GitHubRelease@0
     displayName: Publish to GitHub
