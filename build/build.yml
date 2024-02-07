@@ -14,7 +14,7 @@ jobs:
     TeamName: C++ Cross Platform and Cloud
   templateContext:
     sdl:
-    - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
       tsa:
         enabled: true
         GdnPublishTsaOnboard: true
