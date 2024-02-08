@@ -615,7 +615,7 @@ export class ArduinoApp {
                 return false;
             }
 
-            args.push("upload");
+            args.push("compile", "--upload");
 
             if (dc.port) {
                 args.push("--port", dc.port);
@@ -841,6 +841,8 @@ export class ArduinoApp {
             }
             arduinoChannel.channel.append(line);
         });
+
+        arduinoChannel.info(`Running: ${this._settings.commandPath} ${args.join(" ")}`);
 
         const run = (...args: any[]) =>
             this.useArduinoCli() ?

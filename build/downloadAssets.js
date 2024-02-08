@@ -25,6 +25,8 @@ for (const asset in config.assets) {
       const directory = resolve(__dirname, "..", "assets", "platform", platform);
       const destination = resolve(directory, asset);
 
+      mkdirSync(directory, { recursive: true });
+
       // Download the asset.
       run([
         "curl",

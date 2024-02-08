@@ -21,18 +21,20 @@ const platforms = [
   "darwin-arm64",
 ];
 
+mkdirSync(resolve(__dirname, "..", "out", "vsix"), { recursive: true });
+
 // We include different files for each platform, so we need to build a custom
 // .vscodeignore file based on common file and platform-specific path.
 const ignoreFile = readFileSync(resolve(__dirname, "..", ".vscodeignore"), "utf8");
 const customIgnoreFilePath = resolve(__dirname, "..", "out", ".vscodeignore");
 
 execSync('npm run build', { cwd: resolve(__dirname, ".."), stdio: "inherit" });
-mkdirSync(resolve(__dirname, "..", "out", "vsix"), { recursive: true });
 for (const platform of platforms) {
   writeFileSync(
     customIgnoreFilePath,
     ignoreFile + `!assets/platform/${platform}/**`
   );
+  mkdirSync(resolve(__dirname, "..", "out", "vsix"), { recursive: true });
   const command = `vsce package --target ${platform} --out out/vsix/vscode-arduino-${platform}.vsix ${flags}`;
   execSync(command, {
     cwd: resolve(__dirname, ".."),

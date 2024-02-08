@@ -323,7 +323,9 @@
     ]
   },
   "scripts": {
+    "dockerbuild": "docker build -t vscode-arduino-builder . && docker cp $(docker create vscode-arduino-builder):/app/out/vsix/. ./out",
     "build": "gulp build --mode=production",
+    "package": "node build/package.js",
     "postinstall": "node ./build/downloadAssets.js && cd ./src/views && npm install",
     "test": "gulp test"
   },
@@ -344,6 +346,7 @@
     "@types/winreg": "^1.2.30",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
+    "@vscode/vsce": "^2.23.0",
     "acorn": "^7.4.0",
     "ajv": "^6.12.3",
     "babel-loader": "^8.2.2",
@@ -365,7 +368,7 @@
     "gulp-typescript": "^5.0.1",
     "minimist": "^1.2.6",
     "mocha": "^6.2.3",
-    "node-gyp": "^6.1.0",
+    "node-gyp": "^10.0.1",
     "plugin-error": "^1.0.1",
     "tslint": "^5.20.1",
     "typemoq": "^1.6.0",
@@ -393,7 +396,6 @@
   },
   "overrides": {
     "async": "~3.2.3",
-    "node-sass": "^7.0.0",
     "es5-ext": "0.10.53",
     "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz"
   },

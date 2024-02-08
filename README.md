@@ -216,9 +216,9 @@ You can find the full list of issues on the [Issue Tracker](https://github.com/M
 
 Installation prerequisites:
 
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (>= 12.x)
-- [Npm](https://www.npmjs.com/) (>= 6.x)
+* [Git](https://git-scm.com/)
+* [Node.js](https://nodejs.org/) (>= 16.x)
+* [Npm](https://www.npmjs.com/) (>= 8.x)
 
 To *run and develop*, do the following:
 - `git clone https://github.com/microsoft/vscode-arduino`
@@ -227,6 +227,14 @@ To *run and develop*, do the following:
 - Run `npm i -g gulp`
 - Open in Visual Studio Code (`code .`)
 - Press <kbd>F5</kbd> to debug.
+
+
+In order to create the .vsix file:
+
+* Run `npm run package` (you may want to comment out the platforms you don't want to build in ./build/package.js for during local testing)
+
+If you'd like to test a build without setting up your environment, just install [Docker](https://www.docker.com)
+and run `npm run dockerbuild`, which will output the .vsix files in the `./out` directory.
 
 To *test*, press <kbd>F5</kbd> in VS Code with the "Launch Tests" debug configuration.
 
