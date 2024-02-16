@@ -218,7 +218,7 @@ Installation prerequisites:
 
 - [Git](https://git-scm.com/)
 - [Node.js](https://nodejs.org/) (>= 14.14)
-- [Npm](https://www.npmjs.com/) (>= 6.x)
+- [Npm](https://www.npmjs.com/) (>= 7.x)
 
 To *run and develop*, do the following:
 - `git clone https://github.com/microsoft/vscode-arduino`
