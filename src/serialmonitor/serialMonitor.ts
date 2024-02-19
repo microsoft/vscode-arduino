@@ -10,7 +10,7 @@ export class SerialMonitor implements vscode.Disposable {
     public static DEFAULT_TIMESTAMP_FORMAT: string = "";
 
     public static listBaudRates(): number[] {
-        return [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000];
+        return [300, 1200, 2400, 4800, 9600, 19200, 31250, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000];
     }
 
     public static getInstance(): SerialMonitor {
