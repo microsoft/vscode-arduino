@@ -508,7 +508,7 @@ export class BoardManager {
         }
     }
 
-    private listBoards(): IBoard[] {
+    public listBoards(): IBoard[] {
         const result = [];
         this._boards.forEach((b) => {
             result.push(b);
