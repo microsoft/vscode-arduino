@@ -2,7 +2,7 @@
 
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/Microsoft/vscode-arduino)
 
-Welcome to the Visual Studio Code extension for **Arduino** <sup>preview</sup> ! The Arduino extension makes it easy to develop, build, deploy and debug your Arduino sketches in Visual Studio Code, with a rich set of functionalities. These include:
+Welcome to the Visual Studio Code extension for **Arduino** <sup>preview</sup> ! The Arduino extension makes it easy to develop, build, and deploy your Arduino sketches in Visual Studio Code, with a rich set of functionalities. These include:
 
 * IntelliSense and syntax highlighting for Arduino sketches
 * Verify and upload your sketches in Visual Studio Code
@@ -12,7 +12,6 @@ Welcome to the Visual Studio Code extension for **Arduino** <sup>preview</sup> !
 * Snippets for sketches
 * Automatic Arduino project scaffolding
 * Command Palette (<kbd>F1</kbd>) integration of frequently used commands (e.g. Verify, Upload...)
-* Integrated Arduino Debugging <sup>New</sup>
 
 ## Prerequisites
 Either the legacy Arduino IDE or Arduino CLI are required. The recommended
@@ -121,7 +120,6 @@ The following settings are as per sketch settings of the Arduino extension. You 
     "port": "COM5",
     "board": "adafruit:samd:adafruit_feather_m0",
     "output": "../build",
-    "debugger": "jlink",
     "prebuild": "./prebuild.sh",
     "postbuild": "./postbuild.sh",
     "intelliSenseGen": "global"
@@ -131,7 +129,6 @@ The following settings are as per sketch settings of the Arduino extension. You 
 - `port` - Name of the serial port connected to the device. Can be set by the `Arduino: Select Serial Port` command. For Mac users could be "/dev/cu.wchusbserial1420".
 - `board` - Currently selected Arduino board alias. Can be set by the `Arduino: Change Board Type` command. Also, you can find the board list there.
 - `output` - Arduino build output path. If not set, Arduino will create a new temporary output folder each time, which means it cannot reuse the intermediate result of the previous build leading to long verify/upload time, so it is recommended to set the field. Arduino requires that the output path should not be the workspace itself or in a subfolder of the workspace, otherwise, it may not work correctly. By default, this option is not set. It's worth noting that the contents of this file could be deleted during the build process, so pick (or create) a directory that will not store files you want to keep.
-- `debugger` - The short name of the debugger that will be used when the board itself does not have a debugger and there is more than one debugger available. You can find the list of debuggers [here](https://github.com/Microsoft/vscode-arduino/blob/main/misc/debuggerUsbMapping.json). By default, this option is not set.
 - `prebuild` - External command which will be invoked before any sketch build (verify, upload, ...). For details see the [Pre- and Post-Build Commands](#Pre--and-Post-Build-Commands) section.
 - `postbuild` - External command to be run after the sketch has been built successfully. See the afore mentioned section for more details.
 - `intelliSenseGen` - Override the global setting for auto-generation of the IntelliSense configuration (i.e. `.vscode/c_cpp_properties.json`). Three options are available:
@@ -200,24 +197,6 @@ vscode-arduino's analysis stores the result as a dedicated IntelliSense-configur
 ![74001156-cfce8280-496a-11ea-9b9d-7d30c83765c1](https://user-images.githubusercontent.com/21954933/74351237-2696ea80-4db7-11ea-9f7a-1bfc652ad5f5.png)
 
 This system allows you to setup and use own IntelliSense configurations in parallel to the automatically generated configurations provided through vscode-arduino. Just add your configuration to `c_cpp_properties.json` and name it differently from the default configuration (`Arduino`), e.g. `My awesome configuration` and select it from the status bar or via the command palette command **C/C++: Select a Configuration...**
-
-## Debugging Arduino Code <sup>preview</sup>
-Before you start to debug your Arduino code, please read [this document](https://code.visualstudio.com/docs/editor/debugging) to learn about the basic mechanisms of debugging in Visual Studio Code. Also see [debugging for C++ in VSCode](https://code.visualstudio.com/docs/languages/cpp#_debugging) for further reference.
-
-Make sure that your Arduino board can work with [STLink](http://www.st.com/en/development-tools/st-link-v2.html), [Jlink](https://www.segger.com/jlink-debug-probes.html) or [EDBG](http://www.atmel.com/webdoc/protocoldocs/ch01s01.html). The debugging support is currently fully tested with the following boards:
-- [MXChip IoT Developer Kit - AZ3166](https://microsoft.github.io/azure-iot-developer-kit/)
-- [Arduino M0 PRO](https://www.arduino.cc/en/Main/ArduinoBoardM0PRO)
-- [Adafruit WICED WiFi Feather](https://www.adafruit.com/product/3056)
-- [Adafruit Feather M0](https://www.adafruit.com/product/3010)
-- Arduino Zero Pro
-
-Steps to start debugging:
-1. Plug in your board to your development machine properly. For those boards that do not have an on-board debugging chip, you need to use a STLink or JLink connector.
-2. Go to the **Debug View** (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> *or* <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd>). and set breakpoints in your source files.
-3. Press <kbd>F5</kbd> to select your debugging environment.
-4. When your breakpoint is hit, you can see variables and add expression(s) to watch on the Debug Side Bar.
-
-> To learn more about how to debug Arduino code, visit our [team blog](https://blogs.msdn.microsoft.com/iotdev/2017/05/27/debug-your-arduino-code-with-visual-studio-code/).
 
 ## Change Log
 See the [Change log](https://github.com/Microsoft/vscode-arduino/blob/main/CHANGELOG.md) for details about the changes in each version.

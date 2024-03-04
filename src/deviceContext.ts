@@ -39,11 +39,6 @@ export interface IDeviceContext {
      */
 
     output: string;
-    /**
-     * Arduino debugger
-     */
-
-    debugger_: string;
 
     /**
      * Current selected programmer.
@@ -183,7 +178,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
     public get onChangeBoard() { return this._settings.board.emitter.event }
     public get onChangeSketch() { return this._settings.sketch.emitter.event }
     public get onChangeOutput() { return this._settings.output.emitter.event }
-    public get onChangeDebugger() { return this._settings.debugger.emitter.event }
     public get onChangeISAutoGen() { return this._settings.intelliSenseGen.emitter.event }
     public get onChangeConfiguration() { return this._settings.configuration.emitter.event }
     public get onChangePrebuild() { return this._settings.prebuild.emitter.event }
@@ -231,15 +225,6 @@ export class DeviceContext implements IDeviceContext, vscode.Disposable {
 
     public set output(value: string) {
         this._settings.output.value = value;
-        this.saveContext();
-    }
-
-    public get debugger_() {
-        return this._settings.debugger.value;
-    }
-
-    public set debugger_(value: string) {
-        this._settings.debugger.value = value;
         this.saveContext();
     }
 

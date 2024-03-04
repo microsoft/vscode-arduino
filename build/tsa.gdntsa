@@ -1,0 +1,9 @@
+{
+    "codebaseName": "vscode-arduino",
+    "notificationAliases": ["embeddeddev@microsoft.com"],
+    "instanceUrl": "https://devdiv.visualstudio.com",
+    "projectName": "DevDiv",
+    "areaPath": "DevDiv\\Cpp Developer Experience\\Cross Platform\\Embedded",
+    "iterationPath": "DevDiv",
+    "allTools": true
+}

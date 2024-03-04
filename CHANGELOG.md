@@ -1,6 +1,24 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## Version 0.6.0
+
+- Release date: March 15, 2023
+
+### Added
+
+- Prerelease versions are now published nightly to the VS Code Marketplace if there were changes to the repo. Prerelease versions will always have a non-zero patch digit in their version number.
+
+### Changed
+
+- The bundled version of the Arduino CLI was updated to [version 0.31.0](https://github.com/arduino/arduino-cli/releases/tag/0.31.0). [#1606](https://github.com/microsoft/vscode-arduino/pull/1606)
+- All functionality related to the `arduino` debug type was removed from the extension. The built-in debugging support was rarely used and not actively maintained. [#1610](https://github.com/microsoft/vscode-arduino/pull/1610)
+
+### Fixed
+
+- When using the bundled Arduino CLI, the extension will no longer attempt to make the CLI executable if it is already executable. Additionally, any errors that occur while attempting to make the CLI executable are shown in a notification. [#1601](https://github.com/microsoft/vscode-arduino/pull/1601)
+- Refreshing the index in the board manager or library manager now works correctly with the Arduino CLI, and additional URLs from the `arduino.additionalUrls` setting are passed to the Arduino CLI. [#1611](https://github.com/microsoft/vscode-arduino/pull/1611)
+
 ## Version 0.5.0
 
 - Release date: February 16, 2023

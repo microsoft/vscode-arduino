@@ -1,0 +1,128 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+parameters:
+- name: prerelease
+  type: boolean
+  default: false
+
+jobs:
+- job: Build
+  pool: 
+    name: VSEngSS-MicroBuild2022-1ES
+  variables:
+    TeamName: C++ Cross Platform and Cloud
+  templateContext:
+    sdl:
+    ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+      tsa:
+        enabled: true
+        GdnPublishTsaOnboard: true
+        GdnPublishTsaConfigFile: $(Build.SourcesDirectory)\build\tsa.gdntsa
+    outputs:
+    - output: pipelineArtifact
+      displayName: 'Publish extension VSIXes as artifact'
+      targetPath: $(Build.StagingDirectory)\vscode-arduino\vsix
+      artifactName: extension-vsixes
+      sbomBuildDropPath: $(Build.SourcesDirectory)
+  steps:
+  - task: MicroBuildSigningPlugin@3
+    displayName: Install MicroBuild Signing
+    inputs:
+      signType: $(SignType)
+      zipSources: false
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: NodeTool@0
+    displayName: Use Node 16.x
+    inputs:
+      versionSpec: 16.x
+  - ${{ if parameters.prerelease }}:
+    - pwsh: node -e "p=require('./package.json');p.version=p.version.replace(/\.\d+$/,'.'+$(Build.BuildNumber));require('fs').writeFileSync('./package.json',JSON.stringify(p,undefined,2))"
+  - script: npm install --global gulp node-gyp @vscode/vsce
+    displayName: Install global dependencies
+  - script: npm install
+    displayName: Install project dependencies
+  - task: ComponentGovernanceComponentDetection@0
+    displayName: Detect components
+  - task: notice@0
+    displayName: Generate NOTICE file
+    inputs:
+      outputfile: $(Build.SourcesDirectory)/NOTICE.txt
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  - script: gulp tslint
+    displayName: Check for linting errors
+  - script: gulp genAikey
+    displayName: Use production AI key
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+  - ${{ if parameters.prerelease }}:
+    - script: node build/package.js --pre-release
+      displayName: Build and pack extension
+  - ${{ else }}:
+    - script: node build/package.js
+      displayName: Build and pack extension
+  - pwsh: |
+      $path = Join-Path $Env:TEMP "7z-installer.exe"
+      Invoke-WebRequest https://www.7-zip.org/a/7z2201-x64.exe -OutFile $path
+      Start-Process -FilePath $path -Args "/S" -Verb RunAs -Wait
+      Remove-Item $path
+      Echo "##vso[task.prependpath]$Env:PROGRAMFILES\7-Zip\"
+    displayName: Install 7zip
+  - pwsh: Get-ChildItem out\vsix | Foreach-Object { 7z x $_.FullName -o$(Build.StagingDirectory)\vscode-arduino\$($_.BaseName) }
+    displayName: Extract extension for signing
+  - task: NuGetToolInstaller@1
+    displayName: Install NuGet
+  - task: NuGetAuthenticate@0
+    displayName: Authenticate NuGet
+  - script: nuget restore .\build\SignFiles.proj -PackagesDirectory .\build\packages
+    displayName: Restore MicroBuild Core
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: MSBuild@1
+    displayName: Sign files
+    inputs:
+      solution: .\build\SignFiles.proj
+      msbuildArguments: /p:SignType=$(SignType)
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - pwsh: |
+      Get-ChildItem -Directory $(Build.StagingDirectory)\vscode-arduino | Foreach-Object { 7z a ($_.FullName + ".vsix") ($_.FullName + "\*") -tzip }
+      New-Item -Path $(Build.StagingDirectory)\vscode-arduino\vsix -ItemType Directory
+      Get-Item $(Build.StagingDirectory)\vscode-arduino\*.vsix | Move-Item -Destination $(Build.StagingDirectory)\vscode-arduino\vsix
+    displayName: Pack signed files
+  - task: MSBuild@1
+    displayName: Sign VSIXes
+    inputs:
+      solution: .\build\SignVsix.proj
+      msbuildArguments: /p:SignType=$(SignType)
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - script: curl -LO https://downloads.arduino.cc/arduino-1.8.19-windows.zip
+    displayName: Download Arduino IDE
+  - script: >-
+      node build/checkHash.js arduino-1.8.19-windows.zip c704a821089eab2588f1deae775916219b1517febd1dd574ff29958dca873945
+    displayName: Verify Arduino IDE
+  - task: ExtractFiles@1
+    displayName: Extract Arduino IDE
+    inputs:
+      archiveFilePatterns: arduino-1.8.19-windows.zip
+      destinationFolder: arduino-ide
+  - script: "echo ##vso[task.prependpath]$(Build.SourcesDirectory)\\arduino-ide\\arduino-1.8.19"
+    displayName: Add Arduino IDE to PATH
+  - script: npm test --silent
+    displayName: Run tests
+  - task: PostAnalysis@2
+    displayName: Check for compliance errors
+    inputs:
+      CredScan: true
+      PoliCheck: true
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: GitHubRelease@0
+    displayName: Publish to GitHub
+    inputs:
+      gitHubConnection: embeddedbot
+      repositoryName: microsoft/vscode-arduino
+      action: create
+      target: $(Build.SourceVersion)
+      tagSource: auto
+      assets: $(Build.StagingDirectory)\vscode-arduino\vsix\*.vsix
+      isPreRelease: $[contains(variables['Build.SourceBranch'], '-rc')]
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+  - task: MicroBuildCleanup@1
+    displayName: Clean up MicroBuild

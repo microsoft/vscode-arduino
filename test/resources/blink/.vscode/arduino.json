@@ -3,7 +3,6 @@
     "port": "COM4",
     "board": "arduino:avr:diecimila",
     "output": null,
-    "_debugger": null,
     "configuration": "cpu=atmega328",
     "programmer": "arduino:jtag3isp"
 }
