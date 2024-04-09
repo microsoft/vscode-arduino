@@ -334,7 +334,7 @@
   "devDependencies": {
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.6",
-    "@types/express": "^4.19.2",
+    "@types/express": "^4.17.13",
     "@types/glob": "^7.1.4",
     "@types/mocha": "^5.2.7",
     "@types/node": "^16.9.6",
