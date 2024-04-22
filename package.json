@@ -1,9 +1,9 @@
 {
-  "name": "vscode-arduino",
-  "displayName": "Arduino",
+  "name": "vscode-arduino-community",
+  "displayName": "Arduino Community Edition",
   "description": "Arduino for Visual Studio Code",
-  "version": "0.6.0",
-  "publisher": "vsciot-vscode",
+  "version": "0.6.1",
+  "publisher": "vscode-arduino",
   "preview": true,
   "engines": {
     "vscode": "^1.63.0"
@@ -12,12 +12,12 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-arduino.git"
+    "url": "https://github.com/vscode-arduino/vscode-arduino.git"
   },
   "bugs": {
-    "url": "https://github.com/Microsoft/vscode-arduino/issues"
+    "url": "https://github.com/vscode-arduino/vscode-arduino/issues"
   },
-  "homepage": "https://github.com/Microsoft/vscode-arduino",
+  "homepage": "https://github.com/vscode-arduino/vscode-arduino",
   "categories": [
     "Programming Languages",
     "Snippets",
@@ -176,7 +176,7 @@
         {
           "id": "arduinoExampleExplorer",
           "name": "Arduino Examples",
-          "when": "vscode-arduino:showExampleExplorer"
+          "when": "vscode-arduino-community:showExampleExplorer"
         }
       ]
     },

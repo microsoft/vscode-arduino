@@ -11,7 +11,7 @@ const usbDetectorModule = impor("../src/serialmonitor/usbDetector") as typeof im
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Arduino: Extension Tests", () => {
     test("should be present", () => {
-        assert.ok(vscode.extensions.getExtension("vsciot-vscode.vscode-arduino"));
+        assert.ok(vscode.extensions.getExtension("vscode-arduino.vscode-arduino-community"));
     });
 
     // The extension is already activated by vscode before running mocha test framework.
@@ -19,7 +19,7 @@ suite("Arduino: Extension Tests", () => {
     // tslint:disable-next-line: only-arrow-functions
     test("should be able to activate the extension", function(done) {
         this.timeout(60 * 1000);
-        const extension = vscode.extensions.getExtension("vsciot-vscode.vscode-arduino");
+        const extension = vscode.extensions.getExtension("vscode-arduino.vscode-arduino-community");
         if (!extension.isActive) {
             extension.activate().then((api) => {
                 done();

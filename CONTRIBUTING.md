@@ -6,9 +6,9 @@ There are many ways that you can contribute, beyond writing code. The goal of th
 
 ## Contributing Fixes
 
-If you are interested in writing code to fix issues, first look at the issues with the [help-wanted](https://github.com/Microsoft/vscode-arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label. They should have the context and code pointers needed to get started. If not, then feel free to ask for some, and we will be happy to provide any guidance you need.
+If you are interested in writing code to fix issues, first look at the issues with the [help-wanted](https://github.com/vscode-arduino/vscode-arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label. They should have the context and code pointers needed to get started. If not, then feel free to ask for some, and we will be happy to provide any guidance you need.
 
-When you are doing code fix, please work against [main](https://github.com/microsoft/vscode-arduino/tree/main)
+When you are doing code fix, please work against [main](https://github.com/vscode-arduino/vscode-arduino/tree/main)
 branch and also submit pull request to `main` branch. Production releases will be tagged from `main`.
 
 
@@ -19,9 +19,9 @@ Have you identified a reproducible problem? Have a feature request? We want to h
 
 ### Look For an Existing Issue
 
-Before you create a new issue, please do a search in [open issues](https://github.com/Microsoft/vscode-arduino/issues) to see if the issue or feature request has already been filed.
+Before you create a new issue, please do a search in [open issues](https://github.com/vscode-arduino/vscode-arduino/issues) to see if the issue or feature request has already been filed.
 
-Be sure to scan through the [most popular](https://github.com/Microsoft/vscode-arduino/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc) issues.
+Be sure to scan through the [most popular](https://github.com/vscode-arduino/vscode-arduino/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc) issues.
 
 If you find your issue already exists, make relevant comments and add your [reaction](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments). Use a reaction in place of a "+1" comment:
 

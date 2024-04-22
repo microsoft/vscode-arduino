@@ -10,7 +10,7 @@ suite("Arduino: Commands Tests", () => {
     setup(function(done) {
         // Ensure that extension is activate while testing
        this.timeout(60 * 1000);
-       const extension = vscode.extensions.getExtension("vsciot-vscode.vscode-arduino");
+       const extension = vscode.extensions.getExtension("vscode-arduino.vscode-arduino-community");
        if (!extension.isActive) {
             extension.activate().then((api) => {
                 // The extension waits 100ms before registering some commands,

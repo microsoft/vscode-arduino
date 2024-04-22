@@ -337,7 +337,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize(context);
             }
-            vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
+            vscode.commands.executeCommand("setContext", "vscode-arduino-community:showExampleExplorer", true);
         })();
     }
     vscode.window.onDidChangeActiveTextEditor(async () => {
@@ -352,7 +352,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!SerialMonitor.getInstance().initialized) {
                 SerialMonitor.getInstance().initialize(context);
             }
-            vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
+            vscode.commands.executeCommand("setContext", "vscode-arduino-community:showExampleExplorer", true);
         }
     });
 
@@ -410,7 +410,7 @@ export async function activate(context: vscode.ExtensionContext) {
             panel.webview.html = await arduinoManagerProvider.provideTextDocumentContent(BOARD_CONFIG_URI);
         });
         registerArduinoCommand("arduino.showExamples", async (forceRefresh: boolean = false) => {
-            vscode.commands.executeCommand("setContext", "vscode-arduino:showExampleExplorer", true);
+            vscode.commands.executeCommand("setContext", "vscode-arduino-community:showExampleExplorer", true);
             if (forceRefresh) {
                 vscode.commands.executeCommand("arduino.reloadExample");
             }
