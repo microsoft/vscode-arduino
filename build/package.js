@@ -10,7 +10,7 @@ const flags = argv.slice(2).join(" ");
 // Taken from https://code.visualstudio.com/api/working-with-extensions/publishing-extension#platformspecific-extensions
 const platforms = [
   "win32-x64",
-  "win32-ia32",
+  // "win32-ia32", This is no longer supported by vscode based on the link above.
   "win32-arm64",
   "linux-x64",
   "linux-arm64",
