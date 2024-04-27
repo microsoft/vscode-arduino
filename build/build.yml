@@ -107,6 +107,11 @@ jobs:
     displayName: Add Arduino IDE to PATH
   - script: npm test --silent
     displayName: Run tests
+  - task: DeleteFiles@1
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)/.vscode-test
+      Contents: "*"
+      RemoveSourceFolder: true
   - task: PostAnalysis@2
     displayName: Check for compliance errors
     inputs:
