@@ -19,6 +19,8 @@ jobs:
         enabled: true
         GdnPublishTsaOnboard: true
         GdnPublishTsaConfigFile: $(Build.SourcesDirectory)\build\tsa.gdntsa
+      policheck:
+        enabled: true
     outputs:
     - output: pipelineArtifact
       displayName: 'Publish extension VSIXes as artifact'
