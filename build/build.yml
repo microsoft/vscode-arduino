@@ -12,6 +12,7 @@ jobs:
     name: VSEngSS-MicroBuild2022-1ES
   variables:
     TeamName: C++ Cross Platform and Cloud
+  templateContext:
     outputs:
     - output: pipelineArtifact
       displayName: 'Publish extension VSIXes as artifact'
