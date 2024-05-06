@@ -12,14 +12,6 @@ jobs:
     name: VSEngSS-MicroBuild2022-1ES
   variables:
     TeamName: C++ Cross Platform and Cloud
-  templateContext:
-    sdl:
-      tsa:
-        enabled: true
-        GdnPublishTsaOnboard: true
-        GdnPublishTsaConfigFile: $(Build.SourcesDirectory)\build\tsa.gdntsa
-      policheck:
-        enabled: true
     outputs:
     - output: pipelineArtifact
       displayName: 'Publish extension VSIXes as artifact'
