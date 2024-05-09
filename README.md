@@ -217,8 +217,8 @@ You can find the full list of issues on the [Issue Tracker](https://github.com/M
 Installation prerequisites:
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (>= 12.x)
-- [Npm](https://www.npmjs.com/) (>= 6.x)
+- [Node.js](https://nodejs.org/) (>= 14.14)
+- [Npm](https://www.npmjs.com/) (>= 7.x)
 
 To *run and develop*, do the following:
 - `git clone https://github.com/microsoft/vscode-arduino`
