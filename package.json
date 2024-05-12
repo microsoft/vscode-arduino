@@ -222,6 +222,13 @@
           "default": "",
           "description": "Path to a script relative to 'arduino.path', you can use a custom launch script to run Arduino by modifying this setting. Example: 'run-arduino.bat' for Windows, 'Contents/MacOS/run-arduino.sh' for Mac, 'bin/run-arduino.sh' for Linux. (Requires a restart after change)"
         },
+        "arduino.additionalCliArguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional arguments to append at the tail of the build command."
+        },
         "arduino.additionalUrls": {
           "type": "array",
           "items": {

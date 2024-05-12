@@ -759,6 +759,10 @@ export class ArduinoApp {
             UsbDetector.getInstance().pauseListening();
         }
 
+        for (const additionalArg in VscodeSettings.getInstance().additionalCliArguments) {
+            args.push(additionalArg);
+        }
+
         // Push sketch as last argument
         args.push(path.join(ArduinoWorkspace.rootPath, dc.sketch));
 
