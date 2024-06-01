@@ -34,6 +34,13 @@ jobs:
         with:
           node-version: 16.x
 
+      # On new macos-latest machines, Python 3.9+ is used, and it's causing issues with binding.gyp
+      - name: Use Python 3.8
+        if: ${{ matrix.os == 'macos-latest' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8
+
       - name: Windows setup
         if: ${{ matrix.os == 'windows-latest' }}
         run: |

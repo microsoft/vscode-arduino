@@ -13,6 +13,13 @@ parameters:
   - test
   - real
 
+schedules:
+- cron: 0 6 * * 0
+  branches:
+    include:
+    - main
+  always: "true"
+
 pr:
   - main
 
@@ -46,6 +53,12 @@ extends:
       name: VSEngSS-MicroBuild2022-1ES
     sdl:
       sourceAnalysisPool: VSEngSS-MicroBuild2022-1ES
+      tsa:
+        enabled: true
+        GdnPublishTsaOnboard: true
+        GdnPublishTsaConfigFile: $(Build.SourcesDirectory)\build\tsa.gdntsa
+      policheck:
+        enabled: true
       spotBugs:
         enabled: false # Turn this off, this isn't java.
     customBuildTags:
