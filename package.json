@@ -358,7 +358,7 @@
     "eslint-plugin-require-path-exists": "^1.1.9",
     "eslint-plugin-standard": "^5.0.0",
     "fancy-log": "^1.3.3",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-eslint": "^6.0.0",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-tslint": "^8.1.4",
@@ -371,7 +371,7 @@
     "typemoq": "^1.6.0",
     "typescript": "^3.7.5",
     "vscode-test": "^1.4.0",
-    "webpack": "^4.44.1"
+    "webpack": "^5.91.0"
   },
   "dependencies": {
     "@microsoft/vscode-serial-monitor-api": "^0.1.5",
