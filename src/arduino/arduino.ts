@@ -105,8 +105,11 @@ export class ArduinoApp {
         if (this._settings.analyzeOnSettingChange) {
             // set up event handling for IntelliSense analysis
             const requestAnalysis = async () => {
-                if (isCompilerParserEnabled()) {
-                    await this._analysisManager.requestAnalysis();
+                // Check again in case the setting was disabled after initialization
+                if (this._settings.analyzeOnSettingChange) {
+                    if (isCompilerParserEnabled()) {
+                        await this._analysisManager.requestAnalysis();
+                    }
                 }
             };
             const dc = DeviceContext.getInstance();
