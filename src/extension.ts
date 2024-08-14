@@ -29,6 +29,11 @@ import { SerialMonitor } from "./serialmonitor/serialMonitor";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
 export async function activate(context: vscode.ExtensionContext) {
+    await vscode.window.showWarningMessage("The Arduino extension is deprecated. Please view our README for more information.", "View README").then((selection) => {
+        if (selection === "View README") {
+            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse("https://github.com/microsoft/vscode-arduino/blob/main/README.md"));
+        }
+    });
     Logger.configure(context);
     arduinoActivatorModule.default.context = context;
     const activeGuid = uuidModule().replace(/-/g, "");
@@ -75,24 +80,6 @@ export async function activate(context: vscode.ExtensionContext) {
         });
     };
 
-    async function askSwitchToBundledCli(message: string): Promise<void> {
-        const result = await vscode.window.showErrorMessage(
-            message, "Use bundled arduino-cli", "View settings");
-        switch (result) {
-            case "Use bundled arduino-cli": {
-                    Logger.traceUserData("switched-to-bundled-arduino-cli");
-                    await vscodeSettings.setUseArduinoCli(true);
-                    await vscodeSettings.setArduinoPath(undefined);
-                    await vscodeSettings.setCommandPath(undefined);
-                    await vscode.commands.executeCommand("workbench.action.reloadWindow");
-                    break;
-                }
-            case "View settings":
-                await vscode.commands.executeCommand("workbench.action.openGlobalSettings");
-                break;
-        }
-    }
-
     if (!vscodeSettings.useArduinoCli) {
         // This notification is intentionally a little bit annoying (popping on
         // workspace open with no permanent dismissal) because we want to move
@@ -104,7 +91,6 @@ export async function activate(context: vscode.ExtensionContext) {
         // value of false. A future will make this breaking change with
         // appropriate messaging.
         Logger.traceUserData("using-legacy-arduino-ide");
-        void askSwitchToBundledCli(constants.messages.REMOVE_ARDUINO_IDE_SUPPORT + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
     }
 
     const registerArduinoCommand = (command: string, commandBody: (...args: any[]) => any, getUserData?: () => any): number => {
@@ -125,14 +111,12 @@ export async function activate(context: vscode.ExtensionContext) {
             // Ask the user to switch to the bundled Arduino CLI if we can't resolve the specified path.
             if (!usingBundledArduinoCli && (!arduinoPath || !validateArduinoPath(arduinoPath, useArduinoCli))) {
                 Logger.traceError("InvalidArduinoPath", new Error(constants.messages.INVALID_ARDUINO_PATH));
-                await askSwitchToBundledCli(constants.messages.INVALID_ARDUINO_PATH + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
             } else if (!commandPath || !util.fileExistsSync(commandPath)) {
                 const error = new Error(constants.messages.INVALID_COMMAND_PATH + commandPath);
                 if (usingBundledArduinoCli) {
                     Logger.notifyUserError("InvalidCommandPath", error);
                 } else {
                     Logger.traceError("InvalidCommandPath", error);
-                    await askSwitchToBundledCli(error.message + " " + constants.messages.SWITCH_TO_BUNDLED_CLI);
                 }
             } else {
                 await commandExecution(command, commandBody, args, getUserData);

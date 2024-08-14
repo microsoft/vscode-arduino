@@ -1,8 +1,8 @@
 {
   "name": "vscode-arduino",
-  "displayName": "Arduino",
-  "description": "Arduino for Visual Studio Code",
-  "version": "0.6.0",
+  "displayName": "Arduino (deprecated)",
+  "description": "Arduino for Visual Studio Code. This extension is deprecated and no longer maintained.",
+  "version": "0.7.0",
   "publisher": "vsciot-vscode",
   "preview": true,
   "engines": {
