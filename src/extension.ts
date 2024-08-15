@@ -31,7 +31,7 @@ const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import 
 export function showDeprecatedPopup(): void {
     vscode.window.showWarningMessage("The Arduino extension is deprecated. Please view our README for more information.", "View README").then((selection) => {
         if (selection === "View README") {
-            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse("https://github.com/microsoft/vscode-arduino/blob/main/README.md"));
+            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse("https://aka.ms/arduinoextensionreadme"));
         }
     });
 }

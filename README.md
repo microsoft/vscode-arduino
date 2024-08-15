@@ -1,6 +1,6 @@
 # Visual Studio Code extension for Arduino (deprecated)
 
-> **Warning**
+> ⚠️ **Warning** ⚠️
 >
 > # This extension is deprecated and no longer maintained. We recommend existing customers to use the [Arduino IDE software](https://www.arduino.cc/en/software).
 
