@@ -29,10 +29,10 @@ jobs:
       # written, but it should be updated when VS Code updates its Node version.
       # Node needs to be installed before OS-specific setup so that we can run
       # the hash verification script.
-      - name: Use Node 16.x
+      - name: Use Node 18.x
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       # On new macos-latest machines, Python 3.9+ is used, and it's causing issues with binding.gyp
       - name: Use Python 3.8
@@ -72,14 +72,22 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' }}
         run: npm install --global gulp
       - name: Install global dependencies
-        run: npm install --global node-gyp
+        run: npm install --global node-gyp vsce
       - name: Install project dependencies
         run: npm install
 
       - name: Check for linting errors
         run: gulp tslint
       - name: Build and pack extension
-        run: node build/package.js
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: |
+            export NODE_OPTIONS="--no-experimental-fetch"
+            node build/package.js
+      - name: Build and pack extension
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+            $env:NODE_OPTIONS="--no-experimental-fetch"
+            node build/package.js
       - name: Publish extension VSIX as artifact
         uses: actions/upload-artifact@v2
         with:
