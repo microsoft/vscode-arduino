@@ -1,8 +1,8 @@
 {
   "name": "vscode-arduino",
-  "displayName": "Arduino",
-  "description": "Arduino for Visual Studio Code",
-  "version": "0.6.0",
+  "displayName": "Arduino (deprecated)",
+  "description": "Arduino for Visual Studio Code. This extension is deprecated and no longer maintained.",
+  "version": "0.7.0",
   "publisher": "vsciot-vscode",
   "preview": true,
   "engines": {
@@ -344,6 +344,7 @@
     "@types/winreg": "^1.2.30",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
+    "@vscode/vsce": "^2.16.0",
     "acorn": "^7.4.0",
     "ajv": "^6.12.3",
     "babel-loader": "^8.2.2",
@@ -365,7 +366,7 @@
     "gulp-typescript": "^5.0.1",
     "minimist": "^1.2.6",
     "mocha": "^6.2.3",
-    "node-gyp": "^6.1.0",
+    "node-gyp": "^8.4.0",
     "plugin-error": "^1.0.1",
     "tslint": "^5.20.1",
     "typemoq": "^1.6.0",
