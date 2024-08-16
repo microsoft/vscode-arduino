@@ -29,10 +29,10 @@ jobs:
       # written, but it should be updated when VS Code updates its Node version.
       # Node needs to be installed before OS-specific setup so that we can run
       # the hash verification script.
-      - name: Use Node 20.x
+      - name: Use Node 18.x
         uses: actions/setup-node@v2
         with:
-          node-version: 20.x
+          node-version: 18.x
 
       # On new macos-latest machines, Python 3.9+ is used, and it's causing issues with binding.gyp
       - name: Use Python 3.8
