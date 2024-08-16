@@ -30,6 +30,8 @@ jobs:
     displayName: Use Node 18.x
     inputs:
       versionSpec: 18.x
+  - script: npm install -g windows-build-tools
+    displayName: Install Windows build tools
   - ${{ if parameters.prerelease }}:
     - pwsh: node -e "p=require('./package.json');p.version=p.version.replace(/\.\d+$/,'.'+$(Build.BuildNumber));require('fs').writeFileSync('./package.json',JSON.stringify(p,undefined,2))"
   - script: npm install --global gulp node-gyp @vscode/vsce

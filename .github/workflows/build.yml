@@ -41,6 +41,10 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Install Windows Tools
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: npm install -g windows-build-tools
+
       - name: Windows setup
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
