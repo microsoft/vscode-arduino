@@ -365,7 +365,7 @@
     "gulp-typescript": "^5.0.1",
     "minimist": "^1.2.6",
     "mocha": "^6.2.3",
-    "node-gyp": "^8.4.0",
+    "node-gyp": "^6.1.0",
     "plugin-error": "^1.0.1",
     "tslint": "^5.20.1",
     "typemoq": "^1.6.0",
@@ -396,8 +396,7 @@
     "node-sass": "^7.0.0",
     "es5-ext": "0.10.53",
     "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz",
-    "semver": "~7.5.2",
-    "source-map": "~0.8.0-beta.0"
+    "semver": "~7.5.2"
   },
   "vsce": {
     "ignoreFile": "out/.vscodeignore"

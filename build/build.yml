@@ -27,9 +27,9 @@ jobs:
       zipSources: false
     condition: ne(variables['Build.Reason'], 'PullRequest')
   - task: NodeTool@0
-    displayName: Use Node 18.x
+    displayName: Use Node 16.x
     inputs:
-      versionSpec: 18.x
+      versionSpec: 16.x
   - ${{ if parameters.prerelease }}:
     - pwsh: node -e "p=require('./package.json');p.version=p.version.replace(/\.\d+$/,'.'+$(Build.BuildNumber));require('fs').writeFileSync('./package.json',JSON.stringify(p,undefined,2))"
   - script: npm install --global gulp node-gyp @vscode/vsce

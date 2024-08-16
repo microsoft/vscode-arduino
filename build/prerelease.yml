@@ -54,9 +54,9 @@ extends:
         - download: current
           artifact: extension-vsixes
         - task: NodeTool@0
-          displayName: Use Node 18.x
+          displayName: Use Node 16.x
           inputs:
-            versionSpec: 18.x
+            versionSpec: 16.x
         - script: npm install --global @vscode/vsce
           displayName: Install vsce
         - script: for f in $(Pipeline.Workspace)/extension-vsixes/*.vsix; do vsce publish --packagePath $f; done
