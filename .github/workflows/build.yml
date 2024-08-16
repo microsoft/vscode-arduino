@@ -30,17 +30,9 @@ jobs:
       # Node needs to be installed before OS-specific setup so that we can run
       # the hash verification script.
       - name: Use Node 18.x
-        if: ${{ matrix.os != 'windows-latest' }}
         uses: actions/setup-node@v2
         with:
           node-version: 18.x
-
-      - name: Install Node
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: |
-          winget install Schniz.fnm
-          fnm env --use-on-cd | Out-String | Invoke-Expression
-          fnm use --install-if-missing 18
           
       # On new macos-latest machines, Python 3.9+ is used, and it's causing issues with binding.gyp
       - name: Use Python 3.8
