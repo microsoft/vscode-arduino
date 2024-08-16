@@ -344,6 +344,7 @@
     "@types/winreg": "^1.2.30",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
+    "@vscode/vsce": "^2.16.0",
     "acorn": "^7.4.0",
     "ajv": "^6.12.3",
     "babel-loader": "^8.2.2",
@@ -396,7 +397,8 @@
     "node-sass": "^7.0.0",
     "es5-ext": "0.10.53",
     "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz",
-    "semver": "~7.5.2"
+    "semver": "~7.5.2",
+    "undici": "~5.28.4"
   },
   "vsce": {
     "ignoreFile": "out/.vscodeignore"

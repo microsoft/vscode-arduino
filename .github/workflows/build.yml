@@ -72,7 +72,7 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' }}
         run: npm install --global gulp
       - name: Install global dependencies
-        run: npm install --global node-gyp vsce
+        run: npm install --global node-gyp
       - name: Install project dependencies
         run: npm install
 
