@@ -30,8 +30,10 @@ jobs:
     displayName: Use Node 18.x
     inputs:
       versionSpec: 18.x
-  - script: python3 -m pip install setuptools wheel
-    displayName: Install Python dependencies
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.8
+    inputs:
+      versionSpec: 3.8
   - ${{ if parameters.prerelease }}:
     - pwsh: node -e "p=require('./package.json');p.version=p.version.replace(/\.\d+$/,'.'+$(Build.BuildNumber));require('fs').writeFileSync('./package.json',JSON.stringify(p,undefined,2))"
   - script: npm install --global gulp node-gyp @vscode/vsce
