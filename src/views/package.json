@@ -42,7 +42,7 @@
     "async": "~3.2.3",
     "node-sass": "^7.0.0",
     "es5-ext": "0.10.53",
-    "source-map": "^0.7.4",
+    "source-map": "^0.8.0-beta.0",
     "string_decoder": "https://github.com/microsoft/vscode-arduino/releases/download/v0.4.12-rc2/string_decoder-10.0.0.tgz"
   }
 }
