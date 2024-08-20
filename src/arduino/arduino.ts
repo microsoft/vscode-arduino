@@ -876,9 +876,14 @@ export class ArduinoApp {
                   stderr?: (s: string) => void},
     ): Thenable<object> {
         const additionalUrls = this.getAdditionalUrls();
+        args = args.concat(["--additional-urls", additionalUrls.join(",")])
+        const verbose = VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose;
+        if(verbose) {
+            arduinoChannel.channel.appendLine([this._settings.commandPath, ...args].join(" "));
+        }
         return util.spawn(
             this._settings.commandPath,
-            args.concat(["--additional-urls", additionalUrls.join(",")]),
+            args,
             options,
             output);
     }
