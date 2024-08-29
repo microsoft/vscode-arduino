@@ -372,7 +372,7 @@
     "typemoq": "^1.6.0",
     "typescript": "^3.7.5",
     "vscode-test": "^1.4.0",
-    "webpack": "^4.44.1"
+    "webpack": "^5.94.0"
   },
   "dependencies": {
     "@microsoft/vscode-serial-monitor-api": "^0.1.5",
