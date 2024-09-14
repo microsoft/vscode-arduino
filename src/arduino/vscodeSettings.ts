@@ -20,11 +20,13 @@ const configKeys = {
     DISABLE_INTELLISENSE_AUTO_GEN: "arduino.disableIntelliSenseAutoGen",
     ANALYZE_ON_OPEN: "arduino.analyzeOnOpen",
     ANALYZE_ON_SETTING_CHANGE: "arduino.analyzeOnSettingChange",
+    ADDITIONAL_CLI_ARGUMENTS: "arduino.additionalCliArguments",
 };
 
 export interface IVscodeSettings {
     arduinoPath: string;
     commandPath: string;
+    additionalCliArguments: string[];
     additionalUrls: string[];
     logLevel: string;
     clearOutputOnBuild: boolean;
@@ -69,6 +71,10 @@ export class VscodeSettings implements IVscodeSettings {
 
     public setCommandPath(value: string): Promise<void> {
         return this.setConfigValue(configKeys.ARDUINO_COMMAND_PATH, value, true);
+    }
+
+    public get additionalCliArguments(): string[] {
+        return this.getConfigValue<string[]>(configKeys.ADDITIONAL_CLI_ARGUMENTS);
     }
 
     public get additionalUrls(): string[] {
