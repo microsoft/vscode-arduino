@@ -10,7 +10,7 @@ import * as vscode from "vscode";
 import * as constants from "./common/constants";
 const arduinoContentProviderModule =
     impor("./arduino/arduinoContentProvider") as typeof import ("./arduino/arduinoContentProvider");
-import { IBoard } from "./arduino/package";
+import { IBoard, IProgrammer } from "./arduino/package";
 import { VscodeSettings } from "./arduino/vscodeSettings";
 const arduinoActivatorModule = impor("./arduinoActivator") as typeof import ("./arduinoActivator");
 const arduinoContextModule = impor("./arduinoContext") as typeof import ("./arduinoContext");
@@ -26,6 +26,7 @@ const completionProviderModule = impor("./langService/completionProvider") as ty
 import { BuildMode } from "./arduino/arduino";
 import * as Logger from "./logger/logger";
 import { SerialMonitor } from "./serialmonitor/serialMonitor";
+import { ArduinoContentProvider } from "./arduino/arduinoContentProvider";
 const usbDetectorModule = impor("./serialmonitor/usbDetector") as typeof import ("./serialmonitor/usbDetector");
 
 export function showDeprecatedPopup(): void {
@@ -376,9 +377,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }
     Logger.traceUserData("end-activate-extension", { correlationId: activeGuid });
 
+    // Makes the provider available to the programmatic api
+    const provider: {
+        arduinoManagerProvider?: ArduinoContentProvider,
+    } = {};
+
     setTimeout(async () => {
         const arduinoManagerProvider = new arduinoContentProviderModule.ArduinoContentProvider(context.extensionPath);
         await arduinoManagerProvider.initialize();
+
+        provider.arduinoManagerProvider = arduinoManagerProvider;
 
         context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(ARDUINO_MANAGER_PROTOCOL, arduinoManagerProvider));
         registerArduinoCommand("arduino.showBoardManager", async () => {
@@ -440,6 +448,48 @@ export async function activate(context: vscode.ExtensionContext) {
         usbDetectorModule.UsbDetector.getInstance().initialize(context);
         usbDetectorModule.UsbDetector.getInstance().startListening();
     }, 200);
+
+    return {
+        getCurrentBoard() {
+            return arduinoContextModule.default.boardManager.currentBoard;
+        },
+        getBoardTypes() {
+            return arduinoContextModule.default.boardManager.listBoards();
+        },
+        changeBoardType(board: IBoard) {
+            arduinoContextModule.default.boardManager.doChangeBoardType(board);
+            provider.arduinoManagerProvider.update(LIBRARY_MANAGER_URI);
+            provider.arduinoManagerProvider.update(EXAMPLES_URI);
+            return { board: arduinoContextModule.default.boardManager.currentBoard };
+        },
+        installBoard: async (packageName: string, arch: string = "", version: string = "", showOutput: boolean = true) => {
+            await arduinoContextModule.default.arduinoApp.installBoard(packageName, arch, version, showOutput)
+        },
+        getCurrentProgrammer() {
+            return deviceContext.programmer;
+        },
+        getAvailableProgrammers(board: IBoard) {
+            return arduinoContextModule.default.arduinoApp.programmerManager.getAvailableProgrammers(board)
+        },
+        selectProgrammer(programmer: IProgrammer) {
+            if (!arduinoContextModule.default.arduinoApp.building) {
+                try {
+                    arduinoContextModule.default.arduinoApp.programmerManager.setProgrammerValue(programmer.name);
+                    deviceContext.programmer = arduinoContextModule.default.arduinoApp.programmerManager.currentProgrammer;
+                    return true;
+                } catch (ex) {
+                    return false;
+                }
+            }
+        },
+        selectSketch(relativeSketchPath: string) {
+            deviceContext.sketch = relativeSketchPath;
+            deviceContext.showStatusBar();
+        },
+        setOutput(relativeOutputPath: string) {
+            deviceContext.output = relativeOutputPath;
+        }
+    }
 }
 
 export async function deactivate() {
